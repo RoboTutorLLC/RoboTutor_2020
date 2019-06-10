@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -12,6 +13,7 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -122,6 +124,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject{
     protected String level;
     protected String task;
 
+    protected LocalBroadcastManager bManager;
 
     public CAk_Component(Context context) {
         super(context);
@@ -273,6 +276,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject{
 
         setWillNotDraw(false);
 
+        bManager = LocalBroadcastManager.getInstance(mContext);
 
 
     }
@@ -543,6 +547,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject{
     };
 
 
+    private boolean isPaused = false;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
@@ -563,6 +568,19 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject{
         }
         if(event.getAction()==MotionEvent.ACTION_UP)
         {
+
+            if (!isPaused) {
+                Intent msg = new Intent(TCONST.INTERVENTION_1);
+                Log.d("INTERVENTION", "Sending intervention.");
+                bManager.sendBroadcast(msg);
+                isPaused = true;
+            } else {
+                Intent msg = new Intent(TCONST.HIDE_INTERVENTION);
+                Log.d("INTERVENTION", "Sending intervention.");
+                bManager.sendBroadcast(msg);
+                isPaused = false;
+            }
+            
             return true;
         }
 

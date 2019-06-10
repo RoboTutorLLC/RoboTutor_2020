@@ -17,6 +17,15 @@ public class QuickDebugTutorList {
 
 
     static {
+        QuickDebugTutor interventionAkira = new QuickDebugTutor(
+                "akira",
+                "akira:0..9.by.1.asc",
+                "[file]akira_0..9.by.1.asc.json"
+        );
+        interventionAkira.setComment("Testing intervention in Akira");
+        toFixBugMap.put("intervention_akira", interventionAkira);
+    }
+    static {
         QuickDebugTutor bug1 = new QuickDebugTutor(
           "write.num",
                 "write.num:WR-100s.8",
