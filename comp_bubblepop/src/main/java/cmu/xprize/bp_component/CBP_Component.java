@@ -19,6 +19,7 @@
 package cmu.xprize.bp_component;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -42,6 +43,7 @@ import cmu.xprize.util.CEvent;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -49,7 +51,7 @@ import cmu.xprize.util.TCONST;
 import java.util.*;
 
 
-public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject {
+public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject, IInterventionSource {
 
     // Make this public and static so sub-components may use it during json load to instantiate
     // controls on the fly.
@@ -77,6 +79,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
     private final Handler           mainHandler = new Handler(Looper.getMainLooper());
     private HashMap                 queueMap    = new HashMap();
+    private HashMap                 nameMap    = new HashMap();
     private boolean                 _qDisabled  = false;
 
     protected LocalBroadcastManager   bManager;
@@ -194,6 +197,25 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         // Allow onDraw to be called to start animations
         //
         setWillNotDraw(false);
+    }
+
+
+    private boolean isPaused = false;
+
+    // JUDITH mimic here
+    // JUDITH move to better location
+    public void doIntervention() {
+        if (!isPaused) {
+            Intent msg = new Intent(TCONST.INTERVENTION_1);
+            Log.d("INTERVENTION", "Sending intervention.");
+            bManager.sendBroadcast(msg);
+            isPaused = true;
+        } else {
+            Intent msg = new Intent(TCONST.HIDE_INTERVENTION);
+            Log.d("INTERVENTION", "Sending intervention.");
+            bManager.sendBroadcast(msg);
+            isPaused = false;
+        }
     }
 
 
@@ -547,6 +569,19 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     }
 
 
+    @Override
+    public void triggerIntervention(String type) {
+
+        Intent msg = new Intent(TCONST.INTERVENTION_1);
+        bManager.sendBroadcast(msg);
+        // pause...
+        // JUDITH NEXT: test this out... will it trigger?
+        // JUDITH NEXT: must add TIntervention to bpop.xml
+    }
+
+    public void triggerHesitationTimer() {
+
+    }
 
     //************************************************************************
     //************************************************************************
@@ -611,10 +646,21 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     public class Queue implements Runnable {
 
         protected String _command;
+        protected String _name; // used to find a command and cancel it.
         protected Object _target;
 
         public Queue(String command) {
             _command = command;
+        }
+
+        // needed for cancelling
+        public Queue (String name, String command) {
+            this._name = name;
+            this._command = command;
+
+            if (name != null) {
+                nameMap.put(name, this);
+            }
         }
 
         public Queue(String command, Object target) {
@@ -631,11 +677,24 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         public void run() {
 
             try {
+
+                if (_name != null) {
+                    nameMap.remove(_name);
+                }
+
                 queueMap.remove(this);
 
-                if(_mechanics != null) {
-                    _mechanics.execCommand(_command, _target);
+                switch(_command) {
+                    case "TRIGGER_INTERVENTION":
+                        triggerIntervention(null);
+                        break;
+
+                    default:
+                        if(_mechanics != null) {
+                            _mechanics.execCommand(_command, _target);
+                        }
                 }
+
             }
             catch(Exception e) {
                 CErrorManager.logEvent(TAG, "Run Error: cmd:" + _command + " tar: " + _target + "  >", e, false);
@@ -712,6 +771,10 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         enQueue(new Queue(command), delay);
     }
 
+
+    public void postNamed(String name, String command, Long delay) {
+        enQueue(new Queue(name, command), delay);
+    }
 
     /**
      * Post a command and target to this scenegraph queue

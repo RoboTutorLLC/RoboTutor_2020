@@ -17,7 +17,7 @@ import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
  * Created by kevindeland on 6/10/19.
  */
 
-public class TIntervention extends CIntervention implements ITutorObject, View.OnClickListener {
+public class TIntervention extends CIntervention implements ITutorObject  {
     public TIntervention(Context context) {
         super(context);
     }
@@ -31,12 +31,6 @@ public class TIntervention extends CIntervention implements ITutorObject, View.O
     }
 
     // JUDITH load thing
-
-
-    @Override
-    public void onClick(View view) {
-
-    }
 
     @Override
     public void init(Context context, AttributeSet attrs) {

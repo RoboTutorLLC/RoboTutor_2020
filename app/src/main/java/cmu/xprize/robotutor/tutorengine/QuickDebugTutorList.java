@@ -24,6 +24,14 @@ public class QuickDebugTutorList {
         );
         interventionAkira.setComment("Testing intervention in Akira");
         toFixBugMap.put("intervention_akira", interventionAkira);
+
+        QuickDebugTutor interventionBpop = new QuickDebugTutor(
+                "bpop.ltr.lc",
+                "bpop.ltr.lc:A..Z.all.asc.all.stat.show.126.json",
+                "[file]bpop.ltr.lc_A..Z.all.asc.all.stat.show.126.json"
+        );
+        interventionBpop.setComment("Testing intervention in Bpop");
+        toFixBugMap.put("intervention_bpop", interventionBpop);
     }
     static {
         QuickDebugTutor bug1 = new QuickDebugTutor(

@@ -167,6 +167,7 @@
         // Here we manage the Stimulus display.
         // We are either going to Speak the Stimulus / Show the Stimulus / Both or Neither -
 
+        // JUDITH trigger the hesitation here...
         "UPDATESTIMULUS": {
           "type": "MODULE",
           "reuse":true,
@@ -205,6 +206,8 @@
             //            {"type": "COMMAND", "id": "SBubblePop", "method": "setVolatileBehavior", "parms": "STIMULUS_SHOWN:String|NEXTNODE:String" , "features":"FTR_SHOW&FTR_SAY&FTR_LETTERS"},
 
 
+            // JUDITH trigger the hesitation here...
+            {"name":"SET TIMED HESITATION PROMPT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "postNamed", "parms": "HESITATION_PROMPT:String|TRIGGER_INTERVENTION:String|6000:Long", "features":""},
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent",           "parms": "SHOW_BUBBLES:String"              ,"features":""}
 
           ]
