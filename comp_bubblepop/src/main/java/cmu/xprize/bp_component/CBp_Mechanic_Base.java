@@ -519,7 +519,10 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
     @Override
     public void onClick(View view) {
 
+        Log.v("event.thing", "This is a Click");
         Log.v(QGRAPH_MSG, "event.click: " + " CBp_Mechanic_Base: bubble touch");
+        // JUDITH_BPOP here is where the hesitation timer should be reset
+        mComponent.resetHesitationTimer();
 
         CBubble bubble = (CBubble)view;
 
@@ -581,6 +584,8 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
 
 
     public boolean onTouch(View view, MotionEvent event) {
+
+        Log.v("event.thing", "This is a Touch");
         PointF touchPt;
         long   delta;
         final int action = event.getAction();

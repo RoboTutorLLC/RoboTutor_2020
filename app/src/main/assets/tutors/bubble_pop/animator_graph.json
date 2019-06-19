@@ -207,7 +207,7 @@
 
 
             // JUDITH trigger the hesitation here...
-            {"name":"SET TIMED HESITATION PROMPT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "postNamed", "parms": "HESITATION_PROMPT:String|TRIGGER_INTERVENTION:String|6000:Long", "features":""},
+            {"name":"SET TIMED HESITATION PROMPT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "triggerHesitationTimer", "parms": "", "features":""},
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent",           "parms": "SHOW_BUBBLES:String"              ,"features":""}
 
           ]

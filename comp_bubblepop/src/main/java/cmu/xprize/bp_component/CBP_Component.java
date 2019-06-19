@@ -579,8 +579,19 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         // JUDITH NEXT: must add TIntervention to bpop.xml
     }
 
-    public void triggerHesitationTimer() {
+    public void resetHesitationTimer() {
+        Log.v("event.thing", "resetting hesitation timer");
+        cancelHesitationTimer();
+        triggerHesitationTimer();
+    }
 
+    public void cancelHesitationTimer() {
+        Log.v("event.thing", "cancelling hesitation timer");
+        cancelPost("HESITATION_PROMPT");
+    }
+    public void triggerHesitationTimer() {
+        Log.v("event.thing", "triggering hesitation timer");
+        postNamed("HESITATION_PROMPT", "TRIGGER_INTERVENTION", 6000L);
     }
 
     //************************************************************************
@@ -687,6 +698,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 switch(_command) {
                     case "TRIGGER_INTERVENTION":
                         triggerIntervention(null);
+                        // JUDITH_BPOP what about cancelling???
                         break;
 
                     default:
@@ -733,6 +745,24 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
             mainHandler.removeCallbacks((Queue)(entry.getValue()));
         }
     }
+
+    /**
+     * Remove named posts
+     *
+     */
+    public void cancelPost(String name) {
+
+        Log.d(TAG, "Cancel Post Requested: " + name);
+
+        while(nameMap.containsKey(name)) {
+
+            Log.d(TAG, "Post Cancelled: " + name);
+
+            mainHandler.removeCallbacks((Queue) (nameMap.get(name)));
+            nameMap.remove(name); // JUDITH replicate
+        }
+    }
+
 
 
     /**
