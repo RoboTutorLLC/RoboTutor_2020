@@ -9,10 +9,33 @@
 
     <!-- in Relative layout - views have to be defined before being referenced -->
 
-   <ImageView
-       android:id="@+id/SInterventionImage"
-       android:visibility="gone"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent" />
+    <LinearLayout
+        android:id="@+id/SInterventionContainer"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/topBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/exitButton"
+                android:text="EXIT"
+                android:background="@android:color/holo_red_light"
+                android:textColor="@android:color/white"
+                android:textSize="30sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/SInterventionImage"
+            android:layout_below="@id/topBanner"
+            android:layout_width="700sp"
+            android:layout_height="500sp" />
+    </LinearLayout>
+
 
 </RelativeLayout>

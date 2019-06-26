@@ -18,8 +18,10 @@
 
 package cmu.xprize.bp_component;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.os.Handler;
@@ -49,6 +51,12 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import java.util.*;
+
+import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
+import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
+import static cmu.xprize.util.TCONST.INTERVENTION_1;
+import static cmu.xprize.util.TCONST.INTERVENTION_2;
+import static cmu.xprize.util.TCONST.INTERVENTION_3;
 
 
 public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject, IInterventionSource {
@@ -83,7 +91,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     private boolean                 _qDisabled  = false;
 
     protected LocalBroadcastManager   bManager;
-
+    protected BroadcastReceiver       bReceiver;
 
     // Working data sets
     //
@@ -193,6 +201,9 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         // Capture the local broadcast manager
         //
         bManager = LocalBroadcastManager.getInstance(mContext);
+        bReceiver = new ChangeReceiver();
+        IntentFilter filter = new IntentFilter(EXIT_FROM_INTERVENTION);
+        bManager.registerReceiver(bReceiver, filter);
 
         // Allow onDraw to be called to start animations
         //
@@ -572,10 +583,11 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     @Override
     public void triggerIntervention(String type) {
 
+        Log.v("event.thing", "triggering intervention");
         Intent msg = new Intent(TCONST.INTERVENTION_1);
         bManager.sendBroadcast(msg);
         // pause...
-        // JUDITH NEXT: test this out... will it trigger?
+        // JUDITH NEXT: test this out... will it trigger? IT DID!!!
         // JUDITH NEXT: must add TIntervention to bpop.xml
     }
 
@@ -592,6 +604,21 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     public void triggerHesitationTimer() {
         Log.v("event.thing", "triggering hesitation timer");
         postNamed("HESITATION_PROMPT", "TRIGGER_INTERVENTION", 6000L);
+    }
+
+    class ChangeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("INTERVENTION", "Received broadcast.");
+
+            switch(intent.getAction()) {
+                case EXIT_FROM_INTERVENTION:
+                    Log.d("event.thing", "intervention was exited");
+                    triggerHesitationTimer();
+                    break;
+            }
+        }
     }
 
     //************************************************************************

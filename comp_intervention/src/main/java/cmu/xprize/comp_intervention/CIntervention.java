@@ -8,7 +8,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.io.FileNotFoundException;
@@ -17,6 +19,7 @@ import cmu.xprize.util.ImageLoader;
 import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
+import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
 import static cmu.xprize.util.TCONST.INTERVENTION_1;
 import static cmu.xprize.util.TCONST.INTERVENTION_2;
@@ -32,7 +35,10 @@ public class CIntervention extends RelativeLayout {
 
     public Context  mContext;
 
+    private LinearLayout interventionContainer;
     private ImageView interventionImage;
+
+    private Button exitIntervention;
 
     private LocalBroadcastManager bManager;
     private ChangeReceiver        bReceiver;
@@ -63,6 +69,10 @@ public class CIntervention extends RelativeLayout {
         mContext = context;
 
         interventionImage = findViewById(R.id.SInterventionImage);
+        interventionContainer = findViewById(R.id.SInterventionContainer);
+        exitIntervention = findViewById(R.id.exitButton);
+
+        exitIntervention.setOnClickListener(exitListener);
 
 
         bManager = LocalBroadcastManager.getInstance(getContext());
@@ -76,6 +86,16 @@ public class CIntervention extends RelativeLayout {
 
         bManager.registerReceiver(bReceiver, filter);
     }
+
+    private View.OnClickListener exitListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            hideIntervention();
+
+            Intent msg = new Intent(EXIT_FROM_INTERVENTION);
+            bManager.sendBroadcast(msg);
+        }
+    };
 
     class ChangeReceiver extends BroadcastReceiver {
 
@@ -113,7 +133,7 @@ public class CIntervention extends RelativeLayout {
                     .loadBitmap(imageRef)
                     .into(interventionImage);
 
-            interventionImage.setVisibility(View.VISIBLE);
+            interventionContainer.setVisibility(View.VISIBLE);
 
         } catch (FileNotFoundException e) {
             Log.e("INTERVENTION", "Image " + imageRef + " not found");
@@ -124,6 +144,6 @@ public class CIntervention extends RelativeLayout {
     private void hideIntervention() {
         Log.d("INTERVENTION", "Hiding intervention");
 
-        interventionImage.setVisibility(View.GONE);
+        interventionContainer.setVisibility(View.GONE);
     }
 }

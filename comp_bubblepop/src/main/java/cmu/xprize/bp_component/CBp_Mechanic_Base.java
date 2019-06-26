@@ -586,6 +586,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
     public boolean onTouch(View view, MotionEvent event) {
 
         Log.v("event.thing", "This is a Touch");
+        mComponent.resetHesitationTimer();
         PointF touchPt;
         long   delta;
         final int action = event.getAction();

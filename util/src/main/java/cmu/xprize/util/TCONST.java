@@ -536,7 +536,8 @@ public class TCONST {
     public static final String INTERVENTION_1 = "INTERVENTION_1";
     public static final String INTERVENTION_2 = "INTERVENTION_2";
     public static final String INTERVENTION_3 = "INTERVENTION_3";
-    public static final String HIDE_INTERVENTION = "HIDE_INTERVENTION";
+    public static final String HIDE_INTERVENTION = "HIDE_INTERVENTION"; // command TO iv
+    public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // command TO iv
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
 
     public static final String FTR_STORY_STARTING = "FTR_STORY_STARTING";
