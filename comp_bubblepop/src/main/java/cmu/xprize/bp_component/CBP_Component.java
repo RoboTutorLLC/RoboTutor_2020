@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
-import cmu.xprize.util.CEvent;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
@@ -50,13 +49,8 @@ import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
-import java.util.*;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
-import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
-import static cmu.xprize.util.TCONST.INTERVENTION_1;
-import static cmu.xprize.util.TCONST.INTERVENTION_2;
-import static cmu.xprize.util.TCONST.INTERVENTION_3;
 
 
 public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject, IInterventionSource {
@@ -82,8 +76,10 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     protected IBubbleMechanic       _mechanics;
 
     private   boolean               correct = false;
-    public int                      attempt_count;
+    protected int attemptsLeft;
     protected int                   correct_Count;
+
+    protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
 
     private final Handler           mainHandler = new Handler(Looper.getMainLooper());
     private HashMap                 queueMap    = new HashMap();
@@ -354,10 +350,10 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 question_count--;
                 question_Index++;
                 logQuestionIndex++;
-                attempt_count = BP_CONST.MAX_ATTEMPT;
+                attemptsLeft = BP_CONST.MAX_ATTEMPT;
 
                 Log.d("BPOP", "question Count: " + question_count);
-                Log.d("BPOP", "attempt  Count: " + attempt_count);
+                Log.d("BPOP", "attempts  Left: " + attemptsLeft);
             } else {
                 CErrorManager.logEvent(TAG,  "Error no DataSource : ", null, false);
             }
@@ -592,19 +588,56 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         // JUDITH NEXT: must add TIntervention to bpop.xml
     }
 
+    /**
+     * Reset the timer that triggers the HESITATION intervention.
+     */
     public void resetHesitationTimer() {
         Log.v("event.thing", "resetting hesitation timer");
         cancelHesitationTimer();
         triggerHesitationTimer();
     }
 
+    /**
+     * Cancel the timer that triggers the HESITATION intervention.
+     */
     public void cancelHesitationTimer() {
         Log.v("event.thing", "cancelling hesitation timer");
         cancelPost("HESITATION_PROMPT");
     }
+
+    /**
+     * Trigger the timer that triggers the HESITATION intervention.
+     */
     public void triggerHesitationTimer() {
+        // why does this get triggered so easily???
         Log.v("event.thing", "triggering hesitation timer");
         postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_BPOP);
+    }
+
+
+    /**
+     * Reset the timer that triggers the STUCK intervention.
+     */
+    public void resetStuckTimer() {
+        Log.v("event.thing", "resetting stuck timer");
+        cancelStuckTimer();
+        triggerStuckTimer();
+    }
+
+    /**
+     * Cancel the timer that triggers the HESITATION intervention.
+     */
+    public void cancelStuckTimer() {
+        Log.v("event.thing", "cancelling stuck timer");
+        cancelPost("STUCK_TIMER");
+    }
+
+    /**
+     * Trigger the timer that triggers the HESITATION intervention.
+     */
+    public void triggerStuckTimer() {
+        Log.v("event.thing", "triggering stuck timer");
+        postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_BPOP);
     }
 
     class ChangeReceiver extends BroadcastReceiver {
@@ -616,7 +649,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
             switch(intent.getAction()) {
                 case EXIT_FROM_INTERVENTION:
                     Log.d("event.thing", "intervention was exited");
-                    triggerHesitationTimer();
+                    // triggerHesitationTimer(); // what is this doing here??? Exit Logic?
                     break;
             }
         }
@@ -731,6 +764,10 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                     case TCONST.I_TRIGGER_HESITATE:
                         triggerIntervention(TCONST.I_TRIGGER_HESITATE);
                         // JUDITH_BPOP what about cancelling???
+                        break;
+
+                    case TCONST.I_TRIGGER_STUCK:
+                        triggerIntervention(TCONST.I_TRIGGER_STUCK);
                         break;
 
 

@@ -548,6 +548,7 @@ public class TCONST {
 
     // CONSTANTS
     public static final Long HESITATE_TIME_BPOP = 10000L;
+    public static final Long STUCK_TIME_BPOP = 10000L;
 
     public static final String FTR_STORY_STARTING = "FTR_STORY_STARTING";
 

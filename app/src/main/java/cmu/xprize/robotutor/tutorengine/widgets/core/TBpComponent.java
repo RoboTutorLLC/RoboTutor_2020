@@ -38,7 +38,6 @@ import cmu.xprize.bp_component.BP_CONST;
 import cmu.xprize.bp_component.CBP_Component;
 import cmu.xprize.bp_component.CBp_Data;
 import cmu.xprize.bp_component.CBubble;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import cmu.xprize.bp_component.CBubbleStimulus;
 import cmu.xprize.comp_logging.ITutorLogger;
@@ -308,6 +307,9 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
 
     public void next() {
+
+        // reset stuck for this new problem
+        resetStuckTimer();
 
         // If wrong reset ALLCORRECT
         //
@@ -808,13 +810,20 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
             Log.d("BPOP", "Correct" );
 
             correct_Count++;
+            wrongFirstAttempts = 0;
 
         } else {
             publishFeature(TCONST.GENERIC_WRONG);
             Log.d("BPOP", "Wrong" );
-            attempt_count--;
+            attemptsLeft--;
 
-            if(attempt_count <= 0) {
+            // look for three first attempt failures in a row
+            wrongFirstAttempts++;
+            if (wrongFirstAttempts == 3) {
+                triggerIntervention(TCONST.I_TRIGGER_FAILURE);
+            }
+
+            if(attemptsLeft <= 0) {
                 publishFeature(TCONST.LAST_ATTEMPT);
 
                 Log.d("BPOP", "Publish Last Attempt" );
@@ -822,7 +831,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
         }
 
         Log.d("BPOP", "Publish correct Count: " + correct_Count);
-        Log.d("BPOP", "Publish attempt Count: " + attempt_count);
+        Log.d("BPOP", "Publish attempt Count: " + attemptsLeft);
 
         trackAndLogPerformance(bubble);
 
