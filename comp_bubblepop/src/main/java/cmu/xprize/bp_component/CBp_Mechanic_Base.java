@@ -22,12 +22,14 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.Intent;
+import android.gesture.Gesture;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
@@ -42,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import cmu.xprize.util.CAnimatorUtil;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
@@ -78,6 +81,9 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
 
     private LocalBroadcastManager         bManager;
 
+    private GestureDetector mDetector;
+    private IInterventionSource iIntervention;
+
     private String          mProblemType;
 
     static final String TAG = "CBp_Mechanic_Base";
@@ -92,6 +98,8 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         // Capture the local broadcast manager
         bManager = LocalBroadcastManager.getInstance(mContext);
         mParent.setOnTouchListener(this);
+
+        mDetector = new GestureDetector(mContext, new BpopGestureListener());
     }
 
     @Override
@@ -522,7 +530,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         Log.v("event.thing", "This is a Click");
         Log.v(QGRAPH_MSG, "event.click: " + " CBp_Mechanic_Base: bubble touch");
         // JUDITH_BPOP here is where the hesitation timer should be reset
-        mComponent.resetHesitationTimer();
+        //mComponent.resetHesitationTimer();  // TRIGGER_BPOP - hesitate - there should only be one of these
 
         CBubble bubble = (CBubble)view;
 
@@ -583,13 +591,19 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
     }
 
 
+    // TRIGGER_BPOP - gesture - onTouch
     public boolean onTouch(View view, MotionEvent event) {
 
-        Log.v("event.thing", "This is a Touch");
-        mComponent.resetHesitationTimer();
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            Log.v("event.thing", "This is a Touch");
+            mComponent.resetHesitationTimer(); // TRIGGER_BPOP - hesitate - there should only be one of these
+        }
         PointF touchPt;
         long   delta;
         final int action = event.getAction();
+
+        boolean gestureResult = mDetector.onTouchEvent(event);
 
         // TODO: switch back to setting onTouchListener
         if(_enabled) {
@@ -711,6 +725,69 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         }
 
         return rand;
+    }
+
+    public void setInterventionSource(IInterventionSource iIntervention) {
+        this.iIntervention = iIntervention;
+    }
+
+    /**
+     * TRIGGER_BPOP - gesture - listener
+     */
+    private class BpopGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d("GESTURE","onDown: ");
+
+            // don't return false here or else none of the other
+            // gestures will work
+            return true;
+        }
+
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Log.i("GESTURE", "onSingleTapConfirmed: ");
+
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i("GESTURE", "onLongPress: ");
+
+            // TRIGGER_BPOP - gesture - count 1
+            iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Log.i("GESTURE", "onDoubleTap: ");
+
+
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
+            Log.i("GESTURE", "onScroll: ");
+
+
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d("GESTURE", "onFling: ");
+
+            // TRIGGER_BPOP - gesture - count 1
+            iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+
+            return true;
+        }
     }
 
 

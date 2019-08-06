@@ -395,6 +395,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 break;
         }
 
+        _mechanics.setInterventionSource(this);
         _mechanics.populateView(_currData);
 
         requestLayout();
@@ -583,8 +584,8 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     @Override
     public void triggerIntervention(String type) {
 
-        Log.v("event.thing", "triggering intervention");
-        Intent msg = new Intent(TCONST.INTERVENTION_1);
+        Log.v("event.thing", "triggering intervention: " + type);
+        Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
         // pause...
         // JUDITH NEXT: test this out... will it trigger? IT DID!!!
@@ -603,7 +604,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     }
     public void triggerHesitationTimer() {
         Log.v("event.thing", "triggering hesitation timer");
-        postNamed("HESITATION_PROMPT", "TRIGGER_INTERVENTION", 6000L);
+        postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_BPOP);
     }
 
     class ChangeReceiver extends BroadcastReceiver {
@@ -723,10 +724,15 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 queueMap.remove(this);
 
                 switch(_command) {
-                    case "TRIGGER_INTERVENTION":
-                        triggerIntervention(null);
+                    case TCONST.I_TRIGGER_GESTURE:
+                        triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+                        break;
+
+                    case TCONST.I_TRIGGER_HESITATE:
+                        triggerIntervention(TCONST.I_TRIGGER_HESITATE);
                         // JUDITH_BPOP what about cancelling???
                         break;
+
 
                     default:
                         if(_mechanics != null) {

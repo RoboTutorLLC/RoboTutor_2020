@@ -536,9 +536,18 @@ public class TCONST {
     public static final String INTERVENTION_1 = "INTERVENTION_1";
     public static final String INTERVENTION_2 = "INTERVENTION_2";
     public static final String INTERVENTION_3 = "INTERVENTION_3";
+
+    public static final String I_TRIGGER_GESTURE = "GESTURE";
+    public static final String I_TRIGGER_STUCK = "STUCK";
+    public static final String I_TRIGGER_HESITATE = "HESITATE";
+    public static final String I_TRIGGER_FAILURE = "FAILURE";
+
     public static final String HIDE_INTERVENTION = "HIDE_INTERVENTION"; // command TO iv
-    public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // command TO iv
+    public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // command from iv
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
+
+    // CONSTANTS
+    public static final Long HESITATE_TIME_BPOP = 10000L;
 
     public static final String FTR_STORY_STARTING = "FTR_STORY_STARTING";
 

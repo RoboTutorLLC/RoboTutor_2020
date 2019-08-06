@@ -3,6 +3,8 @@ package cmu.xprize.bp_component;
 
 import android.graphics.Canvas;
 
+import cmu.xprize.util.IInterventionSource;
+
 public interface IBubbleMechanic {
 
     public void onDraw(Canvas canvas);
@@ -14,5 +16,7 @@ public interface IBubbleMechanic {
     public void populateView(CBp_Data data);
     public void doLayout(int width, int height, CBp_Data data);
     public void execCommand(String command, Object target );
+
+    void setInterventionSource(IInterventionSource source);
 
 }

@@ -24,6 +24,10 @@ import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
 import static cmu.xprize.util.TCONST.INTERVENTION_1;
 import static cmu.xprize.util.TCONST.INTERVENTION_2;
 import static cmu.xprize.util.TCONST.INTERVENTION_3;
+import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
+import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
+import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
+import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 
 /**
  * RoboTutor
@@ -80,6 +84,13 @@ public class CIntervention extends RelativeLayout {
         IntentFilter filter = new IntentFilter(INTERVENTION_1);
         filter.addAction(INTERVENTION_2);
         filter.addAction(INTERVENTION_3);
+
+        // actual triggers
+        filter.addAction(I_TRIGGER_GESTURE);
+        filter.addAction(I_TRIGGER_HESITATE);
+        filter.addAction(I_TRIGGER_STUCK);
+        filter.addAction(I_TRIGGER_FAILURE);
+
         filter.addAction(TCONST.HIDE_INTERVENTION);
 
         bReceiver = new ChangeReceiver();
@@ -103,7 +114,31 @@ public class CIntervention extends RelativeLayout {
         public void onReceive(Context context, Intent intent) {
             Log.d("INTERVENTION", "Received broadcast.");
 
+            // is true
+            boolean isModal = intent.getBooleanExtra("IS_MODAL", false);
+            if (!isModal) return;
+
             switch(intent.getAction()) {
+
+                case I_TRIGGER_HESITATE:
+                    Log.d("INTERVENTION", "Received HESITATE");
+                    displayImage(imgPath[0]);
+                    break;
+
+                case I_TRIGGER_GESTURE:
+                    Log.d("INTERVENTION", "Received GESTURE");
+                    displayImage(imgPath[1]);
+                    break;
+
+                case I_TRIGGER_STUCK:
+                    Log.d("INTERVENTION", "Received STUCK");
+                    displayImage(imgPath[2]);
+                    break;
+
+                case I_TRIGGER_FAILURE:
+                    Log.d("INTERVENTION", "Received FAILURE");
+                    displayImage(imgPath[2]);
+                    break;
 
                 case INTERVENTION_1:
                     displayImage(imgPath[0]);
@@ -124,6 +159,18 @@ public class CIntervention extends RelativeLayout {
         }
     }
 
+    /**
+     * Flash the Hand Raise thing in the top right corner
+     */
+    private void flashHandRaise() {
+        // how do i make the thing flash by ID without needing a dependency on the comp_banner component???
+        // broadcast???
+    }
+
+    /**
+     * Display an Image in the Intervention Modal
+     * @param imageRef
+     */
     private void displayImage(String imageRef) {
         Log.d("INTERVENTION", "Displaying image: " + imageRef);
 
