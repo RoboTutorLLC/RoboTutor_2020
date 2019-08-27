@@ -33,4 +33,9 @@
         android:layout_height="match_parent" />
 
 
+    <cmu.xprize.robotutor.tutorengine.widgets.core.TIntervention
+        android:id="@+id/SIntervention"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </cmu.xprize.robotutor.tutorengine.widgets.core.TScenePercentLayout>
