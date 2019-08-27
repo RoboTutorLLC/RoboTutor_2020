@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.FileNotFoundException;
 
@@ -43,6 +44,7 @@ public class CIntervention extends RelativeLayout {
     private ImageView interventionImage;
 
     private Button exitIntervention;
+    private TextView interventionLabel;
 
     private LocalBroadcastManager bManager;
     private ChangeReceiver        bReceiver;
@@ -77,6 +79,8 @@ public class CIntervention extends RelativeLayout {
         exitIntervention = findViewById(R.id.exitButton);
 
         exitIntervention.setOnClickListener(exitListener);
+
+        interventionLabel = findViewById(R.id.interventionLabel);
 
 
         bManager = LocalBroadcastManager.getInstance(getContext());
@@ -116,28 +120,32 @@ public class CIntervention extends RelativeLayout {
 
             // is true
             boolean isModal = intent.getBooleanExtra("IS_MODAL", false);
-            if (!isModal) return;
+            //if (!isModal) return;
 
             switch(intent.getAction()) {
 
                 case I_TRIGGER_HESITATE:
                     Log.d("INTERVENTION", "Received HESITATE");
                     displayImage(imgPath[0]);
+                    interventionLabel.setText("HESITATE");
                     break;
 
                 case I_TRIGGER_GESTURE:
                     Log.d("INTERVENTION", "Received GESTURE");
                     displayImage(imgPath[1]);
+                    interventionLabel.setText("GESTURE");
                     break;
 
                 case I_TRIGGER_STUCK:
                     Log.d("INTERVENTION", "Received STUCK");
                     displayImage(imgPath[2]);
+                    interventionLabel.setText("STUCK");
                     break;
 
                 case I_TRIGGER_FAILURE:
                     Log.d("INTERVENTION", "Received FAILURE");
                     displayImage(imgPath[2]);
+                    interventionLabel.setText("FAILURE");
                     break;
 
                 case INTERVENTION_1:
