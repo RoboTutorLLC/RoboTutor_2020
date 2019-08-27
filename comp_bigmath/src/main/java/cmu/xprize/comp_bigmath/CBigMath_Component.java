@@ -26,6 +26,7 @@ import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.util.IBehaviorManager;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPerformanceTracker;
 import cmu.xprize.util.IPublisher;

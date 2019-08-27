@@ -64,6 +64,7 @@ import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -81,7 +82,9 @@ import static cmu.xprize.util.TCONST.PAGEFLIP_BUTTON;
  *  settings will not work correctly.
  *
  */
-public class CWritingComponent extends PercentRelativeLayout implements IEventListener, IEventDispatcher, IWritingComponent, ILoadableObject, IPublisher, ITutorLogger {
+public class CWritingComponent extends PercentRelativeLayout implements IEventListener,
+        IEventDispatcher, IWritingComponent, ILoadableObject, IPublisher,
+        ITutorLogger, IInterventionSource {
 
     protected Context               mContext;
     protected char[]                mStimulusData;
@@ -2974,6 +2977,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 _dataEOI = true;        // tell the response that the data is exhausted
                 break;
         }
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
     }
 
     // Event Listener/Dispatcher - End
