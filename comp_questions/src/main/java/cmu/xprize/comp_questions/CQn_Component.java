@@ -19,9 +19,11 @@
 package cmu.xprize.comp_questions;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,6 +43,7 @@ import java.util.Map;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -58,7 +61,8 @@ import static cmu.xprize.util.TCONST.TYPE_AUDIO;
 /**
  *  The Reading Tutor Component
  */
-public class CQn_Component extends ViewAnimator implements IEventListener, IVManListener, IAsrEventListener, ILoadableObject, IPublisher {
+public class CQn_Component extends ViewAnimator implements IEventListener, IVManListener,
+        IAsrEventListener, ILoadableObject, IPublisher, IInterventionSource {
 
     private Context                 mContext;
 
@@ -95,6 +99,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
 
     protected boolean               _scrollVertical = false;
 
+    private LocalBroadcastManager _bManager;
 
     private Animation slide_left_to_right;
     private Animation slide_right_to_left;
@@ -143,6 +148,8 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         slide_top_down       = AnimationUtils.loadAnimation(mContext, R.anim.slide_top_down);
         slide_bottom_up      = AnimationUtils.loadAnimation(mContext, R.anim.slide_bottom_up);
         fade_out              = AnimationUtils.loadAnimation(mContext, R.anim.fade_out);
+
+        _bManager = LocalBroadcastManager.getInstance(getContext());
     }
 
 
@@ -820,6 +827,12 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     // Override...
     public void logPicMatchPerformance(boolean correct, int expected, int studentChoice, int page) {
 
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        _bManager.sendBroadcast(msg);
     }
 
     // IEventListener  -- End

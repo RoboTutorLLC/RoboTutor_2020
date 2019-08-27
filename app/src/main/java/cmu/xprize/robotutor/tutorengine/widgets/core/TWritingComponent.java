@@ -83,7 +83,8 @@ import static cmu.xprize.util.TCONST.MEDIA_STORY;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
 
-public class TWritingComponent extends CWritingComponent implements IBehaviorManager, ITutorSceneImpl, IDataSink, IEventSource, IPublisher, ITutorLogger {
+public class TWritingComponent extends CWritingComponent implements IBehaviorManager,
+        ITutorSceneImpl, IDataSink, IEventSource, IPublisher, ITutorLogger {
 
     private CTutor                  mTutor;
     private CSceneDelegate          mTutorScene;

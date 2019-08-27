@@ -24,6 +24,7 @@ import java.util.List;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -38,7 +39,8 @@ import static cmu.xprize.util.TCONST.TYPE_AUDIO;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class CSpelling_Component extends ConstraintLayout implements ILoadableObject, IPublisher, IEventListener {
+public class CSpelling_Component extends ConstraintLayout implements ILoadableObject, IPublisher,
+        IEventListener, IInterventionSource {
 
     //region Class Variables
 
@@ -475,6 +477,14 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     public void loadJSON(JSONObject jsonData, IScope scope) {
         JSON_Helper.parseSelf(jsonData, this, CClassMap.classMap, scope);
         _dataIndex = 0;
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+
+        Intent msg = new Intent(type);
+        _bManager.sendBroadcast(msg);
+
     }
 
     //endregion

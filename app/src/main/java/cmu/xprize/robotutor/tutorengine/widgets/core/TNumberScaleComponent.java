@@ -44,7 +44,8 @@ import static cmu.xprize.util.TCONST.QGRAPH_MSG;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class TNumberScaleComponent extends CNumberScale_Component implements ITutorObject, IDataSink, IPublisher, ITutorLogger, IBehaviorManager, IEventSource {
+public class TNumberScaleComponent extends CNumberScale_Component implements ITutorObject,
+        IDataSink, IPublisher, ITutorLogger, IBehaviorManager, IEventSource {
 
     private CTutor          mTutor;
     private CObjectDelegate mSceneObject;

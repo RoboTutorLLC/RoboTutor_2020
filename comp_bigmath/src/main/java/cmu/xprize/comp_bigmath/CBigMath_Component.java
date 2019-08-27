@@ -48,7 +48,8 @@ import static cmu.xprize.util.MathUtil.getTensDigit;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class CBigMath_Component extends RelativeLayout implements ILoadableObject, IBehaviorManager, IPublisher, IHesitationManager, IPerformanceTracker {
+public class CBigMath_Component extends RelativeLayout implements ILoadableObject, IBehaviorManager,
+        IPublisher, IHesitationManager, IPerformanceTracker, IInterventionSource {
 
     protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
     protected HashMap           queueMap     = new HashMap();
@@ -455,6 +456,12 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
     @Override
     public void trackAndLogPerformance(boolean correct, Object expected, Object actual) {
 
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
     }
 
     public class Queue implements Runnable {

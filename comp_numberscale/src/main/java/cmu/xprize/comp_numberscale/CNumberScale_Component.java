@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -34,7 +35,8 @@ import cmu.xprize.util.TCONST;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class CNumberScale_Component extends RelativeLayout implements ILoadableObject {
+public class CNumberScale_Component extends RelativeLayout implements
+        ILoadableObject, IInterventionSource {
 
 
     // Infrastructure
@@ -470,6 +472,12 @@ public class CNumberScale_Component extends RelativeLayout implements ILoadableO
 
     public void playTutor1(){
 
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
     }
 
     public class playTutor extends TimerTask {

@@ -19,9 +19,11 @@
 package cmu.xprize.rt_component;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +41,7 @@ import java.util.Map;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -56,7 +59,8 @@ import static cmu.xprize.util.TCONST.TYPE_AUDIO;
 /**
  *  The Reading Tutor Component
  */
-public class CRt_Component extends ViewAnimator implements IEventListener, IVManListener, IAsrEventListener, ILoadableObject, IPublisher {
+public class CRt_Component extends ViewAnimator implements IEventListener, IVManListener,
+        IAsrEventListener, ILoadableObject, IPublisher, IInterventionSource {
 
     private Context                 mContext;
 
@@ -99,6 +103,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     private Animation slide_bottom_up;
     private Animation slide_top_down;
 
+    private LocalBroadcastManager _bManager;
 
     // json loadable
     //
@@ -139,6 +144,8 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
         slide_right_to_left  = AnimationUtils.loadAnimation(mContext, R.anim.slide_right_to_left);
         slide_top_down       = AnimationUtils.loadAnimation(mContext, R.anim.slide_top_down);
         slide_bottom_up      = AnimationUtils.loadAnimation(mContext, R.anim.slide_bottom_up);
+
+        _bManager = LocalBroadcastManager.getInstance(getContext());
     }
 
 
@@ -676,6 +683,12 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
                 Log.e(TAG, "ERROR:node.queuedgraph,action:onevent");
             }
         }
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        _bManager.sendBroadcast(msg);
     }
 
     // IEventListener  -- End

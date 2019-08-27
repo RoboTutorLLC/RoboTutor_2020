@@ -23,6 +23,7 @@ import java.util.Random;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManagerInterface;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -64,7 +65,7 @@ import static cmu.xprize.util.TCONST.DEBUG_HESITATE;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class CNd_Component extends RelativeLayout implements ILoadableObject {
+public class CNd_Component extends RelativeLayout implements ILoadableObject, IInterventionSource {
 
 
     // ND_SCAFFOLD √√√ BEHAVIOR
@@ -704,6 +705,12 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject {
                 mainHandler.post(qCommand);
             }
         }
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        _bManager.sendBroadcast(msg);
     }
 
     public class Queue implements  Runnable {

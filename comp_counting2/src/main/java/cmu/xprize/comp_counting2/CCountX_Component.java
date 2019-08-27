@@ -27,6 +27,7 @@ import java.util.HashMap;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.ltkplus.CGlyphSet;
 import cmu.xprize.ltkplus.IGlyphSink;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -40,7 +41,8 @@ import static cmu.xprize.comp_counting2.COUNTX_CONST.FTR_PLACEVALUE;
  * Created by kevindeland on 10/20/17.
  */
 
-public class CCountX_Component extends PercentRelativeLayout implements ILoadableObject, IPublisher {
+public class CCountX_Component extends PercentRelativeLayout implements
+        ILoadableObject, IPublisher, IInterventionSource {
 
     // Infrastructure
     protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
@@ -967,6 +969,12 @@ public class CCountX_Component extends PercentRelativeLayout implements ILoadabl
     @Override
     public void retractFeatureMap(HashMap featureMap) {
 
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
     }
 
     /**

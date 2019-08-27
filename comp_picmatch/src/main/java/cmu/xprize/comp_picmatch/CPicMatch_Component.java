@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -30,7 +31,8 @@ import cmu.xprize.util.TCONST;
 /**
  * Generated automatically w/ code written by Kevin DeLand
  */
-public class CPicMatch_Component extends RelativeLayout implements ILoadableObject {
+public class CPicMatch_Component extends RelativeLayout implements
+        ILoadableObject, IInterventionSource {
 
     static final String TAG = "CPicMatch_Component";
 
@@ -95,6 +97,7 @@ public class CPicMatch_Component extends RelativeLayout implements ILoadableObje
         optionViews[3] = findViewById(R.id.option_4);
         optionViews[3].setVisibility(View.INVISIBLE);
 
+        bManager = LocalBroadcastManager.getInstance(getContext());
     }
 
     // ALAN_HILL (2) this is called by animator_graph
@@ -186,6 +189,12 @@ public class CPicMatch_Component extends RelativeLayout implements ILoadableObje
     }
 
     private int unpressIndex = 0; // for some reason it only lets me change one background opacity at a time...
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
+    }
 
     class StudentChoiceListener implements View.OnClickListener {
 

@@ -34,6 +34,7 @@ import java.util.Random;
 import cmu.xprize.sb_component.CSb_Scoreboard;
 import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -58,7 +59,7 @@ import static cmu.xprize.util.TCONST.QGRAPH_MSG;
  * 4. Add speedometer
  *
  */
-public class CAk_Component extends RelativeLayout implements ILoadableObject{
+public class CAk_Component extends RelativeLayout implements ILoadableObject, IInterventionSource {
     static public Context mContext;
     //protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
     protected HashMap queueMap     = new HashMap();
@@ -630,6 +631,12 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject{
                 mainHandler.post(qCommand);
             }
         }
+    }
+
+    @Override
+    public void triggerIntervention(String type) {
+        Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);
     }
 
     public class Queue implements Runnable {
