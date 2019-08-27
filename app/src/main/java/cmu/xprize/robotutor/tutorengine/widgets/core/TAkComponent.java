@@ -535,6 +535,16 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         }, 1000); //Timer is in ms heree
     }
 
+    // TRIGGER_AKIRA - failure - look for three first failures in a row
+    // if (is first attempt && is wrong) {
+    //      wrongFirstAttemptCount++;
+    //      if (wrongFirstAttemptCount == 3) {
+    //          triggerIntervention("failure");
+    //      }
+    //  }
+    // if (is first attempt && is correct) {
+    //      wrongFirstAttemptCount = 0;
+    // }
     public void judge(){
         reset();
         switch(questionBoard.choices.length){
@@ -781,6 +791,7 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         player.crash();
     }
 
+    // TRIGGER_AKIRA - freeze - try calling this "pause" button
     public void pause() {
         isRunning = false;
         for(Animator animator : ongoingAnimator)

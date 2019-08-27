@@ -167,6 +167,8 @@ public class CIntervention extends RelativeLayout {
         }
     }
 
+    // TODO make new option for if kid self-chooses to ask for help without a trigger
+
     /**
      * Flash the Hand Raise thing in the top right corner
      */
@@ -195,6 +197,8 @@ public class CIntervention extends RelativeLayout {
             e.printStackTrace();
         }
     }
+
+    // should hide when the student taps on the image (no exit button)
 
     private void hideIntervention() {
         Log.d("INTERVENTION", "Hiding intervention");

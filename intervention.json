@@ -1,0 +1,107 @@
+{
+    "triggers": {
+        "gesture": {
+            "intervention": "application",
+            "description": "the student tries the wrong gesture"
+        },
+
+        "stuck": {
+            "intervention": "application",
+            "description": "the student tries, but takes too long to proceed to next question"
+        },
+
+        "hesitate": {
+            "intervention": "knowledge",
+            "description": "the student does nothing at all"
+        },
+
+        "failure": {
+            "intervention": "knowledge",
+            "description": "the student fails on the first try for X problems"
+        }
+    },
+
+    "applications": {
+        "bpop": {
+            "gesture": "anything but tap",
+            "stuck": "10s",
+            "hesitate": "10s",
+            "failure": 3,
+            "specialConsiderations": "freeze app from running?"
+        },
+
+        "akira": {
+            "gesture": "anything but tap",
+            "stuck": null,
+            "hesitate": "10s",
+            "failure": "?",
+            "specialConsiderations": "freeze app from running?"
+        },
+
+        // continue here
+        "write": {
+            "gesture": "anything but write",
+            "stuck": "10s",
+            "hesitate": "10s",
+            "failure": 3,
+            "specialConsiderations": "failure may be due to bad at app, not knowledge"
+        },
+
+        "numberscale": {
+            "gesture": "anything but tap",
+            "stuck": "???",
+            "hesitate": "???",
+            "failure": null
+        },
+
+        "numcompare": {
+            "gesture": "anything but tap",
+            "stuck": "10s",
+            "hesitate": "10s",
+            "failure": 3
+        },
+
+        "countingx": {
+            "gesture": "anything but tap",
+            "stuck": null,
+            "hesitate": "???",
+            "failure": null
+        },
+
+        "place.value": {
+            "part1": {
+                "gesture": "anything but tap",
+                "stuck": "???",
+                "hesitate": "10s",
+                "failure": null
+            },
+            "part2": {
+                "gesture": "anything but write",
+                "stuck": "10s",
+                "hesitate": "???",
+                "failure": "???"
+            }
+        },
+
+        "bigmath": {
+            "gesture": "context-specific",
+            "stuck": "step-specific. Should be very long",
+            "hesitate": "10s",
+            "failure": "step-specific"
+        },
+
+        "spelling": {
+            "gesture": "anything but tap",
+            "stuck": "20s",
+            "hesitate": "???",
+            "failure": "3 times, for first letter in a word"
+        },
+
+        "picmatch": {
+            "gesture": "anything but tap",
+            "stuck": "10s",
+            "hesitate": "10s",
+            "failure": "3 times, for first attempt per problem"
+        }
+    }
+}

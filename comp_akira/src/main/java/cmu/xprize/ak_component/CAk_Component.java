@@ -88,12 +88,13 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
     protected long sidewalkRightTime;
     private long sidewalkLeftTime;
     private long questionTime;
-    private ImageView cityBackground;
+    private ImageView cityBackground; // TRIGGER_AKIRA - gesture - put listener on this thing?
     protected View mask;
     protected int deviceX=0;
     protected int deviceY=0;
 
     protected boolean isRunning = true;
+    // JUDITH AKIRA is this how to pause???
 
     private Random random;
     protected SoundPool soundPool;
@@ -107,6 +108,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
     protected int carscreechMedia, correctMedia, incorrectMedia, numberchangedMedia,slowdown,speedup;
     protected boolean flag=true;
 
+    // TRIGGER_AKIRA - freeze - this variable might be useful?
     protected boolean speedIsZero=false;
     protected int extraSpeed = 1;
 
@@ -300,7 +302,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
     }
 
     public void next() {
-
         try {
 
             if (datasource != null) {
@@ -549,6 +550,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
 
 
     private boolean isPaused = false;
+    // TRIGGER_AKIRA - gesture - put one in this same class???
+    // TRIGGER_AKIRA - gesture - how much app space does this cover?
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
@@ -569,7 +572,10 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
         }
         if(event.getAction()==MotionEvent.ACTION_UP)
         {
+            // TRIGGER_AKIRA - hesitate - may work in here
 
+            // JUDITH mimic here
+            // JUDITH move to better location
             if (!isPaused) {
                 Intent msg = new Intent(TCONST.INTERVENTION_1);
                 Log.d("INTERVENTION", "Sending intervention.");
@@ -581,7 +587,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
                 bManager.sendBroadcast(msg);
                 isPaused = false;
             }
-            
+
             return true;
         }
 

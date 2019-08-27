@@ -32,6 +32,15 @@ public class QuickDebugTutorList {
         );
         interventionBpop.setComment("Testing intervention in Bpop");
         toFixBugMap.put("intervention_bpop", interventionBpop);
+
+        QuickDebugTutor interventionSpelling = new QuickDebugTutor(
+                "spelling",
+                "spelling:datasource_2",
+                "[file]spelling_datasource_2.json"
+        );
+        interventionSpelling.setComment("Testing intervention in Spelling");
+        toFixBugMap.put("intervention_spelling", interventionSpelling);
+
     }
     static {
         QuickDebugTutor bug1 = new QuickDebugTutor(

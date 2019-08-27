@@ -546,9 +546,9 @@ public class TCONST {
     public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // command from iv
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
 
-    // CONSTANTS
-    public static final Long HESITATE_TIME_BPOP = 10000L;
-    public static final Long STUCK_TIME_BPOP = 10000L;
+    // CONSTANTS -- replace with Judith's thing.
+    public static final Long HESITATE_TIME_BPOP = 12000L;
+    public static final Long STUCK_TIME_BPOP = 12000L;
 
     public static final String FTR_STORY_STARTING = "FTR_STORY_STARTING";
 
