@@ -249,13 +249,13 @@ public class TNumberScaleComponent extends CNumberScale_Component implements ITu
             scope.addUpdateVar("CountChime", new TString(currentChime));
             scope.addUpdateVar("OctaveChime", new TString(octaveChime));
             scope.addUpdateVar("CurrentCount", new TString(String.valueOf(currentNumber)));
-            postEvent(NSCONST.PLAY_CHIME);
+            _queue.postEvent(NSCONST.PLAY_CHIME);
         } else {
             scope.addUpdateVar("CountChime", new TString(currentChime));
             scope.addUpdateVar("OctaveChime", new TString(octaveChime));
             scope.addUpdateVar("CurrentCountt", new TString(String.valueOf((int)(currentNumber-currentNumber%100))));
             scope.addUpdateVar("CurrentCount",new TString(String.valueOf((int)(currentNumber%100))));
-            postEvent(NSCONST.PLAY_CHIME_PLUS);
+            _queue.postEvent(NSCONST.PLAY_CHIME_PLUS);
 
 
 
@@ -297,7 +297,7 @@ public class TNumberScaleComponent extends CNumberScale_Component implements ITu
             TScope scope = mTutor.getScope();
             scope.addUpdateVar("offset", new TString(String.valueOf(delta)));
 
-            postEvent(NSCONST.PLAY_TUTOR_PLUS);
+            _queue.postEvent(NSCONST.PLAY_TUTOR_PLUS);
 
         }
 
@@ -308,7 +308,7 @@ public class TNumberScaleComponent extends CNumberScale_Component implements ITu
     public void playIntro(){
         TScope scope = mTutor.getScope();
         scope.addUpdateVar("offset", new TString(String.valueOf(delta)));
-        postEvent(NSCONST.PLAY_INTRO);
+        _queue.postEvent(NSCONST.PLAY_INTRO);
     }
 
 
@@ -319,7 +319,7 @@ public class TNumberScaleComponent extends CNumberScale_Component implements ITu
             TScope scope = mTutor.getScope();
             scope.addUpdateVar("offset", new TString(String.valueOf(delta)));
 
-            postEvent(NSCONST.PLAY_TUTOR_MINUS);
+            _queue.postEvent(NSCONST.PLAY_TUTOR_MINUS);
             enableTapping();
             setNewTimer();
 

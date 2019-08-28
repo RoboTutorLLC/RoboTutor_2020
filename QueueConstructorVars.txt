@@ -1,0 +1,41 @@
+CMessageQueueFactory,CBP_Component,CNumberScale_Component,CCountX_Component
+    String:command
+    String:name,String:command
+    String:command,Object:target***
+
+CAk_Component*
+    String:name,String:command
+
+CWritingComponent,CBigMathComponent,CNd_Component**
+    String:name,String:command
+    String:name,String:command,String:target
+
+/* Anything can be added to this */
+CPicMatch_Component,CSpellingComponent
+    null
+
+/* Might just keep these separate */
+CQn_Component,CRt_Component****
+    String:command
+    String:command,Object:target
+
+
+*These three are all exactly the same
+**These are the same as * but also have the _target String
+****These do NOT have the (name, command) constructor, don't have nameMap
+
+Q: do any of the "run" methods depend on "name"?
+
+Q: how is _target ~used differently~ in Object v String
+
+CWritingComponent,CBigMathComponent,CNd_Component
+    applyBehaviorNode(_target:String)
+
+CBP_Component
+    _mechanics.execCommand(command:String, target:Object)
+
+CQn_Component,CRt_Component
+    mViewManager.execCommand(_command:String, _target:Object)
+
+
+oh shit... they may have completely different methods

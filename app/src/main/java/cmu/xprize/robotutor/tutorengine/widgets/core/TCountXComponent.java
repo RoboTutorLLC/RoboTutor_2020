@@ -413,7 +413,7 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
 
 
 
-        postEvent(COUNTX_CONST.PLAY_COUNT);
+        _queue.postEvent(COUNTX_CONST.PLAY_COUNT);
     }
 
     @Override
@@ -423,11 +423,11 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
 //        postEvent(COUNTX_CONST.PLAY_CHIME);
         if (count<=100||count%100==0){
             scope.addUpdateVar("CurrentCount", new TString(String.valueOf(count)));
-            postEvent(COUNTX_CONST.PLAY_CHIME);
+            _queue.postEvent(COUNTX_CONST.PLAY_CHIME);
         } else {
             scope.addUpdateVar("CurrentCountt", new TString(String.valueOf((int)(count-count%100))));
             scope.addUpdateVar("CurrentCount",new TString(String.valueOf((int)(count%100))));
-            postEvent(COUNTX_CONST.PLAY_CHIME_PLUS);
+            _queue.postEvent(COUNTX_CONST.PLAY_CHIME_PLUS);
         }
 
     }
@@ -451,8 +451,8 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
             scope.addUpdateVar("first", new TString(String.valueOf((int)(targetNumbers[0]*100))));
             scope.addUpdateVar("second",new TString(String.valueOf((int)(targetNumbers[1]*10))));
         }
-        postEvent(COUNTX_CONST.PLAY_TWO_ADDITION);
-        postEvent(COUNTX_CONST.DONE_MOVING_TO_TEN_FRAME,8000);
+        _queue.postEvent(COUNTX_CONST.PLAY_TWO_ADDITION);
+        _queue.postEvent(COUNTX_CONST.DONE_MOVING_TO_TEN_FRAME,8000);
 
     }
 
@@ -463,7 +463,7 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
         scope.addUpdateVar("second", new TString(String.valueOf((int)(targetNumbers[1]*10))));
         scope.addUpdateVar("third",new TString(String.valueOf((int)(targetNumbers[2]))));
         scope.addUpdateVar("result",new TString(String.valueOf((int)(countTarget))));
-        postEvent(COUNTX_CONST.PLAY_THREE_ADDITION);
+        _queue.postEvent(COUNTX_CONST.PLAY_THREE_ADDITION);
 
 
     }
@@ -472,7 +472,7 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
     public void playAudio(String filename){
         TScope scope = mTutor.getScope();
         scope.addUpdateVar("AudioName", new TString(filename));
-        postEvent(COUNTX_CONST.PLAY_AUDIO);
+        _queue.postEvent(COUNTX_CONST.PLAY_AUDIO);
     }
 
 
@@ -494,11 +494,11 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
 //        postEvent(COUNTX_CONST.PLAY_CHIME);
             if (count<=100||count%100==0){
                 scope.addUpdateVar("CurrentCount", new TString(String.valueOf(count)));
-                postEvent(COUNTX_CONST.PLAY_CHIME);
+                _queue.postEvent(COUNTX_CONST.PLAY_CHIME);
             } else {
                 scope.addUpdateVar("CurrentCountt", new TString(String.valueOf((int)(count-count%100))));
                 scope.addUpdateVar("CurrentCount",new TString(String.valueOf((int)(count%100))));
-                postEvent(COUNTX_CONST.PLAY_CHIME_PLUS);
+                _queue.postEvent(COUNTX_CONST.PLAY_CHIME_PLUS);
             }
 
             new java.util.Timer().schedule(
@@ -522,7 +522,7 @@ public class TCountXComponent extends CCountX_Component implements ITutorObject,
 
     @Override
     public void displayWrittingIns(){
-        postEvent(COUNTX_CONST.WRITTING_INS);
+        _queue.postEvent(COUNTX_CONST.WRITTING_INS);
     }
 
 

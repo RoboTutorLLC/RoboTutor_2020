@@ -27,8 +27,10 @@ import java.util.HashMap;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.ltkplus.CGlyphSet;
 import cmu.xprize.ltkplus.IGlyphSink;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -42,7 +44,7 @@ import static cmu.xprize.comp_counting2.COUNTX_CONST.FTR_PLACEVALUE;
  */
 
 public class CCountX_Component extends PercentRelativeLayout implements
-        ILoadableObject, IPublisher, IInterventionSource {
+        ILoadableObject, IPublisher, IInterventionSource, IMessageQueueRunner {
 
     // Infrastructure
     protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
@@ -117,6 +119,8 @@ public class CCountX_Component extends PercentRelativeLayout implements
 
     // REMOVE private CCount_DotBag dotBag;
 
+    protected CMessageQueueFactory _queue;
+
 
     public CCountX_Component(Context context) {
         super(context);
@@ -152,7 +156,7 @@ public class CCountX_Component extends PercentRelativeLayout implements
         bManager = LocalBroadcastManager.getInstance(getContext());
         drawIndex =-10;
 
-
+        _queue = new CMessageQueueFactory(this, "CCountX");
         //mainHandler.post(animationRunnable);
 
     }
@@ -419,14 +423,14 @@ public class CCountX_Component extends PercentRelativeLayout implements
     public void playHundredIns(){
         if(mode == "placevalue"){
             if(!surfaceView.tapped){
-                postEvent(COUNTX_CONST.PLACEVALUE_INS_H);
+                _queue.postEvent(COUNTX_CONST.PLACEVALUE_INS_H);
 
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
                             @Override
                             public void run() {
                                 if(!surfaceView.tapped){
-                                    postEvent(COUNTX_CONST.PLACEVALUE_INS_T);
+                                    _queue.postEvent(COUNTX_CONST.PLACEVALUE_INS_T);
                                 }
                             }
                         },
@@ -438,7 +442,7 @@ public class CCountX_Component extends PercentRelativeLayout implements
                             @Override
                             public void run() {
                                 if(!surfaceView.tapped){
-                                    postEvent(COUNTX_CONST.PLACEVALUE_INS_O);
+                                    _queue.postEvent(COUNTX_CONST.PLACEVALUE_INS_O);
                                 }
                             }
                         },
@@ -896,36 +900,6 @@ public class CCountX_Component extends PercentRelativeLayout implements
         return Scontent;
     }
 
-
-
-    public void postEvent(String event) {
-        postEvent(event, 0);
-    }
-
-    public void postEvent(String event, Integer delay) {
-
-        post(event, delay);
-    }
-
-    public void post(String command, long delay) {
-
-        enQueue(new Queue(command, command), delay);
-    }
-
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
-    }
-
     @Override
     public void publishState() {
 
@@ -977,75 +951,21 @@ public class CCountX_Component extends PercentRelativeLayout implements
         bManager.sendBroadcast(msg);
     }
 
-    /**
-     * This is how Component-specific commands are added to the Queue.
-     */
-    public class Queue implements Runnable {
+    @Override
+    public void runCommand(String _command) {
 
-        String _name;
-        String _command;
-        String _target;
-        String _item;
-
-        Queue(String name, String command) {
-            _name = name;
-            _command = command;
-
-            nameMap.put(name, this);
-        }
-
-        @Override
-        public void run() {
-
-            Log.d("COUNTINGX_DEBUG_TAG", "Running queue: _command=" + _command);
-            try {
-                if(_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch(_command) {
-                    case COUNTX_CONST.WRITTING_INS:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLACEVALUE_INS_H:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLACEVALUE_INS_T:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLACEVALUE_INS_O:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_COUNT:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_THREE_ADDITION:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_TWO_ADDITION:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_AUDIO:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_CHIME_PLUS:
-                        applyBehavior(_command);
-                        break;
-                    case COUNTX_CONST.PLAY_CHIME:
-                        applyBehavior(_command);
-                        break;
-
-                    default:
-                        break;
-                }
-
-            }  catch(Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, false);
-            }
-
-        }
+        applyBehavior(_command);
     }
 
+    @Override
+    public void runCommand(String _command, Object _target) {
+
+        runCommand(_command);
+    }
+
+    @Override
+    public void runCommand(String _command, String _target) {
+
+        runCommand(_command);
+    }
 }

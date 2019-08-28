@@ -41,6 +41,20 @@ public class QuickDebugTutorList {
         interventionSpelling.setComment("Testing intervention in Spelling");
         toFixBugMap.put("intervention_spelling", interventionSpelling);
 
+        QuickDebugTutor interventionNumscale = new QuickDebugTutor(
+                "numberscale",
+                "num.scale:0..50.off5.31",
+                "[file]num.scale_0..50.off5.31.json"
+        );
+        toFixBugMap.put("intervention_numscale", interventionNumscale);
+
+        QuickDebugTutor interventionCountX = new QuickDebugTutor(
+                "countingx",
+                "countingx:1_10__it_6",
+                "[file]countingx_1_10.json"
+        );
+        toFixBugMap.put("intervention_countx", interventionCountX);
+
     }
     static {
         QuickDebugTutor bug1 = new QuickDebugTutor(

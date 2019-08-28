@@ -25,8 +25,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -36,7 +38,7 @@ import cmu.xprize.util.TCONST;
  */
 
 public class CNumberScale_Component extends RelativeLayout implements
-        ILoadableObject, IInterventionSource {
+        ILoadableObject, IInterventionSource, IMessageQueueRunner {
 
 
     // Infrastructure
@@ -93,6 +95,8 @@ public class CNumberScale_Component extends RelativeLayout implements
 
 
     static final String TAG = "CNumberScale_Component";
+
+    protected CMessageQueueFactory _queue;
 
 
     public CNumberScale_Component(Context context) {
@@ -162,6 +166,7 @@ public class CNumberScale_Component extends RelativeLayout implements
             }
         });
 
+        _queue = new CMessageQueueFactory(this, "CNumScale");
 
     }
 
@@ -421,34 +426,6 @@ public class CNumberScale_Component extends RelativeLayout implements
         _dataIndex = 0;
     }
 
-    public void postEvent(String event) {
-        postEvent(event, 0);
-    }
-
-    public void postEvent(String event, Integer delay) {
-
-        post(event, delay);
-    }
-
-    public void post(String command, long delay) {
-
-        enQueue(new Queue(command, command), delay);
-    }
-
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
-    }
-
     /**
      * This is how Component-specific commands are added to the Queue.
      */
@@ -480,6 +457,26 @@ public class CNumberScale_Component extends RelativeLayout implements
         bManager.sendBroadcast(msg);
     }
 
+    @Override
+    public void runCommand(String _command) {
+
+        runCommand(_command, (Object) null);
+
+    }
+
+    @Override
+    public void runCommand(String _command, Object _target) {
+
+        // wtf... I don't know why _target is zero
+        applyBehavior(_command);
+    }
+
+    @Override
+    public void runCommand(String _command, String _target) {
+
+        runCommand(_command, (Object) null);
+    }
+
     public class playTutor extends TimerTask {
         int _tutorType;
 
@@ -494,66 +491,6 @@ public class CNumberScale_Component extends RelativeLayout implements
             } else {
                 playTutor1();
             }
-        }
-    }
-
-    public class Queue implements Runnable {
-
-        String _name;
-        String _command;
-        String _target;
-        String _item;
-
-        Queue(String name, String command) {
-            _name = name;
-            _command = command;
-
-            nameMap.put(name, this);
-        }
-
-        @Override
-        public void run() {
-
-            Log.d("COUNTINGX_DEBUG_TAG", "Running queue: _command=" + _command);
-            try {
-                if(_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch(_command) {
-                    case NSCONST.PLAY_CHIME:
-                        applyBehavior(_command);
-                        break;
-
-                    case NSCONST.PLAY_CHIME_PLUS:
-                        applyBehavior(_command);
-                        break;
-                    case NSCONST.PLAY_CHIME_PPLUS:
-                        applyBehavior(_command);
-                        break;
-                    case NSCONST.PLAY_INTRO:
-                        applyBehavior(_command);
-                        break;
-
-                    case NSCONST.PLAY_TUTOR_PLUS:
-                        applyBehavior(NSCONST.PLAY_TUTOR_PLUS);
-                        break;
-                    case NSCONST.PLAY_TUTOR_MINUS:
-                        applyBehavior(NSCONST.PLAY_TUTOR_MINUS);
-
-
-
-
-                    default:
-                        break;
-                }
-
-            }  catch(Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, false);
-            }
-
         }
     }
 
