@@ -673,35 +673,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
     }
 
 
-    /**
-     *  Disable the input queues permenantly in prep for destruction
-     *  walks the queue chain to diaable scene queue
-     *
-     */
-    private void terminateQueue() {
-
-        // disable the input queue permenantly in prep for destruction
-        //
-        _qDisabled = true;
-        flushQueue();
-    }
-
-
-    /**
-     * Remove any pending scenegraph commands.
-     *
-     */
-    private void flushQueue() {
-
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            mainHandler.removeCallbacks((CWritingComponent.Queue)(entry.getValue()));
-        }
-    }
-
 
     /**
      * Keep a mapping of pending messages so we can flush the queue if we want to terminate
