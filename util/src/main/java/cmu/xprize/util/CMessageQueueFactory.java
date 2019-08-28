@@ -70,8 +70,6 @@ public class CMessageQueueFactory {
             _targetString = target;
         }
 
-        // QUEUE_REFACTOR wow this is terrible
-
         public String getCommand() {
             return _command;
         }
@@ -92,7 +90,7 @@ public class CMessageQueueFactory {
                                 "CMessageQueue.run _name=%s;_command=%s;_targetObject=%s;_targetString=%s",
                                 _name, _command, _targetObject, _targetString));
 
-                // QUEUE_REFACTOR this will be different for each file
+                // QUEUE_REFACTOR ugh this is somewhat different for each file (see QueueConstructorVars.txt)
                 if(_targetObject != null) {
                     Log.wtf("EPSTEIN", "runCommand(object)");
                     runner.runCommand(_command, _targetObject);

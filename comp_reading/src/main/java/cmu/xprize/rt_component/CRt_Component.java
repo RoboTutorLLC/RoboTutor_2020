@@ -700,6 +700,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     //************************************************************************
     // Component Message Queue  -- Start
 
+    // QUEUE_REFACTOR table for later
 
     public class Queue implements Runnable {
 

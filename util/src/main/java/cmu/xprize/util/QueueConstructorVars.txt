@@ -1,0 +1,21 @@
+CMessageQueueFactory,CBP_Component,CNumberScale_Component,CCountX_Component,
+CAk_Component,CNd_Component,CBigMathComponent
+    String:command
+    String:name,String:command
+    String:command,Object:target***
+
+/* Anything can be added to this */
+CPicMatch_Component,CSpellingComponent
+    null
+
+CWritingComponent**
+    String:name,String:command
+    String:name,String:command,String:target
+
+
+/* Might just keep these separate */
+CQn_Component,CRt_Component****
+    String:command
+    String:command,Object:target
+
+****These do NOT have the (name, command) constructor, don't have nameMap

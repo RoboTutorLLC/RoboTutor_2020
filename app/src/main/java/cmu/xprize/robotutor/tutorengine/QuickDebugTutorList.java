@@ -69,6 +69,13 @@ public class QuickDebugTutorList {
         );
         toFixBugMap.put("intervention_bigmath", interventionBigMath);
 
+        QuickDebugTutor interventionWriting= new QuickDebugTutor(
+                "write.wrd.trc",
+                "write.wrd.trc:syl.3ch..3ch..6",
+                "[file]write.wrd.trc_syl.3ch..3ch..6.json"
+        );
+        toFixBugMap.put("intervention_writing", interventionWriting);
+
     }
     static {
         QuickDebugTutor bug1 = new QuickDebugTutor(
