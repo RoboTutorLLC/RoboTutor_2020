@@ -27,7 +27,6 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -47,10 +46,6 @@ import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 
 /**
  * Created by jacky on 2016/7/6.
- */
-
-
-/**
  *
  * Akira Game panel as component. This class implements ILoadableObject which make it data-driven
  *
@@ -64,10 +59,6 @@ import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 public class CAk_Component extends RelativeLayout implements ILoadableObject,
         IInterventionSource, IMessageQueueRunner {
     static public Context mContext;
-    //protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap queueMap     = new HashMap();
-    protected HashMap           nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
 
     protected String      mDataSource;
     protected   int       _dataIndex = 0;
@@ -76,9 +67,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     static final String TAG = "CAk_Component";
 
 
-    static final int WIDTH = 960, HEIGHT = 600;
+    static final int HEIGHT = 600;
 
-    protected CAk_Data _currData;
     protected long startTime;
     protected CAkPlayer player;
     protected CAkTeachFinger teachFinger;
@@ -90,11 +80,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected TextView score;
     protected long sidewalkRightTime;
     private long sidewalkLeftTime;
-    private long questionTime;
-    private ImageView cityBackground; // TRIGGER_AKIRA - gesture - put listener on this thing?
     protected View mask;
-    protected int deviceX=0;
-    protected int deviceY=0;
 
     protected boolean isRunning = true;
     // JUDITH AKIRA is this how to pause???
@@ -102,7 +88,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     private Random random;
     protected SoundPool soundPool;
 
-    protected boolean lastCorrect = true;
     protected Boolean isFirstInstall;
 
     private PointF[] sidewalkLeftPoints;
@@ -112,18 +97,14 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected boolean flag=true;
 
     // TRIGGER_AKIRA - freeze - this variable might be useful?
-    protected boolean speedIsZero=false;
     protected int extraSpeed = 1;
 
     //json loadable
-    public    int          gameSpeed          ;
     public    CAk_Data[]   datasource;
 
 
     protected List<Animator> ongoingAnimator;
     protected Animator cityAnimator;
-    protected CAkQuestionBoard stopQuestionBoard;
-    public int errornum=0;
     public boolean questionBoard_exist;
 
     // task-level info
@@ -183,18 +164,18 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
         mContext = context;
 
-        sidewalkLeftTime = sidewalkRightTime = questionTime = startTime = System.nanoTime();
+        sidewalkLeftTime = sidewalkRightTime = startTime = System.nanoTime();
 
-        player = (CAkPlayer) findViewById(R.id.player);
-        cityBackground = (ImageView) findViewById(R.id.city);
-        scoreboard = (CSb_Scoreboard) findViewById(R.id.scoreboard);
+        player = findViewById(R.id.player);
+        ImageView cityBackground = findViewById(R.id.city);
+        scoreboard = findViewById(R.id.scoreboard);
         mask = findViewById(R.id.mask);
 
         speedometerButton = new Button[11];
         for(int i = 0; i < 11; i++) {
             int resID = getResources().getIdentifier("button" + i, "id",
                     "cmu.xprize.robotutor");
-            speedometerButton[i] = (Button) findViewById(resID);
+            speedometerButton[i] = findViewById(resID);
             final int speed = i;
             speedometerButton[i].setOnClickListener(new OnClickListener() {
                 @Override
@@ -231,7 +212,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
         speedometerButton[1].getBackground().setColorFilter(0xFFFFCC00,PorterDuff.Mode.SRC);
 
-        teachFinger = (CAkTeachFinger) findViewById(R.id.finger);
+        teachFinger = findViewById(R.id.finger);
         teachFinger.finishTeaching = true;
 
         cityAnimator = CAnimatorUtil.configTranslate(cityBackground,
@@ -252,8 +233,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
 
         isFirstInstall=true;
-        if(isFirstInstall==false)
-            teachFinger.finishTeaching=true;
 
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         carscreechMedia=soundPool.load(mContext, R.raw.carscreech, 1);
@@ -364,7 +343,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
             //it is a number
             int currentNumber = Integer.parseInt(answerString);
             if (currentNumber>=100 && currentNumber %100!=0){
-                extraSpeed = (int)(extraSpeed*-10);
+                extraSpeed = (extraSpeed*-10);
             }
         }
     }
@@ -397,29 +376,10 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
 
     protected  boolean isAudio(CAk_Data data){
-        if(data.belowString.equals("audio"))
-            return true;
-        else
-            return false;
+        return data.belowString.equals("audio");
     }
-
-    protected String getBelowString(CAk_Data data){
-        return data.belowString;
-    }
-
-    protected String getAboveString(CAk_Data data){
-        return data.aboveString;
-    }
-
-    public void post(String command, Object target) {
-
-    }
-
 
     public void playAudio(CAk_Data data){
-    }
-
-    public void UpdateValue(int value) {
     }
 
     protected void onSpeedChange(int speed) {
@@ -431,7 +391,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
                 set.pause();
                 ArrayList<Animator> list = set.getChildAnimations();
                 for(int j = 0; j < list.size(); j++) {
-                    Animator objectAnimator = (Animator) list.get(j);
+                    Animator objectAnimator = list.get(j);
                     objectAnimator.setDuration(5000 - s);
                 }
                 set.resume();
@@ -446,7 +406,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
      * Add repeat animation, game logic here
      * Remember multiply by scaleFactorX and scaleFactorY while setting position of object
      *
-     * TODO
      * 1. Adjust animation duration with Game speed
      * 2. Game logic, +/- score, right/wrong answer
      */
@@ -457,17 +416,12 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         public void run() {
             long elapseRight = (System.nanoTime() - sidewalkRightTime) / 1000000;
             long elapseLeft = (System.nanoTime() - sidewalkLeftTime) / 1000000;
-            long elapse = (System.nanoTime() - questionTime) / 1000000;
 
             int s = extraSpeed * 400;
 
             final PercentRelativeLayout percentLayout = (PercentRelativeLayout) getChildAt(0);
 
-            /**
-             * Add side view
-             *
-             */
-
+            // Add side view
             if(isRunning && elapseRight > 3500) {
 
                 int r = random.nextInt() % 3;
@@ -562,14 +516,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
-//            if(!player.getPlaying())
-//            {
-//                player.setPlaying(true);
-//            }
-//            else
-//            {
-//                player.setUp(true);
-//            }
 
             if(isFirstInstall && !teachFinger.finishTeaching)
                 teachFinger.onTouch(event, player);
@@ -605,8 +551,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
     /**
      * Load the data source
-     *
-     * @param jsonData
      */
     @Override
     public void loadJSON(JSONObject jsonData, IScope scope) {

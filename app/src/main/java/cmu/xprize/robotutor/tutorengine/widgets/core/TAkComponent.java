@@ -120,24 +120,6 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         mSceneObject.setVisibility(visible);
     }
 
-    @Override
-    public void UpdateValue(int value) {
-
-        // update the Scope response variable  "<varname>.value"
-        //
-        publishValue(AKCONST.VAR_VALUE, value);
-
-        boolean correct = true;
-
-        reset();
-
-        if(correct)
-            publishFeature(TCONST.GENERIC_RIGHT);
-        else
-            publishFeature(TCONST.GENERIC_WRONG);
-    }
-
-
     private void reset() {
 
         retractFeature(TCONST.GENERIC_RIGHT);
