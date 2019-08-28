@@ -2,7 +2,6 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -14,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import cmu.xprize.comp_bigmath.BM_CONST;
-import cmu.xprize.comp_bigmath.BigMathMechanic;
 import cmu.xprize.comp_bigmath.CBigMath_Component;
 import cmu.xprize.comp_bigmath.CBigMath_Data;
 import cmu.xprize.comp_logging.CErrorManager;
@@ -259,12 +257,6 @@ public class TBigMathComponent extends CBigMath_Component implements ITutorObjec
             CErrorManager.logEvent(TAG, "Invalid Data Source - " + dataNameDescriptor + " for : " + name() + " : ", e, true);
         }
     }
-
-    /** Functionality methods...
-     *
-     */
-
-
 
     /**
      * IPublisher methods...

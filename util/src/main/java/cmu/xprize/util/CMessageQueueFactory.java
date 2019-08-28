@@ -169,6 +169,10 @@ public class CMessageQueueFactory {
         post(event, delay);
     }
 
+    public void postNamed(String name, String command, String target, Long delay) {
+        enQueue(new Queue(name, command, target), delay);
+    }
+
     /**
      * Keep a mapping of pending messages so we can flush the queue if we want to terminate
      * the tutor before it finishes naturally.

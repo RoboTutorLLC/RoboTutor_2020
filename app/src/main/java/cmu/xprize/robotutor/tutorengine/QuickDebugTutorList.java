@@ -55,6 +55,20 @@ public class QuickDebugTutorList {
         );
         toFixBugMap.put("intervention_countx", interventionCountX);
 
+        QuickDebugTutor interventionNumCompare = new QuickDebugTutor(
+                "numcompare",
+                "numcompare:2d.by.ten",
+                "[file]numcompare_2d.by.ten.json"
+        );
+        toFixBugMap.put("intervention_numcompare", interventionNumCompare);
+
+        QuickDebugTutor interventionBigMath = new QuickDebugTutor(
+                "bigmath",
+                "bigmath:add.by.10.0..80.NoCarryBorrow.lev5",
+                "[file]bigmath_add.by.10.0..80.NoCarryBorrow.lev5.json"
+        );
+        toFixBugMap.put("intervention_bigmath", interventionBigMath);
+
     }
     static {
         QuickDebugTutor bug1 = new QuickDebugTutor(

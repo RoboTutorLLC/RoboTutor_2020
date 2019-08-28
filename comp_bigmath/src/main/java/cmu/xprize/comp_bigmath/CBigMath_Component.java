@@ -1,14 +1,8 @@
 package cmu.xprize.comp_bigmath;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,15 +13,15 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IPerformanceTracker;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -40,7 +34,6 @@ import static cmu.xprize.comp_bigmath.BM_CONST.FEATURES.FTR_ON_DIGIT_ONE;
 import static cmu.xprize.comp_bigmath.BM_CONST.FEATURES.FTR_ON_DIGIT_TEN;
 import static cmu.xprize.comp_bigmath.BM_CONST.FEATURES.FTR_TAP_CONCRETE;
 import static cmu.xprize.comp_bigmath.BM_CONST.FEATURES.FTR_WRITE_DIGIT;
-import static cmu.xprize.comp_bigmath.BM_CONST.HUN_DIGIT;
 import static cmu.xprize.util.MathUtil.getHunsDigit;
 import static cmu.xprize.util.MathUtil.getOnesDigit;
 import static cmu.xprize.util.MathUtil.getTensDigit;
@@ -50,12 +43,7 @@ import static cmu.xprize.util.MathUtil.getTensDigit;
  */
 
 public class CBigMath_Component extends RelativeLayout implements ILoadableObject, IBehaviorManager,
-        IPublisher, IHesitationManager, IPerformanceTracker, IInterventionSource {
-
-    protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap           queueMap     = new HashMap();
-    protected HashMap           nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
+        IPublisher, IHesitationManager, IPerformanceTracker, IInterventionSource, IMessageQueueRunner {
 
     protected BigMathMechanic _mechanic;
     private BigMathLayoutHelper _layout;
@@ -74,8 +62,6 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
 
     // json loadable
     public String bootFeatures;
-    public int rows;
-    public int cols;
     public CBigMath_Data[] dataSource;
     protected CBigMath_Data currentData;
 
@@ -86,12 +72,6 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
     private static final String TEN_DIGIT = "ten";
     private static final String HUN_DIGIT = "hun";
 
-    // CONST name of row variables
-    private static final String OPA_LOCATION = "opA";
-    private static final String OPB_LOCATION = "opB";
-    private static final String RESULT_LOCATION = "result";
-
-
     // View Things
     protected Context mContext;
 
@@ -99,6 +79,8 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
 
 
     static final String TAG = "CBigMath_Component";
+
+    protected CMessageQueueFactory _queue;
 
 
     public CBigMath_Component(Context context) {
@@ -128,40 +110,14 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
         // initialize mechanic
         _mechanic = new BigMathMechanic(getContext(), this, this, this, this, this);
         _layout = new BigMathLayoutHelper(getContext(), this);
+
+        _queue = new CMessageQueueFactory(this, "CBigMath");
     }
 
     public void onDestroy() {
-        terminateQueue();
+        _queue.terminateQueue();
     }
 
-    /**
-     *  Disable the input queues permenantly in prep for destruction
-     *  walks the queue chain to diaable scene queue
-     *
-     */
-    private void terminateQueue() {
-
-        // disable the input queue permenantly in prep for destruction
-        //
-        _qDisabled = true;
-        flushQueue();
-    }
-
-
-    /**
-     * Remove any pending scenegraph commands.
-     *
-     */
-    private void flushQueue() {
-
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            mainHandler.removeCallbacks((Queue)(entry.getValue()));
-        }
-    }
 
     public void next() {
 
@@ -404,47 +360,16 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
             retractFeature(FTR_TAP_CONCRETE);
             publishFeature(FTR_WRITE_DIGIT);
         }
-        postNamed("HESITATION_PROMPT", "APPLY_BEHAVIOR", "INPUT_HESITATION_FEEDBACK", (long)5000);
-    }
-
-    public void postNamed(String name, String command, String target, Long delay) {
-        enQueue(new Queue(name, command, target), delay);
-    }
-
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
+        _queue.postNamed("HESITATION_PROMPT", "APPLY_BEHAVIOR", "INPUT_HESITATION_FEEDBACK", (long)5000);
     }
 
     public void cancelHesitationTimer() {
-        cancelPost("HESITATION_PROMPT");
-    }
-
-    public void cancelPost(String name) {
-
-        Log.d(TAG, "Cancel Post Requested: " + name);
-
-        while(nameMap.containsKey(name)) {
-
-            Log.d(TAG, "Post Cancelled: " + name);
-
-            mainHandler.removeCallbacks((Queue) (nameMap.get(name)));
-            nameMap.remove(name);
-        }
+        _queue.cancelPost("HESITATION_PROMPT");
     }
 
     @Override
     public void triggerHesitation() {
-        postNamed("HESITATION_PROMPT", "APPLY_BEHAVIOR", "INPUT_HESITATION_FEEDBACK", (long)5000);
+        _queue.postNamed("HESITATION_PROMPT", "APPLY_BEHAVIOR", "INPUT_HESITATION_FEEDBACK", (long)5000);
     }
 
     @Override
@@ -465,54 +390,28 @@ public class CBigMath_Component extends RelativeLayout implements ILoadableObjec
         bManager.sendBroadcast(msg);
     }
 
-    public class Queue implements Runnable {
+    @Override
+    public void runCommand(String command) {
 
-        protected String _name;
-        protected String _command;
-        protected String _target;
-        protected String _item;
+    }
 
-        public Queue(String name, String command) {
+    @Override
+    public void runCommand(String command, Object target) {
 
-            _name = name;
-            _command = command;
+    }
 
-            if (name != null) {
-                nameMap.put(name, this);
-            }
-        }
+    @Override
+    public void runCommand(String _command, String _target) {
 
-        public Queue(String name, String command, String target) {
+        switch (_command) {
 
-            this(name, command);
-            _target = target;
-        }
+            case TCONST.APPLY_BEHAVIOR:
 
-        @Override
-        public void run() {
+                applyBehaviorNode(_target);
+                break;
 
-            try {
-                if (_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch (_command) {
-
-                    case TCONST.APPLY_BEHAVIOR:
-
-                        applyBehaviorNode(_target);
-                        break;
-
-                    default:
-                        break;
-                }
-
-
-            } catch (Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, true);
-            }
+            default:
+                break;
         }
     }
 

@@ -23,8 +23,10 @@ import java.util.Random;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManagerInterface;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -65,55 +67,8 @@ import static cmu.xprize.util.TCONST.DEBUG_HESITATE;
  * Generated automatically w/ code written by Kevin DeLand
  */
 
-public class CNd_Component extends RelativeLayout implements ILoadableObject, IInterventionSource {
-
-
-    // ND_SCAFFOLD √√√ BEHAVIOR
-    // (3) if (isWE), perform Scaffolding // put it right in updateStimulus (probably) NEXT NEXT NEXT
-    // (8) when incorrect answer, perform Scaffolding // put it right in xyz
-    // when incorrect answer, don't perform the final step of telling them which number
-
-    // ND_SCAFFOLD √√√ PROMPTS
-    // AUDIO:
-        // PROMPTS: see ~/RoboTutor/ProtoAssets/ProtoAssets_ND/assets/audio/sw/cmu/xprize/proto_nd
-
-    // Let's compare numbers √√√
-    // Which number is bigger? √√√
-    // Correct! √√√
-    // Try again. √√√
-    // so tap on this number √√√
-    // is the same as √√√
-    // is more than √√√
-    // "so compare these numbers"
-
-
-
-            // "first compare the hundreds"
-            // "compare the tens"
-            // "compare the ones"
-            // "this number has more"
-            // "they have the same"
-        // PROCEDURE:
-            // record audio
-            // make new folder for ND_CONST...
-            // record numdiscr in "tutor_descriptor.json"
-            // push into place using RTAsset_Publisher
-
-
-    // ND_SCAFFOLD PROMPTS 2
-    // Tap on the bigger number
-    // "so compare tens"
-    // "so X is bigger than Y"
-    // "so this number is bigger"
-    // "now say this number"
-    //
-
-    // Queue Things
-    protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap           queueMap     = new HashMap();
-    protected HashMap nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
-    //
+public class CNd_Component extends RelativeLayout implements ILoadableObject,
+        IInterventionSource, IMessageQueueRunner {
 
     // DataSource Variables
     protected   int                   _dataIndex = 0;
@@ -133,8 +88,6 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
 
     // json loadable
     public String bootFeatures;
-    public int rows;
-    public int cols;
     public CNd_Data[] dataSource;
 
 
@@ -152,6 +105,8 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
 
 
     static final String TAG = "CNd_Component";
+
+    protected CMessageQueueFactory _queue;
 
 
     public CNd_Component(Context context) {
@@ -178,40 +133,13 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
         _layoutManager.initialize();
         _layoutManager.resetView();
 
+        _queue = new CMessageQueueFactory(this, "CNumCompare");
+
     }
 
     public void onDestroy() {
 
-        terminateQueue();
-    }
-
-    /**
-     *  Disable the input queues permenantly in prep for destruction
-     *  walks the queue chain to diaable scene queue
-     *
-     */
-    private void terminateQueue() {
-
-        // disable the input queue permenantly in prep for destruction
-        //
-        _qDisabled = true;
-        flushQueue();
-    }
-
-
-    /**
-     * Remove any pending scenegraph commands.
-     *
-     */
-    private void flushQueue() {
-
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            mainHandler.removeCallbacks((Queue)(entry.getValue()));
-        }
+        _queue.terminateQueue();
     }
 
     /**
@@ -421,7 +349,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
     }
 
     public void triggerHesitationFeedback() {
-        postNamed(HESITATION_PROMPT, TCONST.APPLY_BEHAVIOR, INPUT_HESITATION_FEEDBACK, (long) ND_CONST.HESITATION_DELAY);
+        _queue.postNamed(HESITATION_PROMPT, TCONST.APPLY_BEHAVIOR, INPUT_HESITATION_FEEDBACK, (long) ND_CONST.HESITATION_DELAY);
     }
 
     /**
@@ -519,7 +447,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
 
         if (_currentHighlightDigit == null) return;
 
-        cancelPost(HESITATION_PROMPT); // prevent hesitation prompt
+        _queue.cancelPost(HESITATION_PROMPT); // prevent hesitation prompt
 
         switch(_currentHighlightDigit) {
             case HUN_DIGIT:
@@ -598,7 +526,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
         _layoutManager.highlightDigit(NO_DIGIT);
 
         // Prevent hesitation prompt.
-        cancelPost(HESITATION_PROMPT);
+        _queue.cancelPost(HESITATION_PROMPT);
 
         // Restart the scaffolding process.
         applyBehaviorNode(getStartingHighlightByNumDigits());
@@ -622,7 +550,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
         applyBehaviorNode(CANCEL_INDICATE_CORRECT);
 
         // Prevent hesitation prompt.
-        cancelPost(HESITATION_PROMPT); // prevent hesitation prompt
+        _queue.cancelPost(HESITATION_PROMPT); // prevent hesitation prompt
 
         // Reset the highlight.
         _layoutManager.highlightDigit(NO_DIGIT);
@@ -673,96 +601,35 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject, II
         _dataIndex = 0;
     }
 
-    /**
-     * Remove named posts
-     */
-    public void cancelPost(String name) {
-
-        Log.d(TAG, "Cancel Post Requested: " + name);
-
-        while(nameMap.containsKey(name)) {
-
-            Log.d(TAG, "Post Cancelled: " + name);
-
-            mainHandler.removeCallbacks((Queue) (nameMap.get(name)));
-            nameMap.remove(name);
-        }
-    }
-
-    public void postNamed(String name, String command, String target, Long delay) {
-        enQueue(new Queue(name, command, target), delay);
-    }
-
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
-    }
-
     @Override
     public void triggerIntervention(String type) {
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
     }
 
-    public class Queue implements  Runnable {
+    @Override
+    public void runCommand(String command) {
+        // not used
+    }
 
-        protected String _name;
-        protected String _command;
-        protected String _target;
-        protected String _item;
+    @Override
+    public void runCommand(String command, Object target) {
+        // not used
+    }
 
-        public Queue(String name, String command) {
+    @Override
+    public void runCommand(String _command, String _target) {
+        switch (_command) {
 
-            _name    = name;
-            _command = command;
+            case TCONST.APPLY_BEHAVIOR:
 
-            if(name != null) {
-                nameMap.put(name, this);
-            }
-        }
+                Log.d(DEBUG_HESITATE, "applybehavior: " + _target);
 
-        public Queue(String name, String command, String target) {
+                applyBehaviorNode(_target);
+                break;
 
-            this(name, command);
-            _target  = target;
-        }
-
-        @Override
-        public void run() {
-
-            try {
-                if (_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch (_command) {
-
-                    case TCONST.APPLY_BEHAVIOR:
-
-                        Log.d(DEBUG_HESITATE, "applybehavior: " + _target);
-
-                        applyBehaviorNode(_target);
-                        break;
-
-                    default:
-                        break;
-                }
-
-
-            } catch (Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, true);
-            }
+            default:
+                break;
         }
     }
 }
