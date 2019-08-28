@@ -48,9 +48,6 @@ public class CCountX_Component extends PercentRelativeLayout implements
 
     // Infrastructure
     protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap queueMap     = new HashMap();
-    protected HashMap           nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
 
     // Layout
     private RelativeLayout Scontent;

@@ -40,14 +40,6 @@ import cmu.xprize.util.TCONST;
 public class CNumberScale_Component extends RelativeLayout implements
         ILoadableObject, IInterventionSource, IMessageQueueRunner {
 
-
-    // Infrastructure
-    protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap queueMap     = new HashMap();
-    protected HashMap           nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
-
-
     protected ImageView Scontent;
     protected CNumberScale_player player;
 
