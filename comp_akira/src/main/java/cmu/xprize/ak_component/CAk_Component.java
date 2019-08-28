@@ -34,8 +34,10 @@ import java.util.Random;
 import cmu.xprize.sb_component.CSb_Scoreboard;
 import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -59,7 +61,8 @@ import static cmu.xprize.util.TCONST.QGRAPH_MSG;
  * 4. Add speedometer
  *
  */
-public class CAk_Component extends RelativeLayout implements ILoadableObject, IInterventionSource {
+public class CAk_Component extends RelativeLayout implements ILoadableObject,
+        IInterventionSource, IMessageQueueRunner {
     static public Context mContext;
     //protected final Handler mainHandler  = new Handler(Looper.getMainLooper());
     protected HashMap queueMap     = new HashMap();
@@ -128,6 +131,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
     protected String task;
 
     protected LocalBroadcastManager bManager;
+
+    protected CMessageQueueFactory _queue;
 
     public CAk_Component(Context context) {
         super(context);
@@ -280,6 +285,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
         setWillNotDraw(false);
 
         bManager = LocalBroadcastManager.getInstance(mContext);
+
+        _queue = new CMessageQueueFactory(this, "CAkira");
 
 
     }
@@ -611,86 +618,36 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject, II
 
     public boolean applyBehavior(String event){ return false;}
 
-    public void postEvent(String event) {
-        postEvent(event, 0);
-    }
-
-    public void postEvent(String event, Integer delay) {
-
-        post1(event, delay);
-    }
-
-    public void post1(String command, long delay) {
-
-        enQueue(new Queue(command, command), delay);
-    }
-
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
-    }
-
     @Override
     public void triggerIntervention(String type) {
         Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
     }
 
-    public class Queue implements Runnable {
+    @Override
+    public void runCommand(String _command) {
+        // template
+        switch(_command) {
+            case AKCONST.PLAY_CHIME:
+                applyBehavior(_command);
+                break;
 
-        String _name;
-        String _command;
-        String _target;
-        String _item;
+            case AKCONST.PLAY_CHIME_PLUS:
+                applyBehavior(_command);
+                break;
 
-        Queue(String name, String command) {
-            _name = name;
-            _command = command;
-
-            nameMap.put(name, this);
-        }
-
-        @Override
-        public void run() {
-
-            Log.d("COUNTINGX_DEBUG_TAG", "Running queue: _command=" + _command);
-            try {
-                if(_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch(_command) {
-                    case AKCONST.PLAY_CHIME:
-                        applyBehavior(_command);
-                        break;
-
-                    case AKCONST.PLAY_CHIME_PLUS:
-                        applyBehavior(_command);
-                        break;
-
-                    default:
-                        break;
-                }
-
-            }  catch(Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, false);
-            }
-
+            default:
+                break;
         }
     }
 
+    @Override
+    public void runCommand(String command, String target) {
+        // not called
+    }
 
-
-
+    @Override
+    public void runCommand(String command, Object target) {
+        // not called
+    }
 }

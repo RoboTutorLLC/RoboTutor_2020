@@ -361,11 +361,11 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             int currentNumber = Integer.parseInt(answerString);
             if (currentNumber<=100||currentNumber%100==0){
                 scope.addUpdateVar("CurrentCount", new TString(String.valueOf(currentNumber)));
-                postEvent(AKCONST.PLAY_CHIME);
+                _queue.post(AKCONST.PLAY_CHIME);
             } else {
                 scope.addUpdateVar("CurrentCountt", new TString(String.valueOf((int)(currentNumber-currentNumber%100))));
                 scope.addUpdateVar("CurrentCount",new TString(String.valueOf((int)(currentNumber%100))));
-                postEvent(AKCONST.PLAY_CHIME_PLUS);
+                _queue.post(AKCONST.PLAY_CHIME_PLUS);
 
             }
 
