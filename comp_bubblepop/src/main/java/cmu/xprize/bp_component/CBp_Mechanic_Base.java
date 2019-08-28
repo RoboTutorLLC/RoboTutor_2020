@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import cmu.xprize.util.CAnimatorUtil;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
 
@@ -55,6 +56,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
 
     protected Context                     mContext;
     protected CBP_Component               mComponent;
+    protected CMessageQueueFactory        mQueue;
     protected CBP_LetterBoxLayout         mParent;
     protected boolean                     mInitialized      = false;
 
@@ -100,6 +102,10 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         mParent.setOnTouchListener(this);
 
         mDetector = new GestureDetector(mContext, new BpopGestureListener());
+    }
+
+    public void setMessageQueue(CMessageQueueFactory queue) {
+        mQueue = queue;
     }
 
     @Override
@@ -300,7 +306,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
                 // of the screen.
                 //
                 showStimulus((CBp_Data) target);
-                mComponent.post(BP_CONST.ZOOM_STIMULUS);
+                mQueue.post(BP_CONST.ZOOM_STIMULUS);
                 break;
 
 
@@ -322,7 +328,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
             case BP_CONST.SHOW_FEEDBACK:
 
                 showFeedback((Integer) target);
-                mComponent.post(BP_CONST.ZOOM_FEEDBACK);
+                mQueue.post(BP_CONST.ZOOM_FEEDBACK);
                 break;
 
             case BP_CONST.ZOOM_FEEDBACK:
@@ -399,7 +405,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        mComponent.post(BP_CONST.MOVE_STIMULUS, 400);
+                        mQueue.post(BP_CONST.MOVE_STIMULUS, 400);
                     }
 
                     @Override

@@ -3,7 +3,9 @@ package cmu.xprize.bp_component;
 
 import android.graphics.Canvas;
 
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
+import cmu.xprize.util.IMessageQueueRunner;
 
 public interface IBubbleMechanic {
 
@@ -18,5 +20,6 @@ public interface IBubbleMechanic {
     public void execCommand(String command, Object target );
 
     void setInterventionSource(IInterventionSource source);
+    void setMessageQueue(CMessageQueueFactory queue);
 
 }

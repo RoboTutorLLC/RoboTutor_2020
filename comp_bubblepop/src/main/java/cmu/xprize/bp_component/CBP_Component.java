@@ -41,11 +41,13 @@ import java.util.List;
 import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -53,7 +55,8 @@ import cmu.xprize.util.TCONST;
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 
 
-public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject, IInterventionSource {
+public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject,
+        IInterventionSource, IMessageQueueRunner {
 
     // Make this public and static so sub-components may use it during json load to instantiate
     // controls on the fly.
@@ -80,11 +83,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     protected int                   correct_Count;
 
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
-
-    private final Handler           mainHandler = new Handler(Looper.getMainLooper());
-    private HashMap                 queueMap    = new HashMap();
-    private HashMap                 nameMap    = new HashMap();
-    private boolean                 _qDisabled  = false;
 
     protected LocalBroadcastManager   bManager;
     protected BroadcastReceiver       bReceiver;
@@ -140,6 +138,8 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     public String                   problem_type     = "normal";
 
     static final String TAG = "CBP_Component";
+
+    protected CMessageQueueFactory _queue;
 
 
 
@@ -201,6 +201,8 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         IntentFilter filter = new IntentFilter(EXIT_FROM_INTERVENTION);
         bManager.registerReceiver(bReceiver, filter);
 
+        _queue = new CMessageQueueFactory(this, "CBpop");
+
         // Allow onDraw to be called to start animations
         //
         setWillNotDraw(false);
@@ -239,7 +241,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
     public void onDestroy() {
 
-        terminateQueue();
+        _queue.terminateQueue();
 
         if(_mechanics != null) {
             _mechanics.onDestroy();
@@ -392,6 +394,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         }
 
         _mechanics.setInterventionSource(this);
+        _mechanics.setMessageQueue(_queue);
         _mechanics.populateView(_currData);
 
         requestLayout();
@@ -602,7 +605,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
      */
     public void cancelHesitationTimer() {
         Log.v("event.thing", "cancelling hesitation timer");
-        cancelPost("HESITATION_PROMPT");
+        _queue.cancelPost("HESITATION_PROMPT");
     }
 
     /**
@@ -611,7 +614,9 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     public void triggerHesitationTimer() {
         // why does this get triggered so easily???
         Log.v("event.thing", "triggering hesitation timer");
-        postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_BPOP);
+        _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_BPOP);
+        // hesitation should only be triggered on first problem.
+        // set a boolean IS_FIRST_PROBLEM and set it to false after first thing
     }
 
 
@@ -629,7 +634,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
      */
     public void cancelStuckTimer() {
         Log.v("event.thing", "cancelling stuck timer");
-        cancelPost("STUCK_TIMER");
+        _queue.cancelPost("STUCK_TIMER");
     }
 
     /**
@@ -637,7 +642,57 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
      */
     public void triggerStuckTimer() {
         Log.v("event.thing", "triggering stuck timer");
-        postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_BPOP);
+        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_BPOP);
+    }
+
+    @Override
+    public void runCommand(String command) {
+        runCommand(command, (Object) null);
+    }
+
+    @Override
+    public void runCommand(String command, String target) {
+        runCommand(command, (Object) null);
+    }
+
+    @Override
+    public void runCommand(String command, Object target) {
+
+        Log.w("EPSTEIN", String.format("CBP.runCommand(%s)", command));
+        switch(command) {
+            case TCONST.I_TRIGGER_GESTURE:
+                // new rules: time between different gestures exceeds 3 * (what judith gave in spreadsheet)
+                // on(firstTouch, f(gesture, time) {
+                //   if (gesture is wrong) {
+                //      originalTime = time;
+                //      lastGesture = gesture;
+                //
+                //    }
+                // }
+                // on (nextGesture, f(gesture, time) {
+                //   if (gesture == wrong) {
+                //
+                //   }
+
+                triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+                break;
+
+            case TCONST.I_TRIGGER_HESITATE:
+                triggerIntervention(TCONST.I_TRIGGER_HESITATE);
+                // JUDITH_BPOP what about cancelling???
+                break;
+
+            case TCONST.I_TRIGGER_STUCK:
+                triggerIntervention(TCONST.I_TRIGGER_STUCK);
+                break;
+
+
+            default:
+                if(_mechanics != null) {
+                    _mechanics.execCommand(command, target); //
+                    Log.wtf("EPSTEIN", "Bpop.runCommand " + command + " " + target.toString());
+                }
+        }
     }
 
     class ChangeReceiver extends BroadcastReceiver {
@@ -707,193 +762,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     // publish component state data - EBD
     //************************************************************************
     //************************************************************************
-
-
-
-    //************************************************************************
-    //************************************************************************
-    // Component Message Queue  -- Start
-
-
-    public class Queue implements Runnable {
-
-        protected String _command;
-        protected String _name; // used to find a command and cancel it.
-        protected Object _target;
-
-        public Queue(String command) {
-            _command = command;
-        }
-
-        // needed for cancelling
-        public Queue (String name, String command) {
-            this._name = name;
-            this._command = command;
-
-            if (name != null) {
-                nameMap.put(name, this);
-            }
-        }
-
-        public Queue(String command, Object target) {
-            _command = command;
-            _target  = target;
-        }
-
-        public String getCommand() {
-            return _command;
-        }
-
-
-        @Override
-        public void run() {
-
-            try {
-
-                if (_name != null) {
-                    nameMap.remove(_name);
-                }
-
-                queueMap.remove(this);
-
-                switch(_command) {
-                    case TCONST.I_TRIGGER_GESTURE:
-                        triggerIntervention(TCONST.I_TRIGGER_GESTURE);
-                        break;
-
-                    case TCONST.I_TRIGGER_HESITATE:
-                        triggerIntervention(TCONST.I_TRIGGER_HESITATE);
-                        // JUDITH_BPOP what about cancelling???
-                        break;
-
-                    case TCONST.I_TRIGGER_STUCK:
-                        triggerIntervention(TCONST.I_TRIGGER_STUCK);
-                        break;
-
-
-                    default:
-                        if(_mechanics != null) {
-                            _mechanics.execCommand(_command, _target);
-                        }
-                }
-
-            }
-            catch(Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error: cmd:" + _command + " tar: " + _target + "  >", e, false);
-            }
-        }
-    }
-
-
-    /**
-     *  Disable the input queues permenantly in prep for destruction
-     *  walks the queue chain to diaable scene queue
-     *
-     */
-    private void terminateQueue() {
-
-        // disable the input queue permenantly in prep for destruction
-        //
-        _qDisabled = true;
-        flushQueue();
-    }
-
-
-    /**
-     * Remove any pending scenegraph commands.
-     *
-     */
-    private void flushQueue() {
-
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            Log.d(TAG, "Post Cancelled on Flush: " + ((Queue)entry.getValue()).getCommand());
-
-            mainHandler.removeCallbacks((Queue)(entry.getValue()));
-        }
-    }
-
-    /**
-     * Remove named posts
-     *
-     */
-    public void cancelPost(String name) {
-
-        Log.d(TAG, "Cancel Post Requested: " + name);
-
-        while(nameMap.containsKey(name)) {
-
-            Log.d(TAG, "Post Cancelled: " + name);
-
-            mainHandler.removeCallbacks((Queue) (nameMap.get(name)));
-            nameMap.remove(name); // JUDITH replicate
-        }
-    }
-
-
-
-    /**
-     * Keep a mapping of pending messages so we can flush the queue if we want to terminate
-     * the tutor before it finishes naturally.
-     *
-     * @param qCommand
-     */
-    private void enQueue(Queue qCommand) {
-        enQueue(qCommand, 0);
-    }
-    private void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
-    }
-
-    /**
-     * Post a command to the tutorgraph queue
-     *
-     * @param command
-     */
-    public void post(String command) {
-        post(command, 0);
-    }
-    public void post(String command, long delay) {
-
-        enQueue(new Queue(command), delay);
-    }
-
-
-    public void postNamed(String name, String command, Long delay) {
-        enQueue(new Queue(name, command), delay);
-    }
-
-    /**
-     * Post a command and target to this scenegraph queue
-     *
-     * @param command
-     */
-    public void post(String command, Object target) {
-        post(command, target, 0);
-    }
-    public void post(String command, Object target, long delay) {
-
-        enQueue(new Queue(command, target), delay);
-    }
-
-
-    // Component Message Queue  -- End
-    //************************************************************************
-    //************************************************************************
-
 
 
     //***********************************************************

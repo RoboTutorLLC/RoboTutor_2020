@@ -92,7 +92,7 @@ public class CBp_Mechanic_RISE extends CBp_Mechanic_Base implements IBubbleMecha
 
                     _isRunning = true;
 
-                    mComponent.post(BP_CONST.SPAWN_BUBBLE);
+                    mQueue.post(BP_CONST.SPAWN_BUBBLE);
                 }
                 break;
 
@@ -115,7 +115,7 @@ public class CBp_Mechanic_RISE extends CBp_Mechanic_Base implements IBubbleMecha
                     }
 
                     _isRunning = true;
-                    mComponent.post(BP_CONST.SPAWN_BUBBLE);
+                    mQueue.post(BP_CONST.SPAWN_BUBBLE);
                 }
                 break;
 
@@ -128,9 +128,9 @@ public class CBp_Mechanic_RISE extends CBp_Mechanic_Base implements IBubbleMecha
 
                         delay = getRandInRange(launchRange);
 
-                        mComponent.post(BP_CONST.SPAWN_BUBBLE, delay);
+                        mQueue.post(BP_CONST.SPAWN_BUBBLE, delay);
                     } else {
-                        mComponent.post(BP_CONST.SPAWN_BUBBLE);
+                        mQueue.post(BP_CONST.SPAWN_BUBBLE);
                     }
                 }
                 break;
@@ -145,7 +145,7 @@ public class CBp_Mechanic_RISE extends CBp_Mechanic_Base implements IBubbleMecha
 
                 broadcastLocation(TCONST.GLANCEAT, mParent.localToGlobal(bubble.getCenterPosition()));
 
-                mComponent.post(BP_CONST.REPLACE_BUBBLE, bubble, delay);
+                mQueue.post(BP_CONST.REPLACE_BUBBLE, bubble, delay);
                 break;
 
         }

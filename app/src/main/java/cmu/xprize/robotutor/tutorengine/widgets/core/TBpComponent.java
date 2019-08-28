@@ -434,18 +434,19 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     //*****************  Scripting Interface
 
 
+    // QUEUE_REFACTOR used in animator_graph
     public void postEvent(String event) {
 
         switch (event) {
 
             case BP_CONST.PAUSE_ANIMATION:
 
-                post(BP_CONST.PAUSE_ANIMATION);
+                _queue.post(BP_CONST.PAUSE_ANIMATION);
                 break;
 
             case BP_CONST.RESUME_ANIMATION:
 
-                post(BP_CONST.RESUME_ANIMATION);
+                _queue.post(BP_CONST.RESUME_ANIMATION);
                 break;
 
             case BP_CONST.SHOW_BUBBLE_MASK:
@@ -464,31 +465,31 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
                 break;
 
             case BP_CONST.SHOW_SCORE:
-                post(BP_CONST.SHOW_SCORE, new Integer(correct_Count));
+                _queue.post(BP_CONST.SHOW_SCORE, new Integer(correct_Count));
                 break;
 
             case BP_CONST.SHOW_STIMULUS:
-                post(BP_CONST.SHOW_STIMULUS, _currData);
+                _queue.post(BP_CONST.SHOW_STIMULUS, _currData);
                 break;
 
             case BP_CONST.SHOW_FEEDBACK:
-                post(BP_CONST.SHOW_FEEDBACK, new Integer(correct_Count));
+                _queue.post(BP_CONST.SHOW_FEEDBACK, new Integer(correct_Count));
                 break;
 
             case BP_CONST.SHOW_BUBBLES:
-                post(BP_CONST.SHOW_BUBBLES);
+                _queue.post(BP_CONST.SHOW_BUBBLES);
                 break;
 
             case BP_CONST.POP_BUBBLE:
-                post(BP_CONST.POP_BUBBLE, _touchedBubble);
+                _queue.post(BP_CONST.POP_BUBBLE, _touchedBubble);
                 break;
 
             case BP_CONST.WIGGLE_BUBBLE:
-                post(BP_CONST.WIGGLE_BUBBLE, _touchedBubble);
+                _queue.post(BP_CONST.WIGGLE_BUBBLE, _touchedBubble);
                 break;
 
             case BP_CONST.CLEAR_CONTENT:
-                post(BP_CONST.CLEAR_CONTENT, _touchedBubble);
+                _queue.post(BP_CONST.CLEAR_CONTENT, _touchedBubble);
                 break;
         }
     }

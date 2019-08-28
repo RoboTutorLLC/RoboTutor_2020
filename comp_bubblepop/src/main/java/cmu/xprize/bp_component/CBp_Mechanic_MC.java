@@ -21,6 +21,7 @@ package cmu.xprize.bp_component;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -107,8 +108,6 @@ public class CBp_Mechanic_MC extends CBp_Mechanic_Base implements IBubbleMechani
         mPaint.setColor(Color.parseColor("#000000"));
         canvas.drawCircle(_viewCenter.x, _viewCenter.y , 13f, mPaint);
 
-        int _bubbleIntrinsicRadius = (mParent.getResources().getDrawable(BP_CONST.BUBBLE_SAMPLE, null).getIntrinsicWidth()) / 2;
-
         for(int i1 = 0; i1 < SBubbles.length ; i1++) {
 
             float[] range = SBubbles[i1].getRange();
@@ -184,7 +183,7 @@ public class CBp_Mechanic_MC extends CBp_Mechanic_Base implements IBubbleMechani
                 if (mInitialized) {
 
                     for(CBubble ibubble : SBubbles) {
-                        mComponent.post(BP_CONST.INFLATE, ibubble, delay);
+                        mQueue.post(BP_CONST.INFLATE, ibubble, delay); // what
                         delay += BP_CONST.INFLATE_DELAY;
                     }
 
@@ -240,7 +239,7 @@ public class CBp_Mechanic_MC extends CBp_Mechanic_Base implements IBubbleMechani
 
                 broadcastLocation(TCONST.GLANCEAT, mParent.localToGlobal(bubble.getCenterPosition()));
 
-                mComponent.post(BP_CONST.REMOVE_BUBBLE, bubble, delay);
+                mQueue.post(BP_CONST.REMOVE_BUBBLE, bubble, delay);
                 break;
 
         }
