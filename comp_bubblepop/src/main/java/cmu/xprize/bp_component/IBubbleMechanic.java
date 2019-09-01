@@ -19,7 +19,6 @@ public interface IBubbleMechanic {
     public void doLayout(int width, int height, CBp_Data data);
     public void execCommand(String command, Object target );
 
-    void setInterventionSource(IInterventionSource source);
     void setMessageQueue(CMessageQueueFactory queue);
 
 }

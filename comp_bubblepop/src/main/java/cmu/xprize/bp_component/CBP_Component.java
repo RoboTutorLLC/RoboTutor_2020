@@ -393,7 +393,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 break;
         }
 
-        _mechanics.setInterventionSource(this);
         _mechanics.setMessageQueue(_queue);
         _mechanics.populateView(_currData);
 
