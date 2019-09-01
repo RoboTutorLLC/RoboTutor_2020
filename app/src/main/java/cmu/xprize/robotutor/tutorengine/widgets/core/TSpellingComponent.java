@@ -139,6 +139,9 @@ public class TSpellingComponent extends CSpelling_Component implements ITutorObj
 
     public void next() {
 
+        resetStuckTimer();
+        resetHesitationTimer();
+
         Log.wtf("LEBRON", "next");
         super.next();
     }
