@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.support.constraint.ConstraintLayout;
-import android.support.constraint.Guideline;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,10 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -40,7 +43,8 @@ import static cmu.xprize.util.TCONST.TYPE_AUDIO;
  */
 
 public class CSpelling_Component extends ConstraintLayout implements ILoadableObject, IPublisher,
-        IEventListener, IInterventionSource {
+        IEventListener, IInterventionSource, IMessageQueueRunner {
+    private static final String TAG = "CSpell";
 
     //region Class Variables
 
@@ -72,6 +76,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     protected boolean lastSyllable;
 
     // View
+    // INT_SPELL - GESTURE - where do I put the gesture listener? need to inspect what happens each
     protected Context mContext;
     protected LinearLayout mLetterHolder;
     protected LinearLayout mSelectedLetterHolder;
@@ -81,6 +86,11 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     private LocalBroadcastManager _bManager;
 
     protected HashMap<String,Boolean> _FeatureMap = new HashMap<>();
+
+    protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
+
+    CMessageQueueFactory _queue;
+    private GestureDetector mDetector;
 
     //endregion
 
@@ -178,14 +188,62 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         Scontent = (ConstraintLayout) findViewById(R.id.SSpelling);
 
+        mDetector = new GestureDetector(mContext, new SpellingGestureListener(this));
+
         mLetterHolder = (LinearLayout) findViewById(R.id.letterHolder);
         mSelectedLetterHolder = (LinearLayout) findViewById(R.id.blankHolder);
         mImageStimulus = (ImageView) findViewById(R.id.imageStimulus);
 
         _bManager = LocalBroadcastManager.getInstance(getContext());
+
+        _queue = new CMessageQueueFactory(this, "CSpelling");
+
+        Scontent.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.v("event.thing", "This is a touch");
+                    resetHesitationTimer();
+                }
+                return mDetector.onTouchEvent(motionEvent);
+            }
+        });
+
     }
 
     //endregion
+
+    public void resetStuckTimer() {
+        cancelStuckTimer();
+        triggerStuckTimer();
+    }
+
+    public void cancelStuckTimer() {
+        Log.v("event.thing", "resetting stuck timer");
+        _queue.cancelPost("STUCK_TIMER");
+    }
+
+    public void triggerStuckTimer() {
+        Log.v("event.thing", "trigger stuck timer");
+        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_SPELL);
+    }
+
+    public void resetHesitationTimer() {
+        Log.v("event.thing", "resetting hesitation timer");
+        cancelHesitationTimer();
+        triggerHesitationTimer();
+    }
+
+    public void cancelHesitationTimer() {
+        Log.v("event.thing", "cancelling hesitation timer");
+        _queue.cancelPost("HESITATION_PROMPT");
+    }
+
+    public void triggerHesitationTimer() {
+        Log.v("event.thing", "triggering hesitation timer");
+        _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_SPELL);
+    }
 
     //region View
     public void onLetterTouch(String letter, int index, CLetter_Tile lt) {
@@ -204,6 +262,18 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         publishValue(SP_CONST.SYLLABLE_STIM, pronunciation);
 
         boolean isCorrect = letter.equalsIgnoreCase(current);
+
+        // INT_SPELL - FAILURE - STATUS:TEST
+        // INT_FAILURE - SPELL - STATUS:TEST
+        if (!isCorrect) {
+            wrongFirstAttempts++;
+            if (wrongFirstAttempts == 3) {
+                triggerIntervention(TCONST.I_TRIGGER_FAILURE);
+            }
+        } else {
+            wrongFirstAttempts = 0;
+        }
+
         trackAndLogPerformance(isCorrect, letter);
         if (isCorrect) {
             Log.d("ddd", "Correct");
@@ -487,5 +557,31 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     }
 
+    @Override
+    public void runCommand(String command) {
+        // QUEUE_REFACTOR only needed when we're actually running triggerIntervention/Hesitation
+        switch(command) {
+            case TCONST.I_TRIGGER_STUCK:
+                triggerIntervention(TCONST.I_TRIGGER_STUCK);
+                break;
+
+            case TCONST.I_TRIGGER_HESITATE:
+                triggerIntervention(TCONST.I_TRIGGER_HESITATE);
+                break;
+
+        }
+    }
+
+    @Override
+    public void runCommand(String command, Object target) {
+        runCommand(command);
+    }
+
+    @Override
+    public void runCommand(String command, String target) {
+        runCommand(command);
+    }
+
     //endregion
+
 }
