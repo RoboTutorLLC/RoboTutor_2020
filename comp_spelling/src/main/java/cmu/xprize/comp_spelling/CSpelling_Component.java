@@ -214,6 +214,10 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     //endregion
 
+
+    // *********************************************
+    // BEGIN stuck and hesitation timers
+    // *********************************************
     public void resetStuckTimer() {
         cancelStuckTimer();
         triggerStuckTimer();
@@ -244,6 +248,10 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         Log.v("event.thing", "triggering hesitation timer");
         _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_SPELL);
     }
+
+    // *********************************************
+    // END stuck and hesitation timers
+    // *********************************************
 
     //region View
     public void onLetterTouch(String letter, int index, CLetter_Tile lt) {
@@ -478,6 +486,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         loadDataSet(data);
         updateStimulus();
+        resetStuckTimer();
+        resetHesitationTimer();
     }
 
     /**

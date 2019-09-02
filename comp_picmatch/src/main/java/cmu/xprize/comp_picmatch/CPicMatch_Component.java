@@ -8,6 +8,8 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -22,8 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -32,7 +36,7 @@ import cmu.xprize.util.TCONST;
  * Generated automatically w/ code written by Kevin DeLand
  */
 public class CPicMatch_Component extends RelativeLayout implements
-        ILoadableObject, IInterventionSource {
+        ILoadableObject, IInterventionSource, IMessageQueueRunner {
 
     static final String TAG = "CPicMatch_Component";
 
@@ -61,6 +65,9 @@ public class CPicMatch_Component extends RelativeLayout implements
     protected Context context;
 
     private LocalBroadcastManager bManager;
+
+    CMessageQueueFactory _queue;
+    private GestureDetector mDetector;
 
     public CPicMatch_Component(Context context) {
         super(context);
@@ -98,7 +105,92 @@ public class CPicMatch_Component extends RelativeLayout implements
         optionViews[3].setVisibility(View.INVISIBLE);
 
         bManager = LocalBroadcastManager.getInstance(getContext());
+
+        _queue = new CMessageQueueFactory(this, "CPicMatch");
+
+        Scontent.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    Log.v("event.thing", "This is a touch");
+                    resetHesitationTimer();
+                }
+                return false;
+            }
+        });
     }
+
+    // *********************************************
+    // BEGIN stuck and hesitation timers
+    // *********************************************
+    public void resetStuckTimer() {
+        cancelStuckTimer();
+        triggerStuckTimer();
+    }
+
+    public void cancelStuckTimer() {
+        Log.v("event.thing", "resetting stuck timer");
+        _queue.cancelPost("STUCK_TIMER");
+    }
+
+    public void triggerStuckTimer() {
+        Log.v("event.thing", "trigger stuck timer");
+        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_PICMATCH);
+    }
+
+    public void resetHesitationTimer() {
+        Log.v("event.thing", "resetting hesitation timer");
+        cancelHesitationTimer();
+        triggerHesitationTimer();
+    }
+
+    public void cancelHesitationTimer() {
+        Log.v("event.thing", "cancelling hesitation timer");
+        _queue.cancelPost("HESITATION_PROMPT");
+    }
+
+    public void triggerHesitationTimer() {
+        Log.v("event.thing", "triggering hesitation timer");
+        _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_PICMATCH);
+    }
+
+    // *********************************************
+    // END stuck and hesitation timers
+    // *********************************************
+
+
+    // *********************************************
+    // BEGIN runCommand
+    // *********************************************
+    @Override
+    public void runCommand(String command) {
+        switch(command) {
+            case TCONST.I_TRIGGER_STUCK:
+                triggerIntervention(TCONST.I_TRIGGER_STUCK);
+                break;
+
+            case TCONST.I_TRIGGER_HESITATE:
+                triggerIntervention(TCONST.I_TRIGGER_HESITATE);
+                break;
+
+        }
+    }
+
+    @Override
+    public void runCommand(String command, Object target) {
+        runCommand(command);
+    }
+
+    @Override
+    public void runCommand(String command, String target) {
+        runCommand(command);
+    }
+
+    // *********************************************
+    // END runCommand
+    // *********************************************
+
 
     // ALAN_HILL (2) this is called by animator_graph
     public void next() {
@@ -124,6 +216,8 @@ public class CPicMatch_Component extends RelativeLayout implements
         loadDataSet(data);
 
         updateStimulus();
+        resetStuckTimer();
+        resetHesitationTimer();
     }
 
     /**

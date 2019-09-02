@@ -15,6 +15,51 @@ public class QuickDebugTutorList {
     public static Map<String, QuickDebugTutor> toFixBugMap = new HashMap<>();
     public static Map<String, QuickDebugTutor> resolvedBugMap = new HashMap<>();
 
+    // for JUDITH demo
+    static {
+
+        // function implemented √√√
+        // tutor chosen         √√√
+        // final testing        OOO
+        QuickDebugTutor failureSupport1 = new QuickDebugTutor(
+                "bpop.addsub",
+                "bpop.addsub:10..80.rand.ADD-2D-V.8",
+                "[file]bpop.addsub_10..80.rand.ADD-2D-V.8.json"
+        );
+        toFixBugMap.put("demo_failure", failureSupport1);
+
+
+        // function implemented √√√
+        // tutor chosen         √√√
+        // final testing        OOO
+        QuickDebugTutor stuckSupport = new QuickDebugTutor(
+                "spelling",
+                "spelling:datasource_2",
+                "[file]spelling_datasource_2.json"
+        );
+        toFixBugMap.put("demo_stuck", stuckSupport);
+
+        // function implemented OOO
+        // tutor chosen         √√√
+        // final testing        OOO
+        QuickDebugTutor gestureSupport1 = new QuickDebugTutor(
+                "write.ltr.uc.trc",
+                "write.ltr.uc.trc:vow.asc.A..Z.1",
+                "[file]write.ltr.uc.trc_vow.asc.A..Z.1.json"
+
+        );
+        toFixBugMap.put("demo_gesture", gestureSupport1);
+
+        // function implemented √√√
+        // tutor chosen         √√√
+        // final testing        OOO
+        QuickDebugTutor hesitateSupport = new QuickDebugTutor(
+                "picmatch",
+                "picmatch:food",
+                "[file]picmatch_food.json"
+        );
+        toFixBugMap.put("demo_hesitate", hesitateSupport);
+    }
 
     static {
         QuickDebugTutor interventionAkira = new QuickDebugTutor(
