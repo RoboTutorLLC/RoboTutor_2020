@@ -408,24 +408,18 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
     /**
      * Test whether the motion is greater than the jitter tolerance
      *
-     * @param x
-     * @param y
-     * @return
      */
     private boolean testPointTolerance(float x, float y) {
 
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
 
-        return ((dx >= TOLERANCE || dy >= TOLERANCE) && dx <= LIMIT && dy <= LIMIT)? true:false;
+        return ((dx >= TOLERANCE || dy >= TOLERANCE) && dx <= LIMIT && dy <= LIMIT);
     }
 
 
     /**
      * Update the glyph path if motion is greater than tolerance - remove jitter
-     *
-     * @param x
-     * @param y
      */
     private void moveTouch(float x, float y) {
         PointF touchPt;
@@ -475,6 +469,8 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
     }
 
 
+    // INT_WRITE I think gesture goes here... this should just restart the timer!
+    // INT_WRITE can't really look for gesture...
     public boolean onTouch(View view, MotionEvent event) {
         PointF     p;
         boolean    result = false;

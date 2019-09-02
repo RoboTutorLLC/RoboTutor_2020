@@ -20,36 +20,31 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PointF;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.comp_logging.ITutorLogger;
-import cmu.xprize.comp_writing.CWr_Data;
 import cmu.xprize.comp_logging.PerformanceLogItem;
-import cmu.xprize.comp_writing.CWritingBoxLink;
+import cmu.xprize.comp_writing.CWr_Data;
 import cmu.xprize.comp_writing.CWritingComponent;
 import cmu.xprize.comp_writing.WR_CONST;
 import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
+import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
@@ -57,21 +52,15 @@ import cmu.xprize.robotutor.tutorengine.CMediaPackage;
 import cmu.xprize.robotutor.tutorengine.CSceneDelegate;
 import cmu.xprize.robotutor.tutorengine.CTutor;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;
-import cmu.xprize.util.IEventSource;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
 import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
 import cmu.xprize.robotutor.tutorengine.graph.scene_descriptor;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScriptable2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TInteger;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TString;
-import cmu.xprize.comp_logging.CErrorManager;
-import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IEvent;
-import cmu.xprize.util.IEventListener;
-import cmu.xprize.comp_logging.ILogManager;
-
-import cmu.xprize.robotutor.R;
+import cmu.xprize.util.IEventSource;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -90,9 +79,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     private CSceneDelegate          mTutorScene;
     private CMediaManager           mMediaManager;
 
-    public List<IEventListener>     mListeners          = new ArrayList<IEventListener>();
-    protected List<String>          mLinkedViews;
-    protected boolean               mListenerConfigured = false;
     private int[]                   _screenCoord        = new int[2];
 
     private HashMap<String, String> volatileMap = new HashMap<>();
@@ -106,10 +92,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     private HashMap<String,Integer> _IntegerVar = new HashMap<>();
     private HashMap<String,Boolean> _FeatureMap = new HashMap<>();
 
-    protected String                DATASOURCEPATH;
-    protected String                STORYSOURCEPATH;
     protected String                AUDIOSOURCEPATH;
-    protected String                SHAREDPATH;
 
     private static final String  TAG = "TWritingComponent";
 
@@ -146,142 +129,32 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
         _recognizer.setClassBoost(GCONST.NO_BOOST); // reset boost which may have been set from Asm
 
-        mRecognizedScroll = (CLinkedScrollView) findViewById(R.id.Sstimulus);
-        mRecogList        = (LinearLayout) findViewById(R.id.SstimulusList);
+        mRecognizedScroll = findViewById(R.id.Sstimulus);
+        mRecogList        = findViewById(R.id.SstimulusList);
 
-        mResponseViewScroll = (CLinkedScrollView) findViewById(R.id.Sresponseview);
-        mResponseViewList = (LinearLayout) findViewById(R.id.SresponseviewList);
-        mResponseScrollLayout = (RelativeLayout)  findViewById(R.id.Sresponsescrolllayout);
-        mDrawnScroll = (CLinkedScrollView) findViewById(R.id.SfingerWriter);
-        mGlyphList   = (LinearLayout) findViewById(R.id.Sdrawn_glyphs);
+        mResponseViewScroll = findViewById(R.id.Sresponseview);
+        mResponseViewList = findViewById(R.id.SresponseviewList);
+        mResponseScrollLayout = findViewById(R.id.Sresponsescrolllayout);
+        mDrawnScroll = findViewById(R.id.SfingerWriter);
+        mGlyphList   = findViewById(R.id.Sdrawn_glyphs);
         mGlyphList.setClipChildren(false);
 
-        mReplayButton = (ImageButton) findViewById(R.id.Sreplay);
-        mWritingBoxLink = (CWritingBoxLink) findViewById(R.id.SWritingBoxLink);
+        mReplayButton = findViewById(R.id.Sreplay);
+        mWritingBoxLink = findViewById(R.id.SWritingBoxLink);
 
-//        mDrawnScroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-//
-//            }
-//            @Override
-//            public void onScrollChanged() {
-        //scrolling buttons
-//        mScrollRightButton = (ImageButton) findViewById(R.id.buttonright);
-//        mScrollLeftButton = (ImageButton) findViewById(R.id.buttonleft);
-//        mScrollLeftButton.setVisibility(View.INVISIBLE);
-//
-//        mScrollRightButton.setOnTouchListener(new View.OnTouchListener() {
-//
-//            private Handler mHandler;
-//            private long mInitialDelay = 5;
-//            private long mRepeatDelay = 5;
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        if (mHandler != null)
-//                            return true;
-//                        mHandler = new Handler();
-//                        mHandler.postDelayed(mAction, mInitialDelay);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        if (mHandler == null)
-//                            return true;
-//                        mHandler.removeCallbacks(mAction);
-//                        mHandler = null;
-//                        break;
-//                }
-//                return false;
-//            }
-//
-//            Runnable mAction = new Runnable() {
-//                @Override
-//                public void run() {
-//                    mDrawnScroll.scrollTo((int) mDrawnScroll.getScrollX() + 20, (int) mDrawnScroll.getScrollY());
-//                    mHandler.postDelayed(mAction, mRepeatDelay);
-//                }
-//            };
-//        });
-//
-//        mScrollLeftButton.setOnTouchListener(new View.OnTouchListener() {
-//
-//            private Handler mHandler;
-//            private long mInitialDelay = 5;
-//            private long mRepeatDelay = 5;
-//
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        if (mHandler != null)
-//                            return true;
-//                        mHandler = new Handler();
-//                        mHandler.postDelayed(mAction, mInitialDelay);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        if (mHandler == null)
-//                            return true;
-//                        mHandler.removeCallbacks(mAction);
-//                        mHandler = null;
-//                        break;
-//                }
-//                return false;
-//            }
-//
-//            Runnable mAction = new Runnable() {
-//                @Override
-//                public void run() {
-//                    mDrawnScroll.scrollTo((int) mDrawnScroll.getScrollX() - 20, (int) mDrawnScroll.getScrollY());
-//                    mHandler.postDelayed(mAction, mRepeatDelay);
-//                }
-//            };
-//        });
-//
-        //toggle buttons visibility and refresh writing box links upon scrolling.
         if(activityFeature.contains("FTR_SEN")){
-        mDrawnScroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-            @Override
-            public void onScrollChanged() {
-//                mWritingBoxLink.setGlyphList(mGlyphList);
-                mWritingBoxLink.invalidate();
+            mDrawnScroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                @Override
+                public void onScrollChanged() {
 
-                //code below is to enable or disable the arrows
-//                int scrollX = mDrawnScroll.getScrollX(); // For HorizontalScrollView
-////                int maxScrollX = mDrawnScroll.getChildAt(0).getWidth();
-//                int maxScrollX = 5000;
-//                int a = mDrawnScroll.getWidth();
-//                if (scrollX > 0){
-//                    mScrollLeftButton.setVisibility(View.VISIBLE);
-//                }
-//                else{
-//                    mScrollLeftButton.setVisibility(View.INVISIBLE);
-//                }
-//                if (scrollX < maxScrollX){
-//                    mScrollRightButton.setVisibility(View.VISIBLE);
-//                }
-//                else{
-//                    mScrollRightButton.setVisibility(View.INVISIBLE);
-//                }
-            }
-        });
+                    mWritingBoxLink.invalidate();
+                }
+            });
         }
 
-//
-//        if (activityFeature.contains("FTR_SEN")){
-//            mScrollRightButton.setVisibility(View.VISIBLE);
-//            mScrollRightButton.setVisibility(View.VISIBLE);
-//        }
-        //code for scrolling buttons ends
-
-// TODO: DEBUG only
-//        mRecogList.setOnTouchListener(new RecogTouchListener());
-//        mGlyphList.setOnTouchListener(new drawnTouchListener());
         mResponseViewScroll.setLinkedScroll(mDrawnScroll);
         mRecognizedScroll.setLinkedScroll(mDrawnScroll);
         mDrawnScroll.setLinkedScroll(mRecognizedScroll);
-
-
-
 
         // Iniitalize the static behaviors
         //
@@ -301,7 +174,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
     /**
      *
-     * @param event
      */
     @Override
     public void onEvent(IEvent event) {
@@ -316,15 +188,13 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
     private void extractHashContents(StringBuilder builder, HashMap map) {
 
-        Iterator<?> tObjects = map.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
+        for (Object o : map.entrySet()) {
 
             builder.append(',');
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Map.Entry entry = (Map.Entry) o;
 
-            String key   = entry.getKey().toString();
+            String key = entry.getKey().toString();
             String value = "#" + entry.getValue().toString();
 
             builder.append(key);
@@ -336,18 +206,16 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
         StringBuilder featureset = new StringBuilder();
 
-        Iterator<?> tObjects = map.entrySet().iterator();
-
         // Scan to build a list of active features
         //
-        while(tObjects.hasNext() ) {
+        for (Object o : map.entrySet()) {
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Map.Entry entry = (Map.Entry) o;
 
             Boolean value = (Boolean) entry.getValue();
 
-            if(value) {
-                featureset.append(entry.getKey().toString() + ";");
+            if (value) {
+                featureset.append(entry.getKey().toString()).append(";");
             }
         }
 
@@ -357,7 +225,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         if(featureset.length() != 0) {
             featureset.deleteCharAt(featureset.length()-1);
 
-            builder.append(",$features#" + featureset.toString());
+            builder.append(",$features#").append(featureset.toString());
         }
     }
 
@@ -501,7 +369,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     @Override
     public boolean applyBehavior(String event) {
 
-        boolean result = false;
+        boolean result;
 
         if(!(result = super.applyBehavior(event))) {
 
@@ -530,7 +398,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     /**
      * Apply Events in the Tutor Domain.
      *
-     * @param nodeName
      */
     @Override
     public void applyBehaviorNode(String nodeName) {
@@ -792,7 +659,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
      * FeatureSet that should be pushed/popped when using pushDataSource
      * e.g. we want EOD to track even if it has never been set
      *
-     * @param feature
      */
     @Override
     public void retractFeature(String feature) {
@@ -802,23 +668,17 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     }
 
 
-    /**
-     *
-     * @param featureMap
-     */
     @Override
     public void publishFeatureMap(HashMap featureMap) {
 
-        Iterator<?> tObjects = featureMap.entrySet().iterator();
+        for (Object o : featureMap.entrySet()) {
 
-        while(tObjects.hasNext() ) {
+            Map.Entry entry = (Map.Entry) o;
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Boolean active = (Boolean) entry.getValue();
 
-            Boolean active = (Boolean)entry.getValue();
-
-            if(active) {
-                String feature = (String)entry.getKey();
+            if (active) {
+                String feature = (String) entry.getKey();
 
                 mTutor.addFeature(feature);
             }
@@ -826,23 +686,17 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     }
 
 
-    /**
-     *
-     * @param featureMap
-     */
     @Override
     public void retractFeatureMap(HashMap featureMap) {
 
-        Iterator<?> tObjects = featureMap.entrySet().iterator();
+        for (Object o : featureMap.entrySet()) {
 
-        while(tObjects.hasNext() ) {
+            Map.Entry entry = (Map.Entry) o;
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Boolean active = (Boolean) entry.getValue();
 
-            Boolean active = (Boolean)entry.getValue();
-
-            if(active) {
-                String feature = (String)entry.getKey();
+            if (active) {
+                String feature = (String) entry.getKey();
 
                 mTutor.delFeature(feature);
             }
@@ -859,10 +713,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     //************************************************************************
     // DataSink Implementation Start
 
-    /**
-     *
-     * @param dataPacket
-     */
     public void pushDataSource(String dataPacket) {
 
         if(dataSource != null) {
@@ -888,10 +738,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     }
 
 
-    /**
-     *
-     * @param dataNameDescriptor
-     */
     public void setDataSource(String dataNameDescriptor) {
 
         _correct = 0;
@@ -980,18 +826,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
                 AUDIOSOURCEPATH = TCONST.STORY_PATH + levelFolder + "/" + storyFolder;
                 mMediaManager.addSoundPackage(mTutor, MEDIA_STORY, new CMediaPackage(LANG_AUTO, AUDIOSOURCEPATH));
 
-
-            }else if (dataNameDescriptor.startsWith("db|")) {
-                dataNameDescriptor = dataNameDescriptor.substring(3);
-
-            } else if (dataNameDescriptor.startsWith("[")) {
-
-                dataNameDescriptor = dataNameDescriptor.substring(1, dataNameDescriptor.length()-1);
-
-                // Pass an array of strings as the data source.
-                //
-//                setDataSource(dataNameDescriptor.split(","));
-
             } else {
                 throw (new Exception("test"));
             }
@@ -1022,22 +856,26 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
             String publishValueConstTens = "";
             String publishFeatureValue = "";
 
-            if(constant == "STIM_1") {
+        switch (constant) {
+            case "STIM_1":
                 Log.d("tadpolr", "publishConcat: STIM_1");
                 publishFeatureValue = WR_CONST.FTR_STIM_1_CONCAT;
                 publishValueConstHundreds = WR_CONST.AUDIO_STIM_1_CONCAT_HUNDREDS;
                 publishValueConstTens = WR_CONST.AUDIO_STIM_1_CONCAT_TENS;
-            } else if (constant == "STIM_3") {
+                break;
+            case "STIM_3":
                 Log.d("tadpolr", "publishConcat: STIM_3");
                 publishFeatureValue = WR_CONST.FTR_STIM_3_CONCAT;
                 publishValueConstHundreds = WR_CONST.AUDIO_STIM_3_CONCAT_HUNDREDS;
                 publishValueConstTens = WR_CONST.AUDIO_STIM_3_CONCAT_TENS;
-            } else if (constant == "ANS") {
+                break;
+            case "ANS":
                 Log.d("tadpolr", "publishConcat: ANS");
                 publishFeatureValue = WR_CONST.FTR_ANS_CONCAT;
                 publishValueConstHundreds = WR_CONST.AUDIO_ANS_CONCAT_HUNDREDS;
                 publishValueConstTens = WR_CONST.AUDIO_ANS_CONCAT_TENS;
-            }
+                break;
+        }
 
         // attempt to parse non-int value will prevent _data
         // from changing from demo_data to data_source_data
@@ -1140,13 +978,13 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
         private HashMap<String,Boolean> _FeatureStore;
 
-        protected List<CWr_Data>    _dataStore;
-        protected int               _dataIndexStore;
-        protected boolean           _dataEOIStore;
+        List<CWr_Data>    _dataStore;
+        int               _dataIndexStore;
+        boolean           _dataEOIStore;
 
         CWr_Data[]                  _dataSourceStore;
 
-        public CDataSourceImg() {
+        CDataSourceImg() {
 
             _correctStore    = _correct;
             _wrongStore      = _wrong;
@@ -1161,7 +999,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
             retractFeatureMap(_FeatureMap);
         }
 
-        public void restoreDataSource() {
+        void restoreDataSource() {
 
             // Retract the active feature set
             //
