@@ -15,7 +15,8 @@ import cmu.xprize.util.TCONST;
 
 public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-    IInterventionSource iIntervention;
+    private IInterventionSource iIntervention;
+    private String TAG = "TAG";
 
     public BpopGestureListener(IInterventionSource iIntervention) {
         this.iIntervention = iIntervention;
@@ -23,7 +24,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
 
     @Override
     public boolean onDown(MotionEvent event) {
-        Log.d("GESTURE","onDown: ");
+        Log.d(TAG,"onDown: ");
 
         // don't return false here or else none of the other
         // gestures will work
@@ -33,23 +34,21 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        Log.i("GESTURE", "onSingleTapConfirmed: ");
+        Log.i(TAG, "onSingleTapConfirmed: ");
 
         return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        Log.i("GESTURE", "onLongPress: ");
-
-        // TRIGGER_BPOP - gesture - count 1
+        Log.i(TAG, "onLongPress: ");
         iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Log.i("GESTURE", "onDoubleTap: ");
+        Log.i(TAG, "onDoubleTap: ");
 
 
         return true;
@@ -58,7 +57,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2,
                             float distanceX, float distanceY) {
-        Log.i("GESTURE", "onScroll: ");
+        Log.i(TAG, "onScroll: ");
 
 
         return true;
@@ -67,9 +66,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
-        Log.d("GESTURE", "onFling: ");
-
-        // TRIGGER_BPOP - gesture - count 1
+        Log.d(TAG, "onFling: ");
         iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
         return true;
