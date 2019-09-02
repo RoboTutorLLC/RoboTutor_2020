@@ -37,13 +37,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import cmu.xprize.ltkplus.CGlyph;
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.ltkplus.CGlyph;
 import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.TCONST;
 
@@ -75,9 +72,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
     private ImageButton             mGlyphFlashBut;
     private Button                  mGlyphSaveBut;
 
-    private boolean                 _allowEraseCorrect = false;
     private int[]                   _screenCoord       = new int[2];
-    private boolean                 _isLast;
     private int                     _attempt           = 0;
 
     protected final Handler         mainHandler = new Handler(Looper.getMainLooper());
@@ -124,23 +119,23 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
         super.onFinishInflate();
 
-        mDrawnContainer  = (FrameLayout)findViewById(R.id.drawn_container);
-        mGlyphInput      = (CGlyphInputContainer)findViewById(R.id.drawn_box);
-        mGlyphReplay     = (CGlyphReplayContainer)findViewById(R.id.replay_box);
-        mInsLftSpaceBut  = (ImageButton)findViewById(R.id.insert_space_left);
-        mInsRgtSpaceBut  = (ImageButton)findViewById(R.id.insert_space_right);
-        mDeleteSpaceBut  = (ImageButton)findViewById(R.id.delete_space);
-        mEraseGlyphBut   = (ImageButton)findViewById(R.id.delete_glyph);
+        mDrawnContainer  = findViewById(R.id.drawn_container);
+        mGlyphInput      = findViewById(R.id.drawn_box);
+        mGlyphReplay     = findViewById(R.id.replay_box);
+        mInsLftSpaceBut  = findViewById(R.id.insert_space_left);
+        mInsRgtSpaceBut  = findViewById(R.id.insert_space_right);
+        mDeleteSpaceBut  = findViewById(R.id.delete_space);
+        mEraseGlyphBut   = findViewById(R.id.delete_glyph);
 
         mInsLftSpaceBut.setVisibility(INVISIBLE);
         mInsRgtSpaceBut.setVisibility(INVISIBLE);
         mDeleteSpaceBut.setVisibility(INVISIBLE);
         mEraseGlyphBut.setVisibility(INVISIBLE);
 
-        mGlyphReplayBut = (ImageButton)findViewById(R.id.glyph_playback);
-        mGlyphMorphBut = (ImageButton)findViewById(R.id.glyph_align);
-        mGlyphFlashBut  = (ImageButton)findViewById(R.id.glyph_flash);
-        mGlyphSaveBut   = (Button) findViewById(R.id.Ssave);
+        mGlyphReplayBut = findViewById(R.id.glyph_playback);
+        mGlyphMorphBut = findViewById(R.id.glyph_align);
+        mGlyphFlashBut  = findViewById(R.id.glyph_flash);
+        mGlyphSaveBut   = findViewById(R.id.Ssave);
 
         mGlyphReplayBut.setVisibility(INVISIBLE);
         mGlyphMorphBut.setVisibility(INVISIBLE);
@@ -197,8 +192,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
 
     public int getGlyphIndex(){
-        int index = ((LinearLayout)this.getParent()).indexOfChild(this);
-        return index;
+        return ((LinearLayout) this.getParent()).indexOfChild(this);
     }
 
     public class insLSpaceClickListener implements View.OnClickListener {
@@ -372,7 +366,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
 
     /**
-     * @param drawBase
      */
     public void showBaseLine(boolean drawBase) {
 
@@ -398,8 +391,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
     }
 
     public Rect getBoxRect(){
-        Rect drawnBox = mGlyphInput.getViewBnds();
-        return drawnBox;
+        return mGlyphInput.getViewBnds();
     }
 
     @Override
@@ -534,6 +526,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
      */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        // INT_WRITE does it go here?
         PointF touchPt;
         final int action = event.getAction();
 
@@ -564,20 +557,20 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
     public class Queue implements Runnable {
 
-        protected String _command    = "";
-        protected String _target     = "";
-        protected String _item       = "";
+        String _command    = "";
+        String _target     = "";
+        String _item       = "";
 
-        public Queue(String command) {
+        Queue(String command) {
             _command = command;
         }
 
-        public Queue(String command, String target) {
+        Queue(String command, String target) {
             _command = command;
             _target  = target;
         }
 
-        public Queue(String command, String target, String item) {
+        Queue(String command, String target, String item) {
             _command = command;
             _target  = target;
             _item    = item;
@@ -672,17 +665,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
         }
     }
 
-
-
-    /**
-     * Keep a mapping of pending messages so we can flush the queue if we want to terminate
-     * the tutor before it finishes naturally.
-     *
-     * @param qCommand
-     */
-    private void enQueue(Queue qCommand) {
-        enQueue(qCommand, 0);
-    }
     private void enQueue(Queue qCommand, long delay) {
 
         if(!_qDisabled) {
@@ -699,8 +681,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
     /**
      * Post a command to the queue
-     *
-     * @param command
      */
     public void post(String command) {
         post(command, 0);
@@ -713,8 +693,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
     /**
      * Post a command and target to this queue
-     *
-     * @param command
      */
     public void post(String command, String target) {
         post(command, target, 0);
@@ -724,8 +702,6 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
     /**
      * Post a command , target and item to this queue
-     *
-     * @param command
      */
     public void post(String command, String target, String item) {
         post(command, target, item, 0);
