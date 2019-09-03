@@ -525,22 +525,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         }
         if(event.getAction()==MotionEvent.ACTION_UP)
         {
-            // TRIGGER_AKIRA - hesitate - may work in here
-
-            // JUDITH mimic here
-            // JUDITH move to better location
-            if (!isPaused) {
-                Intent msg = new Intent(TCONST.INTERVENTION_1);
-                Log.d("INTERVENTION", "Sending intervention.");
-                bManager.sendBroadcast(msg);
-                isPaused = true;
-            } else {
-                Intent msg = new Intent(TCONST.HIDE_INTERVENTION);
-                Log.d("INTERVENTION", "Sending intervention.");
-                bManager.sendBroadcast(msg);
-                isPaused = false;
-            }
-
             return true;
         }
 

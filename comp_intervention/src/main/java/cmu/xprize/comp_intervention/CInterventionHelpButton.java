@@ -13,9 +13,6 @@ import android.widget.ImageButton;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
-import static cmu.xprize.util.TCONST.INTERVENTION_1;
-import static cmu.xprize.util.TCONST.INTERVENTION_2;
-import static cmu.xprize.util.TCONST.INTERVENTION_3;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
@@ -63,12 +60,8 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
         bReceiver = new ChangeReceiver();
 
-        // ugh these should be different...
-        IntentFilter filter = new IntentFilter(INTERVENTION_1);
-        filter.addAction(INTERVENTION_2);
-        filter.addAction(INTERVENTION_3);
-
         // actual triggers
+        IntentFilter filter = new IntentFilter();
         filter.addAction(I_TRIGGER_GESTURE);
         filter.addAction(I_TRIGGER_HESITATE);
         filter.addAction(I_TRIGGER_STUCK);
@@ -94,10 +87,6 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
             switch(intent.getAction()) {
 
                 // all these are legit
-                case INTERVENTION_1:
-                case INTERVENTION_2:
-                case INTERVENTION_3:
-
                 case I_TRIGGER_GESTURE:
                 case I_TRIGGER_HESITATE:
                 case I_TRIGGER_STUCK:

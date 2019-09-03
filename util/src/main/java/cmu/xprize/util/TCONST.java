@@ -533,10 +533,6 @@ public class TCONST {
 
 
     // Broadcasts for Intervention
-    public static final String INTERVENTION_1 = "INTERVENTION_1";
-    public static final String INTERVENTION_2 = "INTERVENTION_2";
-    public static final String INTERVENTION_3 = "INTERVENTION_3";
-
     public static final String I_TRIGGER_GESTURE = "GESTURE";
     public static final String I_TRIGGER_STUCK = "STUCK";
     public static final String I_TRIGGER_HESITATE = "HESITATE";

@@ -8,13 +8,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import cmu.xprize.util.ImageLoader;
 import cmu.xprize.util.TCONST;
@@ -22,9 +22,6 @@ import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
-import static cmu.xprize.util.TCONST.INTERVENTION_1;
-import static cmu.xprize.util.TCONST.INTERVENTION_2;
-import static cmu.xprize.util.TCONST.INTERVENTION_3;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
@@ -43,14 +40,11 @@ public class CIntervention extends RelativeLayout {
     private LinearLayout interventionContainer;
     private ImageView interventionImage;
 
-    private Button exitIntervention;
     private TextView interventionLabel;
 
     private LocalBroadcastManager bManager;
     private ChangeReceiver        bReceiver;
 
-
-    private static String[] imgPath = {"image1.jpg", "image2.jpg", "image3.jpg"};
 
     public CIntervention(Context context) {
         super(context);
@@ -75,21 +69,17 @@ public class CIntervention extends RelativeLayout {
         mContext = context;
 
         interventionImage = findViewById(R.id.SInterventionImage);
+        interventionImage.setOnClickListener(exitListener);
         interventionContainer = findViewById(R.id.SInterventionContainer);
-        exitIntervention = findViewById(R.id.exitButton);
 
-        exitIntervention.setOnClickListener(exitListener);
 
         interventionLabel = findViewById(R.id.interventionLabel);
 
 
         bManager = LocalBroadcastManager.getInstance(getContext());
 
-        IntentFilter filter = new IntentFilter(INTERVENTION_1);
-        filter.addAction(INTERVENTION_2);
-        filter.addAction(INTERVENTION_3);
-
         // actual triggers
+        IntentFilter filter = new IntentFilter();
         filter.addAction(I_TRIGGER_GESTURE);
         filter.addAction(I_TRIGGER_HESITATE);
         filter.addAction(I_TRIGGER_STUCK);
@@ -122,45 +112,24 @@ public class CIntervention extends RelativeLayout {
             boolean isModal = intent.getBooleanExtra("IS_MODAL", false);
             //if (!isModal) return;
 
-            switch(intent.getAction()) {
+            String imgRef;
+            String action = intent.getAction();
+            if (action == null) return;
+
+            switch(action) {
 
                 case I_TRIGGER_HESITATE:
-                    Log.d("INTERVENTION", "Received HESITATE");
-                    displayImage(imgPath[0]);
-                    interventionLabel.setText("HESITATE");
-                    break;
-
                 case I_TRIGGER_GESTURE:
-                    Log.d("INTERVENTION", "Received GESTURE");
-                    displayImage(imgPath[1]);
-                    interventionLabel.setText("GESTURE");
-                    break;
-
                 case I_TRIGGER_STUCK:
-                    Log.d("INTERVENTION", "Received STUCK");
-                    displayImage(imgPath[2]);
-                    interventionLabel.setText("STUCK");
-                    break;
-
                 case I_TRIGGER_FAILURE:
-                    Log.d("INTERVENTION", "Received FAILURE");
-                    displayImage(imgPath[2]);
-                    interventionLabel.setText("FAILURE");
-                    break;
-
-                case INTERVENTION_1:
-                    displayImage(imgPath[0]);
-                    break;
-
-                case INTERVENTION_2:
-                    displayImage(imgPath[1]);
-                    break;
-
-                case INTERVENTION_3:
-                    displayImage(imgPath[2]);
+                    Log.d("INTERVENTION", "Received " + action);
+                    imgRef = getChildPhoto(action, null);
+                    displayImage(imgRef);
+                    interventionLabel.setText(action);
                     break;
 
                 case HIDE_INTERVENTION:
+                default:
                     hideIntervention();
             }
 
@@ -179,7 +148,7 @@ public class CIntervention extends RelativeLayout {
 
     /**
      * Display an Image in the Intervention Modal
-     * @param imageRef
+     * @param imageRef path to child photo
      */
     private void displayImage(String imageRef) {
         Log.d("INTERVENTION", "Displaying image: " + imageRef);
@@ -204,5 +173,31 @@ public class CIntervention extends RelativeLayout {
         Log.d("INTERVENTION", "Hiding intervention");
 
         interventionContainer.setVisibility(View.GONE);
+    }
+
+    // Placeholder for eventual image selection code.
+    private static HashMap<String, String> imgPath;
+    static {
+        imgPath = new HashMap<>();
+        imgPath.put(I_TRIGGER_GESTURE, "child1.png");
+        imgPath.put(I_TRIGGER_FAILURE, "child2.png");
+        imgPath.put(I_TRIGGER_STUCK, "child3.png");
+        imgPath.put(I_TRIGGER_HESITATE, "child4.png");
+    }
+
+    /**
+     * Get a String image filename based on intervention type and domain
+     *
+     * @param interventionType GESTURE, FAILURE, STUCK, or HESITATE
+     * @param activityOrDomain MATH, LIT, STORIES, etc
+     * @return String path to child's photo
+     */
+    private String getChildPhoto(String interventionType, String activityOrDomain) {
+
+        String imgRef = imgPath.get(interventionType);
+        if (imgRef == null) imgRef = "image1.jpg"; // default placeholder
+
+        return imgRef;
+
     }
 }

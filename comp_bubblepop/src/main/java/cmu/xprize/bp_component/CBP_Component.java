@@ -209,25 +209,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     }
 
 
-    private boolean isPaused = false;
-
-    // JUDITH mimic here
-    // JUDITH move to better location
-    public void doIntervention() {
-        if (!isPaused) {
-            Intent msg = new Intent(TCONST.INTERVENTION_1);
-            Log.d("INTERVENTION", "Sending intervention.");
-            bManager.sendBroadcast(msg);
-            isPaused = true;
-        } else {
-            Intent msg = new Intent(TCONST.HIDE_INTERVENTION);
-            Log.d("INTERVENTION", "Sending intervention.");
-            bManager.sendBroadcast(msg);
-            isPaused = false;
-        }
-    }
-
-
     /**
      * The game mechanic uses this to get the game container where it will create
      * all the game controls.  The purpose of this is to make the game resolution invariant.

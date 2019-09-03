@@ -55,19 +55,16 @@ import cmu.xprize.robotutor.startup.configuration.Configuration;
 import cmu.xprize.robotutor.startup.configuration.ConfigurationItems;
 import cmu.xprize.robotutor.startup.configuration.ConfigurationQuickOptions;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
-
 import cmu.xprize.robotutor.tutorengine.CTutorAssetManager;
-
+import cmu.xprize.robotutor.tutorengine.CTutorEngine;
+import cmu.xprize.robotutor.tutorengine.ITutorManager;
 import cmu.xprize.robotutor.tutorengine.QuickDebugTutor;
 import cmu.xprize.robotutor.tutorengine.QuickDebugTutorList;
 import cmu.xprize.robotutor.tutorengine.util.CAssetObject;
-import cmu.xprize.util.CDisplayMetrics;
-import cmu.xprize.util.CLoaderView;
-
-import cmu.xprize.robotutor.tutorengine.CTutorEngine;
-import cmu.xprize.robotutor.tutorengine.ITutorManager;
 import cmu.xprize.robotutor.tutorengine.util.CrashHandler;
 import cmu.xprize.robotutor.tutorengine.widgets.core.IGuidView;
+import cmu.xprize.util.CDisplayMetrics;
+import cmu.xprize.util.CLoaderView;
 import cmu.xprize.util.IReadyListener;
 import cmu.xprize.util.IRoboTutor;
 import cmu.xprize.util.JSON_Helper;
@@ -80,14 +77,9 @@ import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.MATH_MATRIX
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.SONGS_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.STORIES_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.UNKNOWN_MATRIX;
-import static cmu.xprize.util.TCONST.CODE_DROP_1_ASSET_PATTERN;
-import static cmu.xprize.util.TCONST.CODE_DROP_2_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.ENGLISH_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.GRAPH_MSG;
 import static cmu.xprize.util.TCONST.MATH_PLACEMENT;
-import static cmu.xprize.util.TCONST.PROTOTYPE_ASSET_PATTERN;
-import static cmu.xprize.util.TCONST.QA_ASSET_PATTERN;
-import static cmu.xprize.util.TCONST.ROBOTUTOR_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.SWAHILI_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
 
@@ -107,7 +99,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     // DEVELOPER VARIABLES FOR QUICK DEBUG LAUNCH
     private static final boolean QUICK_DEBUG_TUTOR = true;
-    private static final String QUICK_DEBUG_TUTOR_KEY = "demo_hesitate";
+    private static final String QUICK_DEBUG_TUTOR_KEY = "intervention_bpop"; //"demo_gesture";
 
     // for devs, this is faster than changing the config file
     private static final boolean QUICK_DEBUG_CONFIG = false;
