@@ -33,6 +33,7 @@ import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
@@ -188,7 +189,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         Scontent = (ConstraintLayout) findViewById(R.id.SSpelling);
 
-        mDetector = new GestureDetector(mContext, new SpellingGestureListener(this));
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(this));
 
         mLetterHolder = (LinearLayout) findViewById(R.id.letterHolder);
         mSelectedLetterHolder = (LinearLayout) findViewById(R.id.blankHolder);

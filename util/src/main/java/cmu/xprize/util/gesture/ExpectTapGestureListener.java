@@ -1,4 +1,4 @@
-package cmu.xprize.comp_spelling;
+package cmu.xprize.util.gesture;
 
 import android.util.Log;
 import android.view.GestureDetector;
@@ -8,23 +8,23 @@ import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
 
 /**
- * RoboTutor
- * <p>
+ * ExpectTapGestureListener
+ * <p>Expects a tap </p>
  * Created by kevindeland on 9/1/19.
  */
 
-public class SpellingGestureListener extends GestureDetector.SimpleOnGestureListener {
+public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     private IInterventionSource iIntervention;
     private String TAG = "GESTURE";
 
-    public SpellingGestureListener(IInterventionSource iIntervention) {
+    public ExpectTapGestureListener(IInterventionSource iIntervention) {
         this.iIntervention = iIntervention;
     }
 
     @Override
     public boolean onDown(MotionEvent event) {
-        Log.v(TAG,"onDown: ");
+        Log.d(TAG,"onDown: ");
 
         // don't return false here or else none of the other
         // gestures will work
@@ -34,21 +34,21 @@ public class SpellingGestureListener extends GestureDetector.SimpleOnGestureList
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        Log.v(TAG, "onSingleTapConfirmed: ");
+        Log.i(TAG, "onSingleTapConfirmed: ");
 
         return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        Log.v(TAG, "onLongPress: ");
+        Log.i(TAG, "onLongPress: ");
         iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Log.v(TAG, "onDoubleTap: ");
+        Log.i(TAG, "onDoubleTap: ");
 
 
         return true;
@@ -57,7 +57,7 @@ public class SpellingGestureListener extends GestureDetector.SimpleOnGestureList
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2,
                             float distanceX, float distanceY) {
-        Log.v(TAG, "onScroll: ");
+        Log.i(TAG, "onScroll: ");
 
 
         return true;
@@ -66,7 +66,7 @@ public class SpellingGestureListener extends GestureDetector.SimpleOnGestureList
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
-        Log.v(TAG, "onFling: ");
+        Log.d(TAG, "onFling: ");
         iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
         return true;

@@ -1,4 +1,4 @@
-package cmu.xprize.comp_intervention.gesture;
+package cmu.xprize.util.gesture;
 
 import android.util.Log;
 import android.view.GestureDetector;
@@ -8,18 +8,18 @@ import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
 
 /**
- * RoboTutor
- * <p>
+ * ExpectWriteGestureListener
+ * <p>Expects a write (aka fling/scroll)</p>
  * Created by kevindeland on 9/1/19.
  */
 
-public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener {
+public class ExpectWriteGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     private IInterventionSource iIntervention;
-    private String TAG = "TAG";
+    private String TAG = "GESTURE";
 
-    public BpopGestureListener(IInterventionSource iIntervention) {
-        this.iIntervention = iIntervention;
+    public ExpectWriteGestureListener(IInterventionSource intervention) {
+        this.iIntervention = intervention;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         Log.i(TAG, "onSingleTapConfirmed: ");
-
+        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
         return true;
     }
 
@@ -49,7 +49,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(TAG, "onDoubleTap: ");
-
+        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
         return true;
     }
@@ -67,7 +67,7 @@ public class BpopGestureListener extends GestureDetector.SimpleOnGestureListener
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
         Log.d(TAG, "onFling: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        // iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
 
         return true;
     }

@@ -39,7 +39,7 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cmu.xprize.comp_intervention.gesture.BpopGestureListener;
+import cmu.xprize.util.gesture.ExpectTapGestureListener;
 import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.TCONST;
@@ -92,7 +92,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         bManager = LocalBroadcastManager.getInstance(mContext);
         mParent.setOnTouchListener(this);
 
-        mDetector = new GestureDetector(mContext, new BpopGestureListener(parent));
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(parent));
     }
 
     public void setMessageQueue(CMessageQueueFactory queue) {
