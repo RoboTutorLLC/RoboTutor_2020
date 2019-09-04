@@ -67,6 +67,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.comp_clickmask.CM_CONST.*;
+import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
 
@@ -811,18 +812,26 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
             Log.d("BPOP", "Correct" );
 
             correct_Count++;
-            wrongFirstAttempts = 0;
+            // wrongFirstAttempts = 0;
 
         } else {
             publishFeature(TCONST.GENERIC_WRONG);
             Log.d("BPOP", "Wrong" );
+
+            wrongAnyAttempts++;
+
+            if (wrongAnyAttempts == 9) { // JUDITH replace magic number
+                triggerIntervention(I_TRIGGER_FAILURE);
+            }
+            /*if (attemptsLeft == BP_CONST.MAX_ATTEMPT) {
+                wrongFirstAttempts++;
+            }*/
             attemptsLeft--;
 
             // look for three first attempt failures in a row
-            wrongFirstAttempts++;
-            if (wrongFirstAttempts == 3) {
+            /*if (wrongFirstAttempts == 3) {
                 triggerIntervention(TCONST.I_TRIGGER_FAILURE);
-            }
+            }*/
 
             if(attemptsLeft <= 0) {
                 publishFeature(TCONST.LAST_ATTEMPT);

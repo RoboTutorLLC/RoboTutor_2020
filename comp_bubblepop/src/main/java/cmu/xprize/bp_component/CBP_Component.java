@@ -83,6 +83,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     protected int                   correct_Count;
 
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
+    protected int wrongAnyAttempts = 0;
 
     protected LocalBroadcastManager   bManager;
     protected BroadcastReceiver       bReceiver;
