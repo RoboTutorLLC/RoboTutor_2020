@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -33,7 +34,7 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
  * Created by kevindeland on 6/10/19.
  */
 
-public class CIntervention extends RelativeLayout {
+public class CInterventionPopup extends RelativeLayout {
 
     public Context  mContext;
 
@@ -46,17 +47,17 @@ public class CIntervention extends RelativeLayout {
     private ChangeReceiver        bReceiver;
 
 
-    public CIntervention(Context context) {
+    public CInterventionPopup(Context context) {
         super(context);
         init(context, null);
     }
 
-    public CIntervention(Context context, AttributeSet attrs) {
+    public CInterventionPopup(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public CIntervention(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CInterventionPopup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
@@ -113,7 +114,10 @@ public class CIntervention extends RelativeLayout {
             //if (!isModal) return;
 
             String imgRef;
+            // only display if the "modal" is set
             String action = intent.getAction();
+            boolean modal = intent.getBooleanExtra("MODAL", false);
+            if (!modal) return;
             if (action == null) return;
 
             switch(action) {
@@ -125,7 +129,9 @@ public class CIntervention extends RelativeLayout {
                     Log.d("INTERVENTION", "Received " + action);
                     imgRef = getChildPhoto(action, null);
                     displayImage(imgRef);
+                    playHelpAudio();
                     interventionLabel.setText(action);
+                    // flashHandRaise();
                     break;
 
                 case HIDE_INTERVENTION:
@@ -165,6 +171,13 @@ public class CIntervention extends RelativeLayout {
             Log.e("INTERVENTION", "Image " + imageRef + " not found");
             e.printStackTrace();
         }
+    }
+
+    // INT_POPUP make sure this only plays once
+    private void playHelpAudio() {
+
+        MediaPlayer mediaPlayer = MediaPlayer.create(mContext, R.raw.intervention_audio);
+        mediaPlayer.start();
     }
 
     // should hide when the student taps on the image (no exit button)

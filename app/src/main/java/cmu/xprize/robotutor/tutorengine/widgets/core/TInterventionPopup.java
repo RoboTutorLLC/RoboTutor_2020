@@ -2,9 +2,8 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
 
-import cmu.xprize.comp_intervention.CIntervention;
+import cmu.xprize.comp_intervention.CInterventionPopup;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.tutorengine.CTutor;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
@@ -17,16 +16,16 @@ import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
  * Created by kevindeland on 6/10/19.
  */
 
-public class TIntervention extends CIntervention implements ITutorObject  {
-    public TIntervention(Context context) {
+public class TInterventionPopup extends CInterventionPopup implements ITutorObject  {
+    public TInterventionPopup(Context context) {
         super(context);
     }
 
-    public TIntervention(Context context, AttributeSet attrs) {
+    public TInterventionPopup(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TIntervention(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TInterventionPopup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
