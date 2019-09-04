@@ -20,8 +20,8 @@ import cmu.xprize.comp_logging.CErrorManager;
 
 public class CMessageQueueFactory {
 
-    IMessageQueueRunner runner;
-    String TAG;
+    private IMessageQueueRunner runner;
+    private String TAG;
 
     public CMessageQueueFactory(IMessageQueueRunner runner, String TAG) {
         this.runner = runner;
@@ -41,9 +41,9 @@ public class CMessageQueueFactory {
     public class Queue implements Runnable {
 
         protected String _command;
-        protected String _name; // used to find a command and cancel it.
-        protected Object _targetObject;
-        protected String _targetString;
+        String _name; // used to find a command and cancel it.
+        Object _targetObject;
+        String _targetString;
 
         public Queue(String command) {
             _command = command;

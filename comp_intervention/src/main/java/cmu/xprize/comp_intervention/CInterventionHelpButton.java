@@ -15,7 +15,6 @@ import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
-import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
 import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
@@ -31,18 +30,13 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 public class CInterventionHelpButton extends android.support.v7.widget.AppCompatImageButton
         implements IMessageQueueRunner {
 
-    CInterventionHelpButton self;
-    private Context mContext;
-
     private LocalBroadcastManager bManager;
-    private ChangeReceiver bReceiver;
 
     // tracks which intervention has been triggered
     private boolean hasBeenTriggered;
     private boolean isFlashing;
     private String currentIntervention;
 
-    private boolean blinkOn;
     private CMessageQueueFactory _queue;
 
     private static final String FLASH_ON = "FLASH_ON";
@@ -70,12 +64,8 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
     }
 
     public void init(Context context) {
-        this.self = this;
-        this.mContext = context;
 
-        bManager = LocalBroadcastManager.getInstance(mContext);
-
-        bReceiver = new ChangeReceiver();
+        bManager = LocalBroadcastManager.getInstance(context);
 
         // actual triggers
         IntentFilter filter = new IntentFilter();
@@ -83,11 +73,9 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         filter.addAction(I_TRIGGER_HESITATE);
         filter.addAction(I_TRIGGER_STUCK);
         filter.addAction(I_TRIGGER_FAILURE);
-
         filter.addAction(TCONST.HIDE_INTERVENTION);
 
-
-        bManager.registerReceiver(bReceiver, filter);
+        bManager.registerReceiver(new InterventionButtonMessageReceiver(), filter);
 
         this.setOnTouchListener(new HelpButtonTouchListener());
 
@@ -98,18 +86,24 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
     }
 
+    /**
+     * Start the button flashing
+     */
     private void startFlashing() {
-        Log.wtf("FLASH", "begin");
+        Log.v("FLASH", "begin");
         this.isFlashing = true;
 
         _queue.post(FLASH_ON, FLASH_ON_TIME);
     }
 
+    /**
+     * Set button state back to regular, and cancel any flash commands
+     */
     private void cancelFlashing() {
         _queue.cancelPost(FLASH_ON);
         _queue.cancelPost(FLASH_OFF);
         isFlashing = false;
-        self.setBackgroundColor(COLOR_OFF);
+        this.setBackgroundColor(COLOR_OFF);
     }
 
     // For dealing with delayed flashing
@@ -120,13 +114,13 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
         switch(command) {
             case FLASH_ON:
-                Log.wtf("FLASH", "flash on");
+                Log.v("FLASH", "flash on");
                 this.setBackgroundColor(COLOR_ON);
                 _queue.post(FLASH_OFF, FLASH_OFF_TIME);
                 break;
 
             case FLASH_OFF:
-                Log.wtf("FLASH", "flash off");
+                Log.v("FLASH", "flash off");
                 this.setBackgroundColor(COLOR_OFF);
                 _queue.post(FLASH_ON, FLASH_ON_TIME);
                 break;
@@ -135,15 +129,21 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
     @Override
     public void runCommand(String command, Object target) {
-        // do nothing
+        // not useds
     }
 
     @Override
     public void runCommand(String command, String target) {
-        // do nothing
+        // not used
     }
 
-    class ChangeReceiver extends BroadcastReceiver {
+    /**
+     * Message Receiver for Interventions
+     * When receiving an Intervention message:
+     *      - set the current action
+     *      - start flashing the Help Button
+     */
+    class InterventionButtonMessageReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -165,25 +165,27 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                     hasBeenTriggered = true;
                     currentIntervention = action;
 
-                    // INT_POPUP make this trigger a flash
                     startFlashing();
-                    break;
-
-
-                // cancel
-                case HIDE_INTERVENTION:
-                    hasBeenTriggered = false;
                     break;
 
             }
         }
     }
 
+    // TODO make new option for if kid self-chooses to ask for help without a trigger
+    /**
+     * Touch Listener for when user touches this button.
+     * Do two things:
+     *      - Broadcast a message to make the Intervention popup show with appropriate message
+     *      - Stop this button from flashing
+     */
     class HelpButtonTouchListener implements OnTouchListener {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
+            //
             if (hasBeenTriggered) {
+                // pass the current intervention as the intent message
                 Intent launchIntervention = new Intent(currentIntervention);
                 launchIntervention.putExtra(I_MODAL_EXTRA, true);
                 bManager.sendBroadcast(launchIntervention);

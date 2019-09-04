@@ -540,8 +540,7 @@ public class TCONST {
 
     public static final String I_MODAL_EXTRA = "MODAL";
 
-    public static final String HIDE_INTERVENTION = "HIDE_INTERVENTION"; // command TO iv
-    public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // command from iv
+    public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // might be needed to resume paused activity, e.g. Akira
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
 
     // CONSTANTS -- replace with Judith's thing.

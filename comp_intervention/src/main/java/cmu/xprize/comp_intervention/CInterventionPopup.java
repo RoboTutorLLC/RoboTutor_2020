@@ -22,7 +22,6 @@ import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
-import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
 import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
@@ -45,25 +44,24 @@ public class CInterventionPopup extends RelativeLayout {
     private TextView interventionLabel;
 
     private LocalBroadcastManager bManager;
-    private ChangeReceiver        bReceiver;
 
 
     public CInterventionPopup(Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public CInterventionPopup(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public CInterventionPopup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        init(context);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(Context context) {
         Log.d("INTERVENTION", "Initializing intervention.");
 
         inflate(getContext(), R.layout.intervention_layout, this);
@@ -87,11 +85,7 @@ public class CInterventionPopup extends RelativeLayout {
         filter.addAction(I_TRIGGER_STUCK);
         filter.addAction(I_TRIGGER_FAILURE);
 
-        filter.addAction(TCONST.HIDE_INTERVENTION);
-
-        bReceiver = new ChangeReceiver();
-
-        bManager.registerReceiver(bReceiver, filter);
+        bManager.registerReceiver(new InterventionPopupMessageReceiver(), filter);
     }
 
     private View.OnClickListener exitListener = new View.OnClickListener() {
@@ -104,7 +98,7 @@ public class CInterventionPopup extends RelativeLayout {
         }
     };
 
-    class ChangeReceiver extends BroadcastReceiver {
+    class InterventionPopupMessageReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -130,23 +124,9 @@ public class CInterventionPopup extends RelativeLayout {
                     interventionLabel.setText(action);
                     // flashHandRaise();
                     break;
-
-                case HIDE_INTERVENTION:
-                default:
-                    hideIntervention();
             }
 
         }
-    }
-
-    // TODO make new option for if kid self-chooses to ask for help without a trigger
-
-    /**
-     * Flash the Hand Raise thing in the top right corner
-     */
-    private void flashHandRaise() {
-        // how do i make the thing flash by ID without needing a dependency on the comp_banner component???
-        // broadcast???
     }
 
     /**
@@ -156,7 +136,6 @@ public class CInterventionPopup extends RelativeLayout {
     private void displayImage(String imageRef) {
         Log.d("INTERVENTION", "Displaying image: " + imageRef);
 
-        String imgPath;
         try {
             ImageLoader.makeBitmapLoader(TCONST.INTERVENTION_FOLDER + "/")
                     .loadBitmap(imageRef)
@@ -199,7 +178,7 @@ public class CInterventionPopup extends RelativeLayout {
      * Get a String image filename based on intervention type and domain
      *
      * @param interventionType GESTURE, FAILURE, STUCK, or HESITATE
-     * @param activityOrDomain MATH, LIT, STORIES, etc
+     * @param activityOrDomain MATH, LIT, STORIES, etc (TODO)
      * @return String path to child's photo
      */
     private String getChildPhoto(String interventionType, String activityOrDomain) {
