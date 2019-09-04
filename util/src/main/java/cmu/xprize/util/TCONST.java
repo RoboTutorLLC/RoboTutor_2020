@@ -538,20 +538,27 @@ public class TCONST {
     public static final String I_TRIGGER_HESITATE = "HESITATE";
     public static final String I_TRIGGER_FAILURE = "FAILURE";
 
+    // Cancel broadcasts
+    public static final String I_CANCEL_STUCK = "X_STUCK";
+    public static final String I_CANCEL_HESITATE = "X_HESITATE";
+    public static final String I_CANCEL_GESTURE = "X_GESTURE";
+
     public static final String I_MODAL_EXTRA = "MODAL";
 
     public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // might be needed to resume paused activity, e.g. Akira
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
 
     // CONSTANTS -- replace with Judith's thing.
-    public static final Long HESITATE_TIME_BPOP = 12000L;
-    public static final Long STUCK_TIME_BPOP = 12000L;
+    public static final Long HESITATE_TIME_BPOP = 40000L; // NOTE THAT THIS IS NOT RESETTING
+    public static final Long STUCK_TIME_BPOP = 40000L;
 
-    public static final Long HESITATE_TIME_SPELL = 6000L;
-    public static final Long STUCK_TIME_SPELL = 12000L;
+    public static final Long HESITATE_TIME_SPELL = 18000L;
+    public static final Long STUCK_TIME_SPELL = 18000L;
 
-    public static final Long HESITATE_TIME_PICMATCH = 6000L;
-    public static final Long STUCK_TIME_PICMATCH = 12000L;
+    public static final Long HESITATE_TIME_PICMATCH = 18000L;
+    public static final Long STUCK_TIME_PICMATCH = 20000L;
+
+    public static final long GESTURE_TIME_WRITE = 18000L;
 
     public static final String FTR_STORY_STARTING = "FTR_STORY_STARTING";
 

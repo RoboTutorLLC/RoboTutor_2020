@@ -37,6 +37,8 @@ import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
+import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
+import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
 import static cmu.xprize.util.TCONST.TYPE_AUDIO;
 
 /**
@@ -199,18 +201,22 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         _queue = new CMessageQueueFactory(this, "CSpelling");
 
-        Scontent.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        mImageStimulus.setOnTouchListener(new HesitationCancelListener());
+        Scontent.setOnTouchListener(new HesitationCancelListener());
 
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    Log.v("event.thing", "This is a touch");
-                    resetHesitationTimer();
-                }
-                return mDetector.onTouchEvent(motionEvent);
+    }
+
+    class HesitationCancelListener implements OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                Log.v("event.thing", "This is a touch");
+                resetHesitationTimer();
             }
-        });
-
+            return false;
+        }
     }
 
     //endregion
@@ -219,33 +225,44 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     // *********************************************
     // BEGIN stuck and hesitation timers
     // *********************************************
+
+    /**
+     * Stuck Timer only reset when a new problem begins
+     */
     public void resetStuckTimer() {
         cancelStuckTimer();
         triggerStuckTimer();
     }
 
-    public void cancelStuckTimer() {
+    private void cancelStuckTimer() {
         Log.v("event.thing", "resetting stuck timer");
         _queue.cancelPost("STUCK_TIMER");
+        Log.wtf("trigger", "resetting stuck timer");
+        triggerIntervention(I_CANCEL_STUCK);
     }
 
-    public void triggerStuckTimer() {
+    private void triggerStuckTimer() {
         Log.v("event.thing", "trigger stuck timer");
         _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_SPELL);
     }
 
+    /**
+     * This should be called whenever ANY View is touched... without overriding existing functions.
+     */
     public void resetHesitationTimer() {
         Log.v("event.thing", "resetting hesitation timer");
         cancelHesitationTimer();
         triggerHesitationTimer();
     }
 
-    public void cancelHesitationTimer() {
+    private void cancelHesitationTimer() {
         Log.v("event.thing", "cancelling hesitation timer");
         _queue.cancelPost("HESITATION_PROMPT");
+        Log.wtf("trigger", "cancelling hesitation timer");
+        triggerIntervention(I_CANCEL_HESITATE);
     }
 
-    public void triggerHesitationTimer() {
+    private void triggerHesitationTimer() {
         Log.v("event.thing", "triggering hesitation timer");
         _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_SPELL);
     }
@@ -256,6 +273,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     //region View
     public void onLetterTouch(String letter, int index, CLetter_Tile lt) {
+
+        resetHesitationTimer();
 
         Log.d("ddd", "Touch: " + letter);
 
@@ -563,6 +582,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     @Override
     public void triggerIntervention(String type) {
 
+        Log.wtf("trigger", "triggering intervention: " + type);
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
 

@@ -32,6 +32,9 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
+import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
+
 /**
  * Generated automatically w/ code written by Kevin DeLand
  */
@@ -108,49 +111,63 @@ public class CPicMatch_Component extends RelativeLayout implements
 
         _queue = new CMessageQueueFactory(this, "CPicMatch");
 
-        Scontent.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        Scontent.setOnTouchListener(new HesitationCancelListener());
+    }
 
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    Log.v("event.thing", "This is a touch");
-                    resetHesitationTimer();
-                }
-                return false;
+    class HesitationCancelListener implements OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                Log.v("event.thing", "This is a touch");
+                resetHesitationTimer();
             }
-        });
+            return false;
+        }
     }
 
     // *********************************************
     // BEGIN stuck and hesitation timers
     // *********************************************
+
+    /**
+     * Stuck Timer only reset when a new problem begins
+     */
     public void resetStuckTimer() {
         cancelStuckTimer();
         triggerStuckTimer();
     }
 
-    public void cancelStuckTimer() {
+    private void cancelStuckTimer() {
         Log.v("event.thing", "resetting stuck timer");
         _queue.cancelPost("STUCK_TIMER");
+        Log.wtf("trigger", "resetting stuck timer");
+        triggerIntervention(I_CANCEL_STUCK);
     }
 
-    public void triggerStuckTimer() {
+    private void triggerStuckTimer() {
         Log.v("event.thing", "trigger stuck timer");
         _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_PICMATCH);
     }
 
+    /**
+     * This should be called whenever ANY View is touched... without overriding existing functions.
+     */
     public void resetHesitationTimer() {
         Log.v("event.thing", "resetting hesitation timer");
         cancelHesitationTimer();
         triggerHesitationTimer();
     }
 
-    public void cancelHesitationTimer() {
+    private void cancelHesitationTimer() {
         Log.v("event.thing", "cancelling hesitation timer");
         _queue.cancelPost("HESITATION_PROMPT");
+        Log.wtf("trigger", "cancelling hesitation timer");
+        triggerIntervention(I_CANCEL_HESITATE);
     }
 
-    public void triggerHesitationTimer() {
+    private void triggerHesitationTimer() {
         Log.v("event.thing", "triggering hesitation timer");
         _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_PICMATCH);
     }
@@ -299,6 +316,8 @@ public class CPicMatch_Component extends RelativeLayout implements
 
         @Override
         public void onClick(View view) {
+
+            resetHesitationTimer();
             attempts++;
             retractFeature("FTR_CORRECT");
             retractFeature("FTR_WRONG");

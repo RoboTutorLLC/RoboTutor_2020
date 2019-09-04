@@ -16,6 +16,9 @@ import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
+import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
+import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
+import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
 import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
@@ -76,6 +79,9 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         filter.addAction(I_TRIGGER_HESITATE);
         filter.addAction(I_TRIGGER_STUCK);
         filter.addAction(I_TRIGGER_FAILURE);
+
+        filter.addAction(I_CANCEL_STUCK);
+        filter.addAction(I_CANCEL_HESITATE);
 
         filter.addAction(EXIT_FROM_INTERVENTION);
 
@@ -152,6 +158,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         @Override
         public void onReceive(Context context, Intent intent) {
 
+            Log.wtf("trigger", "REceived trigger: " + intent.getAction());
 
             String action = intent.getAction();
             boolean modal = intent.getBooleanExtra(I_MODAL_EXTRA, false);
@@ -169,9 +176,38 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                     // don't start flashing if the popup is already showing // NEXT test this...
                     if (popupIsShowing) return;
                     hasBeenTriggered = true;
-                    currentIntervention = action;
+                    if(currentIntervention == null)
+                        currentIntervention = action;
 
                     startFlashing();
+                    break;
+
+
+                // JUDITH - CANCEL_INTERVENTION:
+                case I_CANCEL_STUCK:
+                    Log.wtf("trigger", "Cancelling stuck");
+                    Log.wtf("trigger", "currentIntervention: " + currentIntervention);
+                    if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_STUCK)) {
+                        currentIntervention = null;
+                        hasBeenTriggered = false;
+                        cancelFlashing();
+                    }
+
+                    break;
+
+                case I_CANCEL_HESITATE:
+                    // this is triggered when they tap
+                    Log.wtf("trigger", "Cancelling hesitate");
+                    Log.wtf("trigger", "currentIntervention: " + currentIntervention);
+                    if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_HESITATE)) {
+                        currentIntervention = null;
+                        hasBeenTriggered = false;
+                        cancelFlashing();
+                    }
+                    break;
+
+                case I_CANCEL_GESTURE:
+                    // this is triggered when they do correct gesture
                     break;
 
                 case EXIT_FROM_INTERVENTION:
@@ -202,6 +238,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
                 popupIsShowing = true;
                 hasBeenTriggered = false;
+                currentIntervention = null;
 
                 cancelFlashing();
 
