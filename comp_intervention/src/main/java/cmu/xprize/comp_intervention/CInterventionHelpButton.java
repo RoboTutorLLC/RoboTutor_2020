@@ -15,6 +15,7 @@ import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
+import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
@@ -36,6 +37,8 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
     private boolean hasBeenTriggered;
     private boolean isFlashing;
     private String currentIntervention;
+
+    private boolean popupIsShowing;
 
     private CMessageQueueFactory _queue;
 
@@ -73,7 +76,8 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         filter.addAction(I_TRIGGER_HESITATE);
         filter.addAction(I_TRIGGER_STUCK);
         filter.addAction(I_TRIGGER_FAILURE);
-        filter.addAction(TCONST.HIDE_INTERVENTION);
+
+        filter.addAction(EXIT_FROM_INTERVENTION);
 
         bManager.registerReceiver(new InterventionButtonMessageReceiver(), filter);
 
@@ -162,10 +166,16 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                 case I_TRIGGER_HESITATE:
                 case I_TRIGGER_STUCK:
                 case I_TRIGGER_FAILURE:
+                    // don't start flashing if the popup is already showing // NEXT test this...
+                    if (popupIsShowing) return;
                     hasBeenTriggered = true;
                     currentIntervention = action;
 
                     startFlashing();
+                    break;
+
+                case EXIT_FROM_INTERVENTION:
+                    popupIsShowing = false;
                     break;
 
             }
@@ -190,6 +200,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                 launchIntervention.putExtra(I_MODAL_EXTRA, true);
                 bManager.sendBroadcast(launchIntervention);
 
+                popupIsShowing = true;
                 hasBeenTriggered = false;
 
                 cancelFlashing();
