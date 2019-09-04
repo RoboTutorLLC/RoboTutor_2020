@@ -23,6 +23,7 @@ import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 import static cmu.xprize.util.TCONST.HIDE_INTERVENTION;
+import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
@@ -109,14 +110,10 @@ public class CInterventionPopup extends RelativeLayout {
         public void onReceive(Context context, Intent intent) {
             Log.d("INTERVENTION", "Received broadcast.");
 
-            // is true
-            boolean isModal = intent.getBooleanExtra("IS_MODAL", false);
-            //if (!isModal) return;
-
             String imgRef;
             // only display if the "modal" is set
             String action = intent.getAction();
-            boolean modal = intent.getBooleanExtra("MODAL", false);
+            boolean modal = intent.getBooleanExtra(I_MODAL_EXTRA, false);
             if (!modal) return;
             if (action == null) return;
 

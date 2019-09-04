@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="helpButtonFlash">#5FBA7D</color>
+    <color name="helpButtonNormal">#01401F</color>
+    <color name="helpButtonHighlight">#E0FF2A</color>
+</resources>

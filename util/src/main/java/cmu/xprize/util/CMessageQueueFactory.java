@@ -85,21 +85,21 @@ public class CMessageQueueFactory {
                 }
 
                 queueMap.remove(this);
-                Log.d("EPSTEIN",
+                Log.d("QUEUE_FACTORY",
                         String.format(
                                 "CMessageQueue.run _name=%s;_command=%s;_targetObject=%s;_targetString=%s",
                                 _name, _command, _targetObject, _targetString));
 
                 // QUEUE_REFACTOR ugh this is somewhat different for each file (see QueueConstructorVars.txt)
                 if(_targetObject != null) {
-                    Log.wtf("EPSTEIN", "runCommand(object)");
+                    Log.wtf("QUEUE_FACTORY", "runCommand(object)");
                     runner.runCommand(_command, _targetObject);
                 } else if(_targetString != null) {
                     runner.runCommand(_command, _targetString);
-                    Log.wtf("EPSTEIN", "runCommand(string)");
+                    Log.wtf("QUEUE_FACTORY", "runCommand(string)");
                 } else {
                     runner.runCommand(_command);
-                    Log.wtf("EPSTEIN", String.format("runCommand(%s)", _command));
+                    Log.wtf("QUEUE_FACTORY", String.format("runCommand(%s)", _command));
                 }
 
             }

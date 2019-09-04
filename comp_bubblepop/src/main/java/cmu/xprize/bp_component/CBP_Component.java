@@ -638,7 +638,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     @Override
     public void runCommand(String command, Object target) {
 
-        Log.w("EPSTEIN", String.format("CBP.runCommand(%s)", command));
+        Log.w("QUEUE_FACTORY", String.format("CBP.runCommand(%s)", command));
         switch(command) {
             case TCONST.I_TRIGGER_GESTURE:
                 // new rules: time between different gestures exceeds 3 * (what judith gave in spreadsheet)
@@ -670,7 +670,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
             default:
                 if(_mechanics != null) {
                     _mechanics.execCommand(command, target); //
-                    Log.wtf("EPSTEIN", "Bpop.runCommand " + command + " " + target.toString());
+                    Log.wtf("QUEUE_FACTORY", "Bpop.runCommand " + command + " " + target.toString());
                 }
         }
     }
