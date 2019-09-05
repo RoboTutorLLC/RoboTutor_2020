@@ -40,6 +40,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.LinearLayout;
 
+import cmu.xprize.comp_writing.constants.WR_BEHAVIORS;
+import cmu.xprize.comp_writing.constants.WR_CONST;
+import cmu.xprize.comp_writing.constants.WR_EVENTS;
 import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.ltkplus.CGlyph;
@@ -313,7 +316,7 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
             _recPending = true;
 
             _touchStarted = true;
-            mWritingComponent.applyBehavior(WR_CONST.ON_START_WRITING);
+            mWritingComponent.applyBehavior(WR_BEHAVIORS.ON_START_WRITING);
 
             // This is to support immediate feedback
             //
@@ -454,7 +457,7 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
 
         touchPt = new PointF(x, y);
 
-        mWritingComponent.applyBehavior(WR_CONST.ON_STOP_WRITING); //amogh added for hesitation.
+        mWritingComponent.applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //amogh added for hesitation.
 
         // Only add a new point to the glyph if it is outside the jitter tolerance
         if(testPointTolerance(x,y)) {
@@ -488,7 +491,7 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
 
             case MotionEvent.ACTION_DOWN:
 
-                mWritingComponent.applyBehavior(WR_CONST.WRITE_BEHAVIOR);
+                mWritingComponent.applyBehavior(WR_BEHAVIORS.WRITE_BEHAVIOR);
                 if(mHasGlyph){ //so that when erasing, extra dot for when erasing should not get saved in drawglyph
                     break;
                 }
@@ -901,15 +904,15 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
 
             switch(replayTarget) {
 
-                case WR_CONST.REPLAY_PROTOGLYPH:
+                case WR_EVENTS.REPLAY_PROTOGLYPH:
                     _animGlyph = _protoGlyph;
                     break;
 
-                case WR_CONST.REPLAY_USERGLYPH:
+                case WR_EVENTS.REPLAY_USERGLYPH:
                     _animGlyph = _userGlyph;
                     break;
 
-                case WR_CONST.REPLAY_DEFAULT:
+                case WR_EVENTS.REPLAY_DEFAULT:
                     if (_showUserGlyph)
                         _animGlyph = _userGlyph;
                     else
@@ -1022,7 +1025,7 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
                 @Override
                 public void onAnimationEnd(Animator animation) {
 
-                    mWritingComponent.applyBehavior(WR_CONST.ACTION_COMPLETE);
+                    mWritingComponent.applyBehavior(WR_BEHAVIORS.ACTION_COMPLETE);
                 }
 
                 @Override
@@ -1051,7 +1054,7 @@ public class CGlyphInputContainer extends View implements IGlyphSource, OnTouchL
         boolean result = false;
 
         switch(event) {
-            case WR_CONST.REPLAY_COMPLETE:
+            case WR_BEHAVIORS.REPLAY_COMPLETE:
                 isPlaying = false;
                 break;
         }

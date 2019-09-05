@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import cmu.xprize.comp_writing.constants.WR_CONST;
 import cmu.xprize.util.CClassMap;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CEvent;

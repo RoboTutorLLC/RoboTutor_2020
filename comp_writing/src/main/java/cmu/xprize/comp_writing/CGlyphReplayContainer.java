@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import cmu.xprize.comp_writing.constants.WR_BEHAVIORS;
+import cmu.xprize.comp_writing.constants.WR_EVENTS;
 import cmu.xprize.ltkplus.CAffineXform;
 import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.ltkplus.CGlyph;
@@ -288,7 +290,7 @@ public class CGlyphReplayContainer extends View implements Animator.AnimatorList
 
     @Override
     public void onAnimationStart(Animator animation) {
-        mWritingComponent.applyBehavior(WR_CONST.ON_START_WRITING); //amogh added for hesitation.
+        mWritingComponent.applyBehavior(WR_BEHAVIORS.ON_START_WRITING); //amogh added for hesitation.
         invalidate();
     }
 
@@ -310,7 +312,7 @@ public class CGlyphReplayContainer extends View implements Animator.AnimatorList
             // Tell the touchpane to reset.
             //
             if(_callback != null) {
-                _callback.applyEvent(WR_CONST.FIELD_REPLAY_COMPLETE);
+                _callback.applyEvent(WR_EVENTS.FIELD_REPLAY_COMPLETE);
 //                mWritingComponent.applyBehavior(WR_CONST.FIELD_REPLAY_COMPLETE); //amogh added for hesitation.
             }
 
@@ -326,7 +328,7 @@ public class CGlyphReplayContainer extends View implements Animator.AnimatorList
             broadcastLocation(TCONST.LOOKATEND, tPoint);
         }
 
-        mWritingComponent.applyBehavior(WR_CONST.ACTION_COMPLETE);
+        mWritingComponent.applyBehavior(WR_BEHAVIORS.ACTION_COMPLETE);
     }
 
     /** AnimatorListener Implmentation start */

@@ -40,6 +40,9 @@ import android.widget.RemoteViews;
 import java.util.HashMap;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.comp_writing.constants.WR_BEHAVIORS;
+import cmu.xprize.comp_writing.constants.WR_CONST;
+import cmu.xprize.comp_writing.constants.WR_EVENTS;
 import cmu.xprize.ltkplus.CGlyph;
 import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.TCONST;
@@ -232,7 +235,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
             eraseGlyph();
             resetState();
 
-            mWritingComponent.applyBehavior(WR_CONST.ON_ERASE);
+            mWritingComponent.applyBehavior(WR_BEHAVIORS.ON_ERASE);
         }
     }
 
@@ -272,7 +275,7 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
         public void onClick(View v) {
             Log.v(QGRAPH_MSG, "event.click: " + " CGlyphController:replayGlyph(WR_CONST.REPLAY_DEFAULT");
 
-            mGlyphInput.replayGlyph(WR_CONST.REPLAY_DEFAULT);
+            mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_DEFAULT);
         }
     }
 
@@ -584,17 +587,17 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
 
                 switch(_command) {
 
-                    case WR_CONST.SHOW_SAMPLE:
+                    case WR_EVENTS.SHOW_SAMPLE:
 
                         mGlyphInput.showSampleChar(true); // shows the traceable outline
                         break;
 
-                    case WR_CONST.HIDE_SAMPLE:
+                    case WR_EVENTS.HIDE_SAMPLE:
 
                         mGlyphInput.showSampleChar(false); // hides the traceable outline
                         break;
 
-                    case WR_CONST.ERASE_GLYPH:
+                    case WR_EVENTS.ERASE_GLYPH:
 
                         eraseGlyph(); // erase the user-drawn glyph
                         break;
@@ -612,50 +615,50 @@ public class CGlyphController extends PercentRelativeLayout implements View.OnTo
                         mGlyphInput.setBoxColor(WR_CONST.BOX_COLOR);
                         mGlyphInput.invalidate();
 
-//                        mWritingComponent.applyBehavior(WR_CONST.ACTION_COMPLETE);
+//                        mWritingComponent.applyBehavior(WR_BEHAVIORS.ACTION_COMPLETE);
                         break;
 
-                    case WR_CONST.RIPPLE_DEMO:
+                    case WR_EVENTS.RIPPLE_DEMO:
 
                         mGlyphReplay.setPointAtStroke(true);
-                        mGlyphInput.replayGlyph(WR_CONST.REPLAY_PROTOGLYPH);
+                        mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_PROTOGLYPH);
 
                         break;
 
-                    case WR_CONST.RIPPLE_REPLAY:
+                    case WR_EVENTS.RIPPLE_REPLAY:
 
                         mGlyphReplay.setPointAtStroke(false);
-                        mGlyphInput.replayGlyph(WR_CONST.REPLAY_USERGLYPH);
+                        mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_USERGLYPH);
                         break;
 
-                    case WR_CONST.RIPPLE_PROTO:
+                    case WR_EVENTS.RIPPLE_PROTO:
 
                         mGlyphReplay.setPointAtStroke(false);
-                        mGlyphInput.replayGlyph(WR_CONST.REPLAY_PROTOGLYPH);
+                        mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_PROTOGLYPH);
                         break;
 
-                    case WR_CONST.ANIMATE_OVERLAY:
+                    case WR_EVENTS.ANIMATE_OVERLAY:
 
                         mGlyphInput.showSampleChar(true);
                         mGlyphInput.animateOverlay();
                         break;
 
-                    case WR_CONST.ANIMATE_ALIGN:
+                    case WR_EVENTS.ANIMATE_ALIGN:
 
                         mGlyphInput.showSampleChar(false);
                         mGlyphInput.animateOverlay();
                         break;
 
-                    case WR_CONST.DEMO_PROTOGLYPH:
+                    case WR_EVENTS.DEMO_PROTOGLYPH:
 
                         mGlyphReplay.setPointAtStroke(true);
-                        mGlyphInput.replayGlyph(WR_CONST.REPLAY_PROTOGLYPH);
+                        mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_PROTOGLYPH);
                         break;
 
-                    case WR_CONST.ANIMATE_PROTOGLYPH:
+                    case WR_EVENTS.ANIMATE_PROTOGLYPH:
 
                         mGlyphReplay.setPointAtStroke(false);
-                        mGlyphInput.replayGlyph(WR_CONST.REPLAY_PROTOGLYPH);
+                        mGlyphInput.replayGlyph(WR_EVENTS.REPLAY_PROTOGLYPH);
                         break;
                 }
             }

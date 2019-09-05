@@ -41,7 +41,9 @@ import cmu.xprize.comp_logging.ITutorLogger;
 import cmu.xprize.comp_logging.PerformanceLogItem;
 import cmu.xprize.comp_writing.CWr_Data;
 import cmu.xprize.comp_writing.CWritingComponent;
-import cmu.xprize.comp_writing.WR_CONST;
+import cmu.xprize.comp_writing.constants.WR_BEHAVIORS;
+import cmu.xprize.comp_writing.constants.WR_FEATURES;
+import cmu.xprize.comp_writing.constants.WR_VALUES;
 import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.robotutor.R;
@@ -254,7 +256,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
             mReplayButton.setOnClickListener(null);
 
-            applyBehavior(WR_CONST.ON_REPLAY_COMMAND);
+            applyBehavior(WR_BEHAVIORS.ON_REPLAY_COMMAND);
 
             mReplayButton.setOnClickListener(new replayClickListener());
         }
@@ -464,8 +466,8 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     @Override
     public void publishState() {
 
-        retractFeature(WR_CONST.ERROR_METRIC);
-        retractFeature(WR_CONST.ERROR_CHAR);
+        retractFeature(WR_FEATURES.ERROR_METRIC);
+        retractFeature(WR_FEATURES.ERROR_CHAR);
         retractFeature(TCONST.GENERIC_RIGHT);
         retractFeature(TCONST.GENERIC_WRONG);
 
@@ -481,13 +483,13 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
             reason = TCONST.GENERIC_WRONG;
 
             if(!_metricValid) {
-                publishFeature(WR_CONST.ERROR_METRIC);
-                reason += " - " + WR_CONST.ERROR_METRIC;
+                publishFeature(WR_FEATURES.ERROR_METRIC);
+                reason += " - " + WR_FEATURES.ERROR_METRIC;
             }
 
             if(!_charValid) {
-                publishFeature(WR_CONST.ERROR_CHAR);
-                reason += " - " + WR_CONST.ERROR_CHAR;
+                publishFeature(WR_FEATURES.ERROR_CHAR);
+                reason += " - " + WR_FEATURES.ERROR_CHAR;
             }
         }
 
@@ -859,21 +861,21 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         switch (constant) {
             case "STIM_1":
                 Log.d("tadpolr", "publishConcat: STIM_1");
-                publishFeatureValue = WR_CONST.FTR_STIM_1_CONCAT;
-                publishValueConstHundreds = WR_CONST.AUDIO_STIM_1_CONCAT_HUNDREDS;
-                publishValueConstTens = WR_CONST.AUDIO_STIM_1_CONCAT_TENS;
+                publishFeatureValue = WR_FEATURES.FTR_STIM_1_CONCAT;
+                publishValueConstHundreds = WR_VALUES.AUDIO_STIM_1_CONCAT_HUNDREDS;
+                publishValueConstTens = WR_VALUES.AUDIO_STIM_1_CONCAT_TENS;
                 break;
             case "STIM_3":
                 Log.d("tadpolr", "publishConcat: STIM_3");
-                publishFeatureValue = WR_CONST.FTR_STIM_3_CONCAT;
-                publishValueConstHundreds = WR_CONST.AUDIO_STIM_3_CONCAT_HUNDREDS;
-                publishValueConstTens = WR_CONST.AUDIO_STIM_3_CONCAT_TENS;
+                publishFeatureValue = WR_FEATURES.FTR_STIM_3_CONCAT;
+                publishValueConstHundreds = WR_VALUES.AUDIO_STIM_3_CONCAT_HUNDREDS;
+                publishValueConstTens = WR_VALUES.AUDIO_STIM_3_CONCAT_TENS;
                 break;
             case "ANS":
                 Log.d("tadpolr", "publishConcat: ANS");
-                publishFeatureValue = WR_CONST.FTR_ANS_CONCAT;
-                publishValueConstHundreds = WR_CONST.AUDIO_ANS_CONCAT_HUNDREDS;
-                publishValueConstTens = WR_CONST.AUDIO_ANS_CONCAT_TENS;
+                publishFeatureValue = WR_FEATURES.FTR_ANS_CONCAT;
+                publishValueConstHundreds = WR_VALUES.AUDIO_ANS_CONCAT_HUNDREDS;
+                publishValueConstTens = WR_VALUES.AUDIO_ANS_CONCAT_TENS;
                 break;
         }
 
@@ -913,7 +915,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
         // update the Scope response variable  "<Sstimulus>.value"
         //
-        publishValue(WR_CONST.VALUE_VAR, mAnswer.toLowerCase());
+        publishValue(WR_VALUES.VALUE_VAR, mAnswer.toLowerCase());
 
         // For number activity that may need concatenation.
         //
@@ -934,27 +936,27 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         // XYZ if this is a story, we have to look up the audio file from the story
         if (mAudioStimulus.length == 1) {
 
-            publishValue(WR_CONST.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_2, "");
-            publishValue(WR_CONST.AUDIO_STIM_3, "");
+            publishValue(WR_VALUES.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_2, "");
+            publishValue(WR_VALUES.AUDIO_STIM_3, "");
 
         } else if (mAudioStimulus.length == 2) {
 
-            publishValue(WR_CONST.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_2, mAudioStimulus[1].toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_3, "");
+            publishValue(WR_VALUES.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_2, mAudioStimulus[1].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_3, "");
 
         } else if (mAudioStimulus.length >= 3) {
 
-            publishValue(WR_CONST.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_2, mAudioStimulus[1].toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_3, mAudioStimulus[2].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_1, mAudioStimulus[0].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_2, mAudioStimulus[1].toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_3, mAudioStimulus[2].toLowerCase());
 
         } else {
 
-            publishValue(WR_CONST.AUDIO_STIM_1, mStimulus.toLowerCase());
-            publishValue(WR_CONST.AUDIO_STIM_2, "");
-            publishValue(WR_CONST.AUDIO_STIM_3, "");
+            publishValue(WR_VALUES.AUDIO_STIM_1, mStimulus.toLowerCase());
+            publishValue(WR_VALUES.AUDIO_STIM_2, "");
+            publishValue(WR_VALUES.AUDIO_STIM_3, "");
         }
 
 

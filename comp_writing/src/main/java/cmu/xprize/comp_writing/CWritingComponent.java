@@ -31,6 +31,7 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,7 +42,6 @@ import android.widget.RelativeLayout;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +51,11 @@ import java.util.Map;
 import java.util.Collections;
 
 import cmu.xprize.comp_logging.ITutorLogger;
-import cmu.xprize.ltkplus.CGlyph;
+import cmu.xprize.comp_writing.constants.WR_BEHAVIORS;
+import cmu.xprize.comp_writing.constants.WR_CONST;
+import cmu.xprize.comp_writing.constants.WR_EVENTS;
+import cmu.xprize.comp_writing.constants.WR_FEATURES;
+import cmu.xprize.comp_writing.constants.WR_VALUES;
 import cmu.xprize.ltkplus.CGlyphMetricConstraint;
 import cmu.xprize.ltkplus.CGlyphMetrics;
 import cmu.xprize.ltkplus.CRecognizerPlus;
@@ -70,9 +74,12 @@ import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.gesture.ExpectWriteGestureListener;
 
 import static cmu.xprize.util.TCONST.EMPTY;
-import static cmu.xprize.util.TCONST.PAGEFLIP_BUTTON;
+import static cmu.xprize.util.TCONST.GESTURE_TIME_WRITE;
+import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
+import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 
 
 /**
@@ -90,6 +97,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     protected char[]                mStimulusData;
     private   List<IEventListener>  mListeners = new ArrayList<IEventListener>();
 
+    // VIEWS
     protected CLinkedScrollView mRecognizedScroll;
     protected CLinkedScrollView mResponseViewScroll;
     protected CLinkedScrollView mDrawnScroll;
@@ -100,6 +108,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //    protected ImageButton       mScrollRightButton;
 //    protected ImageButton       mScrollLeftButton;
 
+    // MORE VIEWS
     protected LinearLayout      mRecogList;
     protected LinearLayout      mResponseViewList; //amogh added
     protected LinearLayout      mGlyphList;
@@ -111,11 +120,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     protected int               mMaxLength   = 0; //GCONST.ALPHABET.length();                // Maximum string length
 
+    // QUEUE STUFF THAT WILL GET MOVED
     protected final Handler     mainHandler  = new Handler(Looper.getMainLooper());
     protected HashMap           queueMap     = new HashMap();
     protected HashMap           nameMap      = new HashMap();
     protected boolean           _qDisabled   = false;
 
+
+    // MISCELLANEOUS STUFF
     protected boolean           _alwaysTrack = true;
     protected int               _fieldIndex  = 0;
     protected String            _replayType;
@@ -133,6 +145,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     private int                 _hesitationNo      = 0; //amogh added
     protected ArrayList<String> _audioFTR = new ArrayList<>();
 
+    // THE ONLY THINGS THAT ARE ACTUALLY IMPORTANT
     protected String            mResponse;
     protected String            mStimulus;
     protected String[]          mAudioStimulus;
@@ -140,6 +153,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     protected CGlyphMetricConstraint _metric = new CGlyphMetricConstraint();
 
+    // FOR READING IN THE DATA SOURCE
     protected List<CWr_Data>    _data;
     protected int               _dataIndex = 0;
     protected boolean           _dataEOI   = false;
@@ -172,8 +186,18 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     //amogh added ends
 
 
-    protected String punctuationSymbols = ",.;:-_!?";
-    protected Map<String, String> punctuationToString;
+    protected static String punctuationSymbols = ",.;:-_!?";
+    protected static Map<String, String> punctuationToString;
+    static {
+        punctuationToString = new HashMap<String, String> ();
+        punctuationToString.put(",", "comma");
+        punctuationToString.put(".", "period");
+        punctuationToString.put("!", "exclamation point");
+        punctuationToString.put("?", "question mark");
+        punctuationToString.put("-","hyphen");
+
+    }
+
     protected Map<String, String> punctuationToFeature;
     //amogh add ends
 
@@ -183,6 +207,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     // TODO: Need to update datasource to contain these data.
     protected String task;
     protected String level;
+
+    private GestureDetector mDetector;
+    protected boolean gestureTimerStarted;
 
     public CWritingComponent(Context context) {
         super(context);
@@ -204,61 +231,71 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         setClipChildren(false);
 
-        punctuationToString = new HashMap<String, String> ();
-        punctuationToString.put(",", "comma");
-        punctuationToString.put(".", "period");
-        punctuationToString.put("!", "exclamation point");
-        punctuationToString.put("?", "question mark");
-        punctuationToString.put("-","hyphen");
+        initializeFeatures();
+
+        // Capture the local broadcast manager
+        bManager = LocalBroadcastManager.getInstance(getContext());
+
+        mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(this));
+
+        // JUDITH each component should have a different listener
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return mDetector.onTouchEvent(motionEvent); // INT_WRITE where else can I put this to make it trigger all the time?
+            }
+        });
+    }
+
+
+    /**
+     * What do all of these features do? Who knows!
+     */
+    private void initializeFeatures() {
 
         punctuationToFeature = new HashMap<String,String>();
-        punctuationToFeature.put(",", WR_CONST.FTR_COMMA);
-        punctuationToFeature.put(".", WR_CONST.FTR_PERIOD);
-        punctuationToFeature.put("!", WR_CONST.FTR_EXCLAIM);
-        punctuationToFeature.put("?", WR_CONST.FTR_QUESTION);
+        punctuationToFeature.put(",", WR_FEATURES.FTR_COMMA);
+        punctuationToFeature.put(".", WR_FEATURES.FTR_PERIOD);
+        punctuationToFeature.put("!", WR_FEATURES.FTR_EXCLAIM);
+        punctuationToFeature.put("?", WR_FEATURES.FTR_QUESTION);
 
         // initialize with four features
-        _attemptFTR.add(WR_CONST.FTR_ATTEMPT_1);
-        _attemptFTR.add(WR_CONST.FTR_ATTEMPT_2);
-        _attemptFTR.add(WR_CONST.FTR_ATTEMPT_3);
-        _attemptFTR.add(WR_CONST.FTR_ATTEMPT_4);
+        _attemptFTR.add(WR_FEATURES.FTR_ATTEMPT_1);
+        _attemptFTR.add(WR_FEATURES.FTR_ATTEMPT_2);
+        _attemptFTR.add(WR_FEATURES.FTR_ATTEMPT_3);
+        _attemptFTR.add(WR_FEATURES.FTR_ATTEMPT_4);
 
         //amogh added
-        _senAttemptFTR.add(WR_CONST.FTR_SEN_ATTEMPT_1);
-        _senAttemptFTR.add(WR_CONST.FTR_SEN_ATTEMPT_2);
-        _senAttemptFTR.add(WR_CONST.FTR_SEN_ATTEMPT_3);
-        _senAttemptFTR.add(WR_CONST.FTR_SEN_ATTEMPT_4);
+        _senAttemptFTR.add(WR_FEATURES.FTR_SEN_ATTEMPT_1);
+        _senAttemptFTR.add(WR_FEATURES.FTR_SEN_ATTEMPT_2);
+        _senAttemptFTR.add(WR_FEATURES.FTR_SEN_ATTEMPT_3);
+        _senAttemptFTR.add(WR_FEATURES.FTR_SEN_ATTEMPT_4);
 
-        _hesitationFTR.add(WR_CONST.FTR_HESITATION_1);
-        _hesitationFTR.add(WR_CONST.FTR_HESITATION_2);
-        _hesitationFTR.add(WR_CONST.FTR_HESITATION_3);
-        _hesitationFTR.add(WR_CONST.FTR_HESITATION_4);
+        _hesitationFTR.add(WR_FEATURES.FTR_HESITATION_1);
+        _hesitationFTR.add(WR_FEATURES.FTR_HESITATION_2);
+        _hesitationFTR.add(WR_FEATURES.FTR_HESITATION_3);
+        _hesitationFTR.add(WR_FEATURES.FTR_HESITATION_4);
 //        _hesitationFTR.add(WR_CONST.FTR_HESITATION_5);
 
         //amogh added to initialise the list for audio features:
-            _audioFTR.add(WR_CONST.FTR_AUDIO_CAP);
-            _audioFTR.add(WR_CONST.FTR_AUDIO_LTR);
-            _audioFTR.add(WR_CONST.FTR_AUDIO_PUNC);
-            _audioFTR.add(WR_CONST.FTR_AUDIO_SPACE);
-            _audioFTR.add(WR_CONST.FTR_INSERT);
-            _audioFTR.add(WR_CONST.FTR_DELETE);
-            _audioFTR.add(WR_CONST.FTR_REPLACE);
-            _audioFTR.add(WR_CONST.FTR_PERIOD);
-            _audioFTR.add(WR_CONST.FTR_COMMA);
-            _audioFTR.add(WR_CONST.FTR_EXCLAIM);
-            _audioFTR.add(WR_CONST.FTR_QUESTION);
+        _audioFTR.add(WR_FEATURES.FTR_AUDIO_CAP);
+        _audioFTR.add(WR_FEATURES.FTR_AUDIO_LTR);
+        _audioFTR.add(WR_FEATURES.FTR_AUDIO_PUNC);
+        _audioFTR.add(WR_FEATURES.FTR_AUDIO_SPACE);
+        _audioFTR.add(WR_FEATURES.FTR_INSERT);
+        _audioFTR.add(WR_FEATURES.FTR_DELETE);
+        _audioFTR.add(WR_FEATURES.FTR_REPLACE);
+        _audioFTR.add(WR_FEATURES.FTR_PERIOD);
+        _audioFTR.add(WR_FEATURES.FTR_COMMA);
+        _audioFTR.add(WR_FEATURES.FTR_EXCLAIM);
+        _audioFTR.add(WR_FEATURES.FTR_QUESTION);
 
 
 //            _audioFTR.add(WR_CONST.FTR_AUDIO_CAP);
 //            _audioFTR.add(WR_CONST.FTR_AUDIO_CAP);
         //amogh added finished
 
-
-        // Capture the local broadcast manager
-        bManager = LocalBroadcastManager.getInstance(getContext());
     }
-
-
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -277,8 +314,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mStimulusData = new char[mMaxLength];
 
         // Setup the Recycler for the recognized input views
-        mRecognizedScroll = (CLinkedScrollView) findViewById(R.id.Sresponse);
-        mRecogList = (LinearLayout) findViewById(R.id.Srecognized_glyphs);
+        mRecognizedScroll = (CLinkedScrollView) findViewById(R.id.Sresponse); // INT_WRITE gesture
+        mRecogList = (LinearLayout) findViewById(R.id.Srecognized_glyphs); // INT_WRITE gesture
         // Note: this is used in the GlyphRecognizer project to initialize the sample
         //
         for(int i1 =0 ; i1 < mStimulusData.length ; i1++)
@@ -286,6 +323,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             // create a new view
             r = (CStimulusController)LayoutInflater.from(getContext())
                                         .inflate(R.layout.recog_resp_comp, null, false);
+
+            // INT_WRITE add gesture listener
+            r.setOnTouchListener(new DebugTouchListener("mRecogList.child[" + i1 + "]"));
 
             mRecogList.addView(r);
         }
@@ -310,8 +350,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             v.setIsLast(i1 ==  mStimulusData.length-1);
 
             mGlyphList.addView(v);
-            ((CGlyphController)v).setLinkedScroll(mDrawnScroll);
-            ((CGlyphController)v).setWritingController(this);
+            v.setLinkedScroll(mDrawnScroll);
+            v.setWritingController(this);
+
+            v.setOnTouchListener(new DebugTouchListener("mGlyphList.child[" + i1 + "]"));
         }
 
 
@@ -332,7 +374,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             comp.setProtoGlyph(_glyphSet.cloneGlyph(expectedChar));
         }
 
-// TODO: Dev only
+// TODO: Dev only might me useful?
 //        mRecogList.setOnTouchListener(new RecogTouchListener());
 //        mGlyphList.setOnTouchListener(new drawnTouchListener());
 
@@ -618,7 +660,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //for letter level
         else if(activityFeature.contains("FTR_SEN_LTR")){
             if (isComplete()) {
-                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
             }
         }
 
@@ -636,7 +678,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //            String writtenAnswerWord = mActiveWord.getWordAnswer();
 //            boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
 //            if(writtenWordIsCorrect){
-//                applyBehavior(WR_CONST.ON_CORRECT);
+//                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
 //            }
 //        }
 
@@ -712,7 +754,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             //for letter level copy
             if (activityFeature.contains("FTR_SEN_LTR")) {
                 if (isComplete()) {
-                    applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                    applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
                 }
             }
 
@@ -729,7 +771,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                String writtenAnswerWord = mActiveWord.getWordAnswer();
 //                boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
 //                if(writtenWordIsCorrect){
-//                    applyBehavior(WR_CONST.ON_CORRECT); //should increment the current word index and the mActiveWord also thus changes.
+//                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should increment the current word index and the mActiveWord also thus changes.
 //                    temporaryOnCorrect();
 //                }
             }
@@ -772,8 +814,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         CStimulusController stimController = (CStimulusController) mRecogList.getChildAt(mActiveIndex);
         CGlyphController gController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
 
-        publishValue(WR_CONST.CANDIDATE_VAR, candidate.getRecChar().toLowerCase());
-        publishValue(WR_CONST.EXPECTED_VAR, mActiveController.getExpectedChar().toLowerCase());
+        publishValue(WR_VALUES.CANDIDATE_VAR, candidate.getRecChar().toLowerCase());
+        publishValue(WR_VALUES.EXPECTED_VAR, mActiveController.getExpectedChar().toLowerCase());
 
 
         // Avoid caseSensitive for words activity
@@ -852,30 +894,30 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             // Fire the appropriate behavior
             if (isComplete()) {
 
-                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
             }
             else {
 
                 if (!_isValid) {
 
-                    publishFeature(WR_CONST.FTR_HAD_ERRORS);
+                    publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                     int attempt = updateAttemptFeature();
 
                     if (attempt > 4) {
-                        applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                     } else {
-                        applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                     }
 
                     if (!_charValid)
-                        applyBehavior(WR_CONST.ON_CHAR_ERROR);
+                        applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
                     else if (!_metricValid)
-                        applyBehavior(WR_CONST.ON_METRIC_ERROR);
+                        applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
                 } else {
                     updateStalledStatus();
 
-                    applyBehavior(WR_CONST.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
+                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
                 }
             }
         }
@@ -929,38 +971,38 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
                 if (isComplete()) {
 
-                    applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                    applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
                 }
                 else {
                     //when not valid
                     if (!_isValid) {
 
                         // lots of fun feature updating here
-                        publishFeature(WR_CONST.FTR_HAD_ERRORS);
+                        publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                         int attempt = updateAttemptFeature();
 
                         if (attempt > 4) {
-                            applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                         } else {
 
                             if(charExpected.equals(" ")) {
                                 publishFeature("FTR_SPACE_SAMPLE");
                             }
-                            applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                         }
 
                         if (!_charValid)
-                            applyBehavior(WR_CONST.ON_CHAR_ERROR);
+                            applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
                         else if (!_metricValid)
-                            applyBehavior(WR_CONST.ON_METRIC_ERROR);
+                            applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
                     }
 
                     //else when valid
                     else {
                         updateStalledStatus();
                         mActiveController.updateCorrectStatus(true);
-                        applyBehavior(WR_CONST.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
+                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
                     }
                 }
             }
@@ -988,7 +1030,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                     //word has not been evaluated ie correctionAttempts = 0 and not to be evaluated. -> just let the user write
                     else{
 //                        attempts = updateAttemptFeature();
-//                        applyBehavior(WR_CONST.ON_ERROR);
+//                        applyBehavior(WR_BEHAVIORS.ON_ERROR);
                     }
 
                 }
@@ -1012,7 +1054,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                             boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
                             if (writtenSentenceIsCorrect) {
                                 temporaryOnCorrect(); //to update the word
-                                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
                             }
 
                             // if the response is correct(item not yet over), check if the word is correct,apply ON_CORRECT
@@ -1026,15 +1068,15 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                                 if (wordIsCorrect) {
                                     //turn blue
                                     //release the oncorrect behavior with word correct feature.
-                                    publishFeature(WR_CONST.FTR_WORD_CORRECT);
+                                    publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
                                     temporaryOnCorrect();
-                                    applyBehavior(WR_CONST.ON_CORRECT);
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
 //                                    temporaryOnCorrect();
                                 }
 
                                 //if the replacement is correct but the word is not, turn it in blue and inhibit input if attempt 2/3 when each letter is colored.
                                 else{
-                                    applyBehavior(WR_CONST.ON_CORRECT);
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
                                 }
 
 
@@ -1047,9 +1089,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                             gController.setPreviousGlyph();// put in animator graph
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                             // in the animator graph -> turn the word blue or red.
                             //set the word as red or blue depending on status.
@@ -1065,9 +1107,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                         if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                         }
                     }
@@ -1078,10 +1120,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                            // increase attempts and update the released feature
 //                            attempts = updateAttemptFeature();
 //                            if (attempts > 4) {
-//                                applyBehavior(WR_CONST.MERCY_RULE);
+//                                applyBehavior(WR_BEHAVIORS.MERCY_RULE);
 //                                currentWordIndex++;
 //                            } else {
-//                                applyBehavior(WR_CONST.ON_ERROR);
+//                                applyBehavior(WR_BEHAVIORS.ON_ERROR);
 //                            }
 //                        }
                 }
@@ -1134,7 +1176,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                             //if the written sentence is correct
                             if (writtenSentenceIsCorrect) {
-                                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
                                 clearSentenceAttemptFeatures(); //should go in the animator graph
                             }
 
@@ -1154,14 +1196,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                                     //checking if the letters of the word are correct
                                     boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
                                     if (writtenWordIsCorrect) {
-                                        publishFeature(WR_CONST.FTR_WORD_CORRECT);
-                                        applyBehavior(WR_CONST.ON_CORRECT); //should turn word blue
+                                        publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
 //                                        temporaryOnCorrectSentence(); //already in animator graph, doesnt deactivate the edits until the letters AND the position of the word is correct.
                                     }
 
                                     //when correct replacement but the word or the sentence is not yet complete.
                                     else{
-                                        applyBehavior(WR_CONST.ON_CORRECT);
+                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT);
                                     }
                                 }
 
@@ -1179,9 +1221,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                             gController.setPreviousGlyph();// put in animator graph
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                             // in the animator graph -> turn the word blue or red.
                             //set the word as red or blue depending on status.
@@ -1197,9 +1239,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                         if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                         }
                     }
@@ -1222,7 +1264,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
                 if (isComplete()) {
 
-                    applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete..
+                    applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete..
                 }
 
                 //when the sentence is not yet complete
@@ -1232,30 +1274,30 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
 
                         // lots of fun feature updating here
-                        publishFeature(WR_CONST.FTR_HAD_ERRORS);
+                        publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                         int attempt = updateAttemptFeature();
 
                         if (attempt > 4) {
-                            applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                         } else {
                             if(charExpected.equals(" ")) {
                                 publishFeature("FTR_SPACE_SAMPLE");
                             }
 
-                            applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                         }
 
                         if (!_charValid)
-                            applyBehavior(WR_CONST.ON_CHAR_ERROR);
+                            applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
                         else if (!_metricValid)
-                            applyBehavior(WR_CONST.ON_METRIC_ERROR);
+                            applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
                     }
 
                     //else when valid
                     else {
                         mActiveController.updateCorrectStatus(true);
-                        applyBehavior(WR_CONST.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
+                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
                     }
                 }
 
@@ -1287,7 +1329,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                        // if this correct response makes the sentence correct,
 //                        boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
 //                        if (writtenSentenceIsCorrect) {
-//                            applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+//                            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
 //                            clearSentenceAttemptFeatures(); //should go in the animator graph
 //                        }
 //
@@ -1299,7 +1341,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                            String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
 //                            boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
 //                            if(writtenWordIsCorrect){
-//                                applyBehavior(WR_CONST.ON_CORRECT);
+//                                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
 //                                temporaryOnCorrectSentence();
 //
 //                            }
@@ -1311,7 +1353,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                        //revert the glyph to old one.
 //                        gController.setPreviousGlyph();// put in animator graph
 //                        updateAttemptFeature();
-//                        applyBehavior(WR_CONST.ON_ERROR);
+//                        applyBehavior(WR_BEHAVIORS.ON_ERROR);
 //                        // in the animator graph -> turn the word blue or red.
 //                        //set the word as red or blue depending on status.
 //                    }
@@ -1322,7 +1364,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //                    gController.setPreviousGlyph();
 //                    //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
 //                    updateAttemptFeature();
-//                    applyBehavior(WR_CONST.ON_ERROR);
+//                    applyBehavior(WR_BEHAVIORS.ON_ERROR);
 //                }
                 //update sentence status
 
@@ -1353,7 +1395,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                             //if the written sentence is correct
                             if (writtenSentenceIsCorrect) {
-                                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
                                 clearSentenceAttemptFeatures(); //should go in the animator graph
                             }
 
@@ -1372,14 +1414,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                                     String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
                                     boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
                                     if (writtenWordIsCorrect) {
-                                        publishFeature(WR_CONST.FTR_WORD_CORRECT);
-                                        applyBehavior(WR_CONST.ON_CORRECT); //should turn word blue
+                                        publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
 //                                        temporaryOnCorrectSentence();
 
                                     }
                                     //when correct replacement but the word or the sentence is not yet complete.
                                     else{
-                                        applyBehavior(WR_CONST.ON_CORRECT);
+                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT);
                                     }
                                 }
 
@@ -1397,9 +1439,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                             gController.setPreviousGlyph();// put in animator graph
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                             // in the animator graph -> turn the word blue or red.
                             //set the word as red or blue depending on status.
@@ -1417,9 +1459,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                         if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
                             int attempt = updateAttemptFeature();
                             if (attempt > 4) {
-                                applyBehavior(WR_CONST.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                             } else {
-                                applyBehavior(WR_CONST.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                             }
                         }
                     }
@@ -1514,9 +1556,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         mActiveController.updateAndDisplayCorrectStatus(true);
         if(isComplete()) {
-            applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
         } else {
-            applyBehavior(WR_CONST.ON_CORRECT);
+            applyBehavior(WR_BEHAVIORS.ON_CORRECT);
         }
     }
 
@@ -1525,14 +1567,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         CGlyphController   v;
 
-        retractFeature(WR_CONST.FTR_INPUT_STALLED);
+        retractFeature(WR_FEATURES.FTR_INPUT_STALLED);
 
         v = (CGlyphController) mGlyphList.getChildAt(mActiveIndex+1);
 
         if(v != null) {
 
             if(!v.getGlyphStarted())
-                publishFeature(WR_CONST.FTR_INPUT_STALLED);
+                publishFeature(WR_FEATURES.FTR_INPUT_STALLED);
         }
     }
 
@@ -1668,7 +1710,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
         if (writtenSentenceIsCorrect) {
             temporaryOnCorrect();
-            applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
         }
 
         //sentence not finished.
@@ -1695,8 +1737,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 if (wordIsCorrect) {
                     //turn blue
                     //release the oncorrect behavior with word correct feature.
-                    publishFeature(WR_CONST.FTR_WORD_CORRECT);
-                    applyBehavior(WR_CONST.ON_CORRECT);
+                    publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
                     temporaryOnCorrect();
 //                    inputWord.updateWordResponse(); //goes in the animator graph
                 }
@@ -1719,7 +1761,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                     if (!writingIsContinued) {
 //                        mActiveWord.activateEditMode(); //put in animator graph //edit buttons removed for code drop 2 in tanzania
                         updateAttemptFeature();
-                        applyBehavior(WR_CONST.ON_ERROR);
+                        applyBehavior(WR_BEHAVIORS.ON_ERROR);
                     }
 
                     //otherwise it just means that the previous words were correct and you are beginning to write  this word, mActiveWord is set to this word, but no features are to bbe released
@@ -1767,14 +1809,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         // evaluate sentence
         boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
         if (writtenSentenceIsCorrect) {
-            applyBehavior(WR_CONST.DATA_ITEM_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
             clearSentenceAttemptFeatures(); //should go in the animator graph
         }
 
         //when the written sentence does not match the expected answer
         else{
-            publishFeature(WR_CONST.FTR_SEN_EVAL);
-            applyBehavior(WR_CONST.ON_ERROR); //activates the edit mode.
+            publishFeature(WR_FEATURES.FTR_SEN_EVAL);
+            applyBehavior(WR_BEHAVIORS.ON_ERROR); //activates the edit mode.
         }
     }
     //amogh added ends
@@ -2165,15 +2207,15 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             boolean isSpaceExpected = expectedCharString.equals(" ");
 
             if (!isSpaceExpected) {
-                v.post(WR_CONST.RIPPLE_PROTO);
+                v.post(WR_EVENTS.RIPPLE_PROTO);
             }
             else{
-//                applyBehavior(WR_CONST.FIELD_REPLAY_COMPLETE);
+//                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
                 publishFeature("FTR_SPACE_REPLAY");
-                applyBehavior(WR_CONST.ON_STOP_WRITING); //amogh added for hesitation.
+                applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //amogh added for hesitation.
             }
 //            v.eraseGlyph();
-            applyBehavior(WR_CONST.REPLAY_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.REPLAY_COMPLETE);
         }
     }
 
@@ -2186,7 +2228,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
             //if complete, pass item complete behavior and return
             if (isComplete()) {
-                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
                 return;
             }
 
@@ -2212,12 +2254,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             boolean isSpaceExpected = expectedCharString.equals(" ");
 
             if (!isSpaceExpected) {
-                v.post(WR_CONST.RIPPLE_PROTO);
+                v.post(WR_EVENTS.RIPPLE_PROTO);
             }
             else{
-//                applyBehavior(WR_CONST.FIELD_REPLAY_COMPLETE);
+//                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
                 publishFeature("FTR_SPACE_REPLAY");
-                applyBehavior(WR_CONST.ON_STOP_WRITING); //added to restart hesitation.
+                applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //added to restart hesitation.
             }
 
             //set the recognised character and set the response color.
@@ -2235,10 +2277,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             //end replay
             //check in the end if the sentence is correct now.
             if(isComplete()){
-                applyBehavior(WR_CONST.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
             }
 
-            applyBehavior(WR_CONST.REPLAY_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.REPLAY_COMPLETE);
 
         }
     }
@@ -2250,12 +2292,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         String expectedCharString = mAnswer.substring(mActiveIndex,mActiveIndex + 1);
         boolean isSpaceExpected = expectedCharString.equals(" ");
         if (!isSpaceExpected) {
-            v.post(WR_CONST.RIPPLE_PROTO);
+            v.post(WR_EVENTS.RIPPLE_PROTO);
         }
         else{
-//                applyBehavior(WR_CONST.FIELD_REPLAY_COMPLETE);
+//                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
             publishFeature("FTR_SPACE_REPLAY");
-            applyBehavior(WR_CONST.ON_STOP_WRITING); //added to restart hesitation.
+            applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //added to restart hesitation.
         }
     }
 
@@ -2268,7 +2310,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             Word correctWord = mListWordsAnswer.get(currentWordIndex);
             ArrayList<Integer> correctIndices = correctWord.listIndicesAnswer;
             v = (CGlyphController) mGlyphList.getChildAt(_fieldIndex);
-            v.post(WR_CONST.RIPPLE_PROTO);
+            v.post(WR_EVENTS.RIPPLE_PROTO);
             v.setRecognisedChar(v.getExpectedChar()); //the recognised character is set to the expected character (since the animation).
             //  added to set the valid character in response.
 
@@ -2280,7 +2322,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             _fieldIndex++;
         }
         else{
-            applyBehavior(WR_CONST.REPLAY_COMPLETE);
+            applyBehavior(WR_BEHAVIORS.REPLAY_COMPLETE);
         }
     }
 
@@ -2322,7 +2364,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 if (_isDemo)
                     broadcastMsg(TCONST.POINT_FADE);
 
-                applyBehavior(WR_CONST.REPLAY_COMPLETE);
+                applyBehavior(WR_BEHAVIORS.REPLAY_COMPLETE);
             }
         }
     }
@@ -2483,7 +2525,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         try {
             if (_data != null) {
 
-                retractFeature(WR_CONST.FTR_HAD_ERRORS);
+                retractFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                 // XYZ
                 updateText(_data.get(_dataIndex));
@@ -2529,6 +2571,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mRecogList.removeAllViews();
         mResponseViewList.removeAllViews(); //  added
 
+        // JUDITH - when a wrong gesture occurs,
         //LOADING THE STIMULUS
         if(!singleStimulus) {
 
@@ -2816,7 +2859,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         switch(event) {
 
-            case WR_CONST.FIELD_REPLAY_COMPLETE:
+            case WR_EVENTS.FIELD_REPLAY_COMPLETE:
                 // This is executed when the glyph replay animation ends. We want to play replayNext when not letter level feedback in sentence writing activities; other relevant behaviors
                 if(activityFeature.contains("FTR_SEN")){
                     //letter level feedback, sentence activity
@@ -2825,14 +2868,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                         CGlyphController v = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
                         v.setIsPlaying(false);
                         //if mercy, then release stop writing behavior, else just restart hesitation.
-                        //applyBehavior(WR_CONST.ON_STOP_WRITING);
+                        //applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING);
                         //vs
-                        applyBehavior(WR_CONST.ON_ANIMATION_COMPLETE);
+                        applyBehavior(WR_BEHAVIORS.ON_ANIMATION_COMPLETE);
                         // apply animation complete behavior which maps to stop hesitaiton
                     }
                     //word and sentence level feedback, sentence activity
                     else {
-                        applyBehavior(WR_CONST.ON_STOP_WRITING);
+                        applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING);
                         replayNext();
                     }
                 }
@@ -2981,8 +3024,28 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     @Override
     public void triggerIntervention(String type) {
-        Intent msg = new Intent(type);
-        bManager.sendBroadcast(msg);
+
+        // INT_WRITE move all this Queue junk to a QueueMessageFactory
+        switch(type) {
+            case I_TRIGGER_GESTURE:
+
+                if (gestureTimerStarted) return;
+                Log.wtf("GESTURE", "Triggering Timer Gesture for " + GESTURE_TIME_WRITE);
+                gestureTimerStarted = true;
+                postNamed(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE, GESTURE_TIME_WRITE);
+                break;
+
+
+            case I_CANCEL_GESTURE:
+
+                gestureTimerStarted = false;
+                Log.wtf("GESTURE", "Cancelling timer gesture for " + GESTURE_TIME_WRITE);
+                cancelPost(I_TRIGGER_GESTURE);
+                break;
+        }
+
+        /*Intent msg = new Intent(type);
+        bManager.sendBroadcast(msg);*/
     }
 
     // Event Listener/Dispatcher - End
@@ -3649,7 +3712,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             CGlyphController v;
             for (int i1 : listIndicesAnswer){
                 v = (CGlyphController) mGlyphList.getChildAt(i1);
-                v.post(WR_CONST.ERASE_GLYPH);
+                v.post(WR_EVENTS.ERASE_GLYPH);
             }
         }
         private int _fieldIndex;
@@ -3783,24 +3846,24 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //for insert operation
         if(editName.equals("I")){
 
-            publishFeature(WR_CONST.FTR_INSERT);
+            publishFeature(WR_FEATURES.FTR_INSERT);
 
             //insert spacing
             if(editValue.equals(" ")){
-                publishFeature(WR_CONST.FTR_AUDIO_SPACE);
+                publishFeature(WR_FEATURES.FTR_AUDIO_SPACE);
             }
 
             //insert punctuation
             else if (punctuationSymbols.contains(editValue)){
-                publishFeature(WR_CONST.FTR_AUDIO_PUNC);
+                publishFeature(WR_FEATURES.FTR_AUDIO_PUNC);
                 publishFeature(punctuationToFeature.get(editValue));
-                publishValue(WR_CONST.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
+                publishValue(WR_VALUES.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
             }
 
             //insert letter
             else{
-                publishFeature(WR_CONST.FTR_AUDIO_LTR);
-                publishValue(WR_CONST.AUDIO_LETTER, editValue.toUpperCase());
+                publishFeature(WR_FEATURES.FTR_AUDIO_LTR);
+                publishValue(WR_VALUES.AUDIO_LETTER, editValue.toUpperCase());
             }
 
 
@@ -3809,32 +3872,32 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //for relacement operation
         else if(editName.equals("R")){
 
-            publishFeature(WR_CONST.FTR_REPLACE);
+            publishFeature(WR_FEATURES.FTR_REPLACE);
 
             String prev = String.valueOf(e.getPrevious());
 
             //replace with space
             if(editValue.equals(" ")){
-                publishFeature(WR_CONST.FTR_AUDIO_SPACE);
+                publishFeature(WR_FEATURES.FTR_AUDIO_SPACE);
             }
 
             //replace with an uppercase letter
             else if(prev.equals(editValue.toLowerCase())){
-                publishFeature(WR_CONST.FTR_AUDIO_CAP);
-                publishValue(WR_CONST.AUDIO_LETTER, editValue.toUpperCase());
+                publishFeature(WR_FEATURES.FTR_AUDIO_CAP);
+                publishValue(WR_VALUES.AUDIO_LETTER, editValue.toUpperCase());
             }
 
             //replace with punctuation
             else if (punctuationSymbols.contains(editValue)){
-                publishFeature(WR_CONST.FTR_AUDIO_PUNC);
+                publishFeature(WR_FEATURES.FTR_AUDIO_PUNC);
                 publishFeature(punctuationToFeature.get(editValue));
-                publishValue(WR_CONST.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
+                publishValue(WR_VALUES.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
             }
 
             //replace with a new letter
             else{
-                publishFeature(WR_CONST.FTR_AUDIO_LTR);
-                publishValue(WR_CONST.AUDIO_LETTER, editValue.toUpperCase());
+                publishFeature(WR_FEATURES.FTR_AUDIO_LTR);
+                publishValue(WR_VALUES.AUDIO_LETTER, editValue.toUpperCase());
 
             }
 
@@ -3843,31 +3906,31 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //for delete operation
         else if(editName.equals("D")){
 
-            publishFeature(WR_CONST.FTR_DELETE);
+            publishFeature(WR_FEATURES.FTR_DELETE);
 
             //delete spacing
             if(editValue.equals("")){
-                publishFeature(WR_CONST.FTR_AUDIO_SPACE);
+                publishFeature(WR_FEATURES.FTR_AUDIO_SPACE);
             }
 
             //delete punctuation
             else if (punctuationSymbols.contains(editValue)){
-                publishFeature(WR_CONST.FTR_AUDIO_PUNC);
+                publishFeature(WR_FEATURES.FTR_AUDIO_PUNC);
                 publishFeature(punctuationToFeature.get(editValue));
-                publishValue(WR_CONST.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
+                publishValue(WR_VALUES.AUDIO_PUNCTUATION, punctuationToString.get(editValue));
             }
 
             //delete letter
             else{
-                publishFeature(WR_CONST.FTR_AUDIO_LTR);
-                publishValue(WR_CONST.AUDIO_LETTER, editValue.toUpperCase());
+                publishFeature(WR_FEATURES.FTR_AUDIO_LTR);
+                publishValue(WR_VALUES.AUDIO_LETTER, editValue.toUpperCase());
             }
 
         }
 
         //for none operation
         else{
-            publishFeature(WR_CONST.FTR_AUDIO_NO_ERROR);
+            publishFeature(WR_FEATURES.FTR_AUDIO_NO_ERROR);
         }
         int i = 1; //just to put a breakpoint and see the features.
 
@@ -3912,6 +3975,8 @@ public class EditOperation {
         this.value = value;
         this.previous = previous;
     }
+
+
 
     public String toString() {
         return operation;
@@ -4189,43 +4254,50 @@ public class EditOperation {
 
                 switch(_command) {
 
-                    case WR_CONST.HIDE_GLYPHS:
+
+                    case I_TRIGGER_GESTURE:
+                        // JUDITH - move this
+                        Intent msg = new Intent(I_TRIGGER_GESTURE);
+                        bManager.sendBroadcast(msg);
+                        break;
+
+                    case WR_EVENTS.HIDE_GLYPHS:
                         hideGlyphs();
                         break;
 
-                    case WR_CONST.HIDE_CURRENT_WORD_GLYPHS:
+                    case WR_EVENTS.HIDE_CURRENT_WORD_GLYPHS:
                         hideCurrentWordGlyph();
                         break;
 
-                    case WR_CONST.HIDE_CURRENT_LETTER_GLYPH:
+                    case WR_EVENTS.HIDE_CURRENT_LETTER_GLYPH:
                         hideGlyphForActiveIndex();
                         break;
 
-                    case WR_CONST.HIDE_SAMPLES:
+                    case WR_EVENTS.HIDE_SAMPLES:
                         hideSamples();
                         break;
 
-                    case WR_CONST.HIDE_SAMPLE_ACTIVE_INDEX:
+                    case WR_EVENTS.HIDE_SAMPLE_ACTIVE_INDEX:
                         hideSampleForActiveIndex();
                         break;
 
-                    case WR_CONST.RIPPLE_HIGHLIGHT:
+                    case WR_EVENTS.RIPPLE_HIGHLIGHT:
 
                         rippleHighlight();
                         break;
 
-                    case WR_CONST.HIGHLIGHT_NEXT:
+                    case WR_EVENTS.HIGHLIGHT_NEXT:
 
                         highlightNext();
                         break;
 
-                    case WR_CONST.INHIBIT_OTHERS:
+                    case WR_EVENTS.INHIBIT_OTHERS:
 
                         if(mActiveController != null)
                             inhibitInput(mActiveController, true);
                         break;
 
-                    case WR_CONST.CLEAR_ATTEMPT:
+                    case WR_EVENTS.CLEAR_ATTEMPT:
                         // Clear attempt after correct behavior so it can use it to determine on
                         // which attempt they succeeded - We don't want this persisting if they
                         // subsequently keep getting them correct
@@ -4233,17 +4305,17 @@ public class EditOperation {
                         clearAttemptFeatures();
                         break;
                     //  added
-                    case WR_CONST.CLEAR_HESITATION:
+                    case WR_EVENTS.CLEAR_HESITATION:
                         //clear the hesitation number in feedback
                         clearHesitationFeatures();
                         break;
 
-                    case WR_CONST.RESET_HESITATION:
+                    case WR_EVENTS.RESET_HESITATION:
                         //clear the hesitation number in feedback
                         resetHesitationFeature();
                         break;
 
-                    case WR_CONST.INC_HESITATION:
+                    case WR_EVENTS.INC_HESITATION:
                         updateHesitationFeature();
                         break;
                     //  added ends
@@ -4253,28 +4325,28 @@ public class EditOperation {
                         applyBehaviorNode(_target);
                         break;
 
-                    case WR_CONST.RIPPLE_DEMO:
+                    case WR_EVENTS.RIPPLE_DEMO:
 
                         rippleReplay(_command, true);
                         break;
 
-                    case WR_CONST.RIPPLE_REPLAY:
-                    case WR_CONST.RIPPLE_PROTO:
+                    case WR_EVENTS.RIPPLE_REPLAY:
+                    case WR_EVENTS.RIPPLE_PROTO:
 
                         rippleReplay(_command, false);
                         break;
-                    case WR_CONST.RIPPLE_REPLAY_WORD:
+                    case WR_EVENTS.RIPPLE_REPLAY_WORD:
                         rippleReplayCurrentWord(_command);
                         break;
-                    case WR_CONST.SHOW_TRACELINE: // Show all glyphs trace line.
+                    case WR_EVENTS.SHOW_TRACELINE: // Show all glyphs trace line.
 
                         showTraceLine();
                         break;
-                    case WR_CONST.HIDE_TRACELINE: // Hide all glyphs trace line.
+                    case WR_EVENTS.HIDE_TRACELINE: // Hide all glyphs trace line.
 
                         hideTraceLine();
                         break;
-                    case WR_CONST.SHOW_SAMPLE:
+                    case WR_EVENTS.SHOW_SAMPLE:
 
                         mActiveController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
                         boolean isExpectedCharacterSpace = mActiveController.getExpectedChar().equals(" ") || mActiveController.getExpectedChar().equals("");
@@ -4284,49 +4356,49 @@ public class EditOperation {
                             break;
                         }
 
-                    case WR_CONST.HIDE_SAMPLE:
+                    case WR_EVENTS.HIDE_SAMPLE:
 
-                    case WR_CONST.ERASE_GLYPH:
-                    case WR_CONST.DEMO_PROTOGLYPH:
-                    case WR_CONST.ANIMATE_PROTOGLYPH:
-                    case WR_CONST.ANIMATE_OVERLAY:
-                    case WR_CONST.ANIMATE_ALIGN:
+                    case WR_EVENTS.ERASE_GLYPH:
+                    case WR_EVENTS.DEMO_PROTOGLYPH:
+                    case WR_EVENTS.ANIMATE_PROTOGLYPH:
+                    case WR_EVENTS.ANIMATE_OVERLAY:
+                    case WR_EVENTS.ANIMATE_ALIGN:
 
                         if(mActiveController != null)
                             mActiveController.post(_command);
                         break;
 
-                    case WR_CONST.POINT_AT_ERASE_BUTTON:
+                    case WR_EVENTS.POINT_AT_ERASE_BUTTON:
 
                         pointAtEraseButton();
                         break;
 
-                    case WR_CONST.POINT_AT_REPLAY_BUTTON:
+                    case WR_EVENTS.POINT_AT_REPLAY_BUTTON:
 
                         pointAtReplayButton();
                         break;
 
-                    case WR_CONST.POINT_AT_GLYPH:
+                    case WR_EVENTS.POINT_AT_GLYPH:
 
                         pointAtGlyph();
                         break;
 
-                    case WR_CONST.CANCEL_POINTAT:
+                    case WR_EVENTS.CANCEL_POINTAT:
 
                         cancelPointAt();
                         break;
 
-                    case WR_CONST.STIMULUS_HIGHLIGHT:
+                    case WR_EVENTS.STIMULUS_HIGHLIGHT:
 
                         highlightStimulus();
                         break;
 
-                    case WR_CONST.GLYPH_HIGHLIGHT:
+                    case WR_EVENTS.GLYPH_HIGHLIGHT:
 
                         highlightGlyph();
                         break;
 
-                    case WR_CONST.AUTO_ERASE:
+                    case WR_EVENTS.AUTO_ERASE:
                         autoErase();
                         break;
 
