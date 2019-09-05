@@ -33,12 +33,16 @@ import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
+import static cmu.xprize.util.TCONST.GESTURE_TIME_SPELL;
+import static cmu.xprize.util.TCONST.HESITATE_TIME_SPELL;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
+import static cmu.xprize.util.TCONST.STUCK_TIME_SPELL;
 import static cmu.xprize.util.TCONST.TYPE_AUDIO;
 
 /**
@@ -93,6 +97,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
 
     CMessageQueueFactory _queue;
+    TimerMaster _timer;
     private GestureDetector mDetector;
 
     //endregion
@@ -200,6 +205,9 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         _bManager = LocalBroadcastManager.getInstance(getContext());
 
         _queue = new CMessageQueueFactory(this, "CSpelling");
+        _timer = new TimerMaster(this, _queue,
+                HESITATE_TIME_SPELL, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
+
 
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());
         Scontent.setOnTouchListener(new HesitationCancelListener());
@@ -213,7 +221,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 Log.v("event.thing", "This is a touch");
-                resetHesitationTimer();
+                _timer.resetHesitationTimer();
             }
             return false;
         }
@@ -222,59 +230,10 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     //endregion
 
 
-    // *********************************************
-    // BEGIN stuck and hesitation timers
-    // *********************************************
-
-    /**
-     * Stuck Timer only reset when a new problem begins
-     */
-    public void resetStuckTimer() {
-        cancelStuckTimer();
-        triggerStuckTimer();
-    }
-
-    private void cancelStuckTimer() {
-        Log.v("event.thing", "resetting stuck timer");
-        _queue.cancelPost("STUCK_TIMER");
-        Log.wtf("trigger", "resetting stuck timer");
-        triggerIntervention(I_CANCEL_STUCK);
-    }
-
-    private void triggerStuckTimer() {
-        Log.v("event.thing", "trigger stuck timer");
-        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_SPELL);
-    }
-
-    /**
-     * This should be called whenever ANY View is touched... without overriding existing functions.
-     */
-    public void resetHesitationTimer() {
-        Log.v("event.thing", "resetting hesitation timer");
-        cancelHesitationTimer();
-        triggerHesitationTimer();
-    }
-
-    private void cancelHesitationTimer() {
-        Log.v("event.thing", "cancelling hesitation timer");
-        _queue.cancelPost("HESITATION_PROMPT");
-        Log.wtf("trigger", "cancelling hesitation timer");
-        triggerIntervention(I_CANCEL_HESITATE);
-    }
-
-    private void triggerHesitationTimer() {
-        Log.v("event.thing", "triggering hesitation timer");
-        _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_SPELL);
-    }
-
-    // *********************************************
-    // END stuck and hesitation timers
-    // *********************************************
-
     //region View
     public void onLetterTouch(String letter, int index, CLetter_Tile lt) {
 
-        resetHesitationTimer();
+        _timer.resetHesitationTimer();
 
         Log.d("ddd", "Touch: " + letter);
 
@@ -506,8 +465,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         loadDataSet(data);
         updateStimulus();
-        resetStuckTimer();
-        resetHesitationTimer();
+        _timer.resetStuckTimer();
+        _timer.resetHesitationTimer();
     }
 
     /**

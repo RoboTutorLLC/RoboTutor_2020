@@ -552,11 +552,13 @@ public class TCONST {
     public static final Long HESITATE_TIME_BPOP = 40000L; // NOTE THAT THIS IS NOT RESETTING
     public static final Long STUCK_TIME_BPOP = 40000L;
 
-    public static final Long HESITATE_TIME_SPELL = 18000L;
+    public static final Long HESITATE_TIME_SPELL = 15000L;
     public static final Long STUCK_TIME_SPELL = 18000L;
+    public static final Long GESTURE_TIME_SPELL = 13000L;
 
     public static final Long HESITATE_TIME_PICMATCH = 18000L;
     public static final Long STUCK_TIME_PICMATCH = 20000L;
+    public static final Long GESTURE_TIME_PICMATCH = 13000L;
 
     public static final long GESTURE_TIME_WRITE = 18000L;
 

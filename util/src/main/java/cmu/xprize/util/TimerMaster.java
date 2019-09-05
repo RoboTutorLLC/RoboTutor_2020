@@ -1,0 +1,88 @@
+package cmu.xprize.util;
+
+import android.util.Log;
+
+import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
+import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
+import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
+import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
+
+/**
+ * TimerMaster
+ * <p>Use this class to manage timers for Interventions</p>
+ * Created by kevindeland on 9/4/19.
+ */
+
+public class TimerMaster {
+
+    private IInterventionSource _intervention;
+    private CMessageQueueFactory _queue;
+    private long _hesitateDelay, _stuckDelay, _gestureDelay;
+
+    private static final String HESITATION_TIMER_RUNNABLE = "HESITATION_TIMER";
+    private static final String STUCK_TIMER_RUNNABLE = "STUCK_TIMER";
+
+
+    /**
+     * Constructor
+     * @param intervention has a "triggerIntervention" command
+     * @param queue responsible for posting delayed commands to the Queue. Has an IMessageQueueRunner
+     *              associated with it that will know what to do when the timer has expired.
+     * @param hesitateDelay delay time to trigger HESITATE
+     * @param stuckDelay delay time to trigger STUCK
+     * @param gestureDelay delay time to trigger GESTURE
+     */
+    public TimerMaster(IInterventionSource intervention, CMessageQueueFactory queue,
+                       long hesitateDelay, long stuckDelay, long gestureDelay) {
+
+        this._intervention = intervention;
+        this._queue = queue;
+        this._hesitateDelay = hesitateDelay;
+        this._stuckDelay = stuckDelay;
+        this._gestureDelay = gestureDelay;
+    }
+
+
+    /**
+     * Stuck Timer only reset when a new problem begins
+     */
+    public void resetStuckTimer() {
+        cancelStuckTimer();
+        triggerStuckTimer();
+    }
+
+    private void cancelStuckTimer() {
+        Log.v("event.thing", "resetting stuck timer");
+        _queue.cancelPost(STUCK_TIMER_RUNNABLE);
+        Log.wtf("trigger", "resetting stuck timer");
+        _intervention.triggerIntervention(I_CANCEL_STUCK);
+    }
+
+    private void triggerStuckTimer() {
+        Log.v("event.thing", "trigger stuck timer");
+        _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
+    }
+
+    /**
+     * This should be called whenever ANY View is touched... without overriding existing functions.
+     */
+    public void resetHesitationTimer() {
+        Log.v("event.thing", "resetting hesitation timer");
+        cancelHesitationTimer();
+        triggerHesitationTimer();
+    }
+
+    private void cancelHesitationTimer() {
+        Log.v("event.thing", "cancelling hesitation timer");
+        _queue.cancelPost(HESITATION_TIMER_RUNNABLE);
+        Log.wtf("trigger", "cancelling hesitation timer");
+        _intervention.triggerIntervention(I_CANCEL_HESITATE);
+    }
+
+    private void triggerHesitationTimer() {
+        Log.v("event.thing", "triggering hesitation timer");
+        _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
+    }
+
+
+}
