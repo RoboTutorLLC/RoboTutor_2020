@@ -549,8 +549,15 @@ public class TCONST {
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
 
     // CONSTANTS -- replace with Judith's thing.
+    public static final int  FAILURE_COUNT_BPOP = 9;
     public static final Long HESITATE_TIME_BPOP = 40000L; // NOTE THAT THIS IS NOT RESETTING
     public static final Long STUCK_TIME_BPOP = 40000L;
+
+    public static final int  FAILURE_COUNT_AKIRA = 9;
+    public static final Long HESITATE_TIME_AKIRA = 10000L;
+    public static final Long STUCK_TIME_AKIRA = -1L; // not applicable...
+    public static final Long GESTURE_TIME_AKIRA = 10000L;
+
 
     public static final Long HESITATE_TIME_SPELL = 15000L;
     public static final Long STUCK_TIME_SPELL = 18000L;

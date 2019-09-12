@@ -58,6 +58,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
 
@@ -85,7 +86,6 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
     private HashMap<String,Boolean> _FeatureMap = new HashMap<>();
 
     static final String TAG = "TAkComponent";
-
 
 
     public TAkComponent(Context context) {
@@ -406,6 +406,9 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
     }
 
 
+    /**
+     * This is called from Animator Graph,
+     */
     public void postQuestionBoard() {
         final CAkQuestionBoard questionBoard = this.questionBoard; //new CAkQuestionBoard(mContext);
         final PercentRelativeLayout percentLayout = (PercentRelativeLayout) getChildAt(0);
@@ -451,7 +454,10 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             }
         });
 
+        // the board starts
         questionboardAnimator.start();
+        // FUCK ME
+
 
         if(flag && teachFinger != null) {
             teachFinger.setVisibility(INVISIBLE);
@@ -601,6 +607,11 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             mTutor.countCorrect();;
         } else {
             mTutor.countIncorrect();
+            wrongAnyAttempts++;
+
+            if (wrongAnyAttempts == TCONST.FAILURE_COUNT_AKIRA) {
+                triggerIntervention(I_TRIGGER_FAILURE);
+            }
         }
 
         PerformanceLogItem event = new PerformanceLogItem();
@@ -719,36 +730,42 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         }
     }
 
+    // called from ag
     public void instruct_finger(){
         teachFinger.bringToFront();
         teachFinger.setPostion(questionBoard.answerLane);
         teachFinger.setVisibility(VISIBLE);
     }
 
+    // called from ag
     public void indicateCarText(){
         teachFinger.bringToFront();
         teachFinger.setPostion(player.getLane());
         teachFinger.setVisibility(VISIBLE);
     }
 
+    // called from ag
     public void indicate1SignText(){
         teachFinger.bringToFront();
         teachFinger.setPostion(CAkPlayer.Lane.SIGH1);
         teachFinger.setVisibility(VISIBLE);
     }
 
+    // called from ag
     public void indicate2SignLeft(){
         teachFinger.bringToFront();
         teachFinger.setPostion(CAkPlayer.Lane.SIGH2L);
         teachFinger.setVisibility(VISIBLE);
     }
 
+    // called from ag
     public void indicate2SignRight(){
         teachFinger.bringToFront();
         teachFinger.setPostion(CAkPlayer.Lane.SIGH2R);
         teachFinger.setVisibility(VISIBLE);
     }
 
+    // called from ag
     public void indicate3Sign(){
         teachFinger.bringToFront();
         switch(questionBoard.answerLane){

@@ -40,8 +40,13 @@ import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 
+import static cmu.xprize.util.TCONST.GESTURE_TIME_AKIRA;
+import static cmu.xprize.util.TCONST.HESITATE_TIME_AKIRA;
+import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
+import static cmu.xprize.util.TCONST.STUCK_TIME_AKIRA;
 
 
 /**
@@ -114,6 +119,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected LocalBroadcastManager bManager;
 
     protected CMessageQueueFactory _queue;
+    protected int wrongAnyAttempts = 0;
+    protected TimerMaster _timer;
 
     public CAk_Component(Context context) {
         super(context);
@@ -266,6 +273,8 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         bManager = LocalBroadcastManager.getInstance(mContext);
 
         _queue = new CMessageQueueFactory(this, "CAkira");
+        _timer = new TimerMaster(this, _queue,
+                HESITATE_TIME_AKIRA, STUCK_TIME_AKIRA, GESTURE_TIME_AKIRA);
 
 
     }
@@ -300,6 +309,12 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         catch(Exception e) {
             CErrorManager.logEvent(TAG, "Data Exhuasted: call past end of data", e, false);
         }
+    }
+
+    // called from AG
+    public void startHesitationTimer() {
+        Log.wtf("TRIGGER", "starting hesitation timer");
+        _timer.resetHesitationTimer();
     }
 
 
@@ -515,6 +530,9 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     // TRIGGER_AKIRA - gesture - how much app space does this cover?
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        _timer.resetHesitationTimer();
+
         if(event.getAction()==MotionEvent.ACTION_DOWN){
 
             if(isFirstInstall && !teachFinger.finishTeaching)
@@ -554,8 +572,15 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
     @Override
     public void runCommand(String _command) {
+        Log.wtf("TRIGGER", _command);
         // template
         switch(_command) {
+
+            // hesitation
+            case I_TRIGGER_HESITATE:
+                triggerIntervention(I_TRIGGER_HESITATE);
+                break;
+
             case AKCONST.PLAY_CHIME:
                 applyBehavior(_command);
                 break;
