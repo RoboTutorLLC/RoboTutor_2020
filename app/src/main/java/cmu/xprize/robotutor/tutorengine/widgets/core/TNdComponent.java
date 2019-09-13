@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_logging.PerformanceLogItem;
 import cmu.xprize.comp_nd.CNd_Component;
 import cmu.xprize.comp_logging.CErrorManager;
@@ -119,6 +120,17 @@ public class TNdComponent extends CNd_Component implements ITutorObject, IDataSi
         mSceneObject.setTutor(tutor);
 
         mMediaManager = CMediaController.getManagerInstance(mTutor.getTutorName());
+    }
+
+    // Override in child class
+    @Override
+    protected long getTimeForThisTutor() {
+        String lookupId = CTutorEngine.getActiveTutor().getTutorId().replace(":", "_");
+        Log.wtf("TUTOR_ID", lookupId);
+        long delayTime = (long) Math.ceil(CInterventionTimes.getTimeByTutorId(lookupId));
+        long delayMs = delayTime * 1000;
+        Log.wtf("TUTOR_ID", "" + delayMs);
+        return delayMs;
     }
 
     @Override

@@ -22,6 +22,8 @@ public class TimerMaster {
     private static final String HESITATION_TIMER_RUNNABLE = "HESITATION_TIMER";
     private static final String STUCK_TIMER_RUNNABLE = "STUCK_TIMER";
 
+    private String _TAG;
+
 
     /**
      * Constructor
@@ -32,7 +34,7 @@ public class TimerMaster {
      * @param stuckDelay delay time to trigger STUCK
      * @param gestureDelay delay time to trigger GESTURE
      */
-    public TimerMaster(IInterventionSource intervention, CMessageQueueFactory queue,
+    public TimerMaster(IInterventionSource intervention, CMessageQueueFactory queue, String TAG,
                        long hesitateDelay, long stuckDelay, long gestureDelay) {
 
         this._intervention = intervention;
@@ -40,6 +42,7 @@ public class TimerMaster {
         this._hesitateDelay = hesitateDelay;
         this._stuckDelay = stuckDelay;
         this._gestureDelay = gestureDelay;
+        this._TAG = TAG;
     }
 
 
@@ -52,14 +55,13 @@ public class TimerMaster {
     }
 
     private void cancelStuckTimer() {
-        Log.v("event.thing", "resetting stuck timer");
+        Log.v(_TAG, "cancel stuck timer");
         _queue.cancelPost(STUCK_TIMER_RUNNABLE);
-        Log.wtf("trigger", "resetting stuck timer");
         _intervention.triggerIntervention(I_CANCEL_STUCK);
     }
 
     private void triggerStuckTimer() {
-        Log.v("event.thing", "trigger stuck timer");
+        Log.v(_TAG, "trigger stuck timer");
         _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
     }
 
@@ -67,20 +69,18 @@ public class TimerMaster {
      * This should be called whenever ANY View is touched... without overriding existing functions.
      */
     public void resetHesitationTimer() {
-        Log.v("event.thing", "resetting hesitation timer");
         cancelHesitationTimer();
         triggerHesitationTimer();
     }
 
     private void cancelHesitationTimer() {
-        Log.v("event.thing", "cancelling hesitation timer");
+        Log.v(_TAG, "cancel hesitation timer");
         _queue.cancelPost(HESITATION_TIMER_RUNNABLE);
-        Log.wtf("trigger", "cancelling hesitation timer");
         _intervention.triggerIntervention(I_CANCEL_HESITATE);
     }
 
     private void triggerHesitationTimer() {
-        Log.v("event.thing", "triggering hesitation timer");
+        Log.v(_TAG, "trigger hesitation timer");
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
     }
 

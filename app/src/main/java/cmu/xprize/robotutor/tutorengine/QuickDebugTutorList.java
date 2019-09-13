@@ -62,15 +62,24 @@ public class QuickDebugTutorList {
     }
 
     static {
-        QuickDebugTutor interventionAkira = new QuickDebugTutor(
+        // ----
+        QuickDebugInterventionTutor interventionAkira = new QuickDebugInterventionTutor(
                 "akira",
                 "akira:0..9.by.1.asc",
                 "[file]akira_0..9.by.1.asc.json"
         );
         interventionAkira.setComment("Testing intervention in Akira");
+
+        interventionAkira.setGesture("OOO");
+        interventionAkira.setStuck(null);
+        interventionAkira.setHesitate("???");
+        interventionAkira.setFailure("???");
+
         toFixBugMap.put("intervention_akira", interventionAkira);
 
-        QuickDebugTutor interventionBpop = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionBpop = new QuickDebugInterventionTutor(
                 "bpop.ltr.lc",
                 "bpop.ltr.lc:A..Z.all.asc.all.stat.show.126.json",
                 "[file]bpop.ltr.lc_A..Z.all.asc.all.stat.show.126.json"
@@ -78,7 +87,9 @@ public class QuickDebugTutorList {
         interventionBpop.setComment("Testing intervention in Bpop");
         toFixBugMap.put("intervention_bpop", interventionBpop);
 
-        QuickDebugTutor interventionSpelling = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionSpelling = new QuickDebugInterventionTutor(
                 "spelling",
                 "spelling:datasource_2",
                 "[file]spelling_datasource_2.json"
@@ -86,35 +97,50 @@ public class QuickDebugTutorList {
         interventionSpelling.setComment("Testing intervention in Spelling");
         toFixBugMap.put("intervention_spelling", interventionSpelling);
 
-        QuickDebugTutor interventionNumscale = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionNumscale = new QuickDebugInterventionTutor(
                 "numberscale",
                 "num.scale:0..50.off5.31",
                 "[file]num.scale_0..50.off5.31.json"
         );
         toFixBugMap.put("intervention_numscale", interventionNumscale);
 
-        QuickDebugTutor interventionCountX = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionCountX = new QuickDebugInterventionTutor(
                 "countingx",
                 "countingx:1_10__it_6",
                 "[file]countingx_1_10.json"
         );
         toFixBugMap.put("intervention_countx", interventionCountX);
 
-        QuickDebugTutor interventionNumCompare = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionNumCompare = new QuickDebugInterventionTutor(
                 "numcompare",
                 "numcompare:2d.by.ten",
                 "[file]numcompare_2d.by.ten.json"
         );
+        interventionNumCompare.setGesture("√OO");
+        interventionNumCompare.setStuck("√√O"); // still some weirdness
+
+        interventionNumCompare.setHesitate("√√O"); // still some weirdness
+        interventionNumCompare.setFailure("OOO"); // trackAndLog
         toFixBugMap.put("intervention_numcompare", interventionNumCompare);
 
-        QuickDebugTutor interventionBigMath = new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionBigMath = new QuickDebugInterventionTutor(
                 "bigmath",
                 "bigmath:add.by.10.0..80.NoCarryBorrow.lev5",
                 "[file]bigmath_add.by.10.0..80.NoCarryBorrow.lev5.json"
         );
         toFixBugMap.put("intervention_bigmath", interventionBigMath);
 
-        QuickDebugTutor interventionWriting= new QuickDebugTutor(
+
+        // ----
+        QuickDebugInterventionTutor interventionWriting= new QuickDebugInterventionTutor(
                 "write.wrd.trc",
                 "write.wrd.trc:syl.3ch..3ch..6",
                 "[file]write.wrd.trc_syl.3ch..3ch..6.json"

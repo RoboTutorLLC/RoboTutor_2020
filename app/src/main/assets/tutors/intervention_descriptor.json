@@ -31,18 +31,18 @@
 
   "applications": {
     "bpop": {
-      "gesture": "anything but tap",
-      "stuck": "10s",
-      "hesitate": "10s",
-      "failure": 3,
+      "gesture": "anything but tap √√√",
+      "stuck": "10s √√√",
+      "hesitate": "10s √√√",
+      "failure": "3 √√√",
       "onIntervention": "freeze? (probably not. depends on difficulty)"
     },
 
     "akira": {
       "gesture": "anything but tap",
       "stuck": null,
-      "hesitate": "10s",
-      "failure": 3,
+      "hesitate": "10s √√√",
+      "failure": "3 √√√",
       "onIntervention": "freeze? (probably not. depends on difficulty)"
     },
 
@@ -98,18 +98,18 @@
       "failure": "see place.value part2"
     },
 
-    "spelling": {
-      "gesture": "anything but tap",
-      "stuck": "per letter: 5s",
-      "hesitate": "10s",
-      "failure": "3 words in a row, if you mess up at all"
+    "spelling √√√": {
+      "gesture": "anything but tap √√√",
+      "stuck": "per letter: 5s √√√",
+      "hesitate": "10s √√√",
+      "failure": "3 words in a row, if you mess up at all √√√"
     },
 
-    "picmatch": {
-      "gesture": "anything but tap",
-      "stuck": "15s", // need longer time to read the words
-      "hesitate": "25s",
-      "failure": "3 times, for first attempt per problem"
+    "picmatch √√√": {
+      "gesture": "anything but tap √√√",
+      "stuck": "15s √√√", // need longer time to read the words
+      "hesitate": "25s √√√",
+      "failure": "3 times, for first attempt per problem √√√"
     }
 
   },

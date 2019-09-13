@@ -207,7 +207,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         _queue = new CMessageQueueFactory(this, "CSpelling");
 
         long hesTime = getTimeForThisTutor();
-        _timer = new TimerMaster(this, _queue,
+        _timer = new TimerMaster(this, _queue, "SpellTimer",
                 (int) hesTime, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
 
 

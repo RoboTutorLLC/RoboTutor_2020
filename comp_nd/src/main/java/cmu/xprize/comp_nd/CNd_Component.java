@@ -3,26 +3,23 @@ package cmu.xprize.comp_nd;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 import cmu.xprize.comp_logging.CErrorManager;
-import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManagerInterface;
+import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
@@ -30,6 +27,8 @@ import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
+import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.comp_nd.ND_CONST.CANCEL_HIGHLIGHT_HUNS;
 import static cmu.xprize.comp_nd.ND_CONST.CANCEL_HIGHLIGHT_ONES;
@@ -62,6 +61,8 @@ import static cmu.xprize.util.MathUtil.getHunsDigit;
 import static cmu.xprize.util.MathUtil.getOnesDigit;
 import static cmu.xprize.util.MathUtil.getTensDigit;
 import static cmu.xprize.util.TCONST.DEBUG_HESITATE;
+import static cmu.xprize.util.TCONST.GESTURE_TIME_NUMCOMPARE;
+import static cmu.xprize.util.TCONST.STUCK_TIME_NUMCOMPARE;
 
 /**
  * Generated automatically w/ code written by Kevin DeLand
@@ -107,6 +108,37 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
     static final String TAG = "CNd_Component";
 
     protected CMessageQueueFactory _queue;
+    TimerMaster _timer;
+    private GestureDetector mDetector;
+
+    class HesitationCancelListener implements OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                Log.v("event.thing", "This is a touch");
+                _timer.resetHesitationTimer();
+            }
+            return false;
+        }
+    }
+
+    /**
+     * holy shit how did I not know about this...
+     * This will be super useful for gesture listener???
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        float x = event.getAxisValue(MotionEvent.AXIS_X);
+        float y = event.getAxisValue(MotionEvent.AXIS_Y);
+
+        Log.i("BAD_TOUCH: ", x + " " + y);
+        mDetector.onTouchEvent(event);
+        _timer.resetHesitationTimer(); // on touch, reset
+        return super.dispatchTouchEvent(event);
+    }
 
 
     public CNd_Component(Context context) {
@@ -135,6 +167,24 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
 
         _queue = new CMessageQueueFactory(this, "CNumCompare");
 
+        long hesTime = getTimeForThisTutor();
+        _timer = new TimerMaster(this, _queue, "NcompareTimer",
+                hesTime, STUCK_TIME_NUMCOMPARE, GESTURE_TIME_NUMCOMPARE);
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(this));
+
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mDetector.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+
+    }
+
+    // Override in child class
+    protected long getTimeForThisTutor() {
+        return 0L;
     }
 
     public void onDestroy() {
@@ -345,6 +395,8 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
             applyBehaviorNode(getStartingHighlightByNumDigits()); // only highlight the necessary digits!!!
         } else {
             triggerHesitationFeedback();
+            _timer.resetHesitationTimer();
+            _timer.resetStuckTimer();
         }
     }
 
@@ -609,7 +661,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
 
     @Override
     public void runCommand(String command) {
-        // not used
+        runCommand(command, (String) null);
     }
 
     @Override
@@ -619,7 +671,16 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
 
     @Override
     public void runCommand(String _command, String _target) {
+        Log.d("runCommand", _command + " : " + _target);
         switch (_command) {
+
+            case TCONST.I_TRIGGER_STUCK:
+                triggerIntervention(TCONST.I_TRIGGER_STUCK);
+                break;
+
+            case TCONST.I_TRIGGER_HESITATE:
+                triggerIntervention(TCONST.I_TRIGGER_HESITATE);
+                break;
 
             case TCONST.APPLY_BEHAVIOR:
 
