@@ -27,6 +27,8 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
+import static cmu.xprize.util.TCONST.I_TYPE_APPLICATION;
+import static cmu.xprize.util.TCONST.I_TYPE_KNOWLEDGE;
 
 /**
  * RoboTutor
@@ -44,6 +46,9 @@ public class CInterventionPopup extends RelativeLayout {
     private TextView interventionLabel;
 
     private LocalBroadcastManager bManager;
+
+    // interventions will provide progressively less information
+    protected HashMap<String, Integer> taperLevels;
 
 
     public CInterventionPopup(Context context) {
@@ -86,6 +91,10 @@ public class CInterventionPopup extends RelativeLayout {
         filter.addAction(I_TRIGGER_FAILURE);
 
         bManager.registerReceiver(new InterventionPopupMessageReceiver(), filter);
+
+        taperLevels = new HashMap<>();
+        taperLevels.put(I_TYPE_KNOWLEDGE, 0);
+        taperLevels.put(I_TYPE_APPLICATION, 0);
     }
 
     private View.OnClickListener exitListener = new View.OnClickListener() {
@@ -111,20 +120,35 @@ public class CInterventionPopup extends RelativeLayout {
             if (!modal) return;
             if (action == null) return;
 
+            int taperedLevel = -1;
             switch(action) {
 
-                case I_TRIGGER_HESITATE:
                 case I_TRIGGER_GESTURE:
                 case I_TRIGGER_STUCK:
-                case I_TRIGGER_FAILURE:
-                    Log.d("INTERVENTION", "Received " + action);
-                    imgRef = getChildPhoto(action, null);
-                    displayImage(imgRef);
-                    playHelpAudio();
-                    interventionLabel.setText(action);
-                    // flashHandRaise();
+                    taperedLevel = taperLevels.get(I_TYPE_APPLICATION);
+                    // increment to next level
+                    Log.wtf("TAPER", "Application support level: " + taperedLevel);
+                    taperLevels.put(I_TYPE_APPLICATION, taperedLevel + 1);
+
                     break;
+
+
+                case I_TRIGGER_HESITATE:
+                case I_TRIGGER_FAILURE:
+                    taperedLevel = taperLevels.get(I_TYPE_KNOWLEDGE);
+                    // increment to next level
+                    Log.wtf("TAPER", "Knowledge support level: " + taperedLevel);
+                    taperLevels.put(I_TYPE_KNOWLEDGE, taperedLevel + 1);
+
+                    break;
+
             }
+            Log.d("INTERVENTION", "Received " + action);
+            imgRef = getChildPhoto(action, null);
+            displayImage(imgRef);
+            if (taperedLevel < 1)
+                playHelpAudio();
+            interventionLabel.setText(action);
 
         }
     }

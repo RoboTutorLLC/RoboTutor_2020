@@ -12,7 +12,6 @@ import android.view.View;
 
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IMessageQueueRunner;
-import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
