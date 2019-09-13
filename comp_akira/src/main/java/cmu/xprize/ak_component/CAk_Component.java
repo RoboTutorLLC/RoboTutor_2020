@@ -178,47 +178,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         scoreboard = findViewById(R.id.scoreboard);
         mask = findViewById(R.id.mask);
 
-        speedometerButton = new Button[11];
-        for(int i = 0; i < 11; i++) {
-            int resID = getResources().getIdentifier("button" + i, "id",
-                    "cmu.xprize.robotutor");
-            speedometerButton[i] = findViewById(resID);
-            final int speed = i;
-            speedometerButton[i].setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onSpeedChange(speed);
-                    if(extraSpeed>speed)     //slow down the speed
-                    {
-                        Log.v(QGRAPH_MSG, "event.click: " + "reduce speed");
-
-                        soundPool.play(slowdown, 0.1f, 0.1f, 1, 0, 1.0f);
-                        System.out.println("slow down");
-                        //soundPool.play(carscreechMedia, 0.1f, 0.1f, 1, 0, 1.0f);
-                    }
-                    else if(extraSpeed<speed)  //increase the speed
-                    {
-                        Log.v(QGRAPH_MSG, "event.click: " + "increase speed");
-
-                        soundPool.play(speedup, 0.1f, 0.1f, 1, 0, 1.0f);
-                        System.out.println("speed up");
-                        //soundPool.play(carscreechMedia, 0.1f, 0.1f, 1, 0, 1.0f);
-                    }
-
-                    extraSpeed = speed;
-                    for(Button b : speedometerButton)
-                        b.getBackground().clearColorFilter();
-                    v.getBackground().setColorFilter(0xFFFFCC00,PorterDuff.Mode.SRC);
-                    if(v == speedometerButton[0])
-                        scoreboard.setVisibility(INVISIBLE);
-                    else
-                        scoreboard.setVisibility(VISIBLE);
-                }
-            });
-        }
-
-        speedometerButton[1].getBackground().setColorFilter(0xFFFFCC00,PorterDuff.Mode.SRC);
-
         teachFinger = findViewById(R.id.finger);
         teachFinger.finishTeaching = true;
 
@@ -241,13 +200,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
         isFirstInstall=true;
 
-        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-        carscreechMedia=soundPool.load(mContext, R.raw.carscreech, 1);
-        correctMedia=soundPool.load(mContext, R.raw.correct, 1);
-        incorrectMedia=soundPool.load(mContext, R.raw.incorrect, 1);
-        numberchangedMedia=soundPool.load(mContext, R.raw.numberchanged, 1);
-        slowdown=soundPool.load(mContext,R.raw.slow,1);
-        speedup=soundPool.load(mContext,R.raw.speed,1);
+        initializeSoundPool();
 
         mainHandler.post(gameRunnable);
         if(attrs != null) {
@@ -273,10 +226,23 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         bManager = LocalBroadcastManager.getInstance(mContext);
 
         _queue = new CMessageQueueFactory(this, "CAkira");
-        _timer = new TimerMaster(this, _queue,
+        _timer = new TimerMaster(this, _queue, "AkiraTimer",
                 HESITATE_TIME_AKIRA, STUCK_TIME_AKIRA, GESTURE_TIME_AKIRA);
 
 
+    }
+
+    /**
+     * initialize sound files by loading them into the SoundPool
+     */
+    private void initializeSoundPool() {
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        carscreechMedia = soundPool.load(mContext, R.raw.carscreech, 1);
+        correctMedia = soundPool.load(mContext, R.raw.correct, 1);
+        incorrectMedia = soundPool.load(mContext, R.raw.incorrect, 1);
+        numberchangedMedia = soundPool.load(mContext, R.raw.numberchanged, 1);
+        slowdown = soundPool.load(mContext,R.raw.slow,1);
+        speedup = soundPool.load(mContext,R.raw.speed,1);
     }
 
     public void same() {
@@ -395,23 +361,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     }
 
     public void playAudio(CAk_Data data){
-    }
-
-    protected void onSpeedChange(int speed) {
-        int s = speed * 400;
-        for(int i = 0; i < ongoingAnimator.size(); i++) {
-            Animator animator = ongoingAnimator.get(i);
-            if(animator.getClass() == AnimatorSet.class) {
-                AnimatorSet set = (AnimatorSet)animator;
-                set.pause();
-                ArrayList<Animator> list = set.getChildAnimations();
-                for(int j = 0; j < list.size(); j++) {
-                    Animator objectAnimator = list.get(j);
-                    objectAnimator.setDuration(5000 - s);
-                }
-                set.resume();
-            }
-        }
     }
 
 
@@ -602,5 +551,78 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     @Override
     public void runCommand(String command, Object target) {
         // not called
+    }
+
+    // ------------------------------------
+    // ------------ DEPRECATED ------------
+    // ------------------------------------
+
+    /**
+     * we never use this
+     */
+    @Deprecated
+    private void initializeSpeedometer() {
+        speedometerButton = new Button[11];
+        for(int i = 0; i < 11; i++) {
+            int resID = getResources().getIdentifier("button" + i, "id",
+                    "cmu.xprize.robotutor");
+            speedometerButton[i] = findViewById(resID);
+            final int speed = i;
+            speedometerButton[i].setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onSpeedChange(speed);
+                    if(extraSpeed>speed)     //slow down the speed
+                    {
+                        Log.v(QGRAPH_MSG, "event.click: " + "reduce speed");
+
+                        soundPool.play(slowdown, 0.1f, 0.1f, 1, 0, 1.0f);
+                        System.out.println("slow down");
+                        //soundPool.play(carscreechMedia, 0.1f, 0.1f, 1, 0, 1.0f);
+                    }
+                    else if(extraSpeed<speed)  //increase the speed
+                    {
+                        Log.v(QGRAPH_MSG, "event.click: " + "increase speed");
+
+                        soundPool.play(speedup, 0.1f, 0.1f, 1, 0, 1.0f);
+                        System.out.println("speed up");
+                        //soundPool.play(carscreechMedia, 0.1f, 0.1f, 1, 0, 1.0f);
+                    }
+
+                    extraSpeed = speed;
+                    for(Button b : speedometerButton)
+                        b.getBackground().clearColorFilter();
+                    v.getBackground().setColorFilter(0xFFFFCC00,PorterDuff.Mode.SRC);
+                    if(v == speedometerButton[0])
+                        scoreboard.setVisibility(INVISIBLE);
+                    else
+                        scoreboard.setVisibility(VISIBLE);
+                }
+            });
+        }
+
+        speedometerButton[1].getBackground().setColorFilter(0xFFFFCC00,PorterDuff.Mode.SRC);
+    }
+
+    /**
+     * This is also deprecated
+     * @param speed idk speed
+     */
+    @Deprecated
+    private void onSpeedChange(int speed) {
+        int s = speed * 400;
+        for(int i = 0; i < ongoingAnimator.size(); i++) {
+            Animator animator = ongoingAnimator.get(i);
+            if(animator.getClass() == AnimatorSet.class) {
+                AnimatorSet set = (AnimatorSet)animator;
+                set.pause();
+                ArrayList<Animator> list = set.getChildAnimations();
+                for(int j = 0; j < list.size(); j++) {
+                    Animator objectAnimator = list.get(j);
+                    objectAnimator.setDuration(5000 - s);
+                }
+                set.resume();
+            }
+        }
     }
 }
