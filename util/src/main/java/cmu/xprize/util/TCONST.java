@@ -551,6 +551,7 @@ public class TCONST {
 
     public static final String EXIT_FROM_INTERVENTION = "EXIT_FROM_INTERVENTION"; // might be needed to resume paused activity, e.g. Akira
     public static final String INTERVENTION_FOLDER = "sdcard/intervention";
+    public static final String INTERVENTION_TIMES_FILE = "TimeSpentPerAttempt.csv";
 
     // CONSTANTS -- replace with Judith's thing.
     public static final int  FAILURE_COUNT_BPOP = 9;
