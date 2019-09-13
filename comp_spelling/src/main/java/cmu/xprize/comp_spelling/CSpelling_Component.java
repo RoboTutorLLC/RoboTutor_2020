@@ -205,13 +205,20 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         _bManager = LocalBroadcastManager.getInstance(getContext());
 
         _queue = new CMessageQueueFactory(this, "CSpelling");
+
+        long hesTime = getTimeForThisTutor();
         _timer = new TimerMaster(this, _queue,
-                HESITATE_TIME_SPELL, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
+                (int) hesTime, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
 
 
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());
         Scontent.setOnTouchListener(new HesitationCancelListener());
 
+    }
+
+    // Override in child class
+    protected long getTimeForThisTutor() {
+        return 0L;
     }
 
     class HesitationCancelListener implements OnTouchListener {

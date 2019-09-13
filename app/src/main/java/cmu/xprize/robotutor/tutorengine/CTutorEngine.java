@@ -268,6 +268,10 @@ public class CTutorEngine implements ILoadableObject2 {
         createAndLaunchTutor(tutorDescriptor.tutorName , tutorDescriptor.features, tutorId, tutorBinding, null);
     }
 
+    static public CTutor getActiveTutor() {
+        return activeTutor;
+    }
+
     /**
      * Here a tutor is destroying itself - so we need to manage the follow-on process -
      * i.e. start some other activity / tutor or session mamagement task.

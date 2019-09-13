@@ -43,12 +43,16 @@ public class CInterventionTimes {
                 // nextLine[] is an array of values
                 try {
                     String id = nextLine[0];
+                    // filter out iterations, just take the last one for now
+                    int itIndex = id.indexOf("__it");
+                    if (itIndex > 0)
+                        id = id.substring(0, itIndex);
                     float time = Float.parseFloat(nextLine[1]);
 
                     Log.v(TAG, "id = " + id + "; time = " + time);
                     timesById.put(id, time);
                 } catch (Exception e) {
-                    Log.v(TAG, "skipped this row");
+                    Log.v(TAG, "skipped this row " + nextLine[0] + ", " + nextLine[1]);
                 }
             }
 
@@ -78,7 +82,7 @@ public class CInterventionTimes {
      * @param id tutor id
      * @return float
      */
-    public float getTimeByTutorId(String id) {
+    public static float getTimeByTutorId(String id) {
 
         return timesById.get(id);
     }
