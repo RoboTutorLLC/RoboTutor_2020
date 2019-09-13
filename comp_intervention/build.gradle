@@ -31,4 +31,5 @@ dependencies {
 
     compile project(':util')
     compile project(':comp_logging')
+    compile 'com.opencsv:opencsv:4.6'
 }
