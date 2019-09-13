@@ -538,6 +538,10 @@ public class TCONST {
     public static final String I_TRIGGER_HESITATE = "HESITATE";
     public static final String I_TRIGGER_FAILURE = "FAILURE";
 
+    // Intervention types
+    public static final String I_TYPE_KNOWLEDGE = "KNOWLEDGE";
+    public static final String I_TYPE_APPLICATION = "APPLICATION";
+
     // Cancel broadcasts
     public static final String I_CANCEL_STUCK = "X_STUCK";
     public static final String I_CANCEL_HESITATE = "X_HESITATE";
