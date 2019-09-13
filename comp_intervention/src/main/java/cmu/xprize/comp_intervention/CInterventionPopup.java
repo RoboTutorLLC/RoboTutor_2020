@@ -146,8 +146,7 @@ public class CInterventionPopup extends RelativeLayout {
             Log.d("INTERVENTION", "Received " + action);
             imgRef = getChildPhoto(action, null);
             displayImage(imgRef);
-            if (taperedLevel < 1)
-                playHelpAudio();
+            playHelpAudio(action, taperedLevel);
             interventionLabel.setText(action);
 
         }
@@ -174,9 +173,41 @@ public class CInterventionPopup extends RelativeLayout {
     }
 
     // INT_POPUP make sure this only plays once
-    private void playHelpAudio() {
+    private void playHelpAudio(String intervention, int level) {
 
-        MediaPlayer mediaPlayer = MediaPlayer.create(mContext, R.raw.intervention_audio);
+        int[] audioPlayback = {
+          R.raw.intervention_audio
+        };
+
+        int[] appSupportAudio = {
+                R.raw.app_support_full,
+                R.raw.app_support_half,
+                R.raw.app_support_short,
+        };
+
+        int[] knowledgeSupportAudio = {
+                R.raw.knowledge_support_full,
+                R.raw.knowledge_support_half,
+                R.raw.knowledge_support_short,
+        };
+
+        level = level > 2 ? 2 : level; // level max out at 2
+        int audio;
+        switch(intervention) {
+            case I_TRIGGER_GESTURE:
+            case I_TRIGGER_STUCK:
+                audio = appSupportAudio[level];
+                break;
+
+            case I_TRIGGER_FAILURE:
+            case I_TRIGGER_HESITATE:
+            default:
+                audio = knowledgeSupportAudio[level];
+                break;
+        }
+
+        // NEXT continue here!
+        MediaPlayer mediaPlayer = MediaPlayer.create(mContext, audio);
         mediaPlayer.start();
     }
 
