@@ -1,4 +1,4 @@
-package cmu.xprize.comp_intervention;
+package cmu.xprize.comp_intervention.data;
 
 import android.util.Log;
 
@@ -50,20 +50,7 @@ public class CInterventionStudentData {
                     // -----------------------------------------------------------
                     // - HERE IS WHERE WE LOAD ONE LINE OF STUDENT DATA FROM CSV -
                     // -----------------------------------------------------------
-                    String id = nextLine[0];
-                    String photoFile = nextLine[1];
-
-                    Map<String, Integer> lvls = new HashMap<>();
-                    lvls.put("MATH", Integer.parseInt(nextLine[2]));
-                    lvls.put("STORY", Integer.parseInt(nextLine[3]));
-                    lvls.put("LIT", Integer.parseInt(nextLine[4]));
-
-                    Map<String, Boolean> played = new HashMap<>();
-                    played.put("BPOP", nextLine[5].equalsIgnoreCase("y"));
-                    played.put("SPELL", nextLine[6].equalsIgnoreCase("y"));
-                    played.put("PICMATCH", nextLine[7].equalsIgnoreCase("y"));
-
-                    Student addme = new Student(id, photoFile, lvls, played);
+                    Student addme = new Student(nextLine);
                     Log.wtf(TAG, addme.toString());
                     studentData.add(addme);
 
@@ -133,40 +120,6 @@ public class CInterventionStudentData {
     }
 
 
-    private class Student {
 
-        String id;
-        String photoFile;
-        Map<String, Integer> levels;
-        Map<String, Boolean> tutors;
-
-        Student(String id,
-                       String photoFile,
-                       Map<String, Integer> levels,
-                       Map<String, Boolean> tutors) {
-            this.id = id;
-            this.photoFile = photoFile;
-            this.levels = levels;
-            this.tutors = tutors;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder x = (new StringBuilder())
-                    .append("id=").append(id)
-                    .append(";photo=").append(photoFile);
-
-            for (String k : levels.keySet()) {
-                x.append(";lvl-").append(k)
-                        .append("=").append(levels.get(k));
-            }
-
-            for (String k: tutors.keySet()) {
-                x.append(";tut-").append(k)
-                        .append("=").append(tutors.get(k));
-            }
-            return x.toString();
-        }
-    }
 
 }

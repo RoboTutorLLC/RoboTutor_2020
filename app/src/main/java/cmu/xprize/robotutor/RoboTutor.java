@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import cmu.xprize.comp_intervention.CInterventionStudentData;
+import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.CLogManager;

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.util.ImageLoader;
 import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
