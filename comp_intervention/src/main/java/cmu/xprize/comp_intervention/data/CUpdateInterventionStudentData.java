@@ -103,7 +103,10 @@ public class CUpdateInterventionStudentData {
                     "1", // lvl_lit
                     "n", // lvl_bpop
                     "n", // lvl_spell
-                    "n" // lvl_picmatch
+                    "n", // lvl_picmatch
+                    "n", // lvl_akira
+                    "n", // lvl_write
+                    "n", // lvl_numcompare
             };
 
             thisStudent = new Student(entries);

@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.R;
@@ -57,6 +58,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.LANG_EN;
+import static cmu.xprize.util.TCONST.STUDENT_ID_VAR;
 
 /**
  * The tutor engine provides top-levelFolder control over the tutor lifecycle and can support multiple
@@ -651,6 +653,9 @@ public class CTutorEngine implements ILoadableObject2 {
         }
         prefsName += CTutorEngine.language;
         StudentDataModel model = new StudentDataModel(RoboTutor.ACTIVITY, prefsName);
+
+        // JUDITH - initialize update_intervention.csv
+        CUpdateInterventionStudentData.writeNewStudent(RoboTutor.STUDENT_ID);
 
         // if it's the first time playing, we want to initialize our placement values
         String firstTime = model.getHasPlayed();

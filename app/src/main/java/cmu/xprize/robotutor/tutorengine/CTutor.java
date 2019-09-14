@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
+import cmu.xprize.comp_intervention.data.IDATA_CONST;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.tutorengine.graph.defdata_tutor;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
@@ -408,6 +410,8 @@ public class CTutor implements ILoadableObject2, IEventSource {
                         Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r2: In Queue: " + _command);
                         cleanUpTutor();
 
+                        updateStudentInterventionProgress(mTutorName);
+
                         CTutorEngine.destroyCurrentTutor();
                         break;
 
@@ -431,6 +435,42 @@ public class CTutor implements ILoadableObject2, IEventSource {
                 CErrorManager.logEvent(TAG, "Run Error:", e, true);
             }
         }
+    }
+
+    private void updateStudentInterventionProgress(String mTutorName) {
+        String key;
+        // HERE HERE HERE
+
+        switch (mTutorName) {
+            case "bubble_pop":
+                key = IDATA_CONST.BPOP;
+                break;
+
+            case "spelling":
+                key = IDATA_CONST.SPELL;
+                break;
+
+            case "picmatch":
+                key = IDATA_CONST.PICMATCH;
+                break;
+
+            case "numdiscr":
+                key = IDATA_CONST.NUMCOMPARE;
+                break;
+
+            case "word_copy":
+                key = IDATA_CONST.WRITE;
+                break;
+
+            case "akira":
+                key = IDATA_CONST.AKIRA;
+                break;
+
+            default:
+                Log.wtf(TAG, "Tutor name " + mTutorName + " not matched ");
+                return;
+        }
+        CUpdateInterventionStudentData.updateStudentTutor(key, true);
     }
 
 
