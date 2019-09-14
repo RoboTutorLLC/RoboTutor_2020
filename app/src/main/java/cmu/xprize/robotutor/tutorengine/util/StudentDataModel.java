@@ -78,18 +78,18 @@ public class StudentDataModel {
      */
     public static void createNewStudent() {
         _editor = _preferences.edit();
-        _editor.putString(StudentDataModel.HAS_PLAYED_KEY, String.valueOf(true));
+        _editor.putString(HAS_PLAYED_KEY, String.valueOf(true));
 
         // writing: Placement = true. Placement Index starts at 0
-        _editor.putBoolean(StudentDataModel.WRITING_PLACEMENT_KEY, CTutorEngine.language.equals(LANG_SW) && Configuration.usePlacement(RoboTutor.ACTIVITY));
-        _editor.putInt(StudentDataModel.WRITING_PLACEMENT_INDEX_KEY, 0);
+        _editor.putBoolean(WRITING_PLACEMENT_KEY, CTutorEngine.language.equals(LANG_SW) && Configuration.usePlacement(RoboTutor.ACTIVITY));
+        _editor.putInt(WRITING_PLACEMENT_INDEX_KEY, 0);
 
         // math: Placement = true. Placement Index starts at 0
-        _editor.putBoolean(StudentDataModel.MATH_PLACEMENT_KEY, CTutorEngine.language.equals(LANG_SW) &&  Configuration.usePlacement(RoboTutor.ACTIVITY));
-        _editor.putInt(StudentDataModel.MATH_PLACEMENT_INDEX_KEY, 0);
+        _editor.putBoolean(MATH_PLACEMENT_KEY, CTutorEngine.language.equals(LANG_SW) &&  Configuration.usePlacement(RoboTutor.ACTIVITY));
+        _editor.putInt(MATH_PLACEMENT_INDEX_KEY, 0);
 
         if(CYCLE_MATRIX) {
-            _editor.putString(StudentDataModel.SKILL_SELECTED_KEY, SELECT_WRITING);
+            _editor.putString(SKILL_SELECTED_KEY, SELECT_WRITING);
         }
 
         _editor.apply();
@@ -143,7 +143,7 @@ public class StudentDataModel {
      * @return "true" or null.
      */
     public String getHasPlayed() {
-        return _preferences.getString(StudentDataModel.HAS_PLAYED_KEY, null);
+        return _preferences.getString(HAS_PLAYED_KEY, null);
     }
 
     public String getWritingTutorID() {
@@ -161,7 +161,7 @@ public class StudentDataModel {
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
         _editor = _preferences.edit();
-        _editor.putString(StudentDataModel.CURRENT_WRITING_TUTOR_KEY, id);
+        _editor.putString(CURRENT_WRITING_TUTOR_KEY, id);
         _editor.apply();
     }
 
@@ -175,7 +175,7 @@ public class StudentDataModel {
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
         _editor = _preferences.edit();
-        _editor.putString(StudentDataModel.CURRENT_STORIES_TUTOR_KEY, id);
+        _editor.putString(CURRENT_STORIES_TUTOR_KEY, id);
         _editor.apply();
     }
 
@@ -189,7 +189,7 @@ public class StudentDataModel {
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
         _editor = _preferences.edit();
-        _editor.putString(StudentDataModel.CURRENT_MATH_TUTOR_KEY, id);
+        _editor.putString(CURRENT_MATH_TUTOR_KEY, id);
         _editor.apply();
     }
 
@@ -201,7 +201,7 @@ public class StudentDataModel {
 
     public void updateActiveSkill(String skill) {
         _editor = _preferences.edit();
-        _editor.putString(StudentDataModel.SKILL_SELECTED_KEY, skill);
+        _editor.putString(SKILL_SELECTED_KEY, skill);
         _editor.apply();
         Log.wtf("ACTIVE_SKILL", "update=" + skill);
     }
@@ -261,7 +261,7 @@ public class StudentDataModel {
 
     void updateLastTutor(String activeTutorId) {
         _editor = _preferences.edit();
-        _editor.putString (StudentDataModel.LAST_TUTOR_PLAYED_KEY, activeTutorId);
+        _editor.putString (LAST_TUTOR_PLAYED_KEY, activeTutorId);
         _editor.apply();
     }
 
@@ -272,32 +272,32 @@ public class StudentDataModel {
 
     void updateMathPlacement(boolean b) {
         _editor = _preferences.edit();
-        _editor.putBoolean(StudentDataModel.MATH_PLACEMENT_KEY, b);
+        _editor.putBoolean(MATH_PLACEMENT_KEY, b);
         _editor.apply();
     }
 
     void updateMathPlacementIndex(Integer i) {
         _editor = _preferences.edit();
         if (i == null) {
-            _editor.remove(StudentDataModel.MATH_PLACEMENT_INDEX_KEY);
+            _editor.remove(MATH_PLACEMENT_INDEX_KEY);
         } else {
-            _editor.putInt(StudentDataModel.MATH_PLACEMENT_INDEX_KEY, i);
+            _editor.putInt(MATH_PLACEMENT_INDEX_KEY, i);
         }
         _editor.apply();
     }
 
     void updateWritingPlacement(boolean b) {
         _editor = _preferences.edit();
-        _editor.putBoolean(StudentDataModel.WRITING_PLACEMENT_KEY, b);
+        _editor.putBoolean(WRITING_PLACEMENT_KEY, b);
         _editor.apply();
     }
 
     void updateWritingPlacementIndex(Integer i) {
         _editor = _preferences.edit();
         if (i == null) {
-            _editor.remove(StudentDataModel.WRITING_PLACEMENT_INDEX_KEY);
+            _editor.remove(WRITING_PLACEMENT_INDEX_KEY);
         } else {
-            _editor.putInt(StudentDataModel.WRITING_PLACEMENT_INDEX_KEY, i);
+            _editor.putInt(WRITING_PLACEMENT_INDEX_KEY, i);
         }
         _editor.apply();
     }
