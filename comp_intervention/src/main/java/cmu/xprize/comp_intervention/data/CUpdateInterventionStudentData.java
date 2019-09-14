@@ -11,6 +11,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.AKIRA;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.BPOP;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.LIT;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.MATH;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.NUMCOMPARE;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.PICMATCH;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.SPELL;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.STORY;
+import static cmu.xprize.comp_intervention.data.IDATA_CONST.WRITE;
+
 /**
  * RoboTutor
  * <p>
@@ -115,12 +125,16 @@ public class CUpdateInterventionStudentData {
             String[] entries = {
                     thisStudent.id,
                     thisStudent.photoFile,
-                    String.valueOf(thisStudent.levels.get("MATH")),
-                    String.valueOf(thisStudent.levels.get("STORY")),
-                    String.valueOf(thisStudent.levels.get("LIT")),
-                    String.valueOf(thisStudent.tutors.get("BPOP")),
-                    String.valueOf(thisStudent.tutors.get("SPELL")),
-                    String.valueOf(thisStudent.tutors.get("PICMATCH")),
+                    String.valueOf(thisStudent.levels.get(MATH)),
+                    String.valueOf(thisStudent.levels.get(STORY)),
+                    String.valueOf(thisStudent.levels.get(LIT)),
+
+                    String.valueOf(thisStudent.tutors.get(BPOP)),
+                    String.valueOf(thisStudent.tutors.get(SPELL)),
+                    String.valueOf(thisStudent.tutors.get(PICMATCH)),
+                    String.valueOf(thisStudent.tutors.get(AKIRA)),
+                    String.valueOf(thisStudent.tutors.get(WRITE)),
+                    String.valueOf(thisStudent.tutors.get(NUMCOMPARE)),
             };
 
             writer.writeNext(entries);
