@@ -43,6 +43,7 @@ import java.util.Locale;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
+import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.CPerfLogManager;
@@ -85,6 +86,7 @@ import static cmu.xprize.util.TCONST.INTERVENTION_STUDENT_FILE;
 import static cmu.xprize.util.TCONST.INTERVENTION_TIMES_FILE;
 import static cmu.xprize.util.TCONST.MATH_PLACEMENT;
 import static cmu.xprize.util.TCONST.SWAHILI_ASSET_PATTERN;
+import static cmu.xprize.util.TCONST.UPDATE_INTERVENTION_FILE;
 import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
 
 
@@ -293,6 +295,9 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // initialize singleton
         String interventionStudentFile = TCONST.INTERVENTION_FOLDER + File.separator + INTERVENTION_STUDENT_FILE;
         CInterventionStudentData.initialize(interventionStudentFile);
+
+        String updateInterventionFile = TCONST.INTERVENTION_FOLDER + File.separator + UPDATE_INTERVENTION_FILE;
+        CUpdateInterventionStudentData.initialize(updateInterventionFile);
     }
 
 
