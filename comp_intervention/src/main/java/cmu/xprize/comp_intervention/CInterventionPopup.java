@@ -220,14 +220,14 @@ public class CInterventionPopup extends RelativeLayout {
     }
 
     // Placeholder for eventual image selection code.
-    private static HashMap<String, String> imgPath;
+    /*private static HashMap<String, String> imgPath;
     static {
         imgPath = new HashMap<>();
         imgPath.put(I_TRIGGER_GESTURE, "child1.png");
         imgPath.put(I_TRIGGER_FAILURE, "child2.png");
         imgPath.put(I_TRIGGER_STUCK, "child3.png");
         imgPath.put(I_TRIGGER_HESITATE, "child4.png");
-    }
+    }*/
 
     /**
      * Get a String image filename based on intervention type and domain
@@ -238,8 +238,22 @@ public class CInterventionPopup extends RelativeLayout {
      */
     private String getChildPhoto(String interventionType, String activityOrDomain) {
 
-        String imgRef = imgPath.get(interventionType);
-        if (imgRef == null) imgRef = "image1.jpg"; // default placeholder
+        /*String imgRef = imgPath.get(interventionType);
+        if (imgRef == null) imgRef = "image1.jpg"; // default placeholder*/
+
+        String imgRef;
+        switch (interventionType) {
+            case I_TRIGGER_GESTURE:
+            case I_TRIGGER_STUCK:
+                imgRef = CInterventionStudentData.getPhotoForApplicationSupport("BPOP"); // TODO: replace
+                break;
+
+            case I_TRIGGER_FAILURE:
+            case I_TRIGGER_HESITATE:
+            default:
+                imgRef = CInterventionStudentData.getPhotoForKnowledgeSupport("LIT", 2);
+                break;
+        }
 
         return imgRef;
 

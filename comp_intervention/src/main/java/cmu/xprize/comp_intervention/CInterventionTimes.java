@@ -68,7 +68,7 @@ public class CInterventionTimes {
      * @param filename location of file
      * @return singleton
      */
-    static public CInterventionTimes getTimesMap(String filename) {
+    static public CInterventionTimes initialize(String filename) {
 
         if(singleton == null) {
             singleton = new CInterventionTimes(filename);

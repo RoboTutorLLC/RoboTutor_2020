@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import cmu.xprize.comp_intervention.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.CLogManager;
@@ -80,6 +81,7 @@ import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.STORIES_MAT
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.UNKNOWN_MATRIX;
 import static cmu.xprize.util.TCONST.ENGLISH_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.GRAPH_MSG;
+import static cmu.xprize.util.TCONST.INTERVENTION_STUDENT_FILE;
 import static cmu.xprize.util.TCONST.INTERVENTION_TIMES_FILE;
 import static cmu.xprize.util.TCONST.MATH_PLACEMENT;
 import static cmu.xprize.util.TCONST.SWAHILI_ASSET_PATTERN;
@@ -101,7 +103,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     // DEVELOPER VARIABLES FOR QUICK DEBUG LAUNCH
     private static final boolean QUICK_DEBUG_TUTOR = true;
-    private static final String QUICK_DEBUG_TUTOR_KEY = "intervention_numcompare";// "demo_failure"; //"demo_gesture"; // "demo_stuck"; // "demo_hesitate";
+    private static final String QUICK_DEBUG_TUTOR_KEY = "intervention_bpop";// "demo_failure"; //"demo_gesture"; // "demo_stuck"; // "demo_hesitate";
 
     // for devs, this is faster than changing the config file
     private static final boolean QUICK_DEBUG_CONFIG = false;
@@ -183,9 +185,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         audioLogPath = Environment.getExternalStorageDirectory() + TCONST.AUDIO_LOG_FOLDER;
 
-        // initialize InterventionTimes singleton (this is sort of like a read-only database)
-        String interventionTimesFile = TCONST.INTERVENTION_FOLDER + File.separator + INTERVENTION_TIMES_FILE;
-        CInterventionTimes.getTimesMap(interventionTimesFile);
+        initalizeInterventionData();
 
         APP_PRIVATE_FILES = getApplicationContext().getExternalFilesDir("").getPath();
 
@@ -283,6 +283,16 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         masterContainer.addAndShow(progressView);
 
         // testCrashHandler();
+    }
+
+    private void initalizeInterventionData() {
+        // initialize InterventionTimes singleton (this is sort of like a read-only database)
+        String interventionTimesFile = TCONST.INTERVENTION_FOLDER + File.separator + INTERVENTION_TIMES_FILE;
+        CInterventionTimes.initialize(interventionTimesFile);
+
+        // initialize singleton
+        String interventionStudentFile = TCONST.INTERVENTION_FOLDER + File.separator + INTERVENTION_STUDENT_FILE;
+        CInterventionStudentData.initialize(interventionStudentFile);
     }
 
 
