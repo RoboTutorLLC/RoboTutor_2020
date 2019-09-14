@@ -1,5 +1,7 @@
 package cmu.xprize.comp_intervention.data;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,9 +32,11 @@ public class Student {
      * Student constructed from a single csv line
      * @param csvLine an array of Strings from a single CSV parsing
      */
-    Student(String[] csvLine) {
+    Student (String[] csvLine) {
         String id = csvLine[0];
         String photoFile = csvLine[1];
+
+        Log.i("9_14", "initializing Student " + id + photoFile);
 
         Map<String, Integer> lvls = new HashMap<>();
         lvls.put(MATH, Integer.parseInt(csvLine[2]));
@@ -47,7 +51,7 @@ public class Student {
         played.put(WRITE, csvLine[9].equalsIgnoreCase("y"));
         played.put(NUMCOMPARE, csvLine[10].equalsIgnoreCase("y"));
 
-        new Student(id, photoFile, lvls, played);
+        this.setVars(id, photoFile, lvls, played);
     }
 
     /**
@@ -57,7 +61,7 @@ public class Student {
      * @param levels map of domains (LIT, MATH, STORY) to the student integer levels
      * @param tutors map of tutor names (bpop, numcompare, etc) to booleans (have they played?)
      */
-    private Student(String id,
+    private void setVars(String id,
             String photoFile,
             Map<String, Integer> levels,
             Map<String, Boolean> tutors) {
@@ -69,6 +73,7 @@ public class Student {
 
     @Override
     public String toString() {
+
         StringBuilder x = (new StringBuilder())
                 .append("id=").append(id)
                 .append(";photo=").append(photoFile);

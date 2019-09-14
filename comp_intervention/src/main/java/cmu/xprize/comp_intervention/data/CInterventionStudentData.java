@@ -39,6 +39,7 @@ public class CInterventionStudentData {
 
             while ((nextLine = reader.readNext()) != null) {
                 Log.i(TAG, "nextLine = " + nextLine[0] + ", " + nextLine[1]);
+                Log.i("9_14", "nextLine = " + nextLine[0] + ", " + nextLine[1]);
 
                 // skip the header
                 if (!skippedHeader) {
@@ -51,15 +52,19 @@ public class CInterventionStudentData {
                     // - HERE IS WHERE WE LOAD ONE LINE OF STUDENT DATA FROM CSV -
                     // -----------------------------------------------------------
                     Student addme = new Student(nextLine);
+                    Log.wtf("9_14", addme.id);
                     Log.wtf(TAG, addme.toString());
+                    Log.i("9_14", "Adding: " + addme.toString());
                     studentData.add(addme);
 
                 } catch (Exception e) {
+                    Log.e("9_14", "Error: " + e.getMessage());
                     Log.v(TAG, "skipped this row " + nextLine[0]);
                 }
 
             }
         } catch (IOException e) {
+            Log.wtf("9_14", "ERROR: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -107,8 +112,11 @@ public class CInterventionStudentData {
     public static String getPhotoForApplicationSupport(String tutor) {
 
         List<String> possibles = new ArrayList<String>();
+        Log.i("9_14", "getPhotoForAppSupport " + tutor);
+        Log.i("9_14", "dataSize=" + studentData.size());
 
         for (Student s : studentData) {
+            Log.wtf("9_14", s.tutors.toString());
             if (s.tutors.get(tutor))
                 possibles.add(s.photoFile);
         }
