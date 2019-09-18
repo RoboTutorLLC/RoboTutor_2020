@@ -124,12 +124,18 @@ public class TSpellingComponent extends CSpelling_Component implements ITutorObj
 
     // Override in child class
     @Override
-    protected long getTimeForThisTutor() {
-        String lookupId = CTutorEngine.getActiveTutor().getTutorId().replace(":", "_");
-        Log.wtf("TUTOR_ID", lookupId);
-        long delayTime = (long) Math.ceil(CInterventionTimes.getTimeByTutorId(lookupId));
-        long delayMs = delayTime * 1000;
-        Log.wtf("TUTOR_ID", "" + delayMs);
+    protected long lookupHesitateTimeForThisTutor() {
+
+        long delayMs;
+        try {
+            String lookupId = CTutorEngine.getActiveTutor().getTutorId().replace(":", "_");
+            Log.wtf("TUTOR_ID", lookupId);
+            long delayTime = (long) Math.ceil(CInterventionTimes.getTimeByTutorId(lookupId));
+            delayMs = delayTime * 1000;
+            Log.wtf("TUTOR_ID", "" + delayMs);
+        } catch (Exception e) {
+            delayMs = TCONST.HESITATE_TIME_SPELL;
+        }
         return delayMs;
     }
 

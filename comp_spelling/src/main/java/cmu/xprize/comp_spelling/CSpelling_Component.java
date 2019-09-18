@@ -39,9 +39,6 @@ import cmu.xprize.util.gesture.ExpectTapGestureListener;
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_SPELL;
-import static cmu.xprize.util.TCONST.HESITATE_TIME_SPELL;
-import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
-import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
 import static cmu.xprize.util.TCONST.STUCK_TIME_SPELL;
 import static cmu.xprize.util.TCONST.TYPE_AUDIO;
 
@@ -206,7 +203,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         _queue = new CMessageQueueFactory(this, "CSpelling");
 
-        long hesTime = getTimeForThisTutor();
+        long hesTime = lookupHesitateTimeForThisTutor();
         _timer = new TimerMaster(this, _queue, "SpellTimer",
                 (int) hesTime, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
 
@@ -216,8 +213,12 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     }
 
-    // Override in child class
-    protected long getTimeForThisTutor() {
+    /**
+     * Lookup time in the table. If nothing, give the default.
+     *
+     * @return time delay in ms.
+     */
+    protected long lookupHesitateTimeForThisTutor() {
         return 0L;
     }
 
