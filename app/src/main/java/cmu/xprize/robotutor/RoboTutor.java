@@ -178,15 +178,6 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // Note = we don't want the system to try and recreate any of our views- always pass null
         //
         super.onCreate(null);
-
-        hotLogPath   = Environment.getExternalStorageDirectory() + TCONST.HOT_LOG_FOLDER;
-        readyLogPath = Environment.getExternalStorageDirectory() + TCONST.READY_LOG_FOLDER;
-
-        hotLogPathPerf = Environment.getExternalStorageDirectory() + TCONST.HOT_LOG_FOLDER_PERF;
-        readyLogPathPerf = Environment.getExternalStorageDirectory() + TCONST.READY_LOG_FOLDER_PERF;
-
-        audioLogPath = Environment.getExternalStorageDirectory() + TCONST.AUDIO_LOG_FOLDER;
-
         initalizeInterventionData();
 
         APP_PRIVATE_FILES = getApplicationContext().getExternalFilesDir("").getPath();
@@ -199,13 +190,6 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         ConfigurationItems configurationItems = QUICK_DEBUG_CONFIG ? QUICK_DEBUG_CONFIG_OPTION : new ConfigurationItems(); // OPEN_SOURCE opt to switch here.
         Configuration.saveConfigurationItems(this, configurationItems);
 
-        Calendar calendar = Calendar.getInstance(Locale.US);
-        String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
-        String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
-        // NOTE: Need to include the configuration name when that is fully merged
-        String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
-                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + sequenceIdString +
-                "_" + initTime + "_" + Build.SERIAL;
 
         Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "rt: onCreate");
         // Catch all errors and cause a clean exit -
@@ -231,21 +215,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         VERSION_RT   = BuildConfig.VERSION_NAME;
         VERSION_SPEC = CAssetObject.parseVersionSpec(VERSION_RT);
 
-        Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
-
-        logManager = CLogManager.getInstance();
-        logManager.transferHotLogs(hotLogPath, readyLogPath);
-        logManager.transferHotLogs(hotLogPathPerf, readyLogPathPerf);
-
-        logManager.startLogging(hotLogPath, logFilename);
-        CErrorManager.setLogManager(logManager);
-
-        perfLogManager = CPerfLogManager.getInstance();
-        perfLogManager.startLogging(hotLogPathPerf, "PERF_" + logFilename);
-
-        // TODO : implement time stamps
-        logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");
-        logManager.postEvent_I(GRAPH_MSG, "EngineVersion:" + VERSION_RT);
+        initializeAndStartLogs();
 
         Log.v(TAG, "External_Download:" + DOWNLOAD_PATH);
 
@@ -287,6 +257,49 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // testCrashHandler();
     }
 
+    /**
+     * create log paths.
+     * initialize times and other IDs
+     * start logging
+     */
+    private void initializeAndStartLogs() {
+
+        hotLogPath   = Environment.getExternalStorageDirectory() + TCONST.HOT_LOG_FOLDER;
+        readyLogPath = Environment.getExternalStorageDirectory() + TCONST.READY_LOG_FOLDER;
+
+        hotLogPathPerf = Environment.getExternalStorageDirectory() + TCONST.HOT_LOG_FOLDER_PERF;
+        readyLogPathPerf = Environment.getExternalStorageDirectory() + TCONST.READY_LOG_FOLDER_PERF;
+
+        audioLogPath = Environment.getExternalStorageDirectory() + TCONST.AUDIO_LOG_FOLDER;
+
+        Calendar calendar = Calendar.getInstance(Locale.US);
+        String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
+        String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
+        // NOTE: Need to include the configuration name when that is fully merged
+        String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
+                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + sequenceIdString +
+                "_" + initTime + "_" + Build.SERIAL;
+
+        Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
+
+        logManager = CLogManager.getInstance();
+        logManager.transferHotLogs(hotLogPath, readyLogPath);
+        logManager.transferHotLogs(hotLogPathPerf, readyLogPathPerf);
+
+        logManager.startLogging(hotLogPath, logFilename);
+        CErrorManager.setLogManager(logManager);
+
+        perfLogManager = CPerfLogManager.getInstance();
+        perfLogManager.startLogging(hotLogPathPerf, "PERF_" + logFilename);
+
+        // TODO : implement time stamps
+        logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");
+        logManager.postEvent_I(GRAPH_MSG, "EngineVersion:" + VERSION_RT);
+    }
+
+    /**
+     * Load student intervention data
+     */
     private void initalizeInterventionData() {
         // initialize InterventionTimes singleton (this is sort of like a read-only database)
         String interventionTimesFile = TCONST.INTERVENTION_FOLDER + File.separator + INTERVENTION_TIMES_FILE;
