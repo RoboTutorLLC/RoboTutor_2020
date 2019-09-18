@@ -11,5 +11,7 @@ public class WR_CONST {
     // TIMES
     public static final long RIPPLE_DELAY   = 400L;
     public static final long HIGHLIGHT_TIME = 300;
+
+    public static final String HESITATION_PROMPT = "HESITATION_PROMPT";
 }
 

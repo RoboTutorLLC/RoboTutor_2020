@@ -300,23 +300,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         mTutorScene.setVisibility(visible);
     }
 
-    // RUN_Q called from AG
-    // postEvent(HIDE_CURRENT_LETTER_GLYPH)
-    public void postEvent(String event) {
-        post(event,0);
-    }
-
-    // RUN_Q called from AG
-    public void postEvent(String event, Integer delay) {
-
-        post(event, delay);
-    }
-
-    // RUN_Q called from AG
-    public void postNextNodeDelay(Integer delay) {
-        enQueue(new Queue(null, APPLY_BEHAVIOR, NEXT_NODE), delay);
-    }
-
     public void pointAtEraseButton() {
         super.pointAtEraseButton();
     }

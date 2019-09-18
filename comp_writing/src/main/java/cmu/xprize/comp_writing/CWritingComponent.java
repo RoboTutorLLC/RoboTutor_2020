@@ -81,6 +81,7 @@ import static cmu.xprize.util.TCONST.EMPTY;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_WRITE;
 import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
+import static cmu.xprize.util.TCONST.NEXT_NODE;
 
 
 /**
@@ -1297,9 +1298,13 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         return _hesitationNo;
     }
 
-    public void cancelAndResetHesitation(String promptName){
-        cancelPost(promptName);
+    public void cancelAndResetHesitation(){
+        cancelHesitation();
         resetHesitationFeature(); //clears hesitation features and resets hesitation number to 0
+    }
+
+    public void cancelHesitation() {
+        cancelPost(WR_CONST.HESITATION_PROMPT);
     }
 
     public void temporaryOnCorrect(){
@@ -3682,7 +3687,6 @@ public class EditOperation {
                         break;
                     //  added ends
 
-                    // RUN_Q DO THIS NEXT
                     case TCONST.APPLY_BEHAVIOR:
 
                         applyBehaviorNode(_target);
@@ -3848,22 +3852,23 @@ public class EditOperation {
      * trigger hesitation timer for help... refactored from "postNamed" for debugging purposes
      */
     public void triggerHelpHesitationTimer() {
-        enQueue(new Queue("HESITATION_PROMPT", APPLY_BEHAVIOR, "INPUT_HESITATION_FEEDBACK"), 6000L);
+        enQueue(new Queue(WR_CONST.HESITATION_PROMPT, APPLY_BEHAVIOR, "INPUT_HESITATION_FEEDBACK"), 6000L);
     }
 
-
-    /**
-     * Post a command to the queue
-     *
-     * @param command
-     */
-    // RUN_Q is this needed??? see animator graph, it calls "post" with parms "NEXT_NODE"...
-    public void post(String command) {
-        post(command, 0);
+    // RUN_Q next... make the _queue!!! see Bpop as example?
+    // RUN_Q called from AG
+    public void postEvent(String command) {
+        enQueue(new Queue(null, command), 0);
     }
-    public void post(String command, long delay) {
 
-        enQueue(new Queue(null, command), delay);
+    // RUN_Q called from AG
+    public void postEvent(String event, Integer delay) {
+        enQueue(new Queue(null, event), delay);
+    }
+
+    // RUN_Q called from AG
+    public void postNextNodeDelay(Integer delay) {
+        enQueue(new Queue(null, APPLY_BEHAVIOR, NEXT_NODE), delay);
     }
 
 
@@ -3876,26 +3881,6 @@ public class EditOperation {
     public void postBehavior(String target) {
         enQueue(new Queue(null, APPLY_BEHAVIOR, target), 0);
     }
-
-    public void post(String command, String target, long delay) {
-        enQueue(new Queue(null, command, target), delay);
-    }
-
-
-    /**
-     * Post a command , target and item to this queue
-     *
-     * @param command
-     */
-    public void post(String command, String target, String item) {
-        post(command, target, item, 0);
-    }
-    public void post(String command, String target, String item, long delay) {
-        enQueue(new Queue(null, command, target, item), delay);
-    }
-
-
-
 
     // Component Message Queue  -- End
     //************************************************************************

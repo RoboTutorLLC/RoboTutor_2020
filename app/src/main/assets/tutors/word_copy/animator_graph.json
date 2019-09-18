@@ -96,12 +96,10 @@
 
             //  letter level feedback - cancel hesitation, hide current glyph, set resume hesitation when animation complete, play animation, hide animation glyph, show for tracing.
             {"name": "Hide Current Letter Glyphs - hesitation",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_CURRENT_LETTER_GLYPH:String", "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR"},
-//            {"name":"CANCEL HESITATION FEEDBACK",  "type": "COMMAND", "id": "INPUT_HESITATION_FEEDBACK", "method": "cancelNode", "parms": "", "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR"},
 
 
                     //show sample for tracing
             {"name": "SHOW sample",          "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent",  "parms": "SHOW_SAMPLE:String",    "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR"},
-//            {"name": "prompt - please trace the...", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Please trace the letter.mp3", "soundpackage": "sentence","mode": "flow", "features": "FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_SPACE_SAMPLE&!FTR_AUDIO_NO_ERROR"},
 
             {"name": "audio - please write", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Please write.mp3","soundpackage": "sentence", "mode":"flow", "features": "FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_SPACE_SAMPLE&!FTR_AUDIO_NO_ERROR"},
 
@@ -109,8 +107,7 @@
 
             {"name": "Clear space feature",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "retractFeature", "parms": "FTR_SPACE_SAMPLE:String",  "features":"FTR_SEN"},
 
-            // RUN_Q postBehavior
-            {"name":"post(APPLY_BEHAVIOR, REPLAY_TUTORIAL_GLYPH_BEHAVIOR)", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postBehavior",           "parms": "REPLAY_TUTORIAL_GLYPH_BEHAVIOR:String", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_3"},
+            {"name":"postBehavior(REPLAY_TUTORIAL_GLYPH_BEHAVIOR)", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postBehavior",           "parms": "REPLAY_TUTORIAL_GLYPH_BEHAVIOR:String", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_3"},
 
 
 
@@ -118,8 +115,7 @@
 
             {"name": "show box on first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEditAndPoint", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_2|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_2"},
 
-            // RUN_Q postBehavior
-            {"name":"post(APPLY_BEHAVIOR, MERCY_RULE_BEHAVIOR)", "type": "COMMAND", "id": "SWordCopy", "method": "postBehavior",           "parms": "MERCY_RULE_BEHAVIOR:String", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_4|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_4"},
+            {"name":"postBehavior(MERCY_RULE_BEHAVIOR)", "type": "COMMAND", "id": "SWordCopy", "method": "postBehavior",           "parms": "MERCY_RULE_BEHAVIOR:String", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_4|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_4"},
 
 
 
@@ -147,16 +143,6 @@
 
               //hesitation 3, attempt 1 2 3, sen_attempt_1,2,3
             {"name": "show box on first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEdit", "parms": "", "features":"FTR_SEN_SEN&FTR_HESITATION_3&FTR_SEN_ATTEMPT_1|FTR_SEN_SEN&FTR_HESITATION_3&FTR_SEN_ATTEMPT_2|FTR_SEN_SEN&FTR_HESITATION_3&FTR_SEN_ATTEMPT_3"},
-
-
-            //prompts for sentence copying letter level feedback
-              //hesitation 2 (when the first edit group is highlighted)
-                  //Words may be missing incorrect or unnecessary
-//                  {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Words may be missing incorrect or unnecessary.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_2&!FTR_AUDIO_NO_ERROR"},
-              //hesitation 3 play the normal rules as below.
-
-
-            //hesitation prompts
 
             //Letter
                   //INSERT
@@ -281,16 +267,6 @@
             {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "We leave one space between words.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&!FTR_SEN_LTR&FTR_AUDIO_SPACE&FTR_INSERT&FTR_HESITATION_3&FTR_ATTEMPT_2"},
                         //for letter level
             {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "We leave one space between words.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&FTR_SEN_LTR&FTR_AUDIO_SPACE&FTR_INSERT&FTR_HESITATION_2"},
-
-
-            //REPLACE
-                        //HESITATION 1 (ALREADY COVERED ABOVE)
-                              //ATTEMPT 1
-//            {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "We leave one space between words.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&FTR_AUDIO_SPACE&FTR_HESITATION_1&FTR_ATTEMPT_1|FTR_SEN&FTR_AUDIO_SPACE&FTR_HESITATION_1&FTR_SEN_ATTEMPT_1&!FTR_ATTEMPT_1&!FTR_ATTEMPT_2&!FTR_ATTEMPT_3&!FTR_ATTEMPT_4"},
-//                              //ATTEMPT 2
-//            {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "We leave one space between words.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&FTR_AUDIO_SPACE&FTR_HESITATION_1&FTR_ATTEMPT_2"},
-//                              //ATTEMPT 3
-//            {"name": "", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "We leave one space between words.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN&FTR_AUDIO_SPACE&FTR_HESITATION_1&FTR_ATTEMPT_3"},
 
                         //HESITATION 2
                               //ATTEMPT 1
@@ -497,15 +473,6 @@
           "tracks": [
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "logState", "parms": "type#behavior,value#GENERAL_CORRECT_BEHAVIOR:String", "features":""},
 
-            //{"name": "Count correct", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "countCorrect", "parms": "", "features":""},
-            //amogh added
-
-//            {"name": "show box", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBox", "parms": "1", "features":"FTR_HESITATION_1"},
-//            {"name": "show box", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBox2", "parms": "", "features":""},
-//            {"name": "show box", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBox", "parms": "", "features":""},
-            //amogh added ends
-//            {"name": "errordebugaudio", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "1.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_SEN"},
-
             {"name": "Disable Replay", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "enableReplayButton", "parms": "FALSE:Boolean", "features":"FTR_DICTATION"},
 
             // clean up after tracing - hide the sample and ensure the other fields are re-enabled (only when it is not a sentence writing activity)
@@ -515,28 +482,11 @@
 
             {"name": "GOOD - feedback", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Good.mp3","soundpackage": "default","mode": "flow", "features": "FTR_ATTEMPT_4&!FTR_SEN"},
 
-//            {"name": "DELAYED Highlight Next", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIGHLIGHT_NEXT:String|0:Integer",    "features":"FTR_INPUT_STALLED&!FTR_SEN"},
-
             // functions to be called for sentence writing
 
             //letter level feedback
             {"name": "Hide Sample for current index - correct",   "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_SAMPLE_ACTIVE_INDEX:String",  "features":"FTR_SEN&FTR_SEN_LTR"},
             {"name": "increment the current letter index(letter level feedback).", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementActiveIndex", "parms": "", "features":"FTR_SEN&FTR_SEN_LTR"},
-
-
-            // 1. word level feedback (the three things below and clearing the attempt index)
-
-              //when word is correct -> deactive edit mode, inhibit word input, update response colors
-
-//            {"name": "inhibit input for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "inhibitWordInput", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD&FTR_WORD_CORRECT"},
-
-            //update colors irrespective of whether the word was in which attempt, it is necessary to convey that the replacement is right.
-//            {"name": "update the response colors for each letter in word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateLettersWordResponse", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD"},
-//            {"name": "inhibit input for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "inhibitWordInput", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD"},
-
-//            {"name": "increment the current word index.", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementCurrentWordIndex", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD&FTR_WORD_CORRECT"}, //currently in temporarycorrectbehavior in cwritingcomponent.java
-
-            //2. sentence level on_correct behaviors (called when correct replacement)
 
             //when the word is already colored letterwise
             {"name": "update the response colors for each letter in word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateLettersWordResponse", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_1|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_2|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_3|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_4"},
@@ -549,13 +499,8 @@
             {"name": "inhibit input for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "inhibitWordInput", "parms": "", "features":"FTR_SEN_CORR&FTR_SEN_SEN&FTR_WORD_CORRECT"},
             {"name": "increment the current word index.", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementCurrentWordIndex", "parms": "", "features":"FTR_SEN_CORR&FTR_SEN_SEN&FTR_WORD_CORRECT"},
 
-
-
-
-
             //if the attempt number is 4, hide the sample glyphs for tracing.
             {"name": "hide sample for word",          "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showSampleForActiveWord",  "parms": "FALSE:Boolean",    "features":"FTR_SEN&FTR_SEN_WRD&FTR_ATTEMPT_4"},
-
 
 
             //amogh comment - clearing attempt feature still holds for words - need to recheck for sentence writing
@@ -625,9 +570,8 @@
 
 
             {"name": "update the response colors for sentence", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateSentenceResponse", "parms": "TRUE:Boolean", "features":"FTR_SEN&!FTR_SEN_LTR"},
-            {"name":"cancelAndResetHesitation - ITEM_COMPLETE_BEHAVIOR",  "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "HESITATION_PROMPT:String",    "features":"FTR_SEN"},
-            // RUN_Q keep cancelPost
-            {"name":"",  "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "cancelPost", "parms": "HESITATION_PROMPT:String",    "features":"FTR_SEN"},
+            {"name":"cancelAndResetHesitation",  "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "",    "features":"FTR_SEN"},
+            {"name":"",  "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "cancelHesitation", "parms": "",    "features":"FTR_SEN"},
 
             {"name": "Clear sentence features - ITEM_COMPLETE_BEHAVIOR",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "clearSentenceFeatures", "parms": "",  "features":"FTR_SEN_SEN"},
             {"name": "Clear hesitation features - ITEM_COMPLETE_BEHAVIOR",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "clearHesitationFeatures", "parms": "",  "features":"FTR_SEN"},
@@ -883,7 +827,6 @@
 
 
             {"name": "Clear space feature",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "retractFeature", "parms": "FTR_SPACE_SAMPLE:String",  "features":"FTR_SEN"},
-            // RUN_Q post(2)(APPLY_BEHAVIOR, REPLAY_TUTORIAL_GLYPH_BEHAVIOR)
             {"name":"post(APPLY_BEHAVIOR, REPLAY_TUTORIAL_GLYPH_BEHAVIOR)", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postBehavior",           "parms": "REPLAY_TUTORIAL_GLYPH_BEHAVIOR:String", "features":"FTR_SEN&FTR_SEN_LTR&FTR_ATTEMPT_4"},
 
             {"name": "Clear space feature",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "retractFeature", "parms": "FTR_SPACE_SAMPLE:String",  "features":"FTR_SEN"},
@@ -964,9 +907,6 @@
             {"name": "increment the current word index.", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementCurrentWordIndex", "parms": "", "features":"FTR_SEN&!FTR_SEN_LTR"},
             {"name": "increment the current letter index(letter level feedback).", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementActiveIndex", "parms": "", "features":"FTR_SEN&FTR_SEN_LTR"}, //index increment included in letter
 
-
-            //                        {"name": "debug audio"    , "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Continue.mp3",     "soundpackage": "sentence", "mode":"flow", "features": "FTR_SEN"},
-
             {"name": "Replay Complete behavior", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "REPLAY_COMPLETE:String|DELAYED_NEXT_2:String" ,"features":"!FTR_SEN"},
 
             //retract features
@@ -1039,8 +979,6 @@
           ]
         }
       ,
-
-        // RUN_Q wtf are these three things, do we need them
         "RESUME_HESITATION_AFTER_REPLAY": {
           "type": "QUEUE",
           "COMMENT": "Does three things- 1) Erases the animation glyph. 2) posts a delayed hesitation feedback call 3) sets a volatile behavior for START_WRITING to cancel hesitation number",
@@ -1072,7 +1010,7 @@
           "reuse": true,
           "tracks": [
             {"name":"",  "type": "COMMAND", "id": "MERCY_RULE_BEHAVIOR", "method": "cancelNode", "parms": "", "features":""},
-            {"name":"cancelAndResetHesitation - START_HESITATION_ON_MERCY_COMPLETE",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "HESITATION_PROMPT:String",    "features":"FTR_SEN"},
+            {"name":"cancelAndResetHesitation",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "",    "features":"FTR_SEN"},
             {"name":"SetVolatile - WRITE_BEHAVIOR - CANCEL_AND_RESET_HESITATION_POSTING",             "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "WRITE_BEHAVIOR:String|CANCEL_AND_RESET_INPUT_HESITATION_POSTING:String" ,"features":"FTR_SEN"}, //amogh added
             {"name":"triggerHelpHesitationTimer", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "triggerHelpHesitationTimer",  "parms": "", "features":"FTR_SEN"}
           ]
@@ -1516,12 +1454,9 @@
 
             // NOTE: Due to a limitation in the queue architecture you should only enable one of ON_ERROR | ON_METRIC_ERROR | ON_CHAR_ERROR
 
-//            {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "setStickyBehavior", "parms": "ON_METRIC_ERROR:String|METRIC_ERROR_BEHAVIOR:String" ,"features":""},
-//            {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "setStickyBehavior", "parms": "ON_CHAR_ERROR:String|CHAR_ERROR_BEHAVIOR:String" ,"features":""},
-
             {"name":"SetVolatile - DATA_ITEM_COMPLETE - ITEM_COMPLETE_BEHAVIOR",  "type": "COMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "DATA_ITEM_COMPLETE:String|ITEM_COMPLETE_BEHAVIOR:String" ,"features":""},
 
-            {"name":"cancelAndResetHesitation - NEXT_DATA_MODULE",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "HESITATION_PROMPT:String",    "features":"FTR_SEN"},
+            {"name":"cancelAndResetHesitation",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "",    "features":"FTR_SEN"},
 
             {"name":"next",  "type": "COMMAND", "id": "SWordCopy", "method": "next" ,"features":""},
 
@@ -1646,11 +1581,9 @@
         "CLEAR_CANCEL_REPLAY_BEHAVIOR": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "WRITE_BEHAVIOR:String|NULL:String" ,"features":""},
         "CANCEL_REPLAY_FEEDBACK":       {"name":"",  "type": "COMMAND", "id": "DICTATION_REPLAY_BEHAVIOR", "method": "cancelNode", "parms": "", "features":""},
 
-
-        // RUN_Q keep cancelPost
-        "CANCEL_INPUT_HESITATION_POSTING": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelPost", "parms": "HESITATION_PROMPT:String",    "features":""},
+        "CANCEL_INPUT_HESITATION_POSTING": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelHesitation", "parms": "",    "features":""},
         "RESET_HESITATION_NUMBER": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "RESET_HESITATION:String",    "features":""},
-        "CANCEL_AND_RESET_INPUT_HESITATION_POSTING": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "HESITATION_PROMPT:String",    "features":""},
+        "CANCEL_AND_RESET_INPUT_HESITATION_POSTING": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "cancelAndResetHesitation", "parms": "",    "features":""},
         "CLEAR_REPLAY_GLYPH": {"name":"",  "type": "COMMAND", "id": "SWordCopy", "method": "eraseCurrentReplayGlyph", "parms": "",    "features":""},
 
 
@@ -1681,6 +1614,7 @@
         "INIT_ASK":     {"name":"",  "type": "COMMAND", "id": "Spicker", "method": "setStickyBehavior", "parms": "SPEAK_BUTTON:String|PICKER_TRACK:String" ,"features":""},
         "PICKER_TRACK": {"name":"",  "type": "TIMELINE", "trackname": "ASK_BUTTON", "features": ""},
 
+        // this is called in scene_queuedgraph
         "DELAYED_NEXT":      {"name":"",  "type": "COMMAND", "id": "ITEM_COMPLETE_BEHAVIOR", "method": "post", "parms": "NEXT_NODE:String", "features":""},
         "DELAYED_NEXT_2":    {"name":"",  "type": "COMMAND", "id": "MERCY_RULE_BEHAVIOR",    "method": "post", "parms": "NEXT_NODE:String", "features":""},
         "DELAYED_DEMO_NEXT": {"name":"",  "type": "COMMAND", "id": "DEMO_COMPLETE_BEHAVIOR", "method": "post", "parms": "NEXT_NODE:String", "features":""},
