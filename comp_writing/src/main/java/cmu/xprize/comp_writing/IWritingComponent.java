@@ -7,20 +7,20 @@ import cmu.xprize.ltkplus.CRecResult;
 
 public interface IWritingComponent {
 
-    public void onCreate();
+    void onCreate();
 
-    public void deleteItem(View child);
-    public void addItemAt(View child, int inc);
-    public void autoScroll(IGlyphController glyph);
+    void deleteItem(View child);
+    void addItemAt(View child, int inc);
+    void autoScroll(IGlyphController glyph);
 
-    public void stimulusClicked(int touchIndex);
-    public void onErase(int eraseIndex);
-    public boolean scanForPendingRecognition(IGlyphController source);
-    public void inhibitInput(IGlyphController source, boolean inhibit);
+    void stimulusClicked(int touchIndex);
+    void onErase(int eraseIndex);
+    boolean scanForPendingRecognition(IGlyphController source);
+    void inhibitInput(IGlyphController source, boolean inhibit);
 
-    public boolean applyBehavior(String event);
+    boolean applyBehavior(String event);
 
-    public void updateGlyphStats(CRecResult[] ltkPlusResult, CRecResult[] ltkresult, CGlyphMetrics metricsA, CGlyphMetrics metricsB);
-    public boolean updateStatus(IGlyphController child, CRecResult[] _ltkPlusCandidates );
-    public void resetResponse(IGlyphController child );
+    void updateGlyphStats(CRecResult[] ltkPlusResult, CRecResult[] ltkresult, CGlyphMetrics metricsA, CGlyphMetrics metricsB);
+    boolean updateStatus(IGlyphController child, CRecResult[] _ltkPlusCandidates );
+    void resetResponse(IGlyphController child );
 }

@@ -242,7 +242,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                return mDetector.onTouchEvent(motionEvent); // INT_WRITE where else can I put this to make it trigger all the time?
+                mDetector.onTouchEvent(motionEvent); // INT_WRITE where else can I put this to make it trigger all the time?
+                return true;
             }
         });
     }
@@ -289,11 +290,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         _audioFTR.add(WR_FEATURES.FTR_COMMA);
         _audioFTR.add(WR_FEATURES.FTR_EXCLAIM);
         _audioFTR.add(WR_FEATURES.FTR_QUESTION);
-
-
-//            _audioFTR.add(WR_CONST.FTR_AUDIO_CAP);
-//            _audioFTR.add(WR_CONST.FTR_AUDIO_CAP);
-        //amogh added finished
 
     }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -374,10 +370,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             comp.setProtoGlyph(_glyphSet.cloneGlyph(expectedChar));
         }
 
-// TODO: Dev only might me useful?
-//        mRecogList.setOnTouchListener(new RecogTouchListener());
-//        mGlyphList.setOnTouchListener(new drawnTouchListener());
-
         mRecognizedScroll.setLinkedScroll(mDrawnScroll);
         mDrawnScroll.setLinkedScroll(mRecognizedScroll);
 
@@ -434,19 +426,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //    public void show
 
     public void showHighlightBoxOnFirstEditGroup(){
-//        EditOperation firstEditOperationSentence = getFirstEditOperation(mWrittenSentence, mAnswer);
-//        firstEditOperationSentence.showHighlightBox();
+
         int startIndex = 0;
         int endIndex = 0;
         for(int i = 0; i < mGlyphList.getChildCount(); i++){
             CGlyphController c = (CGlyphController) mGlyphList.getChildAt(i);
             if(!c.isCorrect() && c.hasGlyph()){
-//                if(i == endIndex + 1){
-//                    endIndex++;
-//                }
-//                else{
-//                    startIndex = i;
-//                }
                 endIndex++;
             }
 
@@ -511,118 +496,19 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 //            updateExpectedCharacters();
             publishOnEraseState();
             CGlyphController c = (CGlyphController) mGlyphList.getChildAt(eraseIndex);
-            if(activityFeature.contains("FTR_SEN_LTR")){
+            if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)){
 
                 String expectedChar = mStimulus.substring(eraseIndex,eraseIndex + 1);
                 boolean isSpaceExpected = expectedChar.equals(" ");
                 if(!isSpaceExpected){
                     c.updateCorrectStatus(false);
                 }
-
-                if(activityFeature.contains("FTR_SEN_CORR")){
-//                    if(!isSpaceExpected){
-//                        c.toggleStimuliGlyph();
-//                    }
-                }
             }
     }
-    //
-
-    //to be called by the animator graph
-//    public void showHighlightBox(Integer level, Word w){
-//
-//        mHighlightErrorBoxView = new View (getContext());
-//        int wid = 0;
-//        int left = 0;
-//        //switch case sets the width, and the position of the box.
-//        switch (level){
-//
-//            case 1:
-//
-//                break;
-//
-//            case 2:
-//
-//                wid = w.getWidth();
-//                left = w.getLeft();
-//
-//                break;
-//
-//            case 3:
-//
-//                wid  = mResponseViewList.getChildAt(0).getWidth();
-//                left = w.getFirstEditLeft();
-//
-//                break;
-//
-//            case 4:
-//
-//                break;
-//        }
-//
-//        //now that the width and the position of this box has been set, set its drawable and show for some time.
-//        mHighlightErrorBoxView.setX((float)left);
-//        mHighlightErrorBoxView.setLayoutParams(new LayoutParams(wid, 90));
-//        mHighlightErrorBoxView.setBackgroundResource(R.drawable.highlight_error);
-//        //        MarginLayoutParams mp = (MarginLayoutParams) mHighlightErrorBoxView.getLayoutParams();
-//        //        mp.setMargins(100,00,0,100);
-//        //                mHighlightErrorBoxView.setX((float)300.00);
-//        //        int pos = mResponseViewList.getChildAt(index+2).getLeft();
-//        //        mHighlightErrorBoxView.setX(100);
-//        //        mHighlightErrorBoxView.setLeft(1000);
-//        mResponseScrollLayout.addView(mHighlightErrorBoxView);
-//        mHighlightErrorBoxView.postDelayed(new Runnable() {
-//            public void run() {
-//                mHighlightErrorBoxView.setVisibility(View.GONE);
-//            }
-//        }, 4000);
-//    }
-
-    //to be called by the animator graph
-//    public void showHighlightBox(Integer level) {
-//
-//        //for sentence level, need to check if the first edit is inside a word or not.
-//        if(activityFeature.contains("FTR_SEN_SEN")){
-//            if(mSentenceAttempts > 0) {
-//                //find first edit, it can be R,I,D
-//                EditOperation firstEditOperationSentence = getFirstEditOperation(mWrittenSentence, mAnswer);
-//
-//                int activeWordIndex = getActiveWordIndexForEdit(firstEditOperationSentence);
-//
-//                //if outside the word, highlight the error
-//                if (activeWordIndex == -1) {
-//
-//                    //highlight the error according to if its insert, replace or delete
-//                    firstEditOperationSentence.showHighlightBox();
-//                }
-//
-//                // if inside the word, simply follow what was happening at the word level
-//                else {
-//                    Word firstEditWord = mListWordsInput.get(activeWordIndex);
-////                    if (firstEditWord.getAttempt() > 0) {
-//                        showHighlightBox(level, firstEditWord);
-////                    }
-//                }
-//            }
-//        }
-//
-//        //for word level
-//        else{
-//            if (mActiveWord.getAttempt() > 0 ) {
-//                showHighlightBox(level, mActiveWord);
-//            }
-//        }
-//    }
-
 
     public void showSampleForActiveWord(Boolean show){
         mActiveWord.showSamples(show);
     }
-//    public void showSampleForActiveIndex(Boolean show){
-//        mActiveWord.showSamples(show);
-//    }
-
-    //amogh added ends
 
     //************************************************************************
     //************************************************************************
@@ -639,7 +525,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         int index = mGlyphList.indexOfChild(child);
         boolean canDelete = checkDelete(mEditSequence, index);
 
-//        if(canDelete){
         //remove from mGlyphList
         mGlyphList.removeViewAt(index);
         //remove from response
@@ -650,37 +535,13 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
         mActiveWord = mListWordsInput.get(currentWordIndex);
 
-        //update the expected characters
-//        updateExpectedCharacters();
-
-        if(activityFeature.contains("FTR_SEN_CORR")){
-
-        }
 
         //for letter level
-        else if(activityFeature.contains("FTR_SEN_LTR")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)){
             if (isComplete()) {
                 applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
             }
         }
-
-        else if(activityFeature.contains("FTR_SEN_WRD")){
-//                    evaluateSentenceWordLevel();
-        }
-        else if (activityFeature.contains("FTR_SEN_SEN")){
-
-        }
-        else{
-
-        }
-//            //if the word is complete, release the ON_CORRECT feature.
-//            String writtenActiveWord = mActiveWord.getWrittenWordString();
-//            String writtenAnswerWord = mActiveWord.getWordAnswer();
-//            boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
-//            if(writtenWordIsCorrect){
-//                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-//            }
-//        }
 
     }
 
@@ -719,11 +580,11 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mGlyphList.addView(v, index + inc);
 
         //enable the required buttons for this view, add the conditions for other activities
-        if (activityFeature.contains("FTR_SEN_COPY")) {
+        if (activityFeature.contains(WR_FEATURES.FTR_SEN_COPY)) {
             v.showDeleteSpaceButton(true);
             v.showInsLftButton(true);
             v.showInsRgtButton(true);
-        } else if (activityFeature.contains("FTR_SEN_CORR")) {
+        } else if (activityFeature.contains(WR_FEATURES.FTR_SEN_CORR)) {
             activateEditModeValidOnly();
         }
 
@@ -735,15 +596,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         updateSentenceEditSequence(); //updates mWrittenSentence, mEditSequence, mAlignedSourceSentence, mAlignedTargetSentence
         mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence, mAlignedTargetSentence); //sets the list of written word objects using mAlignedSourceSentence, mAlignedTargetSentence and then gets the number of attempts from the previous list.
 
-        //update the expected characters
-//        updateExpectedCharacters();
-
-        if (activityFeature.contains("FTR_SEN_CORR")) {
-
-        }
-
-        //for letter level
-        else {
+        if (!activityFeature.contains(WR_FEATURES.FTR_SEN_CORR)) {
             // if too many insertions, remove views from last.
             int lengthAnswer = mAnswer.length();
             if(mGlyphList.getChildCount() > lengthAnswer + 2){
@@ -752,42 +605,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             }
 
             //for letter level copy
-            if (activityFeature.contains("FTR_SEN_LTR")) {
+            if (activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)) {
                 if (isComplete()) {
                     applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
                 }
             }
-
-            //for word level copy
-            else if (activityFeature.contains("FTR_SEN_WRD")) {
-                //since the mListWordsInput is now updated, the parameters for mActiveWord have also changed, so refresh it.
-//                mActiveWord = mListWordsInput.get(currentWordIndex);
-
-                //might have to change this. works for now.
-//                evaluateSentenceWordLevel();
-
-//                //if the word is complete, release the ON_CORRECT feature.
-//                String writtenActiveWord = mActiveWord.getWrittenWordString();
-//                String writtenAnswerWord = mActiveWord.getWordAnswer();
-//                boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
-//                if(writtenWordIsCorrect){
-//                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should increment the current word index and the mActiveWord also thus changes.
-//                    temporaryOnCorrect();
-//                }
-            }
-
-            // for sentence level copy
-            else if (activityFeature.contains("FTR_SEN_SEN")) {
-
-            }
         }
-
-//            }
-
-//            if cannot insert
-//            else {
-                //increase attempt number for the word or the sentence!
-//            }
     }
 
 
@@ -804,6 +627,14 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mGlyphList.removeAllViews();
     }
 
+    /**
+     * WHAT DOES THIS DO???? I don't know...
+     * TODO: clean this up, we shouldn't have one method with 600 lines of code
+     *
+     * @param glyphController
+     * @param _ltkPlusCandidates
+     * @return
+     */
     public boolean updateStatus(IGlyphController glyphController, CRecResult[] _ltkPlusCandidates) {
 
         mActiveController = glyphController;
@@ -820,8 +651,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         // Avoid caseSensitive for words activity
         boolean isAnswerCaseSensitive = true;
-        boolean isWordActivity = activityFeature.contains("FTR_WORDS");
-        boolean isMissingLtrActivity = activityFeature.contains("FTR_MISSING_LTR");
+        boolean isWordActivity = activityFeature.contains(WR_FEATURES.FTR_WORDS);
+        boolean isMissingLtrActivity = activityFeature.contains(WR_FEATURES.FTR_MISSING_LTR);
 
         if (isWordActivity || isMissingLtrActivity) {
             isAnswerCaseSensitive = false;
@@ -848,58 +679,118 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         //amogh add begins
             //changing _charValid for sentence writing activities
-            if(activityFeature.contains("FTR_SEN_LTR")){
-                String correctString = mAnswer.substring(mActiveIndex,mActiveIndex + 1);
-                boolean isCorrect = mResponse.equals(correctString);
-                if(isCorrect) //amogh comment, this will change when insert and delete buttons will be there(then comparison has to be done using the aligned strings.).
-                {
-                    _charValid = true;
-                }
-                else{
-                    _charValid = false;
-                }
-            }
-            else if(activityFeature.contains("FTR_SEN_WRD")){
-
+            if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)) {
+                String correctString = mAnswer.substring(mActiveIndex, mActiveIndex + 1);
+                _charValid = mResponse.equals(correctString);
             }
 
         //amogh ends
 
         _isValid = _charValid && _metricValid; // _isValid essentially means "is a correct drawing"
 
-
-
-
-//            updateResponseView(mResponse);
-
         // when not a sentence writing activity
-        if (!(activityFeature.contains("FTR_SEN"))){
+        if (!(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX))){
+            updateStatusForNonSentence(stimController);
+        }
 
-            //update the controller's correct status
-            mActiveController.updateAndDisplayCorrectStatus(_isValid);
+        // for sentence activities (word level and sentence level feedback)
+        else{
+            updateStatusForSentence(gController);
+        }
+        return _isValid;
+    }
+
+    /**
+     * perform UpdateStatus logic for data sources that are non-sentence-writing tutors
+     * @param stimController
+     */
+    private void updateStatusForNonSentence(CStimulusController stimController) {
+        //update the controller's correct status
+        mActiveController.updateAndDisplayCorrectStatus(_isValid);
+
+        // Update the controller feedback colors
+        if (!singleStimulus) {
+            stimController.updateStimulusState(_isValid);
+        }
+
+        // Depending upon the result we allow the controller to disable other fields if it is working
+        // in Immediate feedback mode
+        // TODO: check if we need to constrain this to immediate feedback mode
+        inhibitInput(mActiveController, !_isValid);
+        mActiveController.inhibitInput(_isValid);
+        // Publish the state features.
+        publishState();
+
+        // Fire the appropriate behavior
+        if (isComplete()) {
+
+            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
+        }
+        else {
+
+            if (!_isValid) {
+
+                publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
+
+                int attempt = updateAttemptFeature();
+
+                if (attempt > 4) {
+                    applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                } else {
+                    applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                }
+
+                if (!_charValid)
+                    applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
+                else if (!_metricValid)
+                    applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
+            } else {
+                updateStalledStatus();
+
+                applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
+            }
+        }
+    }
+
+    /**
+     * perform UpdateStatus logic for data sources that are sentence-writing tutors
+     * @param gController
+     */
+    private void updateStatusForSentence(CGlyphController gController) {
+        //amogh added to set the valid character in response.
+        CStimulusController resp = (CStimulusController) mResponseViewList.getChildAt(mActiveIndex);
+        String charExpected = gController.getExpectedChar();
+        resp.setStimulusChar(mResponse, false);
+
+        //update the controller's correct status
+        mActiveController.updateCorrectStatus(_isValid); //sets the _correct in CGlyphInputController, would change for the different sentence level activities.
+
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR) && activityFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
 
             // Update the controller feedback colors
-            if (!singleStimulus) {
-                stimController.updateStimulusState(_isValid);
-            }
+            resp.updateResponseState(_isValid);
 
-            // Depending upon the result we allow the controller to disable other fields if it is working
-            // in Immediate feedback mode
-            // TODO: check if we need to constrain this to immediate feedback mode
+            //update sentence parameters
+            updateSentenceEditSequence();
+
             inhibitInput(mActiveController, !_isValid);
             mActiveController.inhibitInput(_isValid);
-            // Publish the state features.
+
+
             publishState();
 
+
             // Fire the appropriate behavior
+            //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
             if (isComplete()) {
 
                 applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
             }
             else {
-
+                //when not valid
                 if (!_isValid) {
 
+                    // lots of fun feature updating here
                     publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                     int attempt = updateAttemptFeature();
@@ -907,6 +798,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                     if (attempt > 4) {
                         applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
                     } else {
+
+                        if(charExpected.equals(" ")) {
+                            publishFeature(WR_FEATURES.FTR_SPACE_SAMPLE);
+                        }
                         applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                     }
 
@@ -914,562 +809,398 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                         applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
                     else if (!_metricValid)
                         applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
-                } else {
-                    updateStalledStatus();
+                }
 
+                //else when valid
+                else {
+                    updateStalledStatus();
+                    mActiveController.updateCorrectStatus(true);
                     applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
                 }
             }
         }
 
-        // for sentence activities (word level and sentence level feedback)
-        else{
+        //for word level feedback
+        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
 
-            //amogh added to set the valid character in response.
-            CStimulusController resp = (CStimulusController) mResponseViewList.getChildAt(mActiveIndex);
-            String charExpected = gController.getExpectedChar();
-            resp.setStimulusChar(mResponse, false);
+            mActiveWord = mListWordsInput.get(currentWordIndex);
+            int attempts = mActiveWord.getAttempt();
 
-            //update the controller's correct status
-            mActiveController.updateCorrectStatus(_isValid); //sets the _correct in CGlyphInputController, would change for the different sentence level activities.
+            //evaluate when the word is being written and evaluated for the first time, also making sure that its not the first box (as we are trying to detect the transition to the next word)
+            if(attempts == 0 && mActiveIndex > 0){
 
-            if(activityFeature.contains("FTR_SEN_LTR") && activityFeature.contains("FTR_SEN_COPY")){
+                //if punctuation is written or the previous space is left empty
+                CGlyphController previousController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex - 1);
+                boolean isPunctuationDrawn = punctuationSymbols.contains(mResponse);
+                boolean nextWordStarted = previousController.getRecognisedChar().equals("");
+                boolean isLastLetter = (mActiveIndex == mGlyphList.getChildCount() - 1);
 
-                // Update the controller feedback colors
-                resp.updateResponseState(_isValid);
-
-                //update sentence parameters
-                updateSentenceEditSequence();
-//                mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
-
-                //currently -> when the next letter is valid and the previous glyph is supposed to be space. Needs to change.
-                    // when the previous glyph is supposed to be space, accept it and inhibit space
-//                    if (mActiveIndex > 0 && (mAnswer.substring(mActiveIndex - 1, mActiveIndex).equals(" "))) {
-//                CGlyphController gControllerSpace = (CGlyphController) mGlyphList.getChildAt(mActiveIndex - 1);
-//                CStimulusController respSpace = (CStimulusController) mResponseViewList.getChildAt(mActiveIndex - 1);
-//                respSpace.setStimulusChar("", false);
-//                respSpace.updateResponseState(true);
-//                gControllerSpace.setIsStimulus("");
-//                gControllerSpace.updateCorrectStatus(_isValid);
-//                gControllerSpace.inhibitInput(true);
-//                    }
-
-                //update the expected characters according to string edit distance.
-
-//                if(!mResponse.equals(charExpected)) {
-//                    updateExpectedCharacters();
-//                }
-
-                inhibitInput(mActiveController, !_isValid);
-                mActiveController.inhibitInput(_isValid);
-
-
-                publishState();
-
-
-                // Fire the appropriate behavior
-                //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
-                if (isComplete()) {
-
-                    applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete...
-                }
-                else {
-                    //when not valid
-                    if (!_isValid) {
-
-                        // lots of fun feature updating here
-                        publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
-
-                        int attempt = updateAttemptFeature();
-
-                        if (attempt > 4) {
-                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                        } else {
-
-                            if(charExpected.equals(" ")) {
-                                publishFeature("FTR_SPACE_SAMPLE");
-                            }
-                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                        }
-
-                        if (!_charValid)
-                            applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
-                        else if (!_metricValid)
-                            applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
+                if (nextWordStarted || isPunctuationDrawn || isLastLetter) {
+                    //checks all the words in succession, stops at the first incorrect one, sets it to the active word, applies ON_CORRECT and ON_ERROR behaviors on the way
+                    evaluateSentenceWordLevel();
                     }
 
-                    //else when valid
-                    else {
-                        updateStalledStatus();
-                        mActiveController.updateCorrectStatus(true);
-                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
-                    }
-                }
-            }
-
-            //for word level feedback
-            else if(activityFeature.contains("FTR_SEN_WRD")){
-
-                mActiveWord = mListWordsInput.get(currentWordIndex);
-                int attempts = mActiveWord.getAttempt();
-
-                //evaluate when the word is being written and evaluated for the first time, also making sure that its not the first box (as we are trying to detect the transition to the next word)
-                if(attempts == 0 && mActiveIndex > 0){
-
-                    //if punctuation is written or the previous space is left empty
-                    CGlyphController previousController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex - 1);
-                    boolean isPunctuationDrawn = punctuationSymbols.contains(mResponse);
-                    boolean nextWordStarted = previousController.getRecognisedChar().equals("");
-                    boolean isLastLetter = (mActiveIndex == mGlyphList.getChildCount() - 1);
-
-                    if (nextWordStarted || isPunctuationDrawn || isLastLetter) {
-                        //checks all the words in succession, stops at the first incorrect one, sets it to the active word, applies ON_CORRECT and ON_ERROR behaviors on the way
-                        evaluateSentenceWordLevel();
-                        }
-
-                    //word has not been evaluated ie correctionAttempts = 0 and not to be evaluated. -> just let the user write
-                    else{
-//                        attempts = updateAttemptFeature();
-//                        applyBehavior(WR_BEHAVIORS.ON_ERROR);
-                    }
-
-                }
-
-                //when incorrect attempt has been made on this word before
-                else if(attempts > 0){
-
-                    //check if allowed to write here
-                    boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
-
-                    //if replacement is allowed at this index
-                    if(canReplace) {
-                        boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
-                        //if the replacement edit is valid
-                        if(responseEqualsTargetReplacement){
-
-                            updateSentenceEditSequence();
-                            mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
-
-                            // if this correct response makes the sentence correct,
-                            boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
-                            if (writtenSentenceIsCorrect) {
-                                temporaryOnCorrect(); //to update the word
-                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
-                            }
-
-                            // if the response is correct(item not yet over), check if the word is correct,apply ON_CORRECT
-                            else{
-                                //since the replacement is correct, still apply the oncorrect; its just that according to the attempt feature attempt fn will be called.
-
-                                //checking if this completes the word
-                                mActiveWord = mListWordsInput.get(currentWordIndex);
-                                boolean wordIsCorrect = mActiveWord.updateInputWordCorrectStatus(currentWordIndex);
-                                //if the word is correct update its color
-                                if (wordIsCorrect) {
-                                    //turn blue
-                                    //release the oncorrect behavior with word correct feature.
-                                    publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
-                                    temporaryOnCorrect();
-                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-//                                    temporaryOnCorrect();
-                                }
-
-                                //if the replacement is correct but the word is not, turn it in blue and inhibit input if attempt 2/3 when each letter is colored.
-                                else{
-                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-                                }
-
-
-//                                evaluateSentenceWordLevel(); // not applied because it is primarily for going over all words in a loop. Although code above is almost same.
-                            }
-                        }
-                        // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
-                        else{
-                            //revert the glyph to old one.
-                            gController.setPreviousGlyph();// put in animator graph
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                            }
-                            // in the animator graph -> turn the word blue or red.
-                            //set the word as red or blue depending on status.
-                        }
-                    }
-
-                    //when the glyph drawn is at the wrong place, increase the attempt and replace the old glyph that was there.
-                    else{
-                        gController.setPreviousGlyph();
-                        //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
-
-                        //if the glyph drawn again is the same as the previous one, don't increase the attempt.
-                        if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                            }
-                        }
-                    }
-
-//                        //if the word is still not correct and the current attempt is wrong.
-//                        else  {
-//
-//                            // increase attempts and update the released feature
-//                            attempts = updateAttemptFeature();
-//                            if (attempts > 4) {
-//                                applyBehavior(WR_BEHAVIORS.MERCY_RULE);
-//                                currentWordIndex++;
-//                            } else {
-//                                applyBehavior(WR_BEHAVIORS.ON_ERROR);
-//                            }
-//                        }
-                }
-            }
-
-            //for sentence level feedback in the copy activity
-            else if(activityFeature.contains("FTR_SEN_SEN") && activityFeature.contains("FTR_SEN_COPY")){
-
-                if(mSentenceAttempts == 0){
-                    //when the sentence has not been evaluated yet, evaluate on punctuation
-                    if("!?.".contains(mResponse))
-                    {
-                        evaluateSentenceFirstTime();
-                    }
-                    //when correct, not end punctuation and attempts = 0, normal recognition only
-                    else
-                    {}
-                }
-
-                //when the sentence attempts > 0,
-                // functions to implement -> identify the current word indices(separate), turn those red/blue(easy), turn indivdual red/blue(easy).
-                else if(mSentenceAttempts > 0){
-
-                    //set the current active word, so that hesitation and feedback can be shown on this word.
-                    currentWordIndex = getActiveWordIndex(mActiveIndex);
-
-                    //amogh comment, the active word initialised here is not right, remove this declaration unless this one is used until the next declaration.
-                    if (currentWordIndex != -1){
-                        mActiveWord = mListWordsInput.get(currentWordIndex);
-                    }
-
-                    //check if allowed to write here
-                    boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
-
-                    //if allowed to replace at this position
-                    if(canReplace){
-
-                        boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
-
-                        ///if the replacement is correct and at the correct position
-                        if(responseEqualsTargetReplacement){
-
-                            updateSentenceEditSequence();
-                            mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
-
-                            //update the indices and text for words in mListWordsInput
-
-                            // if this correct response makes the sentence correct,
-                            boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
-
-                            //if the written sentence is correct
-                            if (writtenSentenceIsCorrect) {
-                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
-                                clearSentenceAttemptFeatures(); //should go in the animator graph
-                            }
-
-                            // if the response is correct at the right place, but there are more corrections to be made, check if the word is correct, turn blue depending on what the attempt level of that sentence is.
-                            else{
-
-                                if(currentWordIndex != -1) { //when the replacement is in a word
-                                    // check if the word written is correct and release ON_CORRECT. How to check that a word is written correctly? strings should match bw
-
-                                    //refreshing mActiveWord
-                                    if (currentWordIndex != -1) {
-                                        mActiveWord = mListWordsInput.get(currentWordIndex);
-                                    }
-
-                                    String writtenActiveWord = mActiveWord.getWrittenWordString();
-                                    String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
-                                    //checking if the letters of the word are correct
-                                    boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
-                                    if (writtenWordIsCorrect) {
-                                        publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
-                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
-//                                        temporaryOnCorrectSentence(); //already in animator graph, doesnt deactivate the edits until the letters AND the position of the word is correct.
-                                    }
-
-                                    //when correct replacement but the word or the sentence is not yet complete.
-                                    else{
-                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-                                    }
-                                }
-
-                                //when not in a word (open in the sentence/space)
-                                else{
-                                    //maybe just turn this glyph controller blue?
-                                    //and inhibit input?
-                                }
-                            }
-                        }
-
-                        // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
-                        else{
-                            //revert the glyph to old one.
-                            gController.setPreviousGlyph();// put in animator graph
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                            }
-                            // in the animator graph -> turn the word blue or red.
-                            //set the word as red or blue depending on status.
-                        }
-                    }
-
-                    //when the glyph drawn is at the wrong place, increase the attempt and replace the old glyph that was there.
-                    else{
-                        gController.setPreviousGlyph();
-                        //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
-
-                        //if the glyph drawn again is the same as the previous one, don't increase the attempt.
-                        if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            //letter level feedback in correction activities
-            else if (activityFeature.contains("FTR_SEN_CORR") && activityFeature.contains("FTR_SEN_LTR"))          {
-                // Update the controller feedback colors
-                resp.updateResponseState(_isValid);
-
-                //update sentence parameters
-                updateSentenceEditSequence();
-
-                //inhibit the input if correct replacement.
-                inhibitInput(mActiveController, !_isValid);
-                mActiveController.inhibitInput(_isValid);
-
-                //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
-                if (isComplete()) {
-
-                    applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete..
-                }
-
-                //when the sentence is not yet complete
+                //word has not been evaluated ie correctionAttempts = 0 and not to be evaluated. -> just let the user write
                 else{
-                    //when not valid
-                    if (!_isValid) {
-
-
-                        // lots of fun feature updating here
-                        publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
-
-                        int attempt = updateAttemptFeature();
-
-                        if (attempt > 4) {
-                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                        } else {
-                            if(charExpected.equals(" ")) {
-                                publishFeature("FTR_SPACE_SAMPLE");
-                            }
-
-                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                        }
-
-                        if (!_charValid)
-                            applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
-                        else if (!_metricValid)
-                            applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
-                    }
-
-                    //else when valid
-                    else {
-                        mActiveController.updateCorrectStatus(true);
-                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
-                    }
                 }
 
             }
 
-            //sentence level feedback in correction activities
-            else if (activityFeature.contains("FTR_SEN_CORR") && activityFeature.contains("FTR_SEN_SEN")){
-//                //set the current active word, so that hesitation and feedback can be shown on this word.
-//                currentWordIndex = getActiveWordIndex(mActiveIndex);
-//                if (currentWordIndex != -1){
-//                    mActiveWord = mListWordsInput.get(currentWordIndex);
-//                }
-//
-//                //check if allowed to write here
-//                boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
-//
-//                //if allowed to replace at this position
-//                if(canReplace){
-//
-//                    //check if the correct glyph is drawn
-//                    //if yes, and update the edit sequence, and check if the sentence is correct now.
-//                    boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
-//                    if(responseEqualsTargetReplacement){
-//                        updateSentenceEditSequence();
-//                        mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
-//
-//                        //update the indices and text for words in mListWordsInput
-//
-//                        // if this correct response makes the sentence correct,
-//                        boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
-//                        if (writtenSentenceIsCorrect) {
-//                            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
-//                            clearSentenceAttemptFeatures(); //should go in the animator graph
-//                        }
-//
-//                        // if the response is correct, but there are more corrections to be made, check if the word is correct, turn blue depending on what the attempt level of that sentence is.
-//                        else{
-//                            //check if the word written is correct and release ON_CORRECT. How to check that a word is written correctly? strings should match bw
-//                            //not sure yet, but let's try to set the condition as the matching of strings in the mListWordsInput and mListWordsAnswer
-//                            String writtenActiveWord = mActiveWord.getWrittenWordString();
-//                            String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
-//                            boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
-//                            if(writtenWordIsCorrect){
-//                                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-//                                temporaryOnCorrectSentence();
-//
-//                            }
-//                        }
-//                    }
-//
-//                    // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
-//                    else{
-//                        //revert the glyph to old one.
-//                        gController.setPreviousGlyph();// put in animator graph
-//                        updateAttemptFeature();
-//                        applyBehavior(WR_BEHAVIORS.ON_ERROR);
-//                        // in the animator graph -> turn the word blue or red.
-//                        //set the word as red or blue depending on status.
-//                    }
-//                }
-//
-//                //when the glyph drawn is at the wrong place, increase the attempt and replace the old glyph that was there.
-//                else{
-//                    gController.setPreviousGlyph();
-//                    //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
-//                    updateAttemptFeature();
-//                    applyBehavior(WR_BEHAVIORS.ON_ERROR);
-//                }
-                //update sentence status
+            //when incorrect attempt has been made on this word before
+            else if(attempts > 0){
 
-                    //check if allowed to write here
+                //check if allowed to write here
+                boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
+
+                //if replacement is allowed at this index
+                if(canReplace) {
+                    boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
+                    //if the replacement edit is valid
+                    if(responseEqualsTargetReplacement){
+
+                        updateSentenceEditSequence();
+                        mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
+
+                        // if this correct response makes the sentence correct,
+                        boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
+                        if (writtenSentenceIsCorrect) {
+                            temporaryOnCorrect(); //to update the word
+                            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
+                        }
+
+                        // if the response is correct(item not yet over), check if the word is correct,apply ON_CORRECT
+                        else{
+                            //since the replacement is correct, still apply the oncorrect; its just that according to the attempt feature attempt fn will be called.
+
+                            //checking if this completes the word
+                            mActiveWord = mListWordsInput.get(currentWordIndex);
+                            boolean wordIsCorrect = mActiveWord.updateInputWordCorrectStatus(currentWordIndex);
+                            //if the word is correct update its color
+                            if (wordIsCorrect) {
+                                //turn blue
+                                //release the oncorrect behavior with word correct feature.
+                                publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                                temporaryOnCorrect();
+                                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
+                            }
+
+                            //if the replacement is correct but the word is not, turn it in blue and inhibit input if attempt 2/3 when each letter is colored.
+                            else{
+                                applyBehavior(WR_BEHAVIORS.ON_CORRECT);
+                            }
+                        }
+                    }
+                    // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
+                    else{
+                        gController.setPreviousGlyph();// put in animator graph
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        }
+                        // in the animator graph -> turn the word blue or red.
+                        //set the word as red or blue depending on status.
+                    }
+                }
+
+                //when the glyph drawn is at the wrong place, increase the attempt and replace the old glyph that was there.
+                else{
+                    gController.setPreviousGlyph();
+                    //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
+
+                    //if the glyph drawn again is the same as the previous one, don't increase the attempt.
+                    if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        }
+                    }
+                }
+            }
+        }
+
+        //for sentence level feedback in the copy activity
+        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_SEN) && activityFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
+
+            if(mSentenceAttempts == 0){
+                //when the sentence has not been evaluated yet, evaluate on punctuation
+                if("!?.".contains(mResponse))
+                {
+                    evaluateSentenceFirstTime();
+                }
+                //when correct, not end punctuation and attempts = 0, normal recognition only
+                else
+                {}
+            }
+
+            //when the sentence attempts > 0,
+            // functions to implement -> identify the current word indices(separate), turn those red/blue(easy), turn indivdual red/blue(easy).
+            else if(mSentenceAttempts > 0){
+
+                //set the current active word, so that hesitation and feedback can be shown on this word.
                 currentWordIndex = getActiveWordIndex(mActiveIndex);
 
-                if(currentWordIndex != -1){
+                //amogh comment, the active word initialised here is not right, remove this declaration unless this one is used until the next declaration.
+                if (currentWordIndex != -1){
                     mActiveWord = mListWordsInput.get(currentWordIndex);
                 }
 
-                    boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
+                //check if allowed to write here
+                boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
 
-                    //if allowed to replace at this position
-                    if(canReplace){
+                //if allowed to replace at this position
+                if(canReplace){
 
-                        boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
+                    boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
 
-                        ///if the replacement is correct and at the correct position
-                        if(responseEqualsTargetReplacement){
+                    ///if the replacement is correct and at the correct position
+                    if(responseEqualsTargetReplacement){
 
-                            updateSentenceEditSequence();
-                            mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
+                        updateSentenceEditSequence();
+                        mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
 
-                            //update the indices and text for words in mListWordsInput
+                        //update the indices and text for words in mListWordsInput
 
-                            // if this correct response makes the sentence correct, go to the next item
-                            boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
+                        // if this correct response makes the sentence correct,
+                        boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
 
-                            //if the written sentence is correct
-                            if (writtenSentenceIsCorrect) {
-                                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
-                                clearSentenceAttemptFeatures(); //should go in the animator graph
-                            }
-
-                            // if the response is correct at the right place, but there are more corrections to be made, check if the word is correct, turn blue depending on what the attempt level of that sentence is.
-                            else{
-
-                                if(currentWordIndex != -1) { //when the replacement is in a word
-                                    // check if the word written is correct and release ON_CORRECT. How to check that a word is written correctly? strings should match bw
-
-                                    //refreshing mActiveWord
-                                    if (currentWordIndex != -1) {
-                                        mActiveWord = mListWordsInput.get(currentWordIndex);
-                                    }
-
-                                    String writtenActiveWord = mActiveWord.getWrittenWordString();
-                                    String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
-                                    boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
-                                    if (writtenWordIsCorrect) {
-                                        publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
-                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
-//                                        temporaryOnCorrectSentence();
-
-                                    }
-                                    //when correct replacement but the word or the sentence is not yet complete.
-                                    else{
-                                        applyBehavior(WR_BEHAVIORS.ON_CORRECT);
-                                    }
-                                }
-
-                                //when not in a word (open in the sentence/space)
-                                else{
-                                    //maybe just turn this glyph controller blue?
-                                    //and inhibit input?
-                                }
-                            }
+                        //if the written sentence is correct
+                        if (writtenSentenceIsCorrect) {
+                            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
+                            clearSentenceAttemptFeatures(); //should go in the animator graph
                         }
 
-                        // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
+                        // if the response is correct at the right place, but there are more corrections to be made, check if the word is correct, turn blue depending on what the attempt level of that sentence is.
                         else{
-                            //revert the glyph to old one.
-                            gController.setPreviousGlyph();// put in animator graph
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+
+                            if(currentWordIndex != -1) { //when the replacement is in a word
+                                // check if the word written is correct and release ON_CORRECT. How to check that a word is written correctly? strings should match bw
+
+                                //refreshing mActiveWord
+                                if (currentWordIndex != -1) {
+                                    mActiveWord = mListWordsInput.get(currentWordIndex);
+                                }
+
+                                String writtenActiveWord = mActiveWord.getWrittenWordString();
+                                String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
+                                //checking if the letters of the word are correct
+                                boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
+                                if (writtenWordIsCorrect) {
+                                    publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
+//                                        temporaryOnCorrectSentence(); //already in animator graph, doesnt deactivate the edits until the letters AND the position of the word is correct.
+                                }
+
+                                //when correct replacement but the word or the sentence is not yet complete.
+                                else{
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
+                                }
                             }
-                            // in the animator graph -> turn the word blue or red.
-                            //set the word as red or blue depending on status.
+
+                            //when not in a word (open in the sentence/space)
+                            else{
+                                //maybe just turn this glyph controller blue?
+                                //and inhibit input?
+                            }
                         }
                     }
 
-                    //when the glyph drawn is at the wrong place(!canReplace), increase the attempt and replace the old glyph that was there.
+                    // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
                     else{
+                        //revert the glyph to old one.
+                        gController.setPreviousGlyph();// put in animator graph
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        }
+                        // in the animator graph -> turn the word blue or red.
+                        //set the word as red or blue depending on status.
+                    }
+                }
 
-                        //if the letter drawn is the same as the previous one,
-                        gController.setPreviousGlyph();
-                        //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
+                //when the glyph drawn is at the wrong place, increase the attempt and replace the old glyph that was there.
+                else{
+                    gController.setPreviousGlyph();
+                    //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
 
-                        //if the glyph drawn again is the same as the previous one, don't increase the attempt.
-                        if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
-                            int attempt = updateAttemptFeature();
-                            if (attempt > 4) {
-                                applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
-                            } else {
-                                applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
-                            }
+                    //if the glyph drawn again is the same as the previous one, don't increase the attempt.
+                    if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
                         }
                     }
-
-
+                }
             }
         }
-        return _isValid;
+
+
+        //letter level feedback in correction activities
+        else if (activityFeature.contains(WR_FEATURES.FTR_SEN_CORR) && activityFeature.contains(WR_FEATURES.FTR_SEN_LTR))          {
+            // Update the controller feedback colors
+            resp.updateResponseState(_isValid);
+
+            //update sentence parameters
+            updateSentenceEditSequence();
+
+            //inhibit the input if correct replacement.
+            inhibitInput(mActiveController, !_isValid);
+            mActiveController.inhibitInput(_isValid);
+
+            //Here isComplete just loops through the mGlyphList elements and checks the isCorrect of all. For word level/sentence level feedback, this might not work.
+            if (isComplete()) {
+
+                applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE); // goto node "ITEM_COMPLETE_BEHAVIOR" -- run when item is complete..
+            }
+
+            //when the sentence is not yet complete
+            else{
+                //when not valid
+                if (!_isValid) {
+
+
+                    // lots of fun feature updating here
+                    publishFeature(WR_FEATURES.FTR_HAD_ERRORS);
+
+                    int attempt = updateAttemptFeature();
+
+                    if (attempt > 4) {
+                        applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                    } else {
+                        if(charExpected.equals(" ")) {
+                            publishFeature(WR_FEATURES.FTR_SPACE_SAMPLE);
+                        }
+
+                        applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                    }
+
+                    if (!_charValid)
+                        applyBehavior(WR_BEHAVIORS.ON_CHAR_ERROR);
+                    else if (!_metricValid)
+                        applyBehavior(WR_BEHAVIORS.ON_METRIC_ERROR);
+                }
+
+                //else when valid
+                else {
+                    mActiveController.updateCorrectStatus(true);
+                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //goto node "GENERAL_CORRECT_BEHAVIOR"
+                }
+            }
+
+        }
+
+        //sentence level feedback in correction activities
+        else if (activityFeature.contains(WR_FEATURES.FTR_SEN_CORR) && activityFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
+
+            //update sentence status
+
+                //check if allowed to write here
+            currentWordIndex = getActiveWordIndex(mActiveIndex);
+
+            if(currentWordIndex != -1){
+                mActiveWord = mListWordsInput.get(currentWordIndex);
+            }
+
+                boolean canReplace = checkReplace(mEditSequence, mActiveIndex);
+
+                //if allowed to replace at this position
+                if(canReplace){
+
+                    boolean responseEqualsTargetReplacement = mResponse.equals(getReplacementTargetString(mEditSequence, mActiveIndex));
+
+                    ///if the replacement is correct and at the correct position
+                    if(responseEqualsTargetReplacement){
+
+                        updateSentenceEditSequence();
+                        mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
+
+                        //update the indices and text for words in mListWordsInput
+
+                        // if this correct response makes the sentence correct, go to the next item
+                        boolean writtenSentenceIsCorrect = mWrittenSentence.equals(mAnswer);
+
+                        //if the written sentence is correct
+                        if (writtenSentenceIsCorrect) {
+                            applyBehavior(WR_BEHAVIORS.DATA_ITEM_COMPLETE);
+                            clearSentenceAttemptFeatures(); //should go in the animator graph
+                        }
+
+                        // if the response is correct at the right place, but there are more corrections to be made, check if the word is correct, turn blue depending on what the attempt level of that sentence is.
+                        else{
+
+                            if(currentWordIndex != -1) { //when the replacement is in a word
+                                // check if the word written is correct and release ON_CORRECT. How to check that a word is written correctly? strings should match bw
+
+                                //refreshing mActiveWord
+                                if (currentWordIndex != -1) {
+                                    mActiveWord = mListWordsInput.get(currentWordIndex);
+                                }
+
+                                String writtenActiveWord = mActiveWord.getWrittenWordString();
+                                String writtenAnswerWord = mListWordsAnswer.get(currentWordIndex).getWordAnswer();
+                                boolean writtenWordIsCorrect = writtenActiveWord.equals(writtenAnswerWord);
+                                if (writtenWordIsCorrect) {
+                                    publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT); //should turn word blue
+//                                        temporaryOnCorrectSentence();
+
+                                }
+                                //when correct replacement but the word or the sentence is not yet complete.
+                                else{
+                                    applyBehavior(WR_BEHAVIORS.ON_CORRECT);
+                                }
+                            }
+
+                            //when not in a word (open in the sentence/space)
+                            else{
+                                //maybe just turn this glyph controller blue?
+                                //and inhibit input?
+                            }
+                        }
+                    }
+
+                    // else (if incorrect letter drawn, but correct place chosen for replacement), revert the glyph to what it was, then increase attempt and release on error behavior.
+                    else{
+                        //revert the glyph to old one.
+                        gController.setPreviousGlyph();// put in animator graph
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        }
+                        // in the animator graph -> turn the word blue or red.
+                        //set the word as red or blue depending on status.
+                    }
+                }
+
+                //when the glyph drawn is at the wrong place(!canReplace), increase the attempt and replace the old glyph that was there.
+                else{
+
+                    //if the letter drawn is the same as the previous one,
+                    gController.setPreviousGlyph();
+                    //lets increase the attempt for this word, this will also release the corresponding feature which can then be used in the animator graph to call the functions that we want.
+
+                    //if the glyph drawn again is the same as the previous one, don't increase the attempt.
+                    if(!mResponse.equals(mWrittenSentence.substring(mActiveIndex,mActiveIndex + 1))) {
+                        int attempt = updateAttemptFeature();
+                        if (attempt > 4) {
+                            applyBehavior(WR_BEHAVIORS.MERCY_RULE); // goto node "MERCY_RULE_BEHAVIOR"
+                        } else {
+                            applyBehavior(WR_BEHAVIORS.ON_ERROR); // goto node "GENERAL_ERROR_BEHAVIOR"
+                        }
+                    }
+                }
+
+
+        }
     }
 
 
@@ -1622,10 +1353,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         clearAttemptFeatures();
         int attempt;
         // only publish attempt feature for first four attempts... next time will activate mercy rule
-        if(activityFeature.contains("FTR_SEN_WRD")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
             attempt = mActiveWord.incAttempt();
         }
-        else if(activityFeature.contains("FTR_SEN_SEN")){
+        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
             attempt = mActiveWord.incAttempt();
         }
         else{
@@ -1724,14 +1455,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 currentWordIndex = i;
                 mActiveWord = inputWord;
 
-                boolean wordIsCorrect;
-//                // so we don't evaluate the correct status everytime, check if the word has been set to correct before.
-//                if(inputWord.getWordCorrectStatus()){
-//                    wordIsCorrect = true;
-//                }
-//                else{
-                wordIsCorrect = mActiveWord.updateInputWordCorrectStatus(i); //checks indices and strings inside
-//                }
+                boolean wordIsCorrect = mActiveWord.updateInputWordCorrectStatus(i); //checks indices and strings inside
 
                 //if the word is correct update its color
                 if (wordIsCorrect) {
@@ -1740,7 +1464,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                     publishFeature(WR_FEATURES.FTR_WORD_CORRECT);
                     applyBehavior(WR_BEHAVIORS.ON_CORRECT);
                     temporaryOnCorrect();
-//                    inputWord.updateWordResponse(); //goes in the animator graph
                 }
 
                 //if the word is incorrect, set current word as this, increase attempt if in middle of being written. update colors if
@@ -1759,39 +1482,13 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                     //mark the word as wrong only when it was incorrectly written, and not in continuation.
                     if (!writingIsContinued) {
-//                        mActiveWord.activateEditMode(); //put in animator graph //edit buttons removed for code drop 2 in tanzania
                         updateAttemptFeature();
                         applyBehavior(WR_BEHAVIORS.ON_ERROR);
-                    }
-
-                    //otherwise it just means that the previous words were correct and you are beginning to write  this word, mActiveWord is set to this word, but no features are to bbe released
-                    else {
-
                     }
 
                     // break so that it stops at the first incorrect word that is there.
                     break;
                 }
-
-                //move to the next iteration only when on_correct is applied
-//                while (currentWordIndex == i){
-//                    try {
-//                    wait();
-//                    }
-//                    catch (InterruptedException ex) {
-//                    Thread.currentThread().interrupt();
-//                    }
-//                }
-//                for(;;){
-//                    int j = 2 *8;
-//                    if(currentWordIndex == i){
-//                        j = 2 * 299;
-//                    }
-//                    else{
-//                        j= 2 * 23;
-//                        break;
-//                    }
-//                }
             }
         }
 
@@ -1823,6 +1520,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     /**
      * Iterates through each character in a word to see if it's been drawn completely.
+     * ( ?? should this be renamed to isWordComplete() ?? )
      *
      * @return
      */
@@ -2133,10 +1831,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     public void rippleReplayCurrentWord(String type){
         mActiveWord.rippleReplayWord(type);
         mActiveWord.updatePostReplay();
-        if(activityFeature.contains("FTR_SEN_WRD")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
 //            evaluateSentenceWordLevel();
         }
-        else if(activityFeature.contains("FTR_SEN_SEN")){
+        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
             updateSentenceEditSequence();
             mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
         }
@@ -2211,7 +1909,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             }
             else{
 //                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
-                publishFeature("FTR_SPACE_REPLAY");
+                publishFeature(WR_FEATURES.FTR_SPACE_REPLAY);
                 applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //amogh added for hesitation.
             }
 //            v.eraseGlyph();
@@ -2248,7 +1946,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //if not correct, play replay unless its a space, and update the response, the sentence parameters and the correct status of the glyph
         else {
             v.eraseGlyph();
-//            String expectedCharString = v.getExpectedChar(); //comment, this needs to change when insert and delete buttons come in, as then the expected character dynamically changing would also mean changing the protoglyph dynamically, but here expected character is just to enable easy writing.
             String expectedCharString = mAnswer.substring(mActiveIndex,mActiveIndex + 1);
 
             boolean isSpaceExpected = expectedCharString.equals(" ");
@@ -2258,7 +1955,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             }
             else{
 //                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
-                publishFeature("FTR_SPACE_REPLAY");
+                publishFeature(WR_FEATURES.FTR_SPACE_REPLAY);
                 applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //added to restart hesitation.
             }
 
@@ -2272,7 +1969,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
             //update the sentence parameters
             updateSentenceEditSequence();
-//        mListWordsInput = getUpdatedListWordsInput(mListWordsInput, mAlignedSourceSentence,mAlignedTargetSentence);
 
             //end replay
             //check in the end if the sentence is correct now.
@@ -2296,7 +1992,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
         else{
 //                applyBehavior(WR_BEHAVIORS.FIELD_REPLAY_COMPLETE);
-            publishFeature("FTR_SPACE_REPLAY");
+            publishFeature(WR_FEATURES.FTR_SPACE_REPLAY);
             applyBehavior(WR_BEHAVIORS.ON_STOP_WRITING); //added to restart hesitation.
         }
     }
@@ -2337,7 +2033,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     private void replayNext() {
 
         //in case of sentence level and word level feedback in the sentence writing activities, just replay the word.
-        if(activityFeature.contains("FTR_SEN_WRD") || activityFeature.contains("FTR_SEN_SEN")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_WRD) || activityFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
             rippleReplayWordContinued();
         }
 
@@ -2576,7 +2272,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         if(!singleStimulus) {
 
             //for sentence level activities, the stimulus should always be correct ie mAnswer should be loaded in the stimulus
-            if(activityFeature.contains("FTR_SEN")){
+            if(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX)){
                 for (int i1 = 0; i1 < mAnswer.length(); i1++) {
                     // create a new view
                     r = (CStimulusController) LayoutInflater.from(getContext())
@@ -2627,7 +2323,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mGlyphList.setClipChildren(false);
 
         // For write.missingLtr: We need non-answer Glyphs to behave like simple text stimulus
-        if (activityFeature.contains("FTR_MISSING_LTR")) {
+        if (activityFeature.contains(WR_FEATURES.FTR_MISSING_LTR)) {
 
             int answerIndex = 0;
 
@@ -2670,7 +2366,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             }
         }
 
-        else if(activityFeature.contains("FTR_SEN_CORR")){
+        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_CORR)){
             //load glyph input container
             int stimulusLength = mStimulus.length();
             for(int i1 = 0 ; i1 < stimulusLength ; i1++)
@@ -2756,7 +2452,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
 
         //initialise the mListWordsAnswer for sentence writing activities
-        if(activityFeature.contains("FTR_SEN")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX)){
             mListWordsAnswer = new ArrayList<>();
             mListWordsAnswer = getListWords(mAnswer);
             updateSentenceEditSequence();
@@ -2768,7 +2464,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
 
         //for correction activities set the expected characters and protoglyphs, also show buttons(optional); now that the sentence parameters have been initialised,
-        if(activityFeature.contains("FTR_SEN_CORR")){
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_CORR)){
 
             int expectedCharIndex = 0;
 
@@ -2810,18 +2506,11 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                 expectedCharIndex++;
             }
-
-            //  comment move this to the animator graph
-            //shows all buttons.
-//            activateEditModeValidOnly(); //edit buttons removed for code drop 2 in tanzania
         }
 
-//        else if (activityFeature.contains("FTR_SEN")){
-////            activateEditMode(); //edit buttons removed for code drop 2 in tanzania
-//        }
 
         //setting the linking lines to be visible when everything loaded.
-        if(activityFeature.contains("FTR_SEN")) {
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX)) {
             mWritingBoxLink.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
@@ -2832,8 +2521,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 }
             });
         }
-
-
     }
 
     public void refreshWritingBoxLink(){
@@ -2861,9 +2548,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
             case WR_EVENTS.FIELD_REPLAY_COMPLETE:
                 // This is executed when the glyph replay animation ends. We want to play replayNext when not letter level feedback in sentence writing activities; other relevant behaviors
-                if(activityFeature.contains("FTR_SEN")){
+                if(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX)){
                     //letter level feedback, sentence activity
-                    if(activityFeature.contains("FTR_SEN_LTR")){
+                    if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)){
                         //in case of sentence writing letter level feedback, it plays for just one letter
                         CGlyphController v = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
                         v.setIsPlaying(false);
@@ -2897,12 +2584,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
      */
     public void applyBehaviorNode(String nodeName) {
     }
-
-    //  added custom pointing behaviors for sentence writing tutors
-
-//    public void pointAtFirstEdit(){
-//        EditOperation = firstEdit = getFirstEditOperation()
-//    }
 
     //points at the first letter of active word
     public void pointAtActiveWord(){
@@ -3501,44 +3182,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
             wordIsCorrect = true;
             return true;
         }
-//        public boolean getWordCorrectStatus(){
-//                listCorrectStatus = new ArrayList<>();
-//                listHasGlyph = new ArrayList<>();
-//
-//                //update the correct status and the status of having glyphs for the letters of this word
-//                for (int i : listIndicesAnswer){
-////                    CStimulusController respController = (CStimulusController) mResponseViewList.getChildAt(i);
-//                    CGlyphController g = (CGlyphController) mGlyphList.getChildAt(i);
-//                    Boolean status = g.isCorrect();
-//                    listCorrectStatus.add(status);
-//                    listHasGlyph.add(g.hasGlyph());
-//                }
-//
-//                    //evaluate the word's correct status
-//                for(int i = 0; i < listCorrectStatus.size(); i++){
-//
-//                    //when not correct and glyph present -> set wordIsCorrect to false
-//                    if (listCorrectStatus.get(i) == false && listHasGlyph.get(i)){
-//                        wordIsCorrect = false;
-//                        break;
-//                    }
-//
-//                    //when correct and glyph present set wordIsCorrect to True.
-//                    else if (listHasGlyph.get(i) && listCorrectStatus.get(i)){
-//                        wordIsCorrect = true;
-//                    }
-//
-//                    // for the remaining case(when the glyph is not present)
-//                    else {
-//                        return false;
-//                    }
-//                }
-//
-//                return wordIsCorrect;
-//
-////            updateWordStimulus(); //  this is here only for debugging purposes, actually will be called from the animator graph
-////            inhibitWordInput(); //   added - this is here only for debugging purposes, actually will be called by the animator graph.
-//        }
 
         public void updateWordResponse(){
             boolean wordStatus = wordIsCorrect;
@@ -3941,7 +3584,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         releaseAudioFeatures(firstEdit);
     }
 //    public void releaseFirstEditAudioFeatures(){
-//        if (activityFeature.contains("FTR_SEN_WRD")){
+//        if (activityFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
 //            int wordAttempts = mActiveWord.getAttempt();
 ////            if(wordAttempts > 0){  // the number of attempts can be passed through the animator graph itself.
 //                mActiveWord.releaseFirstWordEditAudioFeatures();
@@ -4350,9 +3993,9 @@ public class EditOperation {
 
                         mActiveController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
                         boolean isExpectedCharacterSpace = mActiveController.getExpectedChar().equals(" ") || mActiveController.getExpectedChar().equals("");
-                        boolean isCorrect = activityFeature.contains("FTR_SEN_LTR") && mActiveController.isCorrect();
+                        boolean isCorrect = activityFeature.contains(WR_FEATURES.FTR_SEN_LTR) && mActiveController.isCorrect();
                         if(isExpectedCharacterSpace || isCorrect){
-                            publishFeature("FTR_SPACE_SAMPLE");
+                            publishFeature(WR_FEATURES.FTR_SPACE_SAMPLE);
                             break;
                         }
 
