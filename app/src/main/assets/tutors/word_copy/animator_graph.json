@@ -99,16 +99,6 @@
               //sentence level feedback
             {"name": "Evaluate sentence on hesitation (sentence level feedback)", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "evaluateSentenceFirstTime", "parms": "", "features":"FTR_SEN_SEN&FTR_HESITATION_2&!FTR_SEN_ATTEMPT_1&!FTR_SEN_ATTEMPT_2&!FTR_SEN_ATTEMPT_3&!FTR_SEN_ATTEMPT_4"},
 
-
-            // HESITATION AUDIO
-
-            //First release the right audio features
-//            {"name": "hesitationdebugaudio", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "1.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_HESITATION_1"},
-//            {"name": "hesitationdebugaudio", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "2.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_HESITATION_2"},
-//            {"name": "hesitationdebugaudio", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "3.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_HESITATION_3"},
-//            {"name": "hesitationdebugaudio", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "4.mp3","soundpackage": "sentence",  "mode":"flow", "features": "FTR_HESITATION_4"},
-//             when to release? when the sentence has been evaluated atleast once (ie one of the FTR_SEN_ATTEMPT is enabled)
-
             {"name": "release the audio features for the first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "releaseFirstEditAudioFeatures", "parms": "", "features":"FTR_SEN&FTR_SEN_LTR||FTR_SEN&FTR_SEN_WRD|FTR_SEN&FTR_SEN_SEN&FTR_SEN_ATTEMPT_1|FTR_SEN&FTR_SEN_SEN&FTR_SEN_ATTEMPT_2|FTR_SEN&FTR_SEN_SEN&FTR_SEN_ATTEMPT_3|FTR_SEN&FTR_SEN_SEN&FTR_SEN_ATTEMPT_4"},
 
 
@@ -123,21 +113,6 @@
 
             //word level feedback
             {"name": "point on the first letter of the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "pointAtActiveWord", "parms": "", "features":"!FTR_AUDIO_SPACE&!FTR_AUDIO_PUNC&FTR_SEN_WRD&FTR_HESITATION_2"},
-
-
-          //showing the highlight boxes / tracing
-
-            // letter level feedback
-                  //HESITATION 2, all ATTEMPTS
-//            {"name": "show box on first edit group", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEditGroup", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_2"},
-
-//            {"name": "prompt - please trace the...", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Please trace the letter.mp3", "soundpackage": "sentence","mode": "flow", "features": "FTR_SEN&FTR_HESITATION_2"},
-
-//            {"name": "SHOW sample",          "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent",  "parms": "SHOW_SAMPLE:String",    "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_2"},
-//            {"name": "Hide Current Letter sample",   "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_SAMPLE_ACTIVE_INDEX:String",  "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_2"},
-
-            //HESITATION_3
-
 
             //  letter level feedback - cancel hesitation, hide current glyph, set resume hesitation when animation complete, play animation, hide animation glyph, show for tracing.
             {"name": "Hide Current Letter Glyphs - hesitation",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_CURRENT_LETTER_GLYPH:String", "features":"FTR_SEN&FTR_SEN_LTR&FTR_HESITATION_3&!FTR_AUDIO_NO_ERROR"},
@@ -158,25 +133,8 @@
 
 
             //  letter level feedback
-//            {"name": "Hide Current Letter Glyphs",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_CURRENT_LETTER_GLYPH:String", "features":"FTR_SEN&FTR_SEN_LTR&FTR_ATTEMPT_4"},
-//            {"name": "SHOW sample",          "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent",  "parms": "SHOW_SAMPLE:String",    "features":"FTR_SEN&FTR_SEN_LTR&FTR_ATTEMPT_4"},
-
 
             {"name": "show box on first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEditAndPoint", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_2|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_2"},
-
-
-            //letter level feedback, HESITATION 3, all ATTEMPTS
-            //amogh comment also need to cancel the hesitation and input hesitation posting (see preenter of mercy_rule_behavior)
-//            {"name": "on completion of animation, make the replay glyph disappear", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "FIELD_REPLAY_COMPLETE:String|CLEAR_REPLAY_GLYPH:String" ,"features":"FTR_SEN&FTR_SEN_LTR"},
-//            {"name": "play current glyph animation", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "rippleReplayDisappearActiveIndex", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_3"},
-            //amogh comment, the main problem is that on_stop_writing resets the hesitation number -> the solution should be to reset the hesitation number manually where cancelandresethesitation is called, so that when onstopwriting is called here, the hesitation restarts but the number is not reset. or change the features in start_hesitation_on_stop_writing or change stop writing behavior when onAnimationend is called in replay container -> map it to reset or not reset depending on feature (can introduce a new one for hesitation and not mercy).
-
-
-
-            //HESITATION 4
-//            {"name": "Letter Ripple Prototype",         "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "rippleReplayActiveIndex", "parms": "",  "features":"FTR_SEN&FTR_SEN_LTR"},
-//            {"name": "Hide Current Letter sample",   "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_SAMPLE_ACTIVE_INDEX:String",  "features":"FTR_SEN&FTR_SEN_LTR"},
-//            {"name": "Hide Current Letter Glyphs",    "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "postEvent", "parms": "HIDE_CURRENT_LETTER_GLYPH:String", "features":"FTR_SEN&FTR_SEN_LTR"},
 
             //HESITATION 4, MERCY
             {"name":"post APPLY_BEHAVIOR - MERCY_RULE_BEHAVIOR", "type": "COMMAND", "id": "SWordCopy", "method": "post",           "parms": "APPLY_BEHAVIOR:String|MERCY_RULE_BEHAVIOR:String", "features":"FTR_SEN_COPY&FTR_SEN_LTR&FTR_HESITATION_4|FTR_SEN_CORR&FTR_SEN_LTR&FTR_HESITATION_4"},
@@ -194,8 +152,6 @@
 
               //hesitation 3, attempt 1 2 3
             {"name": "show box on first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEdit", "parms": "", "features":"FTR_SEN_WRD&FTR_HESITATION_3&FTR_ATTEMPT_1|FTR_SEN_WRD&FTR_HESITATION_3&FTR_ATTEMPT_2|FTR_SEN_WRD&FTR_HESITATION_3&FTR_ATTEMPT_3"},
-
-            //            {"name": "show box on first edit", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "showHighlightBoxOnFirstEdit", "parms": "", "features":"FTR_SEN_WRD&FTR_HESITATION_2&FTR_ATTEMPT_1|FTR_SEN_WRD&FTR_HESITATION_2&FTR_ATTEMPT_3"},
 
 
               // 2. sentence level feedback
@@ -594,7 +550,7 @@
             // 1. word level feedback (the three things below and clearing the attempt index)
 
               //when word is correct -> deactive edit mode, inhibit word input, update response colors
-//            {"name": "deactivate edit mode for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "deactivateEditModeInActiveWord", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD&FTR_WORD_CORRECT"},
+
 //            {"name": "inhibit input for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "inhibitWordInput", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_WRD&FTR_WORD_CORRECT"},
 
             //update colors irrespective of whether the word was in which attempt, it is necessary to convey that the replacement is right.
@@ -609,7 +565,6 @@
             {"name": "update the response colors for each letter in word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateLettersWordResponse", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_1|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_2|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_3|FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_4"},
 
             //additional behaviors for when the word is complete
-//            {"name": "deactivate edit mode for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "deactivateEditModeInActiveWord", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_WORD_CORRECT"},
             {"name": "inhibit input for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "inhibitWordInput", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_WORD_CORRECT"},
             {"name": "increment the current word index.", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "incrementCurrentWordIndex", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_WORD_CORRECT"},
 
@@ -825,15 +780,12 @@
 
 
               // 2. sentence level feedback - change stimulus color for complete sentence (here we can pinpoint what error the kid made)
-              // {"name": "prompt - Please fix the wrong word", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Please fix the wrong word.mp3","soundpackage": "sentence","mode": "flow", "features": "FTR_SEN&FTR_ATTEMPT_1"},
                 //not yet sure if the complete sentence should be turned red or not.
-//              {"name": "update the response colors for sentence", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateSentenceResponse", "parms": "FALSE:Boolean", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_1"},
             {"name": "update the response color for the word", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateWordResponse", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&FTR_ATTEMPT_1"},
 
             //FTR_ATTEMPT_1 is used for counting errors on words, FTR_SEN_ATTEMPT_1 is for sentence level mistakes
                   //sentence initial evaluation
             {"name": "initial sentence incorrect prompt", "type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "Sorry, what you wrote is not correct.mp3","soundpackage": "sentence","mode": "flow", "features": "FTR_SEN_COPY&FTR_SEN_SEN&!FTR_SEN_ATTEMPT_1&!FTR_SEN_ATTEMPT_2&!FTR_SEN_ATTEMPT_3&!FTR_SEN_ATTEMPT_4"},
-//            {"name": "Activate the edit mode for the sentence", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "activateEditMode", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&!FTR_SEN_ATTEMPT_1&!FTR_SEN_ATTEMPT_2&!FTR_SEN_ATTEMPT_3&!FTR_SEN_ATTEMPT_4"}, //only play when initially evaluated not everytime.
             {"name": "release SEN_ATTEMPT_1 update the sentence attempt features", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "updateSentenceAttemptFeature", "parms": "", "features":"FTR_SEN_COPY&FTR_SEN_SEN&!FTR_SEN_ATTEMPT_1&!FTR_SEN_ATTEMPT_2&!FTR_SEN_ATTEMPT_3&!FTR_SEN_ATTEMPT_4"},
 
                   //word incorrect in sentence once evaluated.(same as word level)
@@ -1079,7 +1031,6 @@
 
 
             {"name": "end mercy behavior on complete.", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "REPLAY_COMPLETE:String|START_HESITATION_ON_MERCY_COMPLETE:String" ,"features":"FTR_SEN&!FTR_SEN_LTR"},
-//            {"name": "evaluate and update the sentence",          "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "evaluateSentenceWordLevel",  "parms": "",    "features":"FTR_SEN_WRD"},
 
 
 
@@ -1579,7 +1530,6 @@
 
 
             //sentence writing activities
-//            {"name": "Refresh the view for links",   "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "refreshWritingBoxLink",       "parms": "",  "features":"FTR_SEN"},
 
             //copy
             {"name":"Play - please copy the sentence", "type": "AUDIO", "command": "PLAY", "soundsource": "Please copy the sentence.mp3","soundpackage": "sentence","mode":"flow", "features": "FTR_SEN_COPY&!FTR_DICTATION"},
@@ -1598,9 +1548,6 @@
             //what we want is to set a sticky behavior, for stop writing, every time that the user stops writing, a postNamed is started, and volatile behavior is set for WRITE.
             //amogh comment sep 5
             {"name":"SetSticky - STOP_WRITE_BEHAVIOR - CANCEL_INPUT_HESITATION_POSTING",             "type": "COMMAND", "id": "SWordCopy", "method": "setStickyBehavior", "parms": "ON_STOP_WRITING:String|START_HESITATION_ON_STOP_WRITING:String" ,"features":"FTR_SEN"},
-
-//            {"name": "Activate the edit mode for the sentence", "type": "QUEUEDCOMMAND", "id": "SWordCopy", "method": "activateEditMode", "parms": "", "features":"FTR_SEN"}, //only play when initially evaluated not everytime.
-
 
 
             {"name":"SetVolatile - WRITE_BEHAVIOR - CANCEL_INPUT_HESITATION_POSTING",             "type": "COMMAND", "id": "SWordCopy", "method": "setVolatileBehavior", "parms": "WRITE_BEHAVIOR:String|CANCEL_INPUT_HESITATION_POSTING:String" ,"features":"!FTR_SEN"}, //posted at the start, sets behavior that as soon as the user starts writing, input hesitation is cancelled
