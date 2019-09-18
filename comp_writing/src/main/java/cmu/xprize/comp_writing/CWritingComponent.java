@@ -76,6 +76,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.gesture.ExpectWriteGestureListener;
 
+import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_WRITE;
 import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
@@ -590,6 +591,10 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
      */
     public boolean updateStatus(IGlyphController glyphController, CRecResult[] _ltkPlusCandidates) {
 
+        // reset hesitation feedback timer HERE?
+        // no, reset gesture feedback timer HERE
+        // if correct, reset STUCK
+
         mActiveController = glyphController;
 
         mActiveIndex = mGlyphList.indexOfChild((View) mActiveController);
@@ -629,13 +634,12 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         _metricValid = _metric.testConstraint(candidate.getGlyph(), this); //measures hor, vert position, height width wrt the drawing box
 
-
         //amogh add begins
-            //changing _charValid for sentence writing activities
-            if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)) {
-                String correctString = mAnswer.substring(mActiveIndex, mActiveIndex + 1);
-                _charValid = mResponse.equals(correctString);
-            }
+        //changing _charValid for sentence writing activities
+        if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR)) {
+            String correctString = mAnswer.substring(mActiveIndex, mActiveIndex + 1);
+            _charValid = mResponse.equals(correctString);
+        }
 
         //amogh ends
 
@@ -718,7 +722,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         //update the controller's correct status
         mActiveController.updateCorrectStatus(_isValid); //sets the _correct in CGlyphInputController, would change for the different sentence level activities.
 
-        if(activityFeature.contains(WR_FEATURES.FTR_SEN_LTR) && activityFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
+        // putting in a local variable so we don't have to look at all of these
+        String sentenceFeature = activityFeature;
+        if(sentenceFeature.contains(WR_FEATURES.FTR_SEN_LTR) && sentenceFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
 
             // Update the controller feedback colors
             resp.updateResponseState(_isValid);
@@ -774,7 +780,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
 
         //for word level feedback
-        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
+        else if(sentenceFeature.contains(WR_FEATURES.FTR_SEN_WRD)){
 
             mActiveWord = mListWordsInput.get(currentWordIndex);
             int attempts = mActiveWord.getAttempt();
@@ -876,7 +882,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
 
         //for sentence level feedback in the copy activity
-        else if(activityFeature.contains(WR_FEATURES.FTR_SEN_SEN) && activityFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
+        else if(sentenceFeature.contains(WR_FEATURES.FTR_SEN_SEN) && sentenceFeature.contains(WR_FEATURES.FTR_SEN_COPY)){
 
             if(mSentenceAttempts == 0){
                 //when the sentence has not been evaluated yet, evaluate on punctuation
@@ -996,7 +1002,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
 
         //letter level feedback in correction activities
-        else if (activityFeature.contains(WR_FEATURES.FTR_SEN_CORR) && activityFeature.contains(WR_FEATURES.FTR_SEN_LTR))          {
+        else if (sentenceFeature.contains(WR_FEATURES.FTR_SEN_CORR) && sentenceFeature.contains(WR_FEATURES.FTR_SEN_LTR))          {
             // Update the controller feedback colors
             resp.updateResponseState(_isValid);
 
@@ -1050,7 +1056,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         }
 
         //sentence level feedback in correction activities
-        else if (activityFeature.contains(WR_FEATURES.FTR_SEN_CORR) && activityFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
+        else if (sentenceFeature.contains(WR_FEATURES.FTR_SEN_CORR) && sentenceFeature.contains(WR_FEATURES.FTR_SEN_SEN)){
 
             //update sentence status
 
@@ -2439,12 +2445,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     }
 
 
-    public void highlightFields() {
-
-        post(TCONST.HIGHLIGHT, 500);
-    }
-
-
     // Tutor methods  End
     //************************************************************************
     //************************************************************************
@@ -2508,7 +2508,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 if (gestureTimerStarted) return;
                 Log.wtf("GESTURE", "Triggering Timer Gesture for " + GESTURE_TIME_WRITE);
                 gestureTimerStarted = true;
-                postNamed(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE, GESTURE_TIME_WRITE);
+                enQueue(new Queue(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE), GESTURE_TIME_WRITE);
                 break;
 
 
@@ -3413,12 +3413,7 @@ public class EditOperation {
         mHighlightErrorBoxView.setX((float)left);
         mHighlightErrorBoxView.setLayoutParams(new LayoutParams(wid, height));
         mHighlightErrorBoxView.setBackgroundResource(R.drawable.highlight_error);
-        //        MarginLayoutParams mp = (MarginLayoutParams) mHighlightErrorBoxView.getLayoutParams();
-        //        mp.setMargins(100,00,0,100);
-        //                mHighlightErrorBoxView.setX((float)300.00);
-        //        int pos = mResponseViewList.getChildAt(index+2).getLeft();
-        //        mHighlightErrorBoxView.setX(100);
-        //        mHighlightErrorBoxView.setLeft(1000);
+
         mResponseScrollLayout.addView(mHighlightErrorBoxView);
         mHighlightErrorBoxView.postDelayed(new Runnable() {
             public void run() {
@@ -3571,6 +3566,7 @@ public class EditOperation {
     // Component Message Queue  -- Start
 
 
+    // RUN_Q
     // QUEUE_REFACTOR trying to do this the new way doesn't work... table for later
     public class Queue implements Runnable {
 
@@ -3686,6 +3682,7 @@ public class EditOperation {
                         break;
                     //  added ends
 
+                    // RUN_Q DO THIS NEXT
                     case TCONST.APPLY_BEHAVIOR:
 
                         applyBehaviorNode(_target);
@@ -3833,10 +3830,7 @@ public class EditOperation {
      *
      * @param qCommand
      */
-    private void enQueue(Queue qCommand) {
-        enQueue(qCommand, 0);
-    }
-    private void enQueue(Queue qCommand, long delay) {
+    protected void enQueue(Queue qCommand, long delay) {
 
         if(!_qDisabled) {
             queueMap.put(qCommand, qCommand);
@@ -3850,18 +3844,11 @@ public class EditOperation {
         }
     }
 
-    public void postNamed(String name, String command, String target) {
-        postNamed(name, command, target, 0L);
-    }
-    public void postNamed(String name, String command, String target, Long delay) {
-        enQueue(new Queue(name, command, target), delay);
-    }
-
-    public void postNamed(String name, String command) {
-        postNamed(name, command, 0L);
-    }
-    public void postNamed(String name, String command, Long delay) {
-        enQueue(new Queue(name, command), delay);
+    /**
+     * trigger hesitation timer for help... refactored from "postNamed" for debugging purposes
+     */
+    public void triggerHelpHesitationTimer() {
+        enQueue(new Queue("HESITATION_PROMPT", APPLY_BEHAVIOR, "INPUT_HESITATION_FEEDBACK"), 6000L);
     }
 
 
@@ -3870,6 +3857,7 @@ public class EditOperation {
      *
      * @param command
      */
+    // RUN_Q is this needed??? see animator graph, it calls "post" with parms "NEXT_NODE"...
     public void post(String command) {
         post(command, 0);
     }
@@ -3882,12 +3870,16 @@ public class EditOperation {
     /**
      * Post a command and target to this queue
      *
-     * @param command
+     * @param target
      */
-    public void post(String command, String target) {
-        post(command, target, 0);
+    // RUN_Q called from AG
+    public void postBehavior(String target) {
+        enQueue(new Queue(null, APPLY_BEHAVIOR, target), 0);
     }
-    public void post(String command, String target, long delay) { enQueue(new Queue(null, command, target), delay); }
+
+    public void post(String command, String target, long delay) {
+        enQueue(new Queue(null, command, target), delay);
+    }
 
 
     /**

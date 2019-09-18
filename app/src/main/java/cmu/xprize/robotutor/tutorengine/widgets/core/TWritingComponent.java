@@ -68,9 +68,11 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
 import static cmu.xprize.util.TCONST.LANG_AUTO;
 import static cmu.xprize.util.TCONST.MEDIA_STORY;
+import static cmu.xprize.util.TCONST.NEXT_NODE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
 
@@ -298,18 +300,21 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         mTutorScene.setVisibility(visible);
     }
 
+    // RUN_Q called from AG
+    // postEvent(HIDE_CURRENT_LETTER_GLYPH)
     public void postEvent(String event) {
-        postEvent(event,0);
+        post(event,0);
     }
 
+    // RUN_Q called from AG
     public void postEvent(String event, Integer delay) {
 
         post(event, delay);
     }
 
-    public void postEvent(String event, String param, Integer delay) {
-
-        post(event, param, delay);
+    // RUN_Q called from AG
+    public void postNextNodeDelay(Integer delay) {
+        enQueue(new Queue(null, APPLY_BEHAVIOR, NEXT_NODE), delay);
     }
 
     public void pointAtEraseButton() {
@@ -321,10 +326,6 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
     }
 
     public void showReplayButton(Boolean show) { mReplayButton.setVisibility(show? VISIBLE:INVISIBLE); }
-
-    public void highlightFields() {
-        super.highlightFields();
-    }
 
     public void clear() { super.clear(); }
 
