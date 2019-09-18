@@ -164,7 +164,7 @@ public class CMessageQueueFactory {
 
     public void postEvent(String event, Integer delay) {
 
-        post(event, delay);
+        post(event, (long) delay);
     }
 
     public void postNamed(String name, String command, String target, Long delay) {

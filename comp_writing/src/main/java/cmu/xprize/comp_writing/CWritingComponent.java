@@ -65,11 +65,13 @@ import cmu.xprize.ltkplus.CRecResult;
 import cmu.xprize.util.CClassMap;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CLinkedScrollView;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -93,7 +95,7 @@ import static cmu.xprize.util.TCONST.NEXT_NODE;
  */
 public class CWritingComponent extends PercentRelativeLayout implements IEventListener,
         IEventDispatcher, IWritingComponent, ILoadableObject, IPublisher,
-        ITutorLogger, IInterventionSource {
+        ITutorLogger, IInterventionSource, IMessageQueueRunner {
 
     protected Context               mContext;
     protected char[]                mStimulusData;
@@ -121,13 +123,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     protected CWritingBoxLink mWritingBoxLink;
 
     protected int               mMaxLength   = 0; //GCONST.ALPHABET.length();                // Maximum string length
-
-    // QUEUE STUFF THAT WILL GET MOVED
-    protected final Handler     mainHandler  = new Handler(Looper.getMainLooper());
-    protected HashMap           queueMap     = new HashMap();
-    protected HashMap           nameMap      = new HashMap();
-    protected boolean           _qDisabled   = false;
-
 
     // MISCELLANEOUS STUFF
     protected boolean           _alwaysTrack = true;
@@ -187,6 +182,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     protected int               mSentenceAttempts;
     //amogh added ends
 
+    protected CMessageQueueFactory _queue;
 
     protected static String punctuationSymbols = ",.;:-_!?";
     protected static Map<String, String> punctuationToString;
@@ -248,6 +244,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 return true;
             }
         });
+
+        _queue = new CMessageQueueFactory(this, "CWrite");
     }
 
 
@@ -380,7 +378,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     public void onDestroy() {
 
-        terminateQueue();
+        _queue.terminateQueue();
     }
 
 
@@ -1304,7 +1302,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     }
 
     public void cancelHesitation() {
-        cancelPost(WR_CONST.HESITATION_PROMPT);
+        _queue.cancelPost(WR_CONST.HESITATION_PROMPT);
     }
 
     public void temporaryOnCorrect(){
@@ -2513,7 +2511,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 if (gestureTimerStarted) return;
                 Log.wtf("GESTURE", "Triggering Timer Gesture for " + GESTURE_TIME_WRITE);
                 gestureTimerStarted = true;
-                enQueue(new Queue(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE), GESTURE_TIME_WRITE);
+                _queue.post(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE, GESTURE_TIME_WRITE);
                 break;
 
 
@@ -2521,7 +2519,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                 gestureTimerStarted = false;
                 Log.wtf("GESTURE", "Cancelling timer gesture for " + GESTURE_TIME_WRITE);
-                cancelPost(I_TRIGGER_GESTURE);
+                _queue.cancelPost(I_TRIGGER_GESTURE);
                 break;
         }
 
@@ -3571,304 +3569,196 @@ public class EditOperation {
     // Component Message Queue  -- Start
 
 
-    // RUN_Q
-    // QUEUE_REFACTOR trying to do this the new way doesn't work... table for later
-    public class Queue implements Runnable {
+    @Override
+    public void runCommand(String command) {
 
-        protected String _name;
-        protected String _command;
-        protected String _target;
-        protected String _item;
+        runCommand(command, (String) null);
+    }
 
+    @Override
+    public void runCommand(String command, Object target) {
+        // not used
+    }
 
-        public Queue(String name, String command) {
+    @Override
+    public void runCommand(String _command, String _target) {
 
-            _name    = name;
-            _command = command;
+        Log.w("QUEUE_FACTORY", String.format("CWrite.runComand(%s, %s)", _command, _target));
 
-            if(name != null) {
-                nameMap.put(name, this);
-            }
-        }
+        switch(_command) {
 
-        public Queue(String name, String command, String target) {
+            case I_TRIGGER_GESTURE:
+                // JUDITH - move this
+                Intent msg = new Intent(I_TRIGGER_GESTURE);
+                bManager.sendBroadcast(msg);
+                break;
 
-            this(name, command);
-            _target  = target;
-        }
+            case WR_EVENTS.HIDE_GLYPHS:
+                hideGlyphs();
+                break;
 
-        public Queue(String name, String command, String target, String item) {
+            case WR_EVENTS.HIDE_CURRENT_WORD_GLYPHS:
+                hideCurrentWordGlyph();
+                break;
 
-            this(name, command, target);
-            _item    = item;
-        }
+            case WR_EVENTS.HIDE_CURRENT_LETTER_GLYPH:
+                hideGlyphForActiveIndex();
+                break;
 
+            case WR_EVENTS.HIDE_SAMPLES:
+                hideSamples();
+                break;
 
-        public String getCommand() {
-            return _command;
-        }
+            case WR_EVENTS.HIDE_SAMPLE_ACTIVE_INDEX:
+                hideSampleForActiveIndex();
+                break;
 
+            case WR_EVENTS.RIPPLE_HIGHLIGHT:
 
-        @Override
-        public void run() {
+                rippleHighlight();
+                break;
 
-            try {
-                if(_name != null) {
-                    nameMap.remove(_name);
+            case WR_EVENTS.HIGHLIGHT_NEXT:
+
+                highlightNext();
+                break;
+
+            case WR_EVENTS.INHIBIT_OTHERS:
+
+                if(mActiveController != null)
+                    inhibitInput(mActiveController, true);
+                break;
+
+            case WR_EVENTS.CLEAR_ATTEMPT:
+                // Clear attempt after correct behavior so it can use it to determine on
+                // which attempt they succeeded - We don't want this persisting if they
+                // subsequently keep getting them correct
+                //
+                clearAttemptFeatures();
+                break;
+            //  added
+            case WR_EVENTS.CLEAR_HESITATION:
+                //clear the hesitation number in feedback
+                clearHesitationFeatures();
+                break;
+
+            case WR_EVENTS.RESET_HESITATION:
+                //clear the hesitation number in feedback
+                resetHesitationFeature();
+                break;
+
+            case WR_EVENTS.INC_HESITATION:
+                updateHesitationFeature();
+                break;
+            //  added ends
+
+            case TCONST.APPLY_BEHAVIOR:
+                applyBehaviorNode(_target);
+                break;
+
+            case WR_EVENTS.RIPPLE_DEMO:
+
+                rippleReplay(_command, true);
+                break;
+
+            case WR_EVENTS.RIPPLE_REPLAY:
+            case WR_EVENTS.RIPPLE_PROTO:
+
+                rippleReplay(_command, false);
+                break;
+            case WR_EVENTS.RIPPLE_REPLAY_WORD:
+                rippleReplayCurrentWord(_command);
+                break;
+            case WR_EVENTS.SHOW_TRACELINE: // Show all glyphs trace line.
+
+                showTraceLine();
+                break;
+            case WR_EVENTS.HIDE_TRACELINE: // Hide all glyphs trace line.
+
+                hideTraceLine();
+                break;
+            case WR_EVENTS.SHOW_SAMPLE:
+
+                mActiveController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
+                boolean isExpectedCharacterSpace = mActiveController.getExpectedChar().equals(" ") || mActiveController.getExpectedChar().equals("");
+                boolean isCorrect = activityFeature.contains(WR_FEATURES.FTR_SEN_LTR) && mActiveController.isCorrect();
+                if(isExpectedCharacterSpace || isCorrect){
+                    publishFeature(WR_FEATURES.FTR_SPACE_SAMPLE);
+                    break;
                 }
 
-                queueMap.remove(this);
+            case WR_EVENTS.HIDE_SAMPLE:
 
-                switch(_command) {
+            case WR_EVENTS.ERASE_GLYPH:
+            case WR_EVENTS.DEMO_PROTOGLYPH:
+            case WR_EVENTS.ANIMATE_PROTOGLYPH:
+            case WR_EVENTS.ANIMATE_OVERLAY:
+            case WR_EVENTS.ANIMATE_ALIGN:
 
+                if(mActiveController != null)
+                    mActiveController.post(_command);
+                break;
 
-                    case I_TRIGGER_GESTURE:
-                        // JUDITH - move this
-                        Intent msg = new Intent(I_TRIGGER_GESTURE);
-                        bManager.sendBroadcast(msg);
-                        break;
+            case WR_EVENTS.POINT_AT_ERASE_BUTTON:
 
-                    case WR_EVENTS.HIDE_GLYPHS:
-                        hideGlyphs();
-                        break;
+                pointAtEraseButton();
+                break;
 
-                    case WR_EVENTS.HIDE_CURRENT_WORD_GLYPHS:
-                        hideCurrentWordGlyph();
-                        break;
+            case WR_EVENTS.POINT_AT_REPLAY_BUTTON:
 
-                    case WR_EVENTS.HIDE_CURRENT_LETTER_GLYPH:
-                        hideGlyphForActiveIndex();
-                        break;
+                pointAtReplayButton();
+                break;
 
-                    case WR_EVENTS.HIDE_SAMPLES:
-                        hideSamples();
-                        break;
+            case WR_EVENTS.POINT_AT_GLYPH:
 
-                    case WR_EVENTS.HIDE_SAMPLE_ACTIVE_INDEX:
-                        hideSampleForActiveIndex();
-                        break;
+                pointAtGlyph();
+                break;
 
-                    case WR_EVENTS.RIPPLE_HIGHLIGHT:
+            case WR_EVENTS.CANCEL_POINTAT:
 
-                        rippleHighlight();
-                        break;
+                cancelPointAt();
+                break;
 
-                    case WR_EVENTS.HIGHLIGHT_NEXT:
+            case WR_EVENTS.STIMULUS_HIGHLIGHT:
 
-                        highlightNext();
-                        break;
+                highlightStimulus();
+                break;
 
-                    case WR_EVENTS.INHIBIT_OTHERS:
+            case WR_EVENTS.GLYPH_HIGHLIGHT:
 
-                        if(mActiveController != null)
-                            inhibitInput(mActiveController, true);
-                        break;
+                highlightGlyph();
+                break;
 
-                    case WR_EVENTS.CLEAR_ATTEMPT:
-                        // Clear attempt after correct behavior so it can use it to determine on
-                        // which attempt they succeeded - We don't want this persisting if they
-                        // subsequently keep getting them correct
-                        //
-                        clearAttemptFeatures();
-                        break;
-                    //  added
-                    case WR_EVENTS.CLEAR_HESITATION:
-                        //clear the hesitation number in feedback
-                        clearHesitationFeatures();
-                        break;
+            case WR_EVENTS.AUTO_ERASE:
+                autoErase();
+                break;
 
-                    case WR_EVENTS.RESET_HESITATION:
-                        //clear the hesitation number in feedback
-                        resetHesitationFeature();
-                        break;
-
-                    case WR_EVENTS.INC_HESITATION:
-                        updateHesitationFeature();
-                        break;
-                    //  added ends
-
-                    case TCONST.APPLY_BEHAVIOR:
-
-                        applyBehaviorNode(_target);
-                        break;
-
-                    case WR_EVENTS.RIPPLE_DEMO:
-
-                        rippleReplay(_command, true);
-                        break;
-
-                    case WR_EVENTS.RIPPLE_REPLAY:
-                    case WR_EVENTS.RIPPLE_PROTO:
-
-                        rippleReplay(_command, false);
-                        break;
-                    case WR_EVENTS.RIPPLE_REPLAY_WORD:
-                        rippleReplayCurrentWord(_command);
-                        break;
-                    case WR_EVENTS.SHOW_TRACELINE: // Show all glyphs trace line.
-
-                        showTraceLine();
-                        break;
-                    case WR_EVENTS.HIDE_TRACELINE: // Hide all glyphs trace line.
-
-                        hideTraceLine();
-                        break;
-                    case WR_EVENTS.SHOW_SAMPLE:
-
-                        mActiveController = (CGlyphController) mGlyphList.getChildAt(mActiveIndex);
-                        boolean isExpectedCharacterSpace = mActiveController.getExpectedChar().equals(" ") || mActiveController.getExpectedChar().equals("");
-                        boolean isCorrect = activityFeature.contains(WR_FEATURES.FTR_SEN_LTR) && mActiveController.isCorrect();
-                        if(isExpectedCharacterSpace || isCorrect){
-                            publishFeature(WR_FEATURES.FTR_SPACE_SAMPLE);
-                            break;
-                        }
-
-                    case WR_EVENTS.HIDE_SAMPLE:
-
-                    case WR_EVENTS.ERASE_GLYPH:
-                    case WR_EVENTS.DEMO_PROTOGLYPH:
-                    case WR_EVENTS.ANIMATE_PROTOGLYPH:
-                    case WR_EVENTS.ANIMATE_OVERLAY:
-                    case WR_EVENTS.ANIMATE_ALIGN:
-
-                        if(mActiveController != null)
-                            mActiveController.post(_command);
-                        break;
-
-                    case WR_EVENTS.POINT_AT_ERASE_BUTTON:
-
-                        pointAtEraseButton();
-                        break;
-
-                    case WR_EVENTS.POINT_AT_REPLAY_BUTTON:
-
-                        pointAtReplayButton();
-                        break;
-
-                    case WR_EVENTS.POINT_AT_GLYPH:
-
-                        pointAtGlyph();
-                        break;
-
-                    case WR_EVENTS.CANCEL_POINTAT:
-
-                        cancelPointAt();
-                        break;
-
-                    case WR_EVENTS.STIMULUS_HIGHLIGHT:
-
-                        highlightStimulus();
-                        break;
-
-                    case WR_EVENTS.GLYPH_HIGHLIGHT:
-
-                        highlightGlyph();
-                        break;
-
-                    case WR_EVENTS.AUTO_ERASE:
-                        autoErase();
-                        break;
-
-                    default:
-                        break;
-                }
-
-
-            }
-            catch(Exception e) {
-                CErrorManager.logEvent(TAG, "Run Error:", e, false);
-            }
+            default:
+                break;
         }
-    }
 
-
-    /**
-     *  Disable the input queues permenantly in prep for destruction
-     *  walks the queue chain to diaable scene queue
-     *
-     */
-    private void terminateQueue() {
-
-        // disable the input queue permenantly in prep for destruction
-        //
-        _qDisabled = true;
-        flushQueue();
-    }
-
-
-    /**
-     * Remove any pending scenegraph commands.
-     *
-     */
-    private void flushQueue() {
-
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            Log.d(TAG, "Post Cancelled on Flush: " + ((Queue)entry.getValue()).getCommand());
-
-            mainHandler.removeCallbacks((Queue)(entry.getValue()));
-        }
-    }
-
-
-    /**
-     * Remove named posts
-     *
-     */
-    public void cancelPost(String name) {
-
-        while(nameMap.containsKey(name)) {
-
-            mainHandler.removeCallbacks((Queue) (nameMap.get(name)));
-            nameMap.remove(name);
-        }
-    }
-
-
-    /**
-     * Keep a mapping of pending messages so we can flush the queue if we want to terminate
-     * the tutor before it finishes naturally.
-     *
-     * @param qCommand
-     */
-    protected void enQueue(Queue qCommand, long delay) {
-
-        if(!_qDisabled) {
-            queueMap.put(qCommand, qCommand);
-
-            if(delay > 0) {
-                mainHandler.postDelayed(qCommand, delay);
-            }
-            else {
-                mainHandler.post(qCommand);
-            }
-        }
     }
 
     /**
      * trigger hesitation timer for help... refactored from "postNamed" for debugging purposes
      */
     public void triggerHelpHesitationTimer() {
-        enQueue(new Queue(WR_CONST.HESITATION_PROMPT, APPLY_BEHAVIOR, "INPUT_HESITATION_FEEDBACK"), 6000L);
+        _queue.postNamed(WR_CONST.HESITATION_PROMPT, APPLY_BEHAVIOR, "INPUT_HESITATION_FEEDBACK", 6000L);
     }
 
-    // RUN_Q next... make the _queue!!! see Bpop as example?
-    // RUN_Q called from AG
+    // called from AG
     public void postEvent(String command) {
-        enQueue(new Queue(null, command), 0);
+        _queue.post(command);
     }
 
-    // RUN_Q called from AG
+    // called from AG
     public void postEvent(String event, Integer delay) {
-        enQueue(new Queue(null, event), delay);
+        _queue.postEvent(event, delay);
     }
 
-    // RUN_Q called from AG
+    // called from AG
     public void postNextNodeDelay(Integer delay) {
-        enQueue(new Queue(null, APPLY_BEHAVIOR, NEXT_NODE), delay);
+        _queue.postNamed(null, APPLY_BEHAVIOR, NEXT_NODE, delay.longValue());
     }
 
 
@@ -3877,9 +3767,9 @@ public class EditOperation {
      *
      * @param target
      */
-    // RUN_Q called from AG
+    // called from AG
     public void postBehavior(String target) {
-        enQueue(new Queue(null, APPLY_BEHAVIOR, target), 0);
+        _queue.postNamed(null, APPLY_BEHAVIOR, target, 0L);
     }
 
     // Component Message Queue  -- End
