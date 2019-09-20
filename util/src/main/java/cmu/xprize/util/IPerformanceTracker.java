@@ -1,8 +1,10 @@
 package cmu.xprize.util;
 
 /**
- * RoboTutor
- * <p>
+ * IPerformanceTracker
+ *
+ * <p>currently only implemented by BigMath. Would ideally work for others as well.</p>
+ *
  * Created by kevindeland on 10/7/18.
  */
 

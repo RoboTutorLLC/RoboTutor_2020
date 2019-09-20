@@ -66,6 +66,7 @@ import cmu.xprize.util.CClassMap;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
@@ -208,6 +209,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     private GestureDetector mDetector;
     protected boolean gestureTimerStarted;
+    private FailureInterventionHelper _failson;
 
     public CWritingComponent(Context context) {
         super(context);
@@ -246,6 +248,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         });
 
         _queue = new CMessageQueueFactory(this, "CWrite");
+        _failson = new FailureInterventionHelper("WRITE", dataSource.length);
     }
 
 
@@ -646,7 +649,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         // when not a sentence writing activity
         if (!(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX))){
-            updateStatusForNonSentence(stimController);
+            updateStatusForNonSentence(stimController); // FAILSON NEXT where is correct/wrong???
         }
 
         // for sentence activities (word level and sentence level feedback)

@@ -51,6 +51,7 @@ import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.util.CEvent;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IEventSource;
 import cmu.xprize.util.IPublisher;
@@ -87,6 +88,8 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
 
     static final String TAG = "TAkComponent";
 
+    FailureInterventionHelper _failson;
+
 
     public TAkComponent(Context context) {
         super(context);
@@ -106,6 +109,7 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
 
+        _failson = new FailureInterventionHelper("AKIRA", datasource.length);
     }
 
 
@@ -609,7 +613,7 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             mTutor.countIncorrect();
             wrongAnyAttempts++;
 
-            if (wrongAnyAttempts == TCONST.FAILURE_COUNT_AKIRA) {
+            if (_failson.shouldTriggerIntervention(wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }
         }

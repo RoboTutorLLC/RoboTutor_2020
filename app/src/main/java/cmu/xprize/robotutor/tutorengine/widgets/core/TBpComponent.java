@@ -57,6 +57,7 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TString;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.PerformanceLogItem;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IEventSource;
@@ -91,6 +92,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
     private String mProblemType = "";
 
+    FailureInterventionHelper _failson;
 
     public TBpComponent(Context context) {
         super(context);
@@ -820,7 +822,8 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
             wrongAnyAttempts++;
 
-            if (wrongAnyAttempts == 9) { // JUDITH replace magic number
+            // FAILSON NEXT mimic
+            if (_failson.shouldTriggerIntervention(wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }
             /*if (attemptsLeft == BP_CONST.MAX_ATTEMPT) {
@@ -1185,6 +1188,9 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
+
+        // FAILSON  initialize it
+        _failson = new FailureInterventionHelper("BPOP", dataSource.length);
     }
 
 

@@ -24,6 +24,7 @@ import java.util.List;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
@@ -92,6 +93,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     protected HashMap<String,Boolean> _FeatureMap = new HashMap<>();
 
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
+    private FailureInterventionHelper _failson;
 
     CMessageQueueFactory _queue;
     TimerMaster _timer;
@@ -211,6 +213,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());
         Scontent.setOnTouchListener(new HesitationCancelListener());
 
+        _failson = new FailureInterventionHelper("SPELL", dataSource.length);
+
     }
 
     /**
@@ -262,7 +266,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         // INT_FAILURE - SPELL - STATUS:TEST
         if (!isCorrect) {
             wrongFirstAttempts++;
-            if (wrongFirstAttempts == 3) {
+            if (_failson.shouldTriggerIntervention(wrongFirstAttempts)) {
                 triggerIntervention(TCONST.I_TRIGGER_FAILURE);
             }
         } else {
