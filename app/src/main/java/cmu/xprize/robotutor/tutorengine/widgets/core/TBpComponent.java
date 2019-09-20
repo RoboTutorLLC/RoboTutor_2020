@@ -68,6 +68,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.comp_clickmask.CM_CONST.*;
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.BPOP;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
@@ -91,8 +92,6 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     static final String TAG = "TBpComponent";
 
     private String mProblemType = "";
-
-    FailureInterventionHelper _failson;
 
     public TBpComponent(Context context) {
         super(context);
@@ -1190,7 +1189,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
         mSceneObject.init(context, attrs);
 
         // FAILSON  initialize it
-        _failson = new FailureInterventionHelper("BPOP", dataSource.length);
+        _failson = new FailureInterventionHelper(BPOP, dataSource.length);
     }
 
 

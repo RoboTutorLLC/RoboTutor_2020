@@ -21,6 +21,7 @@ import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManagerInterface;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IMessageQueueRunner;
@@ -57,6 +58,7 @@ import static cmu.xprize.comp_nd.ND_CONST.VALUE_DIGIT_MORE;
 import static cmu.xprize.comp_nd.ND_CONST.VALUE_HUN;
 import static cmu.xprize.comp_nd.ND_CONST.VALUE_ONE;
 import static cmu.xprize.comp_nd.ND_CONST.VALUE_TEN;
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.NUMCOMPARE;
 import static cmu.xprize.util.MathUtil.getHunsDigit;
 import static cmu.xprize.util.MathUtil.getOnesDigit;
 import static cmu.xprize.util.MathUtil.getTensDigit;
@@ -110,6 +112,8 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
     protected CMessageQueueFactory _queue;
     TimerMaster _timer;
     private GestureDetector mDetector;
+
+    protected FailureInterventionHelper _failson;
 
     class HesitationCancelListener implements OnTouchListener {
 
@@ -179,6 +183,8 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
                 return true;
             }
         });
+
+        _failson = new FailureInterventionHelper(NUMCOMPARE, dataSource.length);
 
     }
 

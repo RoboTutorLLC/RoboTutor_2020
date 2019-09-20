@@ -25,6 +25,7 @@ import java.util.List;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IMessageQueueRunner;
@@ -33,6 +34,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.PICMATCH;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_PICMATCH;
 import static cmu.xprize.util.TCONST.HESITATE_TIME_PICMATCH;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
@@ -72,6 +74,7 @@ public class CPicMatch_Component extends RelativeLayout implements
     protected Context context;
 
     private LocalBroadcastManager bManager;
+    protected FailureInterventionHelper _failson;
 
     CMessageQueueFactory _queue;
     TimerMaster _timer;
@@ -119,6 +122,7 @@ public class CPicMatch_Component extends RelativeLayout implements
                 HESITATE_TIME_PICMATCH, STUCK_TIME_PICMATCH, GESTURE_TIME_PICMATCH);
 
         Scontent.setOnTouchListener(new HesitationCancelListener());
+        _failson = new FailureInterventionHelper(PICMATCH, dataSource.length);
     }
 
     class HesitationCancelListener implements OnTouchListener {

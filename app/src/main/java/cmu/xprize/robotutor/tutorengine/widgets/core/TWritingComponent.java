@@ -70,6 +70,7 @@ import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
+import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.LANG_AUTO;
 import static cmu.xprize.util.TCONST.MEDIA_STORY;
 import static cmu.xprize.util.TCONST.NEXT_NODE;
@@ -487,6 +488,10 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
             mTutor.countCorrect();
         } else {
             mTutor.countIncorrect();
+            _wrongAnyAttempts++;
+            if(_failson.shouldTriggerIntervention(_wrongAnyAttempts)) {
+                triggerIntervention(I_TRIGGER_FAILURE);
+            }
         }
 
         PerformanceLogItem event = new PerformanceLogItem();

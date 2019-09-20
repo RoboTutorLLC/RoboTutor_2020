@@ -79,6 +79,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.gesture.ExpectWriteGestureListener;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.WRITE;
 import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_WRITE;
@@ -184,6 +185,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     //amogh added ends
 
     protected CMessageQueueFactory _queue;
+    protected FailureInterventionHelper _failson;
+    protected int _wrongAnyAttempts = 0;
 
     protected static String punctuationSymbols = ",.;:-_!?";
     protected static Map<String, String> punctuationToString;
@@ -209,7 +212,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
     private GestureDetector mDetector;
     protected boolean gestureTimerStarted;
-    private FailureInterventionHelper _failson;
 
     public CWritingComponent(Context context) {
         super(context);
@@ -248,7 +250,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         });
 
         _queue = new CMessageQueueFactory(this, "CWrite");
-        _failson = new FailureInterventionHelper("WRITE", dataSource.length);
+        _failson = new FailureInterventionHelper(WRITE, dataSource.length);
     }
 
 
@@ -649,7 +651,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
         // when not a sentence writing activity
         if (!(activityFeature.contains(WR_FEATURES.FTR_SEN_PREFIX))){
-            updateStatusForNonSentence(stimController); // FAILSON NEXT where is correct/wrong???
+            updateStatusForNonSentence(stimController);
         }
 
         // for sentence activities (word level and sentence level feedback)

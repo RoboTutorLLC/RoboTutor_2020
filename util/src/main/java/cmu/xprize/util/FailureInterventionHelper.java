@@ -1,5 +1,7 @@
 package cmu.xprize.util;
 
+import android.util.Log;
+
 /**
  * RoboTutor
  * <p>
@@ -8,34 +10,48 @@ package cmu.xprize.util;
 
 public class FailureInterventionHelper {
 
-    private String _tutorType;
+    public enum Tutor {BPOP, AKIRA, SPELL, WRITE, PICMATCH, NUMCOMPARE}
+
+    private Tutor _tutorType;
     private int _dataSize;
 
-    public FailureInterventionHelper(String _tutorType, int _dataSize) {
+    public FailureInterventionHelper(Tutor _tutorType, int _dataSize) {
         this._tutorType = _tutorType;
         this._dataSize = _dataSize;
     }
 
+    /**
+     * Returns whether a failure intervention should be triggered, based on the number of wrong
+     * attempts that have been committed.
+     * FAILSON Note that this should be changed to be dependent on the passing logic for each tutor,
+     * FAILSON and the total number of problems
+     *
+     * @param anyWrongAttempts how many the student has gotten wrong in total
+     * @return TRUE if an intervention should be triggered
+     */
     public boolean shouldTriggerIntervention(int anyWrongAttempts) {
 
         switch(_tutorType) {
-            case "BPOP":
+            case BPOP:
                 return anyWrongAttempts == 9;
 
-            case "AKIRA":
+            case AKIRA:
                 return anyWrongAttempts == TCONST.FAILURE_COUNT_AKIRA;
 
-            case "SPELL":
+            case SPELL:
                 return anyWrongAttempts == 3;
 
+            case WRITE:
+                return anyWrongAttempts == 9;
 
-            case "WRITE":
-                // FAILSON next... get where anyWrongAttempts is coming from!
-                return false;
+            case PICMATCH:
+                return anyWrongAttempts == 4;
+
+            case NUMCOMPARE:
+                return anyWrongAttempts == 4;
 
             default:
-
-
+                Log.wtf("FailureInterventionHelper", "_tutorType not found: " + _tutorType);
                 return false;
         }
     }

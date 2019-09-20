@@ -37,6 +37,7 @@ import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
 import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.SPELL;
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_SPELL;
@@ -213,7 +214,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());
         Scontent.setOnTouchListener(new HesitationCancelListener());
 
-        _failson = new FailureInterventionHelper("SPELL", dataSource.length);
+        _failson = new FailureInterventionHelper(SPELL, dataSource.length);
 
     }
 

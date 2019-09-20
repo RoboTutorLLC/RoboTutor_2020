@@ -59,6 +59,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.AKIRA;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
@@ -109,7 +110,7 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
 
-        _failson = new FailureInterventionHelper("AKIRA", datasource.length);
+        _failson = new FailureInterventionHelper(AKIRA, datasource.length);
     }
 
 

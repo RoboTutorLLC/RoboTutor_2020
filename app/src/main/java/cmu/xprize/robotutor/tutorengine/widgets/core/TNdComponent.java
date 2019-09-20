@@ -38,6 +38,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 
 /**
@@ -240,6 +241,9 @@ public class TNdComponent extends CNd_Component implements ITutorObject, IDataSi
             mTutor.countCorrect();
         } else {
             mTutor.countIncorrect();
+            if(_failson.shouldTriggerIntervention(mTutor.getIncorrect())) {
+                triggerIntervention(I_TRIGGER_FAILURE);
+            }
         }
 
         PerformanceLogItem event = new PerformanceLogItem();
