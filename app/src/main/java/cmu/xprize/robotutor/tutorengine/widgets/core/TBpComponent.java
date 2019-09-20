@@ -821,7 +821,6 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
             wrongAnyAttempts++;
 
-            // FAILSON NEXT mimic
             if (_failson.shouldTriggerIntervention(wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }
@@ -1188,7 +1187,6 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
 
-        // FAILSON  initialize it
         _failson = new FailureInterventionHelper(BPOP, dataSource.length);
     }
 
