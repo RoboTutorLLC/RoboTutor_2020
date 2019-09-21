@@ -23,8 +23,8 @@ import static cmu.xprize.comp_intervention.data.IDATA_CONST.WRITE;
 
 public class Student {
 
-    String id;
-    String photoFile;
+    public String id;
+    public String photoFile;
     Map<String, Integer> levels;
     Map<String, Boolean> tutors;
 

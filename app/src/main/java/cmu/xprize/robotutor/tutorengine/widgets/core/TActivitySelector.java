@@ -1,9 +1,12 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +65,7 @@ import static cmu.xprize.comp_session.AS_CONST.VAR_DATASOURCE;
 import static cmu.xprize.comp_session.AS_CONST.VAR_INTENT;
 import static cmu.xprize.comp_session.AS_CONST.VAR_INTENTDATA;
 import static cmu.xprize.comp_session.AS_CONST.VAR_TUTOR_ID;
+import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.LANG_EN;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.ROBO_DEBUG_FILE_AKIRA;
@@ -81,6 +85,9 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
     private TLangToggle             mLangButton;
 
     private TTextView               SversionText;
+    private boolean mModalVisible; // this is terrible. should be somewehre else
+    private TStudentProfileModal profileModal;
+    private GestureDetector mGesture;
 
     private HashMap<String, String> volatileMap = new HashMap<>();
     private HashMap<String, String> stickyMap   = new HashMap<>();
@@ -133,6 +140,60 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         SdebugActivity.setButtonController(this);
 
         SversionText.setText(RoboTutor.VERSION_RT);
+
+        profileModal = findViewById(R.id.SstudentProfile);
+        mGesture = new GestureDetector(mContext, new LongPressListener());
+
+        SversionText.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mGesture.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+    }
+
+    private class LongPressListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent motionEvent) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent motionEvent) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent motionEvent) {
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent motionEvent) {
+
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent motionEvent) {
+            Log.wtf("TOUCH_ME", "touched mVersion");
+            mModalVisible = !mModalVisible;
+            profileModal.loadInto(); // this method will detect whether it's already loaded
+
+            profileModal.setVisibility(mModalVisible ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        @Override
+        public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+            return false;
+        }
     }
 
     @Override

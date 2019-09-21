@@ -78,6 +78,18 @@ public class CInterventionStudentData {
         return singleton;
     }
 
+    public static Student getStudentById(String id) {
+
+        Student found = null;
+        for (Student s : studentData) {
+            Log.wtf("MY_ID", "Found student " + s.id);
+            if (s.id.equals(id))
+                found = s;
+        }
+
+        return found;
+    }
+
     /**
      * Return the photo filename of a student who can give knowledge support
      * of a student at level {@code level} in domain {@code domain}

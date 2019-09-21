@@ -1,0 +1,52 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="200dp"
+    android:gravity="center"
+    android:clipChildren="false">
+
+    <!-- in Relative layout - views have to be defined before being referenced -->
+
+    <LinearLayout
+        android:id="@+id/SProfileContainer"
+        android:visibility="visible"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="20sp"
+        android:background="@drawable/border">
+
+        <ImageView
+            android:id="@+id/SProfileImage"
+            android:layout_height="300sp"
+            android:layout_width="300sp"
+            android:src="@drawable/child1"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/sId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:textSize="20sp"
+                android:background="@android:color/holo_blue_bright"/>
+            <TextView
+                android:id="@+id/sName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:textSize="20sp"
+                android:background="@android:color/holo_blue_bright"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>
