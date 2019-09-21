@@ -44,6 +44,7 @@ import java.util.Locale;
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
+import cmu.xprize.comp_intervention.data.Student;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.CPerfLogManager;
@@ -66,6 +67,7 @@ import cmu.xprize.robotutor.tutorengine.QuickDebugTutorList;
 import cmu.xprize.robotutor.tutorengine.util.CAssetObject;
 import cmu.xprize.robotutor.tutorengine.util.CrashHandler;
 import cmu.xprize.robotutor.tutorengine.widgets.core.IGuidView;
+import cmu.xprize.robotutor.tutorengine.widgets.core.TStudentProfileModal;
 import cmu.xprize.util.CDisplayMetrics;
 import cmu.xprize.util.CLoaderView;
 import cmu.xprize.util.IReadyListener;
@@ -145,6 +147,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public boolean       DELETE_INSTALLED_ASSETS = false;
 
     static public String        STUDENT_ID; // received from FaceLogin
+    static public Student       STUDENT_INTERVENTION_PROFILE;
     static public String        SESSION_ID; // received from FaceLogin
 
     final static public  String CacheSource = TCONST.ASSETS;                // assets or extern
@@ -178,7 +181,6 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // Note = we don't want the system to try and recreate any of our views- always pass null
         //
         super.onCreate(null);
-        initalizeInterventionData();
 
         APP_PRIVATE_FILES = getApplicationContext().getExternalFilesDir("").getPath();
 
@@ -311,6 +313,11 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         String updateInterventionFile = TCONST.INTERVENTION_FOLDER + File.separator + UPDATE_INTERVENTION_FILE;
         CUpdateInterventionStudentData.initialize(updateInterventionFile);
+
+        Log.wtf("MY_ID", "STUDENT_ID = " + RoboTutor.STUDENT_ID);
+        Student me = CInterventionStudentData.getStudentById(RoboTutor.STUDENT_ID);
+        STUDENT_INTERVENTION_PROFILE = me;
+        Log.wtf("MY_ID", me != null ? me.toString() : "null");
     }
 
 
@@ -691,6 +698,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         logManager.postEvent_V(TAG, "Robotutor:onStart");
 
         setUniqueIdentifiers();
+        initalizeInterventionData();
 
         // We only want to run the engine start sequence once per onStart call
         //
