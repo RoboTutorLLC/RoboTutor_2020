@@ -31,6 +31,7 @@ import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScriptable2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TInteger;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TString;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IEventSource;
 import cmu.xprize.util.IPublisher;
@@ -38,6 +39,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.NUMCOMPARE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 
@@ -218,6 +220,8 @@ public class TNdComponent extends CNd_Component implements ITutorObject, IDataSi
             } else {
                 throw (new Exception("BadDataSource"));
             }
+
+            _failson = new FailureInterventionHelper(NUMCOMPARE, dataSource.length);
         } catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source - " + dataNameDescriptor + " for : " + name() + " : ", e, true);
         }

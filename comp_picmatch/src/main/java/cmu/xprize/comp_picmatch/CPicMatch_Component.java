@@ -122,7 +122,6 @@ public class CPicMatch_Component extends RelativeLayout implements
                 HESITATE_TIME_PICMATCH, STUCK_TIME_PICMATCH, GESTURE_TIME_PICMATCH);
 
         Scontent.setOnTouchListener(new HesitationCancelListener());
-        _failson = new FailureInterventionHelper(PICMATCH, dataSource.length);
     }
 
     class HesitationCancelListener implements OnTouchListener {

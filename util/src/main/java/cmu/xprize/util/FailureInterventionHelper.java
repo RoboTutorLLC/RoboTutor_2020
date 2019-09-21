@@ -7,7 +7,7 @@ import android.util.Log;
  *
  * How to add FailureInterventionHelper to a tutor
  * 1. declare a `protected` Helper in a CComponent for a Tutor
- * 2. construct the Helper in the `init` function, passing the proper Tutor enum and dataSource size
+ * 2. construct the Helper in the TComponent class, after `dataSource` has been loaded via loadJSON (usually setDataSource)
  * 3. look in `trackAndLogPerformance`, and call `shouldTriggerIntervention` when the student gets a question incorrect
  *
  * Created by kevindeland on 9/20/19.
@@ -44,16 +44,16 @@ public class FailureInterventionHelper {
                 return anyWrongAttempts == TCONST.FAILURE_COUNT_AKIRA;
 
             case SPELL:
-                return anyWrongAttempts == 3;
+                return anyWrongAttempts == 9;
 
             case WRITE:
                 return anyWrongAttempts == 9;
 
             case PICMATCH:
-                return anyWrongAttempts == 4;
+                return anyWrongAttempts == 9;
 
             case NUMCOMPARE:
-                return anyWrongAttempts == 4;
+                return anyWrongAttempts == 9;
 
             default:
                 Log.wtf("FailureInterventionHelper", "_tutorType not found: " + _tutorType);

@@ -42,6 +42,7 @@ import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
@@ -84,6 +85,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
     protected int wrongAnyAttempts = 0;
+    protected FailureInterventionHelper _failson;
 
     protected LocalBroadcastManager   bManager;
     protected BroadcastReceiver       bReceiver;

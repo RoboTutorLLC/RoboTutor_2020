@@ -60,6 +60,7 @@ import cmu.xprize.robotutor.tutorengine.graph.scene_descriptor;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScriptable2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TInteger;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TString;
+import cmu.xprize.util.FailureInterventionHelper;
 import cmu.xprize.util.IBehaviorManager;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventSource;
@@ -68,6 +69,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.FailureInterventionHelper.Tutor.WRITE;
 import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
 import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
@@ -820,6 +822,8 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
             } else {
                 throw (new Exception("test"));
             }
+
+            _failson = new FailureInterventionHelper(WRITE, dataSource.length);
         }
         catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source for : " + name(), null, false);

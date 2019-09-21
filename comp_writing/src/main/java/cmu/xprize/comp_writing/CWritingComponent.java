@@ -250,7 +250,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         });
 
         _queue = new CMessageQueueFactory(this, "CWrite");
-        _failson = new FailureInterventionHelper(WRITE, dataSource.length);
     }
 
 

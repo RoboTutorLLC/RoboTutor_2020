@@ -286,6 +286,8 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
             } else {
                 throw (new Exception("BadDataSource"));
             }
+
+            _failson = new FailureInterventionHelper(BPOP, dataSource.length);
         } catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source - " + dataNameDescriptor + " for : " + name() + " : ", e, false);
         }
@@ -1186,8 +1188,6 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
-
-        _failson = new FailureInterventionHelper(BPOP, dataSource.length);
     }
 
 

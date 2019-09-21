@@ -109,8 +109,6 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
         super.init(context, attrs);
         mSceneObject = new CObjectDelegate(this);
         mSceneObject.init(context, attrs);
-
-        _failson = new FailureInterventionHelper(AKIRA, datasource.length);
     }
 
 
@@ -266,6 +264,8 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             } else {
                 throw (new Exception("BadDataSource"));
             }
+
+            _failson = new FailureInterventionHelper(AKIRA, datasource.length);
         }
         catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source for : " + name(), e, false);

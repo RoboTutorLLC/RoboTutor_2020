@@ -183,9 +183,6 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
                 return true;
             }
         });
-
-        _failson = new FailureInterventionHelper(NUMCOMPARE, dataSource.length);
-
     }
 
     // Override in child class

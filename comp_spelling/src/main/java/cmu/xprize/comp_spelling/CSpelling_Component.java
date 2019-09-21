@@ -94,7 +94,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     protected HashMap<String,Boolean> _FeatureMap = new HashMap<>();
 
     protected int wrongFirstAttempts = 0; // used for INTERVENTION purposes
-    private FailureInterventionHelper _failson;
+    protected FailureInterventionHelper _failson;
 
     CMessageQueueFactory _queue;
     TimerMaster _timer;
@@ -213,9 +213,6 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());
         Scontent.setOnTouchListener(new HesitationCancelListener());
-
-        _failson = new FailureInterventionHelper(SPELL, dataSource.length);
-
     }
 
     /**
