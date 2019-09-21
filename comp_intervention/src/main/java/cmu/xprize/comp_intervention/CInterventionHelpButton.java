@@ -33,6 +33,8 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 public class CInterventionHelpButton extends android.support.v7.widget.AppCompatImageButton
         implements IMessageQueueRunner {
 
+
+    private static final boolean CONFIG_INTERVENTION = true;
     private LocalBroadcastManager bManager;
 
     // tracks which intervention has been triggered
@@ -156,6 +158,11 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            // for turning off intervention mode
+            if (!CONFIG_INTERVENTION) {
+                return;
+            }
 
             Log.wtf("trigger", "REceived trigger: " + intent.getAction());
 

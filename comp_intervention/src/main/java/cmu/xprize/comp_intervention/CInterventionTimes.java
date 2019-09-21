@@ -84,6 +84,11 @@ public class CInterventionTimes {
      */
     public static float getTimeByTutorId(String id) {
 
-        return timesById.get(id);
+        try {
+            return timesById.get(id);
+        } catch (Exception e) {
+            return 6000; // default?
+        }
+
     }
 }
