@@ -99,10 +99,32 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
     /**
      * Start the button flashing
+     * @param currentIntervention
      */
-    private void startFlashing() {
+    private void startFlashing(String currentIntervention) {
         Log.v("FLASH", "begin");
         this.isFlashing = true;
+
+        int iconId;
+        switch(currentIntervention) {
+            case I_TRIGGER_FAILURE:
+                iconId = R.drawable.handraise_icon_failure;
+                break;
+            case I_TRIGGER_GESTURE:
+                iconId = R.drawable.handraise_icon_gesture;
+                break;
+
+            case I_TRIGGER_HESITATE:
+                iconId = R.drawable.handraise_icon_hesitate;
+                break;
+
+            case I_TRIGGER_STUCK:
+                iconId = R.drawable.handraise_icon_stuck;
+                break;
+            default:
+                iconId = R.drawable.handraise_icon;
+        }
+        this.setImageDrawable(getResources().getDrawable(iconId));
 
         _queue.post(FLASH_ON, FLASH_ON_TIME);
     }
@@ -115,6 +137,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         _queue.cancelPost(FLASH_OFF);
         isFlashing = false;
         this.setBackgroundColor(COLOR_OFF);
+        this.setImageDrawable(getResources().getDrawable(R.drawable.handraise_icon));
     }
 
     // For dealing with delayed flashing
@@ -185,7 +208,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                     if(currentIntervention == null)
                         currentIntervention = action;
 
-                    startFlashing();
+                    startFlashing(currentIntervention);
                     break;
 
 

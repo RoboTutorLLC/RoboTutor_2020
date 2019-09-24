@@ -63,7 +63,7 @@
         app:layout_heightPercent="80%"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/handraise_button"
+        android:src="@drawable/handraise_icon"
         android:background="#80000000"
         android:scaleType="centerInside"
         android:layout_alignParentRight="true"
