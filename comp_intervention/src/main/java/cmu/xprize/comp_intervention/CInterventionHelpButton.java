@@ -34,7 +34,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         implements IMessageQueueRunner {
 
 
-    private static final boolean CONFIG_INTERVENTION = true;
+    private static final boolean CONFIG_INTERVENTION = false;
     private LocalBroadcastManager bManager;
 
     // tracks which intervention has been triggered
@@ -94,6 +94,10 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
         COLOR_ON = getResources().getColor(R.color.helpButtonHighlight);
         COLOR_OFF = getResources().getColor(R.color.helpButtonNormal);
+
+        if (!CONFIG_INTERVENTION) {
+            this.setVisibility(View.INVISIBLE);
+        }
 
     }
 
