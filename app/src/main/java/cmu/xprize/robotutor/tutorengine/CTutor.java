@@ -145,8 +145,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
         this.matrix = matrix;
 
         mAssetManager    = context.getAssets();
-        // GRAY_SCREEN_BUG this is where Media Manager is initialized
-        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "p1: Initializing tutor: " + mTutorName);
         mMediaManager    = CMediaController.newMediaManager(mTutorName);
 
         uuid = UUID.randomUUID();
@@ -356,8 +354,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
 
         private void cleanUpTutor() {
 
-            // GRAY_SCREEN_BUG tutor might be cleaned up here
-            Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r1: Cleaning up tutor " + mTutorName);
             CMediaController.destroyMediaManager(mTutorName);
 
             // disable the input queue permanently in prep for destruction
@@ -386,7 +382,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
                     //
                     case TCONST.KILLTUTOR:
 
-                        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r2: In Queue: " + _command);
                         cleanUpTutor();
 
                         CTutorEngine.killDeadTutor();
@@ -407,7 +402,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
                             Log.wtf("STUDENT_MODEL:AFTER_ASSESSMENT", studentModel.toString());
                         }
 
-                        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r2: In Queue: " + _command);
                         cleanUpTutor();
 
                         updateStudentInterventionProgress(mTutorName);
@@ -421,8 +415,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
                     // of some sort of session manager of exit the app completely
                     //
                     case TCONST.FINISH:
-
-                        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r2: In Queue: " + _command);
                         cleanUpTutor();
 
                         CTutorEngine.destroyCurrentTutor();

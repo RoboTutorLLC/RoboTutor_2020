@@ -243,14 +243,11 @@ public class CTutorEngine implements ILoadableObject2 {
         //
         CLogManager.setTutor(defTutor);
 
-        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "**: Creating Tutor in startSessionManager: " + defTutor);
-
         // don't create a new tutor when the screen is off, because on relaunch it will set-in-motion the "KILLTUTOR"
         // https://stackoverflow.com/questions/2474367/how-can-i-tell-if-the-screen-is-on-in-android
         PowerManager powerManager = (PowerManager) Activity.getSystemService(Context.POWER_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             if (powerManager != null && !powerManager.isInteractive()) {
-                Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "fx: Not creating new tutor when screen is off...");
                 return;
             }
         }
@@ -300,8 +297,6 @@ public class CTutorEngine implements ILoadableObject2 {
         activeTutor = null;
         RoboTutor.masterContainer.removeView(deadTutor.getTutorContainer());
 
-        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "p4: StartSessionManager in 'CTutorEngine.destroyCurrentTutor': " + defTutor);
-
         startSessionManager();
 
         Log.d(TAG, "destroyCurrentTutor: " + deadTutor.getTutorName());
@@ -344,10 +339,7 @@ public class CTutorEngine implements ILoadableObject2 {
             Log.d(TAG, "Killing Tutor: " + deadTutor.getTutorName());
 
             RoboTutor.masterContainer.removeView(deadTutor.getTutorContainer());
-            Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r3: Killing Active Tutor: " + deadTutor.getTutorName());
             deadTutor.post(TCONST.KILLTUTOR);
-        } else {
-            Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r3: NULL ACTIVE TUTOR. DeadTutor = " + ((deadTutor == null) ? "null" : deadTutor.getTutorName()));
         }
     }
 
@@ -359,8 +351,6 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param features
      */
     static private void createAndLaunchTutor(String tutorName, String features, String tutorId, defdata_tutor dataSource, String matrix) {
-
-        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "r4: killActiveTutor called from createAndLaunchTutor(" + tutorName + ")");
         killActiveTutor();
 
         // GRAY_SCREEN_BUG
@@ -373,9 +363,6 @@ public class CTutorEngine implements ILoadableObject2 {
         ((ITutorObject)tutorContainer).setName("tutor_container");
 
         RoboTutor.masterContainer.addView((ITutorManager)tutorContainer);
-
-        // GRAY_SCREEN_BUG CTutor created --> Media Manager created --> added to map
-        Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "p2: Initializing tutor: " + tutorName);
 
         activeTutor = new CTutor(Activity, tutorName, tutorId, (ITutorManager)tutorContainer, TutorLogManager, mRootScope, language, features, matrix);
 
@@ -565,8 +552,6 @@ public class CTutorEngine implements ILoadableObject2 {
             // multiple tutors share a single scenegraph
             //
             case "native":
-
-                Log.d(TCONST.DEBUG_GRAY_SCREEN_TAG, "p3b: Creating Tutor in 'CTutor.launch': " + tutorDescriptor.tutorName);
                 createAndLaunchTutor(tutorDescriptor.tutorName, tutorDescriptor.features, tutorId, tutorBinding, matrix);
                 break;
 

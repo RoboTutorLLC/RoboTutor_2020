@@ -918,8 +918,6 @@ public class TCONST {
     }
 
     // debug vals
-    public static final String DEBUG_GRAY_SCREEN_TAG = "DEBUG_GRAY_SCREEN";
-
     public static final String DEBUG_AUDIO_FILE = "DEBUG_AUDIO";
 
     public static final String PLACEMENT_TAG = "DEBUG_PLACEMENT";
