@@ -181,15 +181,15 @@ public class CInterventionPopup extends RelativeLayout {
         };
 
         int[] appSupportAudio = {
-                R.raw.app_support_full,
-                R.raw.app_support_half,
-                R.raw.app_support_short,
+                R.raw.aud1, // TZ_INT
+                R.raw.aud2,
+                R.raw.aud3,
         };
 
         int[] knowledgeSupportAudio = {
-                R.raw.knowledge_support_full,
-                R.raw.knowledge_support_half,
-                R.raw.knowledge_support_short,
+                R.raw.aud5,
+                R.raw.aud4,
+                R.raw.aud3,
         };
 
         level = level > 2 ? 2 : level; // level max out at 2

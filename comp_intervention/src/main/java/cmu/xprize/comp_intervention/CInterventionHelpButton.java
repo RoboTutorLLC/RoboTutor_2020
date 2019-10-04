@@ -34,7 +34,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         implements IMessageQueueRunner {
 
 
-    private static final boolean CONFIG_INTERVENTION = false;
+    private static final boolean CONFIG_INTERVENTION = true;
     private LocalBroadcastManager bManager;
 
     // tracks which intervention has been triggered
