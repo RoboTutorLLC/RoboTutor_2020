@@ -40,6 +40,7 @@ import cmu.xprize.bp_component.CBp_Data;
 import cmu.xprize.bp_component.CBubble;
 import android.graphics.RectF;
 import cmu.xprize.bp_component.CBubbleStimulus;
+import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_logging.ITutorLogger;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
@@ -310,10 +311,27 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     }
 
 
+    // Override in child class
+    @Override
+    protected long lookupHesitateTimeForThisTutor() {
+
+        long delayMs;
+        try {
+            String lookupId = CTutorEngine.getActiveTutor().getTutorId().replace(":", "_");
+            Log.wtf("TUTOR_ID", lookupId);
+            long delayTime = (long) Math.ceil(CInterventionTimes.getTimeByTutorId(lookupId));
+            delayMs = delayTime * 1000;
+            Log.wtf("TUTOR_ID", "" + delayMs);
+        } catch (Exception e) {
+            delayMs = TCONST.HESITATE_TIME_SPELL;
+        }
+        return delayMs;
+    }
+
     public void next() {
 
         // reset stuck for this new problem
-        resetStuckTimer();
+        _timer.resetStuckTimer();
 
         // If wrong reset ALLCORRECT
         //

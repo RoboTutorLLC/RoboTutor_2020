@@ -594,7 +594,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             Log.v("event.thing", "This is a Touch");
-            mComponent.resetHesitationTimer(); // TRIGGER_BPOP - hesitate - there should only be one of these
+            mComponent.getTimer().resetHesitationTimer(); // TRIGGER_BPOP - hesitate - there should only be one of these
         }
         PointF touchPt;
         long   delta;

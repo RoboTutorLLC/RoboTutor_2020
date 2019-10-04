@@ -148,7 +148,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         return _timer;
     }
 
-    TimerMaster _timer;
+    protected TimerMaster _timer;
 
 
 
@@ -219,6 +219,14 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         setWillNotDraw(false);
     }
 
+    /**
+     * Lookup time in the table. If nothing, give the default.
+     *
+     * @return time delay in ms.
+     */
+    protected long lookupHesitateTimeForThisTutor() {
+        return 0L;
+    }
 
     /**
      * The game mechanic uses this to get the game container where it will create
@@ -577,66 +585,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         Log.v("event.thing", "triggering intervention: " + type);
         Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
-
-        switch(type) {
-            case I_TRIGGER_GESTURE:
-
-                break;
-        }
-    }
-
-    /**
-     * Reset the timer that triggers the HESITATION intervention.
-     */
-    public void resetHesitationTimer() {
-        Log.v("event.thing", "resetting hesitation timer");
-        cancelHesitationTimer();
-        triggerHesitationTimer();
-    }
-
-    /**
-     * Cancel the timer that triggers the HESITATION intervention.
-     */
-    public void cancelHesitationTimer() {
-        Log.v("event.thing", "cancelling hesitation timer");
-        _queue.cancelPost("HESITATION_PROMPT");
-    }
-
-    /**
-     * Trigger the timer that triggers the HESITATION intervention.
-     */
-    public void triggerHesitationTimer() {
-        // why does this get triggered so easily???
-        Log.v("event.thing", "triggering hesitation timer");
-        _queue.postNamed("HESITATION_PROMPT", TCONST.I_TRIGGER_HESITATE, TCONST.HESITATE_TIME_BPOP);
-        // hesitation should only be triggered on first problem.
-        // set a boolean IS_FIRST_PROBLEM and set it to false after first thing
-    }
-
-
-    /**
-     * Reset the timer that triggers the STUCK intervention.
-     */
-    public void resetStuckTimer() {
-        Log.v("event.thing", "resetting stuck timer");
-        cancelStuckTimer();
-        triggerStuckTimer();
-    }
-
-    /**
-     * Cancel the timer that triggers the HESITATION intervention.
-     */
-    public void cancelStuckTimer() {
-        Log.v("event.thing", "cancelling stuck timer");
-        _queue.cancelPost("STUCK_TIMER");
-    }
-
-    /**
-     * Trigger the timer that triggers the HESITATION intervention.
-     */
-    public void triggerStuckTimer() {
-        Log.v("event.thing", "triggering stuck timer");
-        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, STUCK_TIME_BPOP);
     }
 
     @Override
@@ -655,20 +603,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         Log.w("QUEUE_FACTORY", String.format("CBP.runCommand(%s)", command));
         switch(command) {
             case TCONST.I_TRIGGER_GESTURE:
-                // new rules: time between different gestures exceeds 3 * (what judith gave in spreadsheet)
-                // on(firstTouch, f(gesture, time) {
-                //   if (gesture is wrong) {
-                //      originalTime = time;
-                //      lastGesture = gesture;
-                //
-                //    }
-                // }
-                // on (nextGesture, f(gesture, time) {
-                //   if (gesture == wrong) {
-                //
-                //   }
-                // JESTER set a timer
-
                 triggerIntervention(TCONST.I_TRIGGER_GESTURE);
                 break;
 
