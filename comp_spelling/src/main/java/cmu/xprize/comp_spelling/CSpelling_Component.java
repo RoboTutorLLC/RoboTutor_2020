@@ -196,8 +196,6 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         Scontent = (ConstraintLayout) findViewById(R.id.SSpelling);
 
-        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(this));
-
         mLetterHolder = (LinearLayout) findViewById(R.id.letterHolder);
         mSelectedLetterHolder = (LinearLayout) findViewById(R.id.blankHolder);
         mImageStimulus = (ImageView) findViewById(R.id.imageStimulus);
@@ -209,6 +207,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         long hesTime = lookupHesitateTimeForThisTutor();
         _timer = new TimerMaster(this, _queue, "SpellTimer",
                 (int) hesTime, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
+
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(_timer));
 
 
         mImageStimulus.setOnTouchListener(new HesitationCancelListener());

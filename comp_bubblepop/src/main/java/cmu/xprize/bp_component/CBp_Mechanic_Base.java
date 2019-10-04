@@ -92,7 +92,7 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         bManager = LocalBroadcastManager.getInstance(mContext);
         mParent.setOnTouchListener(this);
 
-        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(parent));
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(parent.getTimer()));
     }
 
     public void setMessageQueue(CMessageQueueFactory queue) {

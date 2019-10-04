@@ -2,8 +2,10 @@ package cmu.xprize.util;
 
 import android.util.Log;
 
+import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
+import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 
@@ -21,6 +23,10 @@ public class TimerMaster {
 
     private static final String HESITATION_TIMER_RUNNABLE = "HESITATION_TIMER";
     private static final String STUCK_TIMER_RUNNABLE = "STUCK_TIMER";
+    private static final String GESTURE_TIMER_RUNNABLE = "GESTURE_TIMER";
+
+    // need a boolean so we only trigger this once
+    private boolean gestureTriggered;
 
     private String _TAG;
 
@@ -82,6 +88,39 @@ public class TimerMaster {
     private void triggerHesitationTimer() {
         Log.v(_TAG, "trigger hesitation timer");
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
+    }
+
+    /**
+     * This should be called when a normal gesture is made
+     */
+    public void resetGestureTimer() {
+        _queue.cancelPost(GESTURE_TIMER_RUNNABLE);
+        _intervention.triggerIntervention(I_CANCEL_GESTURE);
+
+        // note: must remove all gesture timers
+        _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
+        gestureTriggered = true;
+    }
+
+    /**
+     * trigger gesture timer
+     */
+    public void triggerGestureTimer() {
+       if (gestureTriggered) return; // only trigger once
+
+        _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
+        gestureTriggered = true;
+    }
+
+    /**
+     * cancel gesture timer
+     */
+    public void cancelGestureTimer() {
+        if (!gestureTriggered) return; // don't need to cancel if not triggered
+
+        _queue.cancelPost(GESTURE_TIMER_RUNNABLE);
+        _intervention.triggerIntervention(I_CANCEL_GESTURE);
+        gestureTriggered = false;
     }
 
 

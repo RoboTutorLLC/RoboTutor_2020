@@ -24,8 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,10 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
@@ -52,8 +47,13 @@ import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
+import static cmu.xprize.util.TCONST.GESTURE_TIME_BPOP;
+import static cmu.xprize.util.TCONST.HESITATE_TIME_BPOP;
+import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
+import static cmu.xprize.util.TCONST.STUCK_TIME_BPOP;
 
 
 public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject,
@@ -144,6 +144,12 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
     protected CMessageQueueFactory _queue;
 
+    public TimerMaster getTimer() {
+        return _timer;
+    }
+
+    TimerMaster _timer;
+
 
 
     public CBP_Component(Context context) {
@@ -205,6 +211,8 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         bManager.registerReceiver(bReceiver, filter);
 
         _queue = new CMessageQueueFactory(this, "CBpop");
+        _timer = new TimerMaster(this, _queue, "BpopTimer",
+                HESITATE_TIME_BPOP, STUCK_TIME_BPOP, GESTURE_TIME_BPOP);
 
         // Allow onDraw to be called to start animations
         //
@@ -569,9 +577,12 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         Log.v("event.thing", "triggering intervention: " + type);
         Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
-        // pause...
-        // JUDITH NEXT: test this out... will it trigger? IT DID!!!
-        // JUDITH NEXT: must add TIntervention to bpop.xml
+
+        switch(type) {
+            case I_TRIGGER_GESTURE:
+
+                break;
+        }
     }
 
     /**
@@ -625,7 +636,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
      */
     public void triggerStuckTimer() {
         Log.v("event.thing", "triggering stuck timer");
-        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, TCONST.STUCK_TIME_BPOP);
+        _queue.postNamed("STUCK_TIMER", TCONST.I_TRIGGER_STUCK, STUCK_TIME_BPOP);
     }
 
     @Override
@@ -656,6 +667,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
                 //   if (gesture == wrong) {
                 //
                 //   }
+                // JESTER set a timer
 
                 triggerIntervention(TCONST.I_TRIGGER_GESTURE);
                 break;

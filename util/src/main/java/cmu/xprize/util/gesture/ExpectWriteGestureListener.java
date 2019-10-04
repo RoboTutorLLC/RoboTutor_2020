@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 
 /**
  * ExpectWriteGestureListener
@@ -15,11 +16,17 @@ import cmu.xprize.util.TCONST;
 
 public class ExpectWriteGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-    private IInterventionSource iIntervention;
-    private String TAG = "GESTURE";
+    private TimerMaster iTimer;
+    private String TAG = "WRITE_GESTURE";
 
-    public ExpectWriteGestureListener(IInterventionSource intervention) {
-        this.iIntervention = intervention;
+    /**
+     * Intervention should not be triggered immediately, so the listener should trigger the
+     * gesture timer within the TimerMaster.
+     *
+     * @param timer a TimerMaster that triggers and resets the gesture timer
+     */
+    public ExpectWriteGestureListener(TimerMaster timer) {
+        this.iTimer = timer;
     }
 
     @Override
@@ -35,21 +42,20 @@ public class ExpectWriteGestureListener extends GestureDetector.SimpleOnGestureL
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         Log.i(TAG, "onSingleTapConfirmed: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        iTimer.triggerGestureTimer();
         return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
         Log.i(TAG, "onLongPress: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
-
+        iTimer.triggerGestureTimer();
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(TAG, "onDoubleTap: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        iTimer.triggerGestureTimer();
 
         return true;
     }
@@ -67,7 +73,7 @@ public class ExpectWriteGestureListener extends GestureDetector.SimpleOnGestureL
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
         Log.d(TAG, "onFling: ");
-        // iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        iTimer.resetGestureTimer();
 
         return true;
     }

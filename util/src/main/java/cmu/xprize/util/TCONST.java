@@ -559,6 +559,7 @@ public class TCONST {
     public static final int  FAILURE_COUNT_BPOP = 9;
     public static final Long HESITATE_TIME_BPOP = 40000L; // NOTE THAT THIS IS NOT RESETTING
     public static final Long STUCK_TIME_BPOP = 40000L;
+    public static final Long GESTURE_TIME_BPOP = 3000L;
 
     public static final int  FAILURE_COUNT_AKIRA = 9;
     public static final Long HESITATE_TIME_AKIRA = 10000L;
@@ -574,6 +575,8 @@ public class TCONST {
     public static final Long STUCK_TIME_PICMATCH = 20000L;
     public static final Long GESTURE_TIME_PICMATCH = 13000L;
 
+    public static final Long HESITATE_TIME_WRITE = 18000L;
+    public static final Long STUCK_TIME_WRITE = 20000L;
     public static final long GESTURE_TIME_WRITE = 18000L;
 
     public static final Long HESITATE_TIME_NUMCOMPARE = 9000L;
@@ -905,6 +908,7 @@ public class TCONST {
     public static final String ROBO_DEBUG_FILE_AKIRA = "akira_test.json";
     public static final String ROBO_DEBUG_FILE_ASM = "math_test.json";
     public static final String ROBO_DEBUG_FILE_BPOP = "bpop.json";
+
 
 
     // Debugger Thumb key words

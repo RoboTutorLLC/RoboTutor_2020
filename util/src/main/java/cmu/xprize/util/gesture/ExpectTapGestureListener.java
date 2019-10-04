@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 
 /**
  * ExpectTapGestureListener
@@ -15,11 +16,17 @@ import cmu.xprize.util.TCONST;
 
 public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-    private IInterventionSource iIntervention;
-    private String TAG = "GESTURE";
+    private TimerMaster iTimer;
+    private String TAG = "TAP_GESTURE";
 
-    public ExpectTapGestureListener(IInterventionSource iIntervention) {
-        this.iIntervention = iIntervention;
+    /**
+     * Intervention should not be triggered immediately, so the listener should trigger the
+     * gesture timer within the TimerMaster.
+     *
+     * @param timer a TimerMaster that triggers and resets the gesture timer
+     */
+    public ExpectTapGestureListener(TimerMaster timer) {
+        this.iTimer = timer;
     }
 
     @Override
@@ -35,6 +42,7 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         Log.i(TAG, "onSingleTapConfirmed: ");
+        iTimer.cancelGestureTimer();
 
         return true;
     }
@@ -42,13 +50,14 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
     @Override
     public void onLongPress(MotionEvent e) {
         Log.i(TAG, "onLongPress: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        iTimer.triggerGestureTimer();
 
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(TAG, "onDoubleTap: ");
+        iTimer.triggerGestureTimer();
 
 
         return true;
@@ -59,7 +68,6 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
                             float distanceX, float distanceY) {
         Log.i(TAG, "onScroll: ");
 
-
         return true;
     }
 
@@ -67,7 +75,7 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
         Log.d(TAG, "onFling: ");
-        iIntervention.triggerIntervention(TCONST.I_TRIGGER_GESTURE);
+        iTimer.triggerGestureTimer();
 
         return true;
     }

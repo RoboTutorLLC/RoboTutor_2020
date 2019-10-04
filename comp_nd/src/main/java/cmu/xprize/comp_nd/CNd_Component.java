@@ -174,7 +174,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
         long hesTime = getTimeForThisTutor();
         _timer = new TimerMaster(this, _queue, "NcompareTimer",
                 hesTime, STUCK_TIME_NUMCOMPARE, GESTURE_TIME_NUMCOMPARE);
-        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(this));
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(_timer));
 
         this.setOnTouchListener(new OnTouchListener() {
             @Override

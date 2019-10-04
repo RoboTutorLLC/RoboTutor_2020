@@ -77,15 +77,21 @@ import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import cmu.xprize.util.TimerMaster;
 import cmu.xprize.util.gesture.ExpectWriteGestureListener;
 
 import static cmu.xprize.util.FailureInterventionHelper.Tutor.WRITE;
 import static cmu.xprize.util.TCONST.APPLY_BEHAVIOR;
 import static cmu.xprize.util.TCONST.EMPTY;
+import static cmu.xprize.util.TCONST.GESTURE_TIME_PICMATCH;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_WRITE;
+import static cmu.xprize.util.TCONST.HESITATE_TIME_PICMATCH;
+import static cmu.xprize.util.TCONST.HESITATE_TIME_WRITE;
 import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.NEXT_NODE;
+import static cmu.xprize.util.TCONST.STUCK_TIME_PICMATCH;
+import static cmu.xprize.util.TCONST.STUCK_TIME_WRITE;
 
 
 /**
@@ -210,6 +216,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     protected String task;
     protected String level;
 
+    private TimerMaster _timer;
     private GestureDetector mDetector;
     protected boolean gestureTimerStarted;
 
@@ -238,7 +245,9 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         // Capture the local broadcast manager
         bManager = LocalBroadcastManager.getInstance(getContext());
 
-        mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(this));
+        _timer = new TimerMaster(this, _queue, "WriteTimer",
+                HESITATE_TIME_WRITE, STUCK_TIME_WRITE, GESTURE_TIME_WRITE);
+        mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(_timer));
 
         // JUDITH each component should have a different listener
         this.setOnTouchListener(new OnTouchListener() {
@@ -2515,6 +2524,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 if (gestureTimerStarted) return;
                 Log.wtf("GESTURE", "Triggering Timer Gesture for " + GESTURE_TIME_WRITE);
                 gestureTimerStarted = true;
+                // JESTER mimic1
                 _queue.post(I_TRIGGER_GESTURE, I_TRIGGER_GESTURE, GESTURE_TIME_WRITE);
                 break;
 
@@ -2523,6 +2533,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
 
                 gestureTimerStarted = false;
                 Log.wtf("GESTURE", "Cancelling timer gesture for " + GESTURE_TIME_WRITE);
+                // JESTER mimic2
                 _queue.cancelPost(I_TRIGGER_GESTURE);
                 break;
         }
