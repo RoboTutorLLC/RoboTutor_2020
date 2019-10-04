@@ -323,7 +323,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
             delayMs = delayTime * 1000;
             Log.wtf("TUTOR_ID", "" + delayMs);
         } catch (Exception e) {
-            delayMs = TCONST.HESITATE_TIME_SPELL;
+            delayMs = TCONST.HESITATE_TIME_BPOP;
         }
         return delayMs;
     }

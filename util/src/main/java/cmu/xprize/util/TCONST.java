@@ -557,7 +557,7 @@ public class TCONST {
 
     // CONSTANTS -- replace with Judith's thing.
     public static final int  FAILURE_COUNT_BPOP = 9;
-    public static final Long HESITATE_TIME_BPOP = 15000L; // NOTE THAT THIS IS NOT RESETTING
+    public static final Long HESITATE_TIME_BPOP = 6000L; // NOTE THAT THIS IS NOT RESETTING
     public static final Long STUCK_TIME_BPOP = 20000L;
     public static final Long GESTURE_TIME_BPOP = 6000L;
 
