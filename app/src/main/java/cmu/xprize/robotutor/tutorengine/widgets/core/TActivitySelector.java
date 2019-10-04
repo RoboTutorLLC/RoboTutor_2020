@@ -407,21 +407,21 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING:
 
-                studentModel.updateWritingTutorID(debugTutor); // DEBUG_MENU_LOGIC (x) this might be wrong...
+                studentModel.updateWritingTutorID(debugTutor, true); // DEBUG_MENU_LOGIC (x) this might be wrong...
                 rootTutor     = matrix.getRootSkillByContentArea(SELECT_WRITING);
                 transitionMap = matrix.getTransitionMapByContentArea(SELECT_WRITING);
                 break;
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_STORIES:
 
-                studentModel.updateStoryTutorID(debugTutor);
+                studentModel.updateStoryTutorID(debugTutor, true);
                 rootTutor     = matrix.getRootSkillByContentArea(SELECT_STORIES);
                 transitionMap = matrix.getTransitionMapByContentArea(SELECT_STORIES);
                 break;
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_MATH:
 
-                studentModel.updateMathTutorID(debugTutor);
+                studentModel.updateMathTutorID(debugTutor, true);
                 rootTutor     = matrix.getRootSkillByContentArea(SELECT_MATH);
                 transitionMap = matrix.getTransitionMapByContentArea(SELECT_MATH);
                 break;
@@ -642,7 +642,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
 
                 int increment = timesPlayedActivity + 1;
-                studentModel.updateTimesPlayedTutor(timesPlayedId, increment); // increment to let them know we watched the video
+                studentModel.updateTimesPlayedTutor(timesPlayedId, increment, true); // increment to let them know we watched the video
                 Log.d("VID_LAUNCH", timesPlayedId + ": " + timesPlayedActivity + " --> " + increment);
 
                 CLogManager.setTutor(tutorToLaunch.tutor_id);

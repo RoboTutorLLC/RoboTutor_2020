@@ -252,15 +252,15 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
             if (!chosenTutorId.equals(zeroIndexedTutorId)) {
                 switch (activeSkill) {
                     case SELECT_WRITING:
-                        _student.updateWritingTutorID(chosenTutorId);
+                        _student.updateWritingTutorID(chosenTutorId, true);
                         break;
 
                     case SELECT_STORIES:
-                        _student.updateStoryTutorID(chosenTutorId);
+                        _student.updateStoryTutorID(chosenTutorId, true);
                         break;
 
                     case SELECT_MATH:
-                        _student.updateMathTutorID(chosenTutorId);
+                        _student.updateMathTutorID(chosenTutorId, true);
                         break;
                 }
             }

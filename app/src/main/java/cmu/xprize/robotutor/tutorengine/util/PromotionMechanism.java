@@ -55,7 +55,7 @@ public class PromotionMechanism {
         // 3. Set SELECTOR_MODE
         RoboTutor.SELECTOR_MODE = TCONST.FTR_TUTOR_SELECT;
 
-        _studentModel.updateLastTutor(lastTutorPlayed.getTutorId());
+        _studentModel.updateLastTutor(lastTutorPlayed.getTutorId(), false);
 
         // this will only happen if (wasRepeat && placement)
         if (nextTutor == null) {
@@ -64,15 +64,15 @@ public class PromotionMechanism {
         switch (lastSkillPlayed) { // √
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING:
-                _studentModel.updateWritingTutorID(nextTutor);
+                _studentModel.updateWritingTutorID(nextTutor, false);
                 break;
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_STORIES:
-                _studentModel.updateStoryTutorID(nextTutor);
+                _studentModel.updateStoryTutorID(nextTutor, false);
                 break;
 
             case AS_CONST.BEHAVIOR_KEYS.SELECT_MATH:
-                _studentModel.updateMathTutorID(nextTutor);
+                _studentModel.updateMathTutorID(nextTutor, false);
                 break;
         }
 
@@ -81,15 +81,17 @@ public class PromotionMechanism {
 
             switch (CTutorEngine.menuType) {
                 case CYCLE_CONTENT:
-                    _studentModel.incrementActiveSkill(); // MENU_LOGIC... activeSkill should be incremented after assessment
+                    _studentModel.incrementActiveSkill(false); // MENU_LOGIC... activeSkill should be incremented after assessment
                     break;
 
                 case STUDENT_CHOICE:
-                    _studentModel.updateActiveSkill(lastSkillPlayed);
+                    _studentModel.updateActiveSkill(lastSkillPlayed, false);
                     break;
             }
 
         }
+
+        _studentModel.saveAll();
     }
 
 
@@ -284,18 +286,20 @@ public class PromotionMechanism {
                         // student has made it to the end
                         CPlacementTest_Tutor lastPlacementTest = _matrix.mathPlacement[mathPlacementIndex]; // off-by-one??? they'll never reach it :)
                         // update our preferences to exit PLACEMENT mode
-                        _studentModel.updateMathPlacement(false);
-                        _studentModel.updateMathPlacementIndex(null);
+                        _studentModel.updateMathPlacement(false, false);
+                        _studentModel.updateMathPlacementIndex(null, false);
 
 
+                        _studentModel.saveAll();
                         return lastPlacementTest.fail;
                     } else {
                         // SUPER_PLACEMENT should only increment if they did a new one
                         mathPlacementIndex++; // passing means incrementing by one
                         CPlacementTest_Tutor nextPlacementTest = _matrix.mathPlacement[mathPlacementIndex];
 
-                        _studentModel.updateMathPlacementIndex(mathPlacementIndex);
+                        _studentModel.updateMathPlacementIndex(mathPlacementIndex, false);
 
+                        _studentModel.saveAll();
                         return nextPlacementTest.tutor; // go to beginning of last level
                     }
                 }
@@ -303,6 +307,7 @@ public class PromotionMechanism {
                 else {
                     // SUPER_PLACEMENT try this NEXT NEXT NEXT trace this...
                     if (wasRepeat) {
+                        _studentModel.saveAll();
                         return _studentModel.getWritingTutorID();
                     }
                     int writingPlacementIndex = placementIndex;
@@ -312,10 +317,10 @@ public class PromotionMechanism {
                         CPlacementTest_Tutor lastPlacementTest = _matrix.writePlacement[writingPlacementIndex]; // off-by-one??? they'll never reach it :)
                         // update our preferences to exit PLACEMENT mode
 
-                        _studentModel.updateWritingPlacement(false);
-                        _studentModel.updateWritingPlacementIndex(null); //editor.remove("WRITING_PLACEMENT_INDEX");
+                        _studentModel.updateWritingPlacement(false, false);
+                        _studentModel.updateWritingPlacementIndex(null, false); //editor.remove("WRITING_PLACEMENT_INDEX");
 
-
+                        _studentModel.saveAll();
                         return lastPlacementTest.fail; // go to beginning of last level
                     } else {
                         // SUPER_PLACEMENT should only increment if they did a new one
@@ -323,9 +328,9 @@ public class PromotionMechanism {
                         CPlacementTest_Tutor nextPlacementTest = _matrix.writePlacement[writingPlacementIndex];
 
 
-                        _studentModel.updateWritingPlacementIndex(writingPlacementIndex); //editor.putInt("WRITING_PLACEMENT_INDEX", writingPlacementIndex);
+                        _studentModel.updateWritingPlacementIndex(writingPlacementIndex, false); //editor.putInt("WRITING_PLACEMENT_INDEX", writingPlacementIndex);
 
-
+                        _studentModel.saveAll();
                         return nextPlacementTest.tutor;
                     }
 
@@ -348,20 +353,23 @@ public class PromotionMechanism {
                 // set prefs.usesThingy to false
                 if(useMathPlacement) {
                     lastPlacementTest = _matrix.mathPlacement[placementIndex];
-                    _studentModel.updateMathPlacement(false); // editor.putBoolean(placementKey, false); // no more placement
-                    _studentModel.updateMathPlacementIndex(null);
+                    _studentModel.updateMathPlacement(false, false); // editor.putBoolean(placementKey, false); // no more placement
+                    _studentModel.updateMathPlacementIndex(null, false);
 
                 }
                 // useWritePlacement only other option
                 else {
                     lastPlacementTest = _matrix.writePlacement[placementIndex];
-                    _studentModel.updateWritingPlacement(false); // editor.putBoolean(placementKey, false); // no more placement
-                    _studentModel.updateWritingPlacementIndex(null); // editor.remove(placementIndexKey);
+                    _studentModel.updateWritingPlacement(false, false); // editor.putBoolean(placementKey, false); // no more placement
+                    _studentModel.updateWritingPlacementIndex(null, false); // editor.remove(placementIndexKey);
                 }
+
+                _studentModel.saveAll();
 
                 return lastPlacementTest.fail;
 
 
         }
+
     }
 }

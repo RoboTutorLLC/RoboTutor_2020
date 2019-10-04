@@ -14,21 +14,21 @@ public interface IStudentDataModel {
 
     String getWritingTutorID();
 
-    void updateWritingTutorID(String id);
+    void updateWritingTutorID(String id, boolean saves);
 
     String getStoryTutorID();
 
-    void updateStoryTutorID(String id);
+    void updateStoryTutorID(String id, boolean save);
 
     String getMathTutorID();
 
-    void updateMathTutorID(String id);
+    void updateMathTutorID(String id, boolean save);
 
     String getActiveSkill();
 
-    void updateActiveSkill(String skill);
+    void updateActiveSkill(String skill, boolean save);
 
-    void incrementActiveSkill();
+    void incrementActiveSkill(boolean save);
 
     String getLastSkill();
 
@@ -40,21 +40,23 @@ public interface IStudentDataModel {
 
     int getMathPlacementIndex();
 
-    void updateLastTutor(String activeTutorId);
+    void updateLastTutor(String activeTutorId, boolean save);
 
     String getLastTutor();
 
-    void updateMathPlacement(boolean b);
+    void updateMathPlacement(boolean b, boolean save);
 
-    void updateMathPlacementIndex(Integer i);
+    void updateMathPlacementIndex(Integer i, boolean save);
 
-    void updateWritingPlacement(boolean b);
+    void updateWritingPlacement(boolean b, boolean save);
 
-    void updateWritingPlacementIndex(Integer i);
+    void updateWritingPlacementIndex(Integer i, boolean save);
 
     int getTimesPlayedTutor(String tutor);
 
-    void updateTimesPlayedTutor(String tutor, int i);
+    void updateTimesPlayedTutor(String tutor, int i, boolean save);
+
+    void saveAll();
 
     String toLogString();
 }

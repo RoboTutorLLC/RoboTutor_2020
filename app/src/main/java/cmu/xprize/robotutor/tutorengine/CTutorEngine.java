@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.util.CClassMap2;
 import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
 import cmu.xprize.robotutor.tutorengine.util.PromotionMechanism;
+import cmu.xprize.robotutor.tutorengine.util.StudentDataModelCSV;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
 import cmu.xprize.robotutor.tutorengine.util.TransitionMatrixModel;
 import cmu.xprize.robotutor.tutorengine.widgets.core.TSceneAnimatorLayout;
@@ -652,14 +654,22 @@ public class CTutorEngine implements ILoadableObject2 {
             prefsName += RoboTutor.STUDENT_ID + "_";
         }
         prefsName += CTutorEngine.language;
-        IStudentDataModel model = new StudentDataModelSharedPrefs(RoboTutor.ACTIVITY, prefsName);
+
+        IStudentDataModel model;
+        try {
+            model = new StudentDataModelCSV(RoboTutor.STUDENT_ID);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            model = new StudentDataModelSharedPrefs(RoboTutor.ACTIVITY, prefsName);
+        }
+
 
         // JUDITH - initialize update_intervention.csv
         CUpdateInterventionStudentData.writeNewStudent(RoboTutor.STUDENT_ID);
 
         // if it's the first time playing, we want to initialize our placement values
-        String firstTime = model.getHasPlayed();
-        if (firstTime == null) {
+        String firstTime = model.getHasPlayed(); // KIDSMGMT... change logbook so that this is empty
+        if (firstTime == null || !firstTime.equals("TRUE")) { // KIDSMGMT okay, firstTime should not be TRUE in the CSV.
             model.createNewStudent();
             model.initializeTutorPositions(matrix);
         }

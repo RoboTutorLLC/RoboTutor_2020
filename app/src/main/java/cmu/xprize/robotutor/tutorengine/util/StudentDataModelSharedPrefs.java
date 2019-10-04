@@ -28,42 +28,14 @@ import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
  * see https://stackoverflow.com/questions/7145606/how-android-sharedpreferences-save-store-object
  */
 
-public class StudentDataModelSharedPrefs implements IStudentDataModel {
+public class StudentDataModelSharedPrefs extends AbstractStudentDataModel implements IStudentDataModel {
 
     private static final String TAG = "StudentDataModel";
 
     private static SharedPreferences _preferences;
     private static SharedPreferences.Editor _editor;
 
-    private final static String HAS_PLAYED_KEY = "HAS_PLAYED";
-    private final static String MATH_PLACEMENT_KEY = "MATH_PLACEMENT";
-    private final static String MATH_PLACEMENT_INDEX_KEY = "MATH_PLACEMENT_INDEX";
-    private final static String WRITING_PLACEMENT_KEY = "WRITING_PLACEMENT";
-    private final static String WRITING_PLACEMENT_INDEX_KEY = "WRITING_PLACEMENT_INDEX";
-
-    // these match TCONST
-    private static final String CURRENT_WRITING_TUTOR_KEY   = "letters";
-    private static final String CURRENT_STORIES_TUTOR_KEY    = "stories";
-    private static final String CURRENT_MATH_TUTOR_KEY       = "numbers";
-
-    private  static final String LAST_TUTOR_PLAYED_KEY = "LAST_TUTOR_PLAYED";
-
-
-    // new way cycles through skills
-    private static final boolean CYCLE_MATRIX = true;
-    private static final String SKILL_SELECTED_KEY = "SKILL_SELECTED";
-    // sets to true when student selects repeat
-    private static final String IS_REPEATING_LAST_KEY = "IS_REPEATING_LAST";
-    private static int SKILL_INDEX = 0;
-    private static final String[] SKILL_CYCLE = new String[4];
-
-    // KIDSMGMT this should be write, math, stories, math
-    static {
-        SKILL_CYCLE[0] = SELECT_WRITING;
-        SKILL_CYCLE[1] = SELECT_MATH;
-        SKILL_CYCLE[2] = SELECT_STORIES;
-        SKILL_CYCLE[3] = SELECT_MATH;
-    }
+    private boolean _editorOpen;
 
     /**
      * Constructor
@@ -98,48 +70,6 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     /**
-     * This sets the tutor IDs
-     * @param matrix
-     */
-    @Override
-    public void initializeTutorPositions(TransitionMatrixModel matrix) {
-
-        // initialize math placement
-        boolean useMathPlacement = getMathPlacement() && CTutorEngine.language.equals(LANG_SW) &&  Configuration.usePlacement(RoboTutor.ACTIVITY);
-
-        RoboTutor.logManager.postEvent_V(PLACEMENT_TAG, String.format("useMathPlacement = %s", useMathPlacement));
-        if(useMathPlacement) {
-            int mathPlacementIndex = getMathPlacementIndex();
-            CPlacementTest_Tutor mathPlacementTutor = matrix.mathPlacement[mathPlacementIndex];
-            RoboTutor.logManager.postEvent_I(PLACEMENT_TAG, String.format("mathPlacementIndex = %d", mathPlacementIndex));
-            String mathTutorID = mathPlacementTutor.tutor; // does this need to happen every time???
-            updateMathTutorID(mathTutorID);
-            RoboTutor.logManager.postEvent_I(PLACEMENT_TAG, String.format("mathTutorID = %s", mathTutorID));
-        } else {
-            updateMathTutorID(matrix.rootSkillMath);
-        }
-
-        // initialize writing placement
-        boolean useWritingPlacement = getWritingPlacement() && CTutorEngine.language.equals(LANG_SW) &&  Configuration.usePlacement(RoboTutor.ACTIVITY);
-        RoboTutor.logManager.postEvent_V(PLACEMENT_TAG, String.format("useWritingPlacement = %s", useWritingPlacement));
-        if (useWritingPlacement) {
-            int writingPlacementIndex = getWritingPlacementIndex();
-            CPlacementTest_Tutor writePlacementTutor = matrix.writePlacement[writingPlacementIndex];
-            RoboTutor.logManager.postEvent_I(PLACEMENT_TAG, String.format("writePlacementIndex = %d", writingPlacementIndex));
-            String writingTutorID = writePlacementTutor.tutor;
-            updateWritingTutorID(writingTutorID); // MENU_LOGIC (XXX) why is updateWritingTutorID("story.hear::story_1")
-            RoboTutor.logManager.postEvent_I(PLACEMENT_TAG, String.format("writingTutorID = %s", writingTutorID));
-        } else {
-            updateWritingTutorID(matrix.rootSkillWrite); // MENU_LOGIC (XXX) why is updateWritingTutorID("story.hear::story_1")
-        }
-
-        // stories doesn't have placement testing, so initialize at root
-        if (getStoryTutorID() == null) {
-            updateStoryTutorID(matrix.rootSkillStories);
-        }
-    }
-
-    /**
      * Whether the student has played RoboTutor before.
      * If not, will be updated
      *
@@ -156,14 +86,14 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     @Override
-    public void updateWritingTutorID(String id) {
+    public void updateWritingTutorID(String id, boolean save) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
-        _editor = _preferences.edit();
+        openEditor();
         _editor.putString(CURRENT_WRITING_TUTOR_KEY, id);
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
@@ -172,14 +102,14 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     @Override
-    public void updateStoryTutorID(String id) {
+    public void updateStoryTutorID(String id, boolean save) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
-        _editor = _preferences.edit();
+        openEditor();
         _editor.putString(CURRENT_STORIES_TUTOR_KEY, id);
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
@@ -188,14 +118,14 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     @Override
-    public void updateMathTutorID(String id) {
+    public void updateMathTutorID(String id, boolean save) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
         RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, Method2 + " --> " + Method + "(" + id + ")");
 
-        _editor = _preferences.edit();
+        openEditor();
         _editor.putString(CURRENT_MATH_TUTOR_KEY, id);
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
@@ -206,49 +136,11 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     @Override
-    public void updateActiveSkill(String skill) {
-        _editor = _preferences.edit();
+    public void updateActiveSkill(String skill, boolean save) {
+        openEditor();
         _editor.putString(SKILL_SELECTED_KEY, skill);
-        _editor.apply();
+        applyEditor(save);
         Log.wtf("ACTIVE_SKILL", "update=" + skill);
-    }
-
-    /**
-     * move on to the next skill in cycle
-     * @return
-     */
-    @Override
-    public void incrementActiveSkill() {
-        SKILL_INDEX = (SKILL_INDEX + 1) % SKILL_CYCLE.length; // 0, 1, 2, 3, 0...
-        updateActiveSkill(SKILL_CYCLE[SKILL_INDEX]);
-
-    }
-
-    /**
-     * This is needed to perform a repeat.
-     *
-     * This should behave differently for each Menu
-     *
-     * @return
-     */
-    @Override
-    public String getLastSkill() {
-
-
-        switch(CTutorEngine.menuType) {
-            case CYCLE_CONTENT:
-                int index = SKILL_INDEX == 0 ? SKILL_CYCLE.length -1 : SKILL_INDEX - 1;
-
-                Log.d("REPEAT_ME", "SKILL_INDEX=" + SKILL_INDEX + ", new_index=" + index); // MENU_LOGIC "0", "3"
-                return SKILL_CYCLE[index];
-
-            case STUDENT_CHOICE:
-
-                return getActiveSkill();
-        }
-
-        return null;
-
     }
 
     @Override
@@ -273,10 +165,10 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
 
 
     @Override
-    public void updateLastTutor(String activeTutorId) {
-        _editor = _preferences.edit();
+    public void updateLastTutor(String activeTutorId, boolean save) {
+        openEditor();
         _editor.putString (LAST_TUTOR_PLAYED_KEY, activeTutorId);
-        _editor.apply();
+        applyEditor(save);
     }
 
     // MENU_LOGIC only called once
@@ -286,39 +178,39 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
     }
 
     @Override
-    public void updateMathPlacement(boolean b) {
-        _editor = _preferences.edit();
+    public void updateMathPlacement(boolean b, boolean save) {
+        openEditor();
         _editor.putBoolean(MATH_PLACEMENT_KEY, b);
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
-    public void updateMathPlacementIndex(Integer i) {
-        _editor = _preferences.edit();
+    public void updateMathPlacementIndex(Integer i, boolean save) {
+        openEditor();
         if (i == null) {
             _editor.remove(MATH_PLACEMENT_INDEX_KEY);
         } else {
             _editor.putInt(MATH_PLACEMENT_INDEX_KEY, i);
         }
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
-    public void updateWritingPlacement(boolean b) {
-        _editor = _preferences.edit();
+    public void updateWritingPlacement(boolean b, boolean save) {
+        openEditor();
         _editor.putBoolean(WRITING_PLACEMENT_KEY, b);
-        _editor.apply();
+        applyEditor(save);
     }
 
     @Override
-    public void updateWritingPlacementIndex(Integer i) {
-        _editor = _preferences.edit();
+    public void updateWritingPlacementIndex(Integer i, boolean save) {
+        openEditor();
         if (i == null) {
             _editor.remove(WRITING_PLACEMENT_INDEX_KEY);
         } else {
             _editor.putInt(WRITING_PLACEMENT_INDEX_KEY, i);
         }
-        _editor.apply();
+        applyEditor(save);
     }
 
     /**
@@ -334,10 +226,10 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
 
     // TODO mimic here
     @Override
-    public void updateTimesPlayedTutor(String tutor, int i) {
-        _editor = _preferences.edit();
+    public void updateTimesPlayedTutor(String tutor, int i, boolean save) {
+        openEditor();
         _editor.putInt(getTimesPlayedKey(tutor), i);
-        _editor.apply();
+        applyEditor(save);
     }
 
     private String getTimesPlayedKey(String tutor) {
@@ -372,5 +264,25 @@ public class StudentDataModelSharedPrefs implements IStudentDataModel {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public void saveAll() {
+        applyEditor(true);
+    }
+
+    private void applyEditor(boolean save) {
+        if(!save) return;
+        if (_editorOpen) {
+            _editor.apply();
+            _editorOpen = false;
+        }
+    }
+
+    private void openEditor() {
+        if (!_editorOpen) {
+            _editor = _preferences.edit();
+            _editorOpen = true;
+        }
     }
 }
