@@ -205,10 +205,6 @@
             //Only wait for non expression or short numbers (without hundreds) which are spoken
             //            {"type": "COMMAND", "id": "SBubblePop", "method": "setVolatileBehavior", "parms": "STIMULUS_SHOWN:String|NEXTNODE:String" , "features":"FTR_SHOW&FTR_SAY&FTR_LETTERS"},
 
-
-            // JUDITH trigger the hesitation here...
-            {"name":"SET TIMED HESITATION PROMPT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "resetHesitationTimer", "parms": "", "features":""},
-            {"name":"SET TIMED STUCK PROMPT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "resetStuckTimer", "parms": "", "features":""},
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent",           "parms": "SHOW_BUBBLES:String"              ,"features":""}
 
           ]

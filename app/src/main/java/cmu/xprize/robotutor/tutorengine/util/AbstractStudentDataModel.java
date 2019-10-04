@@ -40,7 +40,6 @@ public abstract class AbstractStudentDataModel implements IStudentDataModel{
 
     protected static int SKILL_INDEX = 0;
 
-    // KIDSMGMT this should be write, math, stories, math
     static {
         SKILL_CYCLE[0] = SELECT_WRITING;
         SKILL_CYCLE[1] = SELECT_MATH;

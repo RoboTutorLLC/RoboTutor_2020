@@ -665,8 +665,8 @@ public class CTutorEngine implements ILoadableObject2 {
         CUpdateInterventionStudentData.writeNewStudent(RoboTutor.STUDENT_ID);
 
         // if it's the first time playing, we want to initialize our placement values
-        String firstTime = model.getHasPlayed(); // KIDSMGMT... change logbook so that this is empty
-        if (firstTime == null || !firstTime.equals("TRUE")) { // KIDSMGMT okay, firstTime should not be TRUE in the CSV.
+        String firstTime = model.getHasPlayed();
+        if (firstTime == null || !firstTime.equalsIgnoreCase("TRUE")) {
             model.createNewStudent();
             model.initializeTutorPositions(matrix);
         }

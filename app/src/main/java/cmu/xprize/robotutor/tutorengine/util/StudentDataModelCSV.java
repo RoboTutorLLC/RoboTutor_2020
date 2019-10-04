@@ -13,7 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.startup.configuration.Configuration;
@@ -88,11 +91,11 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
                 new BufferedReader(new FileReader(getFile(UPDATED_CSV))));
     }
 
-    private static CSVWriter getWriterUpdated() throws IOException {
+    private static CSVWriter getWriterUpdated(boolean append) throws IOException {
 
         // append = true
         return new CSVWriter(
-                new BufferedWriter(new FileWriter(getFile(UPDATED_CSV), true)),
+                new BufferedWriter(new FileWriter(getFile(UPDATED_CSV), append)),
                 CSVWriter.DEFAULT_SEPARATOR,
                 CSVWriter.NO_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -120,28 +123,96 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
         Log.i(DEBUG_CSV, "Constructor");
         _studentId = studentId;
 
-        // just try these to see if the files exist... if they don't, use SharedPrefs
-        _readerOriginal = getReaderOriginal();
         _readerUpdated = getReaderUpdated();
+        boolean foundInUpdated = false;
+        String[] updateHeader, updateRow;
 
+        // map each STUDENT_ID --> {line0, line1, line2, ...}
+        // where lineN is a String[]
+        HashMap<String, String[]> duplicateStudents = new HashMap<String, String[]>();
         try {
-            String[] studentRow = _readerOriginal.readNext();
+            // skip the header
+            updateHeader = _readerUpdated.readNext();
 
-            while ((studentRow = _readerOriginal.readNext()) != null) {
+            Log.i(DEBUG_CSV, "Checking in UPDATED");
 
-                if (studentRow[col("STUDENT_ID")].equals(_studentId)) {
-                    _cachedRow = studentRow;
-                    Log.i(DEBUG_CSV, "found existing student with ID " + _studentId);
-                    break; // found it, break out of table
+            // iterate through each line
+            while ((updateRow = _readerUpdated.readNext()) != null) {
+
+                // this block of code is designed to only keep the last line for each student
+                // so that they can be written out later to save space
+
+                String id = updateRow[col("STUDENT_ID")];
+                // if our map already contains this Student
+                if (duplicateStudents.containsKey(id)) {
+                    // put most recent row
+                    duplicateStudents.put(id, updateRow);
+                } else {
+                    Log.i(DEBUG_CSV, "Adding key " + id + " to duplicateStudents");
+                    // these are the same...
+                    duplicateStudents.put(id, updateRow);
                 }
-
             }
+            _readerUpdated.close(); // close after reading them all!
         } catch (IOException e) {
+
             e.printStackTrace();
+            return; // something isn't right, but we don't want to overwrite
+        }
+
+        rewriteUpdate(updateHeader, duplicateStudents);
+
+        Log.i(DEBUG_CSV, "Checking duplicateStudents for " + _studentId);
+        if (duplicateStudents.containsKey(_studentId)) {
+
+            Log.i(DEBUG_CSV, "Found " + _studentId + " in duplicateStudents");
+            _cachedRow = duplicateStudents.get(_studentId);
+            Log.i(DEBUG_CSV, _cachedRow[col(WRITING_PLACEMENT_INDEX_KEY)]);
+            foundInUpdated = true;
+
+        } else {
+            Log.i(DEBUG_CSV, "Didn't find " + _studentId + " in duplicateStudents");
+            _readerOriginal = getReaderOriginal();
+
+            try {
+                String[] studentRow = _readerOriginal.readNext();
+
+                while ((studentRow = _readerOriginal.readNext()) != null) {
+
+                    if (studentRow[col("STUDENT_ID")].equals(_studentId)) {
+                        _cachedRow = studentRow;
+                        Log.i(DEBUG_CSV, "found existing student with ID " + _studentId);
+                        break; // found it, break out of table
+                    }
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         if (_cachedRow == null) {
             _cachedRow = new String[KEYS_LIST.length]; // initialize empty row
+        }
+    }
+
+    /**
+     * This is used for rewriting update without repeats
+     * @param updateHeader
+     * @param duplicateStudents
+     */
+    private void rewriteUpdate(String[] updateHeader, HashMap<String, String[]> duplicateStudents) {
+
+        try {
+            CSVWriter writer = getWriterUpdated(false);
+            writer.writeNext(updateHeader); // write header
+
+            for (String student : duplicateStudents.keySet()) {
+                writer.writeNext(duplicateStudents.get(student)); // write each student
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -174,98 +245,99 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
 
     @Override
     public String getHasPlayed() {
-        Log.i(DEBUG_CSV, "getHasPlayed()");
+        Log.i(DEBUG_CSV, "getHasPlayed() " + _studentId);
         if (_cachedRow == null) return null;
         return _cachedRow[col("HAS_PLAYED")];
     }
 
     @Override
     public String getWritingTutorID() {
-        Log.i(DEBUG_CSV, "getWritingTutorId()");
-        return _cachedRow[col(CURRENT_WRITING_TUTOR_KEY)];
+        Log.i(DEBUG_CSV, "getWritingTutorId() " + _studentId);
+        String writingTutor = _cachedRow[col(CURRENT_WRITING_TUTOR_KEY)];
+        Log.wtf(DEBUG_CSV, writingTutor);
+        return writingTutor;
     }
 
     @Override
     public void updateWritingTutorID(String id, boolean save) {
-        Log.i(DEBUG_CSV, "updateWritingTutorId()");
+        Log.i(DEBUG_CSV, "updateWritingTutorId(" + id + ") " + _studentId);
         _cachedRow[col(CURRENT_WRITING_TUTOR_KEY)] = id;
         if (save) writeToFile();
     }
 
     @Override
     public String getStoryTutorID() {
-        Log.i(DEBUG_CSV, "getStoryTutorId()");
+        Log.i(DEBUG_CSV, "getStoryTutorId() " + _studentId);
         return _cachedRow[col(CURRENT_STORIES_TUTOR_KEY)];
     }
 
     @Override
     public void updateStoryTutorID(String id, boolean save) {
-        Log.i(DEBUG_CSV, "updateStoryTutorId()");
+        Log.i(DEBUG_CSV, "updateStoryTutorId() " + _studentId);
         _cachedRow[col(CURRENT_STORIES_TUTOR_KEY)] = id;
         if (save) writeToFile();
     }
 
     @Override
     public String getMathTutorID() {
-        Log.i(DEBUG_CSV, "getMathTutorId()");
+        Log.i(DEBUG_CSV, "getMathTutorId() " + _studentId);
         return _cachedRow[col(CURRENT_MATH_TUTOR_KEY)];
     }
 
     @Override
     public void updateMathTutorID(String id, boolean save) {
-        Log.i(DEBUG_CSV, "updateMathTutorId()");
+        Log.i(DEBUG_CSV, "updateMathTutorId() " + _studentId);
         _cachedRow[col(CURRENT_MATH_TUTOR_KEY)] = id;
         if (save) writeToFile();
     }
 
     @Override
     public String getActiveSkill() {
-        Log.i(DEBUG_CSV, "getActiveSkill()");
+        Log.i(DEBUG_CSV, "getActiveSkill() " + _studentId);
         String s = _cachedRow[col(SKILL_SELECTED_KEY)];
         return s != null ? s : SELECT_WRITING;
     }
 
     @Override
     public void updateActiveSkill(String skill, boolean save) {
-        Log.i(DEBUG_CSV, "updateActiveSkill()");
+        Log.i(DEBUG_CSV, "updateActiveSkill() " + _studentId);
         _cachedRow[col(SKILL_SELECTED_KEY)] = skill;
         if (save) writeToFile();
     }
 
     @Override
     public boolean getWritingPlacement() {
-        Log.i(DEBUG_CSV, "getWritingPlacement()");
+        Log.i(DEBUG_CSV, "getWritingPlacement() " + _studentId);
         return String.valueOf(_cachedRow[col(WRITING_PLACEMENT_KEY)])
                 .equalsIgnoreCase("TRUE");
     }
 
-    // KIDSMGMT next... try it with actual file.
-    // Log in with DigitalLogBook (create a new student)
-    // try playing, see what happens... does it update to xyz
     @Override
     public int getWritingPlacementIndex() {
-        Log.i(DEBUG_CSV, "getWritingPlacementIndex()");
+        Log.i(DEBUG_CSV, "getWritingPlacementIndex() " + _studentId);
         String s = _cachedRow[col(WRITING_PLACEMENT_INDEX_KEY)];
-        return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
+        int x = (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
+        Log.w(DEBUG_CSV, "getWritingPlacementIndex = " + x);
+        return x;
     }
 
     @Override
     public boolean getMathPlacement() {
-        Log.i(DEBUG_CSV, "getMathPlacement()");
+        Log.i(DEBUG_CSV, "getMathPlacement() " + _studentId);
         return String.valueOf(_cachedRow[col(MATH_PLACEMENT_KEY)])
                 .equalsIgnoreCase("TRUE");
     }
 
     @Override
     public int getMathPlacementIndex() {
-        Log.i(DEBUG_CSV, "getMathPlacementIndex()");
+        Log.i(DEBUG_CSV, "getMathPlacementIndex() " + _studentId);
         String s = _cachedRow[col(MATH_PLACEMENT_INDEX_KEY)];
         return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
     }
 
     @Override
     public void updateLastTutor(String activeTutorId, boolean save) {
-        Log.i(DEBUG_CSV, "updateLastTutor()");
+        Log.i(DEBUG_CSV, "updateLastTutor() " + _studentId);
         _cachedRow[col(LAST_TUTOR_PLAYED_KEY)] = activeTutorId;
         if (save) writeToFile();
     }
@@ -273,7 +345,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     @Override
     public String getLastTutor() {
 
-        Log.i(DEBUG_CSV, "getLastTutor()");
+        Log.i(DEBUG_CSV, "getLastTutor() " + _studentId);
         return _cachedRow[col(LAST_TUTOR_PLAYED_KEY)];
     }
 
@@ -291,7 +363,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
 
     @Override
     public void updateWritingPlacement(boolean b, boolean save) {
-        _cachedRow[col(WRITING_PLACEMENT_INDEX)] = String.valueOf(b);
+        _cachedRow[col(WRITING_PLACEMENT_KEY)] = String.valueOf(b);
         if (save) writeToFile();
     }
 
@@ -326,7 +398,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
 
     private void writeToFile() {
         try {
-            _writerUpdated = getWriterUpdated();
+            _writerUpdated = getWriterUpdated(true);
             _writerUpdated.writeNext(_cachedRow);
             _writerUpdated.close();
             _hasWrittenOnce = true;
