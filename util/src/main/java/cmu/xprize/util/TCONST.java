@@ -928,4 +928,6 @@ public class TCONST {
     public static final String MATH_PLACEMENT_INDEX = "MATH_PLACEMENT_INDEX";
     public static final String WRITING_PLACEMENT = "WRITING_PLACEMENT";
     public static final String WRITING_PLACEMENT_INDEX = "WRITING_PLACEMENT_INDEX";
+
+    public static final String DEBUG_CSV = "DEBUG_CSV";
 }

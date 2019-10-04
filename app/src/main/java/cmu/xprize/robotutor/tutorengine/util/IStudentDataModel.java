@@ -6,6 +6,9 @@ package cmu.xprize.robotutor.tutorengine.util;
  * Created by kevindeland on 2019-10-04.
  */
 public interface IStudentDataModel {
+
+    String getStudentId();
+
     void initializeTutorPositions(TransitionMatrixModel matrix);
 
     void createNewStudent();

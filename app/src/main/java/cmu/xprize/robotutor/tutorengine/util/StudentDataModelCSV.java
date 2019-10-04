@@ -1,6 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.util;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -20,9 +21,11 @@ import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.util.CPlacementTest_Tutor;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
+import static cmu.xprize.util.TCONST.DEBUG_CSV;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.LANG_SW;
 import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
+import static cmu.xprize.util.TCONST.WRITING_PLACEMENT_INDEX;
 
 /**
  * RoboTutor
@@ -53,7 +56,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
         KEYS_LIST = new String[]{"STUDENT_ID", "HAS_PLAYED",
                 "MATH_PLACEMENT", "MATH_PLACEMENT_INDEX",
                 "WRITING_PLACEMENT", "WRITING_PLACEMENT_INDEX",
-                "SKILL_SELECTED", "letters", "stories", "numbers",
+                "SKILL_SELECTED", "letters", "stories", "numbers", "LAST_TUTOR_PLAYED",
                 "LOG_SEQUENCE_ID",
                 "akira_TIMES_PLAYED", "bpop_TIMES_PLAYED", "countingx_TIMES_PLAYED",
                 "math_TIMES_PLAYED", "numberscale_TIMES_PLAYED", "story_TIMES_PLAYED",
@@ -86,8 +89,10 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     }
 
     private static CSVWriter getWriterUpdated() throws IOException {
+
+        // append = true
         return new CSVWriter(
-                new BufferedWriter(new FileWriter(getFile(UPDATED_CSV))),
+                new BufferedWriter(new FileWriter(getFile(UPDATED_CSV), true)),
                 CSVWriter.DEFAULT_SEPARATOR,
                 CSVWriter.NO_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER,
@@ -112,6 +117,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
      */
     public StudentDataModelCSV(String studentId) throws FileNotFoundException {
 
+        Log.i(DEBUG_CSV, "Constructor");
         _studentId = studentId;
 
         // just try these to see if the files exist... if they don't, use SharedPrefs
@@ -123,8 +129,9 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
 
             while ((studentRow = _readerOriginal.readNext()) != null) {
 
-                if (studentRow[col("STUDENT_ID")].equals(studentId)) {
+                if (studentRow[col("STUDENT_ID")].equals(_studentId)) {
                     _cachedRow = studentRow;
+                    Log.i(DEBUG_CSV, "found existing student with ID " + _studentId);
                     break; // found it, break out of table
                 }
 
@@ -132,11 +139,23 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (_cachedRow == null) {
+            _cachedRow = new String[KEYS_LIST.length]; // initialize empty row
+        }
+    }
+
+    @Override
+    public String getStudentId() {
+        return _studentId;
     }
 
     @Override
     public void createNewStudent() {
 
+        Log.i(DEBUG_CSV, "createNewStudent()");
+
+        _cachedRow[col("STUDENT_ID")] = _studentId;
         _cachedRow[col(HAS_PLAYED_KEY)] = String.valueOf(true);
         _cachedRow[col(WRITING_PLACEMENT_KEY)] = String.valueOf(CTutorEngine.language.equals(LANG_SW) && Configuration.usePlacement(RoboTutor.ACTIVITY));
 
@@ -149,136 +168,171 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
             _cachedRow[col(SKILL_SELECTED_KEY)] = SELECT_WRITING;
         }
 
-        try {
-            // KIDSMGMT NEXT copy this to saveAll();... also mimic behavior in StudentDataModelSharedPrefs
-            CSVWriter writer = getWriterUpdated();
-            writer.writeNext(_cachedRow);
-            writer.close();
-            _hasWrittenOnce = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        writeToFile();
+        _hasWrittenOnce = true;
     }
 
     @Override
     public String getHasPlayed() {
-        // KIDSMGMT next: rename updated_info.csv... make "hasPlayed" column empty
+        Log.i(DEBUG_CSV, "getHasPlayed()");
+        if (_cachedRow == null) return null;
         return _cachedRow[col("HAS_PLAYED")];
     }
 
     @Override
     public String getWritingTutorID() {
+        Log.i(DEBUG_CSV, "getWritingTutorId()");
         return _cachedRow[col(CURRENT_WRITING_TUTOR_KEY)];
     }
 
     @Override
     public void updateWritingTutorID(String id, boolean save) {
-
+        Log.i(DEBUG_CSV, "updateWritingTutorId()");
+        _cachedRow[col(CURRENT_WRITING_TUTOR_KEY)] = id;
+        if (save) writeToFile();
     }
 
     @Override
     public String getStoryTutorID() {
+        Log.i(DEBUG_CSV, "getStoryTutorId()");
         return _cachedRow[col(CURRENT_STORIES_TUTOR_KEY)];
     }
 
     @Override
     public void updateStoryTutorID(String id, boolean save) {
-
+        Log.i(DEBUG_CSV, "updateStoryTutorId()");
+        _cachedRow[col(CURRENT_STORIES_TUTOR_KEY)] = id;
+        if (save) writeToFile();
     }
 
     @Override
     public String getMathTutorID() {
+        Log.i(DEBUG_CSV, "getMathTutorId()");
         return _cachedRow[col(CURRENT_MATH_TUTOR_KEY)];
     }
 
     @Override
     public void updateMathTutorID(String id, boolean save) {
-
+        Log.i(DEBUG_CSV, "updateMathTutorId()");
+        _cachedRow[col(CURRENT_MATH_TUTOR_KEY)] = id;
+        if (save) writeToFile();
     }
 
     @Override
     public String getActiveSkill() {
+        Log.i(DEBUG_CSV, "getActiveSkill()");
         String s = _cachedRow[col(SKILL_SELECTED_KEY)];
         return s != null ? s : SELECT_WRITING;
     }
 
     @Override
     public void updateActiveSkill(String skill, boolean save) {
-
+        Log.i(DEBUG_CSV, "updateActiveSkill()");
+        _cachedRow[col(SKILL_SELECTED_KEY)] = skill;
+        if (save) writeToFile();
     }
 
     @Override
     public boolean getWritingPlacement() {
+        Log.i(DEBUG_CSV, "getWritingPlacement()");
         return String.valueOf(_cachedRow[col(WRITING_PLACEMENT_KEY)])
                 .equalsIgnoreCase("TRUE");
     }
 
-    // KIDSMGMT next continue on these...
-    // - make sure the types are coorect
-    // - for updates, change to have a boolean value that writes it or not
+    // KIDSMGMT next... try it with actual file.
+    // Log in with DigitalLogBook (create a new student)
+    // try playing, see what happens... does it update to xyz
     @Override
     public int getWritingPlacementIndex() {
-        return 0;
+        Log.i(DEBUG_CSV, "getWritingPlacementIndex()");
+        String s = _cachedRow[col(WRITING_PLACEMENT_INDEX_KEY)];
+        return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
     }
 
     @Override
     public boolean getMathPlacement() {
+        Log.i(DEBUG_CSV, "getMathPlacement()");
         return String.valueOf(_cachedRow[col(MATH_PLACEMENT_KEY)])
                 .equalsIgnoreCase("TRUE");
     }
 
     @Override
     public int getMathPlacementIndex() {
-        return 0;
+        Log.i(DEBUG_CSV, "getMathPlacementIndex()");
+        String s = _cachedRow[col(MATH_PLACEMENT_INDEX_KEY)];
+        return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
     }
 
-    // KIDSMGMT change all "update" to take a boolean 'save' as second var
-    // if 'save' is true, write it.
-    // KIDSMGMT also make a 'saveAll' function
     @Override
     public void updateLastTutor(String activeTutorId, boolean save) {
-
+        Log.i(DEBUG_CSV, "updateLastTutor()");
+        _cachedRow[col(LAST_TUTOR_PLAYED_KEY)] = activeTutorId;
+        if (save) writeToFile();
     }
 
     @Override
     public String getLastTutor() {
-        return null;
+
+        Log.i(DEBUG_CSV, "getLastTutor()");
+        return _cachedRow[col(LAST_TUTOR_PLAYED_KEY)];
     }
 
     @Override
     public void updateMathPlacement(boolean b, boolean save) {
-
+        _cachedRow[col(MATH_PLACEMENT_KEY)] = String.valueOf(b);
+        if (save) writeToFile();
     }
 
     @Override
     public void updateMathPlacementIndex(Integer i, boolean save) {
-
+        _cachedRow[col(MATH_PLACEMENT_INDEX_KEY)] = String.valueOf(i);
+        if (save) writeToFile();
     }
 
     @Override
     public void updateWritingPlacement(boolean b, boolean save) {
-
+        _cachedRow[col(WRITING_PLACEMENT_INDEX)] = String.valueOf(b);
+        if (save) writeToFile();
     }
 
     @Override
     public void updateWritingPlacementIndex(Integer i, boolean save) {
-
+        _cachedRow[col(WRITING_PLACEMENT_INDEX_KEY)] = String.valueOf(i);
+        if (save) writeToFile();
     }
 
     @Override
     public int getTimesPlayedTutor(String tutor) {
-        return 0;
+        String key = getTimesPlayedKey(tutor);
+        String s = _cachedRow[col(key)];
+        return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
     }
 
     @Override
     public void updateTimesPlayedTutor(String tutor, int i, boolean save) {
-
+        String key = getTimesPlayedKey(tutor);
+        _cachedRow[col(key)] = String.valueOf(i);
+        if (save) writeToFile();
     }
 
+    /**
+     * Writes all of the cachedRow to CSV.
+     */
     @Override
     public void saveAll() {
-        // KIDSMGMT write _cachedRow to UPDATE
+        Log.i(DEBUG_CSV, "saveAll()");
+        writeToFile();
+    }
+
+    private void writeToFile() {
+        try {
+            _writerUpdated = getWriterUpdated();
+            _writerUpdated.writeNext(_cachedRow);
+            _writerUpdated.close();
+            _hasWrittenOnce = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

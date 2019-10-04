@@ -60,6 +60,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
+import static cmu.xprize.util.TCONST.DEBUG_CSV;
 import static cmu.xprize.util.TCONST.LANG_EN;
 
 /**
@@ -141,8 +142,18 @@ public class CTutorEngine implements ILoadableObject2 {
      */
     static public CTutorEngine getTutorEngine(RoboTutor context) {
 
+        Log.w(DEBUG_CSV, "getTutorEngine()");
         if(singletonTutorEngine == null) {
+            Log.w(DEBUG_CSV, "new CTutorEngine with STUDENT_ID = " + RoboTutor.STUDENT_ID);
             singletonTutorEngine = new CTutorEngine(context);
+        } else if (!RoboTutor.STUDENT_ID.equals(studentModel.getStudentId())){
+            Log.w(DEBUG_CSV, "Changing StudentModel from " + studentModel.getStudentId()
+             + " to " + RoboTutor.STUDENT_ID);
+
+            studentModel = loadStudentModel(matrix);
+            // promotion dependent on StudentModel, so we must update this too
+            promotionMechanism = new PromotionMechanism(studentModel, matrix);
+
         }
 
         return singletonTutorEngine;
@@ -657,6 +668,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
         IStudentDataModel model;
         try {
+            Log.w(DEBUG_CSV, "new StudentDataModelCSV(" + RoboTutor.STUDENT_ID + ")");
             model = new StudentDataModelCSV(RoboTutor.STUDENT_ID);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -129,4 +129,8 @@ public abstract class AbstractStudentDataModel implements IStudentDataModel{
         updateActiveSkill(SKILL_CYCLE[SKILL_INDEX], save);
 
     }
+
+    protected String getTimesPlayedKey(String tutor) {
+        return tutor + "_TIMES_PLAYED";
+    }
 }

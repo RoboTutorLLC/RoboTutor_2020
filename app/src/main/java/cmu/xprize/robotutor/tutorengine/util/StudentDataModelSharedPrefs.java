@@ -35,6 +35,7 @@ public class StudentDataModelSharedPrefs extends AbstractStudentDataModel implem
     private static SharedPreferences _preferences;
     private static SharedPreferences.Editor _editor;
 
+    private String _studentId;
     private boolean _editorOpen;
 
     /**
@@ -43,7 +44,13 @@ public class StudentDataModelSharedPrefs extends AbstractStudentDataModel implem
      * @param prefsID the ID of the student
      */
     public StudentDataModelSharedPrefs(Context context, String prefsID) {
+        _studentId = prefsID;
         _preferences = context.getSharedPreferences(prefsID, Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public String getStudentId() {
+        return _studentId;
     }
 
     /**
@@ -230,10 +237,6 @@ public class StudentDataModelSharedPrefs extends AbstractStudentDataModel implem
         openEditor();
         _editor.putInt(getTimesPlayedKey(tutor), i);
         applyEditor(save);
-    }
-
-    private String getTimesPlayedKey(String tutor) {
-        return tutor + "_TIMES_PLAYED";
     }
 
     @Override
