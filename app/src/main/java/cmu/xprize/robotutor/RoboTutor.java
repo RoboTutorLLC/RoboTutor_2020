@@ -113,7 +113,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     private static final boolean QUICK_DEBUG_CONFIG = false;
     private static final ConfigurationItems QUICK_DEBUG_CONFIG_OPTION = ConfigurationQuickOptions.DEBUG_EN;
 
-    public static final String MATRIX_FILE = "dev_data.intervention_beta.json";
+    public static final String MATRIX_FILE = "dev_data.cd2.json";
 
     private static final String LOG_SEQUENCE_ID = "LOG_SEQUENCE_ID";
 
