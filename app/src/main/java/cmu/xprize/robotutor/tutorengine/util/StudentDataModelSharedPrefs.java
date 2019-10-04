@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.util.Map;
 
 import cmu.xprize.robotutor.RoboTutor;
@@ -23,13 +21,14 @@ import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
 /**
  * RoboTutor
  * <p>
+ *     Uses SharedPrefs to store StudentDataModel
  * Created by kevindeland on 9/20/18.
- *
+ * </p>
  * this *may* be too slow... change to a JSON object, and store all at once
  * see https://stackoverflow.com/questions/7145606/how-android-sharedpreferences-save-store-object
  */
 
-public class StudentDataModel {
+public class StudentDataModelSharedPrefs implements IStudentDataModel {
 
     private static final String TAG = "StudentDataModel";
 
@@ -57,10 +56,12 @@ public class StudentDataModel {
     private static final String IS_REPEATING_LAST_KEY = "IS_REPEATING_LAST";
     private static int SKILL_INDEX = 0;
     private static final String[] SKILL_CYCLE = new String[4];
+
+    // KIDSMGMT this should be write, math, stories, math
     static {
         SKILL_CYCLE[0] = SELECT_WRITING;
-        SKILL_CYCLE[1] = SELECT_STORIES;
-        SKILL_CYCLE[2] = SELECT_WRITING;
+        SKILL_CYCLE[1] = SELECT_MATH;
+        SKILL_CYCLE[2] = SELECT_STORIES;
         SKILL_CYCLE[3] = SELECT_MATH;
     }
 
@@ -69,14 +70,15 @@ public class StudentDataModel {
      * @param context needed to call getSharedPreferences
      * @param prefsID the ID of the student
      */
-    public StudentDataModel(Context context, String prefsID) {
+    public StudentDataModelSharedPrefs(Context context, String prefsID) {
         _preferences = context.getSharedPreferences(prefsID, Context.MODE_PRIVATE);
     }
 
     /**
      * Initializes the student with beginning values
      */
-    public static void createNewStudent() {
+    @Override
+    public void createNewStudent() {
         _editor = _preferences.edit();
         _editor.putString(HAS_PLAYED_KEY, String.valueOf(true));
 
@@ -99,6 +101,7 @@ public class StudentDataModel {
      * This sets the tutor IDs
      * @param matrix
      */
+    @Override
     public void initializeTutorPositions(TransitionMatrixModel matrix) {
 
         // initialize math placement
@@ -142,19 +145,17 @@ public class StudentDataModel {
      *
      * @return "true" or null.
      */
+    @Override
     public String getHasPlayed() {
         return _preferences.getString(HAS_PLAYED_KEY, null);
     }
 
+    @Override
     public String getWritingTutorID() {
         return _preferences.getString(CURRENT_WRITING_TUTOR_KEY, null);
     }
 
-    // MENU_SOLUTION
-    // (1) add useful logs https://stackoverflow.com/questions/6891348/is-there-any-way-to-automatically-log-the-method-name-in-android
-    // (2) fix wacky logic
-    // (3) ship it...
-    // MENU_LOGIC id = "story.hear::story_1" ?
+    @Override
     public void updateWritingTutorID(String id) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -165,10 +166,12 @@ public class StudentDataModel {
         _editor.apply();
     }
 
+    @Override
     public String getStoryTutorID() {
         return _preferences.getString(CURRENT_STORIES_TUTOR_KEY, null);
     }
 
+    @Override
     public void updateStoryTutorID(String id) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -179,10 +182,12 @@ public class StudentDataModel {
         _editor.apply();
     }
 
+    @Override
     public String getMathTutorID() {
         return _preferences.getString(CURRENT_MATH_TUTOR_KEY, null);
     }
 
+    @Override
     public void updateMathTutorID(String id) {
         String Method = Thread.currentThread().getStackTrace()[2].getMethodName();
         String Method2 = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -193,12 +198,14 @@ public class StudentDataModel {
         _editor.apply();
     }
 
+    @Override
     public String getActiveSkill() {
         String activeSkill = _preferences.getString(SKILL_SELECTED_KEY, SELECT_WRITING); // MENU_LOGIC should this have a default???
         Log.wtf("ACTIVE_SKILL", "get=" + activeSkill);
         return activeSkill;
     }
 
+    @Override
     public void updateActiveSkill(String skill) {
         _editor = _preferences.edit();
         _editor.putString(SKILL_SELECTED_KEY, skill);
@@ -210,6 +217,7 @@ public class StudentDataModel {
      * move on to the next skill in cycle
      * @return
      */
+    @Override
     public void incrementActiveSkill() {
         SKILL_INDEX = (SKILL_INDEX + 1) % SKILL_CYCLE.length; // 0, 1, 2, 3, 0...
         updateActiveSkill(SKILL_CYCLE[SKILL_INDEX]);
@@ -223,6 +231,7 @@ public class StudentDataModel {
      *
      * @return
      */
+    @Override
     public String getLastSkill() {
 
 
@@ -242,41 +251,49 @@ public class StudentDataModel {
 
     }
 
+    @Override
     public boolean getWritingPlacement() {
         return _preferences.getBoolean(WRITING_PLACEMENT_KEY, false);
     }
 
+    @Override
     public int getWritingPlacementIndex() {
         return _preferences.getInt(WRITING_PLACEMENT_INDEX_KEY, 0);
     }
 
+    @Override
     public boolean getMathPlacement() {
         return _preferences.getBoolean(MATH_PLACEMENT_KEY, false);
     }
 
+    @Override
     public int getMathPlacementIndex() {
         return  _preferences.getInt(MATH_PLACEMENT_INDEX_KEY, 0);
     }
 
 
-    void updateLastTutor(String activeTutorId) {
+    @Override
+    public void updateLastTutor(String activeTutorId) {
         _editor = _preferences.edit();
         _editor.putString (LAST_TUTOR_PLAYED_KEY, activeTutorId);
         _editor.apply();
     }
 
     // MENU_LOGIC only called once
+    @Override
     public String getLastTutor() {
         return _preferences.getString(LAST_TUTOR_PLAYED_KEY, null);
     }
 
-    void updateMathPlacement(boolean b) {
+    @Override
+    public void updateMathPlacement(boolean b) {
         _editor = _preferences.edit();
         _editor.putBoolean(MATH_PLACEMENT_KEY, b);
         _editor.apply();
     }
 
-    void updateMathPlacementIndex(Integer i) {
+    @Override
+    public void updateMathPlacementIndex(Integer i) {
         _editor = _preferences.edit();
         if (i == null) {
             _editor.remove(MATH_PLACEMENT_INDEX_KEY);
@@ -286,13 +303,15 @@ public class StudentDataModel {
         _editor.apply();
     }
 
-    void updateWritingPlacement(boolean b) {
+    @Override
+    public void updateWritingPlacement(boolean b) {
         _editor = _preferences.edit();
         _editor.putBoolean(WRITING_PLACEMENT_KEY, b);
         _editor.apply();
     }
 
-    void updateWritingPlacementIndex(Integer i) {
+    @Override
+    public void updateWritingPlacementIndex(Integer i) {
         _editor = _preferences.edit();
         if (i == null) {
             _editor.remove(WRITING_PLACEMENT_INDEX_KEY);
@@ -307,11 +326,14 @@ public class StudentDataModel {
      * @param tutor
      * @return
      */
+    @Override
     public int getTimesPlayedTutor(String tutor) {
         String key = getTimesPlayedKey(tutor);
         return _preferences.getInt(key, 0);
     }
 
+    // TODO mimic here
+    @Override
     public void updateTimesPlayedTutor(String tutor, int i) {
         _editor = _preferences.edit();
         _editor.putInt(getTimesPlayedKey(tutor), i);
@@ -320,30 +342,6 @@ public class StudentDataModel {
 
     private String getTimesPlayedKey(String tutor) {
         return tutor + "_TIMES_PLAYED";
-    }
-
-
-    /**
-     * how to get whole model at once, instead of individual elements...
-     * @param key
-     */
-    private void getWholeModel(String key) {
-        Gson gson = new Gson();
-        String json = _preferences.getString(key, "");
-        StudentDataModel newThis = gson.fromJson(json, StudentDataModel.class);
-    }
-
-    /**
-     * how to save whole model at once, instead of individual elements...
-     * @param model
-     */
-    private boolean saveWholeModel(StudentDataModel model) {
-        _editor = _preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(model);
-        Log.d(TAG, "This is what it looks like: " + json);
-        _editor.putString("key", json);
-        return _editor.commit();
     }
 
     @Override
@@ -361,6 +359,7 @@ public class StudentDataModel {
         return builder.toString();
     }
 
+    @Override
     public String toLogString() {
         StringBuilder builder = new StringBuilder();
 

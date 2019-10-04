@@ -8,11 +8,8 @@ import cmu.xprize.comp_ask.CAsk_Data;
 import cmu.xprize.comp_session.AS_CONST;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.util.CAt_Data;
-import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_MATH;
-import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_OPTION_0;
-import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_OPTION_1;
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_STORIES;
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 
@@ -27,9 +24,9 @@ import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 public class StudentChooseMatrixActivityMenu implements IActivityMenu {
 
     TransitionMatrixModel _matrix;
-    StudentDataModel _student;
+    IStudentDataModel _student;
     
-    public StudentChooseMatrixActivityMenu(TransitionMatrixModel matrix, StudentDataModel student) {
+    public StudentChooseMatrixActivityMenu(TransitionMatrixModel matrix, IStudentDataModel student) {
         this._matrix = matrix;
         this._student = student;
     }

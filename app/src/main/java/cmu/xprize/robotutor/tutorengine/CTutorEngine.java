@@ -49,8 +49,9 @@ import cmu.xprize.robotutor.tutorengine.graph.defvar_tutor;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.util.CClassMap2;
+import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
 import cmu.xprize.robotutor.tutorengine.util.PromotionMechanism;
-import cmu.xprize.robotutor.tutorengine.util.StudentDataModel;
+import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
 import cmu.xprize.robotutor.tutorengine.util.TransitionMatrixModel;
 import cmu.xprize.robotutor.tutorengine.widgets.core.TSceneAnimatorLayout;
 import cmu.xprize.util.IScope;
@@ -58,7 +59,6 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.LANG_EN;
-import static cmu.xprize.util.TCONST.STUDENT_ID_VAR;
 
 /**
  * The tutor engine provides top-levelFolder control over the tutor lifecycle and can support multiple
@@ -76,7 +76,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
     private CMediaManager                   mMediaManager;
 
-    public static StudentDataModel          studentModel;
+    public static IStudentDataModel studentModel;
     public static TransitionMatrixModel     matrix;
     public static PromotionMechanism        promotionMechanism;
     public enum MenuType {STUDENT_CHOICE, CYCLE_CONTENT};
@@ -645,14 +645,14 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param matrix what the activity matrix looks like.
      * @return
      */
-    private static StudentDataModel loadStudentModel(TransitionMatrixModel matrix) {
+    private static IStudentDataModel loadStudentModel(TransitionMatrixModel matrix) {
         // initialize
         String prefsName = "";
         if(RoboTutor.STUDENT_ID != null) {
             prefsName += RoboTutor.STUDENT_ID + "_";
         }
         prefsName += CTutorEngine.language;
-        StudentDataModel model = new StudentDataModel(RoboTutor.ACTIVITY, prefsName);
+        IStudentDataModel model = new StudentDataModelSharedPrefs(RoboTutor.ACTIVITY, prefsName);
 
         // JUDITH - initialize update_intervention.csv
         CUpdateInterventionStudentData.writeNewStudent(RoboTutor.STUDENT_ID);

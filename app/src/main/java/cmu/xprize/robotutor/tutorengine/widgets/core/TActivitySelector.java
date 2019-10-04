@@ -1,7 +1,6 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogManager;
 
 import cmu.xprize.comp_ask.CAskElement;
 import cmu.xprize.comp_debug.CDebugComponent;
@@ -45,8 +43,9 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.TInteger;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TString;
 import cmu.xprize.robotutor.tutorengine.util.CycleMatrixActivityMenu;
 import cmu.xprize.robotutor.tutorengine.util.IActivityMenu;
+import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
 import cmu.xprize.robotutor.tutorengine.util.StudentChooseMatrixActivityMenu;
-import cmu.xprize.robotutor.tutorengine.util.StudentDataModel;
+import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
 import cmu.xprize.robotutor.tutorengine.util.TransitionMatrixModel;
 import cmu.xprize.robotutor.tutorengine.util.VideoHelper;
 import cmu.xprize.util.CAt_Data;
@@ -65,7 +64,6 @@ import static cmu.xprize.comp_session.AS_CONST.VAR_DATASOURCE;
 import static cmu.xprize.comp_session.AS_CONST.VAR_INTENT;
 import static cmu.xprize.comp_session.AS_CONST.VAR_INTENTDATA;
 import static cmu.xprize.comp_session.AS_CONST.VAR_TUTOR_ID;
-import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
 import static cmu.xprize.util.TCONST.LANG_EN;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 import static cmu.xprize.util.TCONST.ROBO_DEBUG_FILE_AKIRA;
@@ -95,7 +93,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
     private boolean     askButtonsEnabled = false;
 
     private TransitionMatrixModel matrix; // now holds the transition map things...
-    private StudentDataModel studentModel; // holds the StudentDataModel
+    private IStudentDataModel studentModel; // holds the StudentDataModel
     private IActivityMenu menu;
 
     private HashMap<String,String>  _StringVar  = new HashMap<>();

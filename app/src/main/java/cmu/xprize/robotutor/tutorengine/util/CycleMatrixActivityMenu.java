@@ -11,7 +11,6 @@ import cmu.xprize.comp_session.AS_CONST;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.util.CAt_Data;
 import cmu.xprize.util.CPlacementTest_Tutor;
-import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_MATH;
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_OPTION_0;
@@ -35,9 +34,9 @@ import static cmu.xprize.util.TCONST.MENU_BUG_TAG;
 public class CycleMatrixActivityMenu implements IActivityMenu {
 
     TransitionMatrixModel _matrix;
-    StudentDataModel _student;
+    IStudentDataModel _student;
 
-    public CycleMatrixActivityMenu(TransitionMatrixModel matrix, StudentDataModel student) {
+    public CycleMatrixActivityMenu(TransitionMatrixModel matrix, IStudentDataModel student) {
         this._matrix = matrix;
         this._student = student;
     }
