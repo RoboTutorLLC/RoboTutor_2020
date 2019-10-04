@@ -88,7 +88,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected View mask;
 
     protected boolean isRunning = true;
-    // JUDITH AKIRA is this how to pause???
 
     private Random random;
     protected SoundPool soundPool;
@@ -101,7 +100,6 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected int carscreechMedia, correctMedia, incorrectMedia, numberchangedMedia,slowdown,speedup;
     protected boolean flag=true;
 
-    // TRIGGER_AKIRA - freeze - this variable might be useful?
     protected int extraSpeed = 1;
 
     //json loadable
@@ -475,8 +473,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
 
     private boolean isPaused = false;
-    // TRIGGER_AKIRA - gesture - put one in this same class???
-    // TRIGGER_AKIRA - gesture - how much app space does this cover?
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 

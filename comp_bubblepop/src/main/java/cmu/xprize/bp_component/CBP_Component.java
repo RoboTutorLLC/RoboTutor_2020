@@ -610,7 +610,6 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
             case TCONST.I_TRIGGER_HESITATE:
                 triggerIntervention(TCONST.I_TRIGGER_HESITATE);
-                // JUDITH_BPOP what about cancelling???
                 break;
 
             case TCONST.I_TRIGGER_STUCK:

@@ -181,7 +181,7 @@ public class CInterventionPopup extends RelativeLayout {
         };
 
         int[] appSupportAudio = {
-                R.raw.aud1, // TZ_INT
+                R.raw.aud1,
                 R.raw.aud2,
                 R.raw.aud3,
         };

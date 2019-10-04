@@ -249,7 +249,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
                 HESITATE_TIME_WRITE, STUCK_TIME_WRITE, GESTURE_TIME_WRITE);
         mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(_timer));
 
-        // JUDITH each component should have a different listener
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -2092,7 +2091,6 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         mRecogList.removeAllViews();
         mResponseViewList.removeAllViews(); //  added
 
-        // JUDITH - when a wrong gesture occurs,
         //LOADING THE STIMULUS
         if(!singleStimulus) {
 
@@ -3603,7 +3601,7 @@ public class EditOperation {
         switch(_command) {
 
             case I_TRIGGER_GESTURE:
-                // JUDITH - move this
+                // INT_WRITING - move this
                 Intent msg = new Intent(I_TRIGGER_GESTURE);
                 bManager.sendBroadcast(msg);
                 break;

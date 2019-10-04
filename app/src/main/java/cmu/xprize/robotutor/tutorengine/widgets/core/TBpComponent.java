@@ -456,7 +456,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     //*****************  Scripting Interface
 
 
-    // QUEUE_REFACTOR used in animator_graph
+    // don't delete, called by animator_graph
     public void postEvent(String event) {
 
         switch (event) {

@@ -90,7 +90,8 @@ public class CMessageQueueFactory {
                                 "CMessageQueue.run _name=%s;_command=%s;_targetObject=%s;_targetString=%s",
                                 _name, _command, _targetObject, _targetString));
 
-                // QUEUE_REFACTOR ugh this is somewhat different for each file (see QueueConstructorVars.txt)
+                // ugh this is somewhat different for each file (see QueueConstructorVars.txt)
+                // could refactor
                 if(_targetObject != null) {
                     Log.wtf("QUEUE_FACTORY", "runCommand(object)");
                     runner.runCommand(_command, _targetObject);

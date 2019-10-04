@@ -82,7 +82,6 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
     protected boolean lastSyllable;
 
     // View
-    // INT_SPELL - GESTURE - where do I put the gesture listener? need to inspect what happens each
     protected Context mContext;
     protected LinearLayout mLetterHolder;
     protected LinearLayout mSelectedLetterHolder;
@@ -260,8 +259,6 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         boolean isCorrect = letter.equalsIgnoreCase(current);
 
-        // INT_SPELL - FAILURE - STATUS:TEST
-        // INT_FAILURE - SPELL - STATUS:TEST
         if (!isCorrect) {
             wrongFirstAttempts++;
             if (_failson.shouldTriggerIntervention(wrongFirstAttempts)) {
@@ -559,7 +556,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     @Override
     public void runCommand(String command) {
-        // QUEUE_REFACTOR only needed when we're actually running triggerIntervention/Hesitation
+
         switch(command) {
             case TCONST.I_TRIGGER_STUCK:
                 triggerIntervention(TCONST.I_TRIGGER_STUCK);
