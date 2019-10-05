@@ -391,7 +391,9 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
 
             case "rise":
             case "rising":
-                _mechanics = new CBp_Mechanic_RISE(mContext, this, problem_type);
+                // rising is being very choppy for some reason, so just use MC all the time
+                // _mechanics = new CBp_Mechanic_RISE(mContext, this, problem_type);
+                _mechanics = new CBp_Mechanic_MC(mContext, this, problem_type);
                 break;
         }
 
