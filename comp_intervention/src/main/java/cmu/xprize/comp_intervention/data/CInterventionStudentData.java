@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import cmu.xprize.util.IRoboTutor;
+
 /**
- * RoboTutor
- * <p>
+ * CInterventionStudentData
+ * <p>Reads a list of students who are involved in an intervention study.</p>
  * Created by kevindeland on 9/13/19.
  */
 
@@ -23,9 +25,12 @@ public class CInterventionStudentData {
     private static CInterventionStudentData singleton;
     private static List<Student> studentData;
 
-    private static final String TAG = "STUDENT_INTERVENTION";
+    private static String currentStudentId;
 
-    private static final String TEACHER_IMAGE = "teacher.jpg";
+    // needed for logging, I guess
+    private static String currentTutorId;
+
+    private static final String TAG = "STUDENT_INTERVENTION";
 
     private CInterventionStudentData(String filename) {
         Log.i(TAG, "filename = " + filename);
@@ -78,6 +83,23 @@ public class CInterventionStudentData {
         return singleton;
     }
 
+    /**
+     * Making a constructor/initializer that just takes a list, for testing.
+     * @param students list of students
+     * @return
+     */
+    private CInterventionStudentData(List<Student> students) {
+        studentData = students;
+    }
+    static public CInterventionStudentData initialize(List<Student> students) {
+
+        if (singleton == null) {
+            singleton = new CInterventionStudentData(students);
+        }
+
+        return singleton;
+    }
+
     public static Student getStudentById(String id) {
 
         Student found = null;
@@ -91,6 +113,18 @@ public class CInterventionStudentData {
     }
 
     /**
+     * We need to track this for when we wanna check...
+     * @param studentId
+     */
+    public static void setCurrentStudentId(String studentId) {
+        currentStudentId = studentId;
+    }
+
+    public static String getCurrentStudentId() {
+        return currentStudentId;
+    }
+
+    /**
      * Return the photo filename of a student who can give knowledge support
      * of a student at level {@code level} in domain {@code domain}
      *
@@ -100,18 +134,40 @@ public class CInterventionStudentData {
      */
     public static String getPhotoForKnowledgeSupport(String domain, int level) {
 
+        List<Student> groupMates = findStudentsInMyGroupNotMe(currentStudentId);
+
         List<String> possibles = new ArrayList<String>();
 
-        for (Student s : studentData) {
+        for (Student s : groupMates) {
             if (s.levels.get(domain) > level) // could be > or >=
                 possibles.add(s.photoFile); // add student photo to list
         }
 
         if (possibles.size() == 0)
-            return TEACHER_IMAGE;
+            return getBackupStudentKnowledgeSupport(domain, groupMates);
 
         // get random student image
         else return possibles.get((new Random()).nextInt(possibles.size()));
+    }
+
+    /**
+     * Backup plan, if nobody is at a higher level than us.
+     * @param domain which knowledge domain?
+     * @param groupMates list of Students to choose from
+     * @return Photo filename from Student w/ highest level
+     */
+    private static String getBackupStudentKnowledgeSupport(String domain, List<Student> groupMates) {
+        int maxLevel = -1;
+        String studentPhotoWithHighestLevel = null;
+
+        for (Student s : groupMates) {
+            if (s.levels.get(domain) > maxLevel) {
+                maxLevel = s.levels.get(domain);
+                studentPhotoWithHighestLevel = s.photoFile;
+            }
+        }
+
+        return studentPhotoWithHighestLevel;
     }
 
     /**
@@ -123,22 +179,85 @@ public class CInterventionStudentData {
      */
     public static String getPhotoForApplicationSupport(String tutor) {
 
+        // only allow students in my group
+        List<Student> groupMates = findStudentsInMyGroupNotMe(currentStudentId);
+
         List<String> possibles = new ArrayList<String>();
         Log.i("9_14", "getPhotoForAppSupport " + tutor);
         Log.i("9_14", "dataSize=" + studentData.size());
 
-        for (Student s : studentData) {
+        for (Student s : groupMates) {
             Log.wtf("9_14", s.tutors.toString());
             if (s.tutors.get(tutor))
                 possibles.add(s.photoFile);
         }
 
+        // backup plan. If nobody has played this tutor, get the student who's played the most
         if (possibles.size() == 0)
-            return TEACHER_IMAGE;
+            return getBackupStudentApplicationSupport(groupMates);
 
         else return possibles.get((new Random()).nextInt(possibles.size()));
     }
 
+    /**
+     * If no possible students found by first criteria, use this criteria.
+     * Return student who's played the most tutors.
+     *
+     * @param groupMates list of groupmates
+     * @return Student with most tutors played.
+     */
+    private static String getBackupStudentApplicationSupport(List<Student> groupMates) {
+        int maxTutorsPlayed = -1;
+        String studentPhotoWithMost = null;
+
+        for (Student s : groupMates) {
+            int currentStudentTutors = 0;
+            for (Map.Entry<String, Boolean> e : s.tutors.entrySet()) {
+                if (e.getValue())
+                    currentStudentTutors++;
+            }
+            if (currentStudentTutors >= maxTutorsPlayed) {
+                maxTutorsPlayed = currentStudentTutors;
+                studentPhotoWithMost = s.photoFile;
+            }
+        }
+
+        return studentPhotoWithMost;
+    }
+
+
+    /**
+     * Filter list of studentData into only students in my group (not including me)
+     * @param studentId the student whose group we're looking for
+     * @return list of classmates
+     */
+    private static List<Student> findStudentsInMyGroupNotMe(String studentId) {
+        List<Student> possibles = new ArrayList<>();
+
+        String groupId = getMyGroupId(studentId);
+
+        for (Student s : studentData) {
+            if (s.groupId.equals(groupId) && !s.id.equals(studentId)) {
+                possibles.add(s);
+            }
+        }
+
+        return possibles;
+    }
+
+    /**
+     * Get the group ID of a student;
+     * @param studentId student whose GroupID we want
+     * @return string group id
+     */
+    private static String getMyGroupId(String studentId) {
+        for (Student s : studentData) {
+            if (s.id.equals(studentId)) {
+                return s.groupId;
+            }
+        }
+        return null;
+    }
 
 
 

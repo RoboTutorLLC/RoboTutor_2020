@@ -315,6 +315,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         Log.wtf("MY_ID", "STUDENT_ID = " + RoboTutor.STUDENT_ID);
         Student me = CInterventionStudentData.getStudentById(RoboTutor.STUDENT_ID);
         STUDENT_INTERVENTION_PROFILE = me;
+        CInterventionStudentData.setCurrentStudentId(RoboTutor.STUDENT_ID);
         Log.wtf("MY_ID", me != null ? me.toString() : "null");
     }
 

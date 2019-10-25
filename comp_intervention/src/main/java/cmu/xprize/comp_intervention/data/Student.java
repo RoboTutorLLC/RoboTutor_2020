@@ -25,6 +25,7 @@ public class Student {
 
     public String id;
     public String photoFile;
+    public String groupId;
     Map<String, Integer> levels;
     Map<String, Boolean> tutors;
 
@@ -32,26 +33,28 @@ public class Student {
      * Student constructed from a single csv line
      * @param csvLine an array of Strings from a single CSV parsing
      */
-    Student (String[] csvLine) {
+    public Student (String[] csvLine) {
         String id = csvLine[0];
         String photoFile = csvLine[1];
+        String groupId = csvLine[2];
+
 
         Log.i("9_14", "initializing Student " + id + photoFile);
 
         Map<String, Integer> lvls = new HashMap<>();
-        lvls.put(MATH, Integer.parseInt(csvLine[2]));
-        lvls.put(STORY, Integer.parseInt(csvLine[3]));
-        lvls.put(LIT, Integer.parseInt(csvLine[4]));
+        lvls.put(MATH, Integer.parseInt(csvLine[3]));
+        lvls.put(STORY, Integer.parseInt(csvLine[4]));
+        lvls.put(LIT, Integer.parseInt(csvLine[5]));
 
         Map<String, Boolean> played = new HashMap<>();
-        played.put(BPOP, csvLine[5].equalsIgnoreCase("y"));
-        played.put(SPELL, csvLine[6].equalsIgnoreCase("y"));
-        played.put(PICMATCH, csvLine[7].equalsIgnoreCase("y"));
-        played.put(AKIRA, csvLine[8].equalsIgnoreCase("y"));
-        played.put(WRITE, csvLine[9].equalsIgnoreCase("y"));
-        played.put(NUMCOMPARE, csvLine[10].equalsIgnoreCase("y"));
+        played.put(BPOP, csvLine[6].equalsIgnoreCase("y"));
+        played.put(SPELL, csvLine[7].equalsIgnoreCase("y"));
+        played.put(PICMATCH, csvLine[8].equalsIgnoreCase("y"));
+        played.put(AKIRA, csvLine[9].equalsIgnoreCase("y"));
+        played.put(WRITE, csvLine[10].equalsIgnoreCase("y"));
+        played.put(NUMCOMPARE, csvLine[11].equalsIgnoreCase("y"));
 
-        this.setVars(id, photoFile, lvls, played);
+        this.setVars(id, photoFile, groupId, lvls, played);
     }
 
     /**
@@ -63,10 +66,12 @@ public class Student {
      */
     private void setVars(String id,
             String photoFile,
+            String groupId,
             Map<String, Integer> levels,
             Map<String, Boolean> tutors) {
         this.id = id;
         this.photoFile = photoFile;
+        this.groupId = groupId;
         this.levels = levels;
         this.tutors = tutors;
     }
@@ -76,7 +81,8 @@ public class Student {
 
         StringBuilder x = (new StringBuilder())
                 .append("id=").append(id)
-                .append(";photo=").append(photoFile);
+                .append(";photo=").append(photoFile)
+                .append(";group=").append(groupId);
 
         for (String k : levels.keySet()) {
             x.append(";lvl-").append(k)
