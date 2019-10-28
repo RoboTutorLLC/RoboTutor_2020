@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 
 import cmu.xprize.util.IRoboTutor;
+import cmu.xprize.util.TCONST;
 
 /**
  * CInterventionStudentData
@@ -232,6 +233,10 @@ public class CInterventionStudentData {
      * @return list of classmates
      */
     private static List<Student> findStudentsInMyGroupNotMe(String studentId) {
+
+        // if we're in debug mode, just run check with every possible students
+        if (studentId.equals(TCONST.DEFAULT_STUDENT_ID)) return studentData;
+
         List<Student> possibles = new ArrayList<>();
 
         String groupId = getMyGroupId(studentId);

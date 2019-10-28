@@ -64,6 +64,30 @@ public class StudentInterventionPhotoTest {
         runApplicationSupportTest("id6", "BPOP", "jacob");
     }
 
+    /**
+     * when we're running in Debug mode, should return a non-null photo
+     */
+    @Test
+    public void testDebugNonNull() {
+
+        CInterventionStudentData.setCurrentStudentId("DEBUG");
+        String photoKnowledge = CInterventionStudentData.getPhotoForKnowledgeSupport("MATH", 1);
+        assertNotNull(photoKnowledge);
+
+        String photoApp = CInterventionStudentData.getPhotoForApplicationSupport("BPOP");
+        assertNotNull(photoApp);
+
+    }
+
+    /**
+     * In debug mode, should treat whole file as one group
+     */
+    @Test
+    public void testDebugTopStudent() {
+        runKnowledgeSupportTest("DEBUG", "MATH", 10, "aubrey");
+
+    }
+
 
     /**
      * Run a test for kno
