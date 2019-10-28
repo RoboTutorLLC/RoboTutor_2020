@@ -67,6 +67,7 @@ import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CLinkedScrollView;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.FailureInterventionHelper;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
@@ -2515,6 +2516,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     @Override
     public void triggerIntervention(String type) {
 
+        GlobalStaticsEngine.setCurrentTutorType("WRITE");
         // INT_WRITE move all this Queue junk to a QueueMessageFactory
         switch(type) {
             case I_TRIGGER_GESTURE:

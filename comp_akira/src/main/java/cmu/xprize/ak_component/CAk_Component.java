@@ -34,6 +34,7 @@ import cmu.xprize.sb_component.CSb_Scoreboard;
 import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IMessageQueueRunner;
@@ -512,6 +513,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
 
     @Override
     public void triggerIntervention(String type) {
+        GlobalStaticsEngine.setCurrentTutorType("AKIRA");
         Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
     }

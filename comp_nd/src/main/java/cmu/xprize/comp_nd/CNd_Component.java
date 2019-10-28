@@ -22,6 +22,7 @@ import cmu.xprize.comp_nd.ui.CNd_LayoutManagerInterface;
 import cmu.xprize.comp_nd.ui.CNd_LayoutManager_BaseTen;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.FailureInterventionHelper;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IMessageQueueRunner;
@@ -658,6 +659,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
 
     @Override
     public void triggerIntervention(String type) {
+        GlobalStaticsEngine.setCurrentTutorType("NUMCOMPARE");
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
     }

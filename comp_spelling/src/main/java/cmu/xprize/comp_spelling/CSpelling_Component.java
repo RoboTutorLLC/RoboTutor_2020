@@ -25,6 +25,7 @@ import java.util.List;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.FailureInterventionHelper;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
@@ -547,7 +548,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
     @Override
     public void triggerIntervention(String type) {
-
+        GlobalStaticsEngine.setCurrentTutorType("SPELL");
         Log.wtf("trigger", "triggering intervention: " + type);
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);

@@ -45,10 +45,10 @@ import cmu.xprize.robotutor.tutorengine.util.CycleMatrixActivityMenu;
 import cmu.xprize.robotutor.tutorengine.util.IActivityMenu;
 import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
 import cmu.xprize.robotutor.tutorengine.util.StudentChooseMatrixActivityMenu;
-import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
 import cmu.xprize.robotutor.tutorengine.util.TransitionMatrixModel;
 import cmu.xprize.robotutor.tutorengine.util.VideoHelper;
 import cmu.xprize.util.CAt_Data;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IEventSource;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
@@ -456,6 +456,8 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
         // check SharedPreferences
 
+        saveGlobalTutorVars(tutorToLaunch);
+
         doTutorLaunchWithVideosAndStuff(tutorToLaunch);
     }
 
@@ -492,6 +494,10 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
             // the next tutor to be launched
             CAt_Data tutorToLaunch = menu.getTutorToLaunch(buttonBehavior);
 
+            // TZ_V2 does this always work... i.e. for placement mode?
+            // TZ_V2 this current level is needed
+            saveGlobalTutorVars(tutorToLaunch);
+
             // #Mod 330 Show TutorID in Banner in debug builds
             // DEBUG_TUTORID is used to communicate the active tutor to the Banner in DEBUG mode
             //
@@ -511,6 +517,37 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
             CErrorManager.logEvent(REPEAT_DEBUG_TAG + "_CRASH", "StudentModel--" + studentModel.toLogString(), e,true);
             CErrorManager.logEvent(REPEAT_DEBUG_TAG + "_CRASH", Log.getStackTraceString(e), true);
         }
+    }
+
+    /**
+     * Save tutor information globally, so any part can access it
+     *
+     * @param tutorToLaunch
+     */
+    private void saveGlobalTutorVars(CAt_Data tutorToLaunch) {
+        int currentLevel;
+        try {
+            currentLevel = Integer.parseInt(tutorToLaunch.cell_row);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            currentLevel = 0;
+        }
+        GlobalStaticsEngine.setCurrentLevel(currentLevel);
+
+        String currentDomain = null;
+        switch(tutorToLaunch.skill) {
+            case "letters":
+                currentDomain = "LIT";
+                break;
+
+            case "numbers":
+                currentDomain = "MATH";
+                break;
+
+            case "stories":
+                currentDomain = "STORY";
+        }
+        GlobalStaticsEngine.setCurrentDomain(currentDomain);
     }
 
     /** This allows us to update the current tutor for a given skill from the CDebugComponent

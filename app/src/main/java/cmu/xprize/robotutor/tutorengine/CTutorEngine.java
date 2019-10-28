@@ -56,6 +56,7 @@ import cmu.xprize.robotutor.tutorengine.util.StudentDataModelCSV;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
 import cmu.xprize.robotutor.tutorengine.util.TransitionMatrixModel;
 import cmu.xprize.robotutor.tutorengine.widgets.core.TSceneAnimatorLayout;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
@@ -366,6 +367,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
         activeTutor = new CTutor(Activity, tutorName, tutorId, (ITutorManager)tutorContainer, TutorLogManager, mRootScope, language, features, matrix);
 
+        GlobalStaticsEngine.setCurrentTutorId(tutorId);
         activeTutor.launchTutor(dataSource);
     }
 

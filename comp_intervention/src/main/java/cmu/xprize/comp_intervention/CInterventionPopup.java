@@ -18,6 +18,10 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
+import cmu.xprize.comp_logging.CInterventionLogManager;
+import cmu.xprize.comp_logging.CPerfLogManager;
+import cmu.xprize.comp_logging.InterventionLogItem;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.ImageLoader;
 import cmu.xprize.util.TCONST;
 import me.delandbeforeti.comp_intervention.R;
@@ -145,7 +149,7 @@ public class CInterventionPopup extends RelativeLayout {
 
             }
             Log.d("INTERVENTION", "Received " + action);
-            imgRef = getChildPhoto(action, null);
+            imgRef = getChildPhoto(action);
             displayImage(imgRef);
             playHelpAudio(action, taperedLevel);
             interventionLabel.setText(action);
@@ -234,10 +238,9 @@ public class CInterventionPopup extends RelativeLayout {
      * Get a String image filename based on intervention type and domain
      *
      * @param interventionType GESTURE, FAILURE, STUCK, or HESITATE
-     * @param activityOrDomain MATH, LIT, STORIES, etc (TODO)
      * @return String path to child's photo
      */
-    private String getChildPhoto(String interventionType, String activityOrDomain) {
+    private String getChildPhoto(String interventionType) {
 
         /*String imgRef = imgPath.get(interventionType);
         if (imgRef == null) imgRef = "image1.jpg"; // default placeholder*/
@@ -246,13 +249,17 @@ public class CInterventionPopup extends RelativeLayout {
         switch (interventionType) {
             case I_TRIGGER_GESTURE:
             case I_TRIGGER_STUCK:
-                imgRef = CInterventionStudentData.getPhotoForApplicationSupport("BPOP"); // TODO: replace
+                // TZ_V2 test that this works!!!
+                imgRef = CInterventionStudentData.getPhotoForApplicationSupport(
+                        GlobalStaticsEngine.getCurrentTutorType());
                 break;
 
             case I_TRIGGER_FAILURE:
             case I_TRIGGER_HESITATE:
             default:
-                imgRef = CInterventionStudentData.getPhotoForKnowledgeSupport("LIT", 2);
+                // TZ_V2 test that this works!!!
+                imgRef = CInterventionStudentData.getPhotoForKnowledgeSupport(
+                        GlobalStaticsEngine.getCurrentDomain(), GlobalStaticsEngine.getCurrentLevel());
                 break;
         }
 

@@ -38,6 +38,7 @@ import java.util.List;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.FailureInterventionHelper;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventDispatcher;
 import cmu.xprize.util.IEventListener;
@@ -50,10 +51,6 @@ import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
-import static cmu.xprize.util.TCONST.GESTURE_TIME_BPOP;
-import static cmu.xprize.util.TCONST.HESITATE_TIME_BPOP;
-import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
-import static cmu.xprize.util.TCONST.STUCK_TIME_BPOP;
 
 
 public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoadableObject,
@@ -586,6 +583,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
     @Override
     public void triggerIntervention(String type) {
 
+        GlobalStaticsEngine.setCurrentTutorType("BPOP");
         Log.v("event.thing", "triggering intervention: " + type);
         Intent msg = new Intent(type);
         bManager.sendBroadcast(msg);
