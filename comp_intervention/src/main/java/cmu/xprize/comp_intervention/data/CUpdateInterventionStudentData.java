@@ -98,6 +98,7 @@ public class CUpdateInterventionStudentData {
             String[] entries = {
                     studentId,
                     "PLACEHOLDER",
+                    "none", // group
                     "1", // lvl_math
                     "1", // lvl_story
                     "1", // lvl_lit
