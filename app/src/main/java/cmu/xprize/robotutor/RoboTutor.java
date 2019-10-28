@@ -46,6 +46,7 @@ import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_intervention.data.Student;
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.comp_logging.CInterventionLogManager;
 import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.CPerfLogManager;
 import cmu.xprize.comp_logging.CPreferenceCache;
@@ -169,6 +170,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     String readyLogPath;
     String readyLogPathPerf;
     String audioLogPath;
+    String interventionLogPath;
     public final static String  DOWNLOAD_PATH  = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DOWNLOADS;
     public final static String  EXT_ASSET_PATH = Environment.getExternalStorageDirectory() + File.separator + TCONST.ROBOTUTOR_ASSET_FOLDER;
 
@@ -272,6 +274,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         audioLogPath = Environment.getExternalStorageDirectory() + TCONST.AUDIO_LOG_FOLDER;
 
+        interventionLogPath = Environment.getExternalStorageDirectory() + TCONST.INTERVENTION_LOG_FOLDER;
+
         Calendar calendar = Calendar.getInstance(Locale.US);
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
         String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
@@ -291,6 +295,9 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         perfLogManager = CPerfLogManager.getInstance();
         perfLogManager.startLogging(hotLogPathPerf, "PERF_" + logFilename);
+
+        CInterventionLogManager.getInstance().startLogging(interventionLogPath,
+                "INT_" + logFilename);
 
         // TODO : implement time stamps
         logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");

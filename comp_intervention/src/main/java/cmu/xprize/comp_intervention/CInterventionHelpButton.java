@@ -10,7 +10,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Date;
+
+import cmu.xprize.comp_intervention.data.CInterventionStudentData;
+import cmu.xprize.comp_logging.CInterventionLogManager;
+import cmu.xprize.comp_logging.InterventionLogItem;
 import cmu.xprize.util.CMessageQueueFactory;
+import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IMessageQueueRunner;
 import me.delandbeforeti.comp_intervention.R;
 
@@ -248,6 +254,16 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
                     break;
 
             }
+
+            CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(
+                    (new Date()).getTime(),
+                    CInterventionStudentData.getCurrentStudentId(),
+                    null,
+                    GlobalStaticsEngine.getCurrentTutorId(),
+                    null,
+                    action,
+                    null
+            ));
         }
     }
 

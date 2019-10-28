@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.HashMap;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
@@ -153,6 +154,16 @@ public class CInterventionPopup extends RelativeLayout {
             displayImage(imgRef);
             playHelpAudio(action, taperedLevel);
             interventionLabel.setText(action);
+
+            CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(
+                    (new Date()).getTime(),
+                    CInterventionStudentData.getCurrentStudentId(),
+                    null,
+                    GlobalStaticsEngine.getCurrentTutorId(),
+                    imgRef,
+                    action,
+                    true
+            ));
 
         }
     }
