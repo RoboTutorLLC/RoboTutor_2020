@@ -331,6 +331,7 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     public void next() {
 
         // reset stuck for this new problem
+        _timer.resetHesitationTimer();
         _timer.resetStuckTimer();
 
         // If wrong reset ALLCORRECT
