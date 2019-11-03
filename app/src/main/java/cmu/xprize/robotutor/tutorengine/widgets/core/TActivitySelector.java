@@ -608,7 +608,14 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
             if (videoId != null) {
 
                 // bpop, write, akira, story, math, etc
-                final int timesPlayedActivity = studentModel.getTimesPlayedTutor(videoId);
+                int timesPlayedActivity;
+                try {
+                    int x = studentModel.getTimesPlayedTutor(videoId);
+                    timesPlayedActivity = x;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    timesPlayedActivity = 1; // if something messes up... don't play the vid
+                }
                 final int TIMES_TO_PLAY_DEMO = 1;
                 boolean playDemoVid = timesPlayedActivity < TIMES_TO_PLAY_DEMO; // only play video twice
                 Log.d("VID_LAUNCH", videoId + ": " + timesPlayedActivity + " compare to " + TIMES_TO_PLAY_DEMO);

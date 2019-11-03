@@ -11,7 +11,9 @@ import cmu.xprize.util.TCONST;
 
 public class VideoHelper {
 
-    enum videos { read, cloze, story_pic, asm, akira, bpop, write, sentence_writing, numberscale, picmatch, spelling, countingx, bigmath_add, bigmath_sub, numcompare, pv1, pv2, pv3};
+    enum videos { akira, bpop, countingx, asm, numberscale, story /*not used */, write,
+        cloze, story_pic, sentence_writing,
+        picmatch, spelling, bigmath_add, bigmath_sub, numcompare, pv1, pv2, pv3};
 
     /**
      * "videoId" is used to do two things:

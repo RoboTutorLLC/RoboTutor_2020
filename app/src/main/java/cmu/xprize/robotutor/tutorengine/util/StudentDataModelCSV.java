@@ -52,18 +52,23 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     private boolean _hasWrittenOnce;
 
     // For mapping how the data is stored.
-    private static String[] KEYS_LIST;
+    private static String[] KEYS_LIST = new String[]{"STUDENT_ID", "HAS_PLAYED",
+            "MATH_PLACEMENT", "MATH_PLACEMENT_INDEX",
+            "WRITING_PLACEMENT", "WRITING_PLACEMENT_INDEX",
+            "SKILL_SELECTED", "letters", "stories", "numbers", "LAST_TUTOR_PLAYED",
+            "LOG_SEQUENCE_ID",
+            "akira_TIMES_PLAYED", "bpop_TIMES_PLAYED", "countingx_TIMES_PLAYED",
+            "math_TIMES_PLAYED", "numberscale_TIMES_PLAYED", "story_TIMES_PLAYED",
+            "write_TIMES_PLAYED",
+            "cloze_TIMES_PLAYED", "story_pic_TIMES_PLAYED", "sentence_writing_TIMES_PLAYED",
+            "picmatch_TIMES_PLAYED", "spelling_TIMES_PLAYED", "bigmath_add_TIMES_PLAYED",
+            "bigmath_sub_TIMES_PLAYED", "numcompare_TIMES_PLAYED", "pv1_TIMES_PLAYED",
+            "pv2_TIMES_PLAYED", "pv3_TIMES_PLAYED"
+    };
+
     private static HashMap<String, Integer> KEY_TO_COLUMN;
     static {
         KEY_TO_COLUMN = new HashMap<>();
-        KEYS_LIST = new String[]{"STUDENT_ID", "HAS_PLAYED",
-                "MATH_PLACEMENT", "MATH_PLACEMENT_INDEX",
-                "WRITING_PLACEMENT", "WRITING_PLACEMENT_INDEX",
-                "SKILL_SELECTED", "letters", "stories", "numbers", "LAST_TUTOR_PLAYED",
-                "LOG_SEQUENCE_ID",
-                "akira_TIMES_PLAYED", "bpop_TIMES_PLAYED", "countingx_TIMES_PLAYED",
-                "math_TIMES_PLAYED", "numberscale_TIMES_PLAYED", "story_TIMES_PLAYED",
-                "write_TIMES_PLAYED"};
         for(int i=0; i < KEYS_LIST.length; i++) {
             KEY_TO_COLUMN.put(KEYS_LIST[i], i);
         }
@@ -374,9 +379,11 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     }
 
     @Override
-    public int getTimesPlayedTutor(String tutor) {
-        String key = getTimesPlayedKey(tutor);
-        String s = _cachedRow[col(key)];
+    public int getTimesPlayedTutor(String videoId) {
+        String timesPlayedKey = getTimesPlayedKey(videoId);
+        Log.d("DEBUG_FRIDAY", "timesPlayedKey=" + timesPlayedKey
+                + "; col=" + col(timesPlayedKey));
+        String s = _cachedRow[col(timesPlayedKey)]; // fix... just check for the exception
         return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
     }
 
