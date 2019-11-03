@@ -321,7 +321,7 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     public int getWritingPlacementIndex() {
         Log.i(DEBUG_CSV, "getWritingPlacementIndex() " + _studentId);
         String s = _cachedRow[col(WRITING_PLACEMENT_INDEX_KEY)];
-        int x = (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
+        int x = (s == null || s.length() == 0 || s.equals("null")) ? 0 : Integer.parseInt(s);
         Log.w(DEBUG_CSV, "getWritingPlacementIndex = " + x);
         return x;
     }
@@ -337,7 +337,9 @@ public class StudentDataModelCSV extends AbstractStudentDataModel implements ISt
     public int getMathPlacementIndex() {
         Log.i(DEBUG_CSV, "getMathPlacementIndex() " + _studentId);
         String s = _cachedRow[col(MATH_PLACEMENT_INDEX_KEY)];
-        return (s == null || s.length() == 0) ? 0 : Integer.parseInt(s);
+        int x = (s == null || s.length() == 0 || s.equals("null")) ? 0 : Integer.parseInt(s);
+        Log.w(DEBUG_CSV, "getMathPlacementIndex = " + x);
+        return x;
     }
 
     @Override
