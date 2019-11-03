@@ -40,7 +40,7 @@ allprojects {
         // <Milestone release> <Feature Release> <Patch release> <Asset Compatibility INDEX>
 
 
-        rtVersionName="3.2.6.0" //TODO: move this out of build so we don't have to rebuild to unzip assets
+        rtVersionName="3.2.7.1" //TODO: move this out of build so we don't have to rebuild to unzip assets
 
     }
 }

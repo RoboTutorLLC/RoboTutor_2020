@@ -152,6 +152,39 @@ public class CInterventionStudentData {
     }
 
     /**
+     * Return the photo filename of a student who can give knowledge support
+     * to the current student in domain {@code domain}
+     *
+     * @param domain which domain does the student need help in?
+     *
+     * @return filename of a student's photo
+     */
+    public static String getPhotoForKnowledgeSupport(String domain) {
+        int level = getCurrentStudentLevel(domain);
+        return getPhotoForKnowledgeSupport(domain, level);
+    }
+
+    private static int getCurrentStudentLevel(String domain) {
+
+        int level = -1;
+        for (Student s : studentData) {
+            if (currentStudentId.equals(s.id)) {
+                switch(domain) {
+                    case "MATH":
+                        level = s.levels.get("MATH");
+                        break;
+
+                    case "LIT":
+                        level = s.levels.get("MATH");
+                        break;
+
+                }
+            }
+        }
+        return level;
+    }
+
+    /**
      * Backup plan, if nobody is at a higher level than us.
      * @param domain which knowledge domain?
      * @param groupMates list of Students to choose from

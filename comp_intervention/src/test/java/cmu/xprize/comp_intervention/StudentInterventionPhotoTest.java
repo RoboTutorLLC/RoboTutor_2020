@@ -27,7 +27,17 @@ public class StudentInterventionPhotoTest {
             "id3,michah,g1,8,0,8,Y,N,N,N,N,Y",
             "id4,jacob,g2,6,0,6,N,Y,N,Y,N,N",
             "id5,joshua,g2,4,0,4,N,N,N,N,Y,N",
-            "id6,john,g2,2,0,2,N,N,N,N,N,N"
+            "id6,john,g2,2,0,2,N,N,N,N,N,N",
+            "48d86234-bd53-4d8c-b946-0bb1a80929c8,P1_Halima.png,C1_T1,23,0,20,y,n,y,n,n,n",
+            "e1003b4d-cba8-4c99-8baf-81dfb8a8bb9b,P1_BarakaD.png,C1_T1,27,0,15,y,y,y,y,y,y",
+            "bc713259-7403-40ed-b6b9-02bd0f3ecd32,P1_John.png,C1_T1,28,0,21,y,y,y,y,n,y",
+            "c35e90d8-5707-4693-a6be-3a17fbfb251a,P1_Swalehe.png,C1_T1,29,0,23,y,y,y,y,n,y",
+            "92cda8ae-a713-42e1-a195-fae9cee66580,P1_Helena.png,C1_T1,31,0,24,y,y,y,y,n,y",
+            "5e518c62-fd44-443c-9bbc-40c52b5c8847,P1_Nasra.png,C1_T3,28,0,19,y,n,y,n,n,n",
+            "75f8577e-4fb3-4ed2-8453-95f6ff736ea1,P1_Abigail.png,C1_T3,33,0,21,y,y,y,y,y,y",
+            "c7783c11-e88d-4052-be10-09560d70f5f0,P1_Mary.png,C1_T3,25,0,20,y,n,y,n,n,y",
+            "ef5bdd19-0403-43a1-9b62-051cf6b31e3e,P1_Andrew.png,C1_T3,31,0,22,y,y,y,y,n,y",
+            "7b13fbea-bbf2-4ebc-a168-4be24c9cef7e,P1_Makenga.png,C1_T3,32,0,23,y,y,y,y,n,y"
     };
 
     @Before
@@ -86,6 +96,34 @@ public class StudentInterventionPhotoTest {
     public void testDebugTopStudent() {
         runKnowledgeSupportTest("DEBUG", "MATH", 10, "aubrey");
 
+    }
+
+
+    @Test
+    public void testJudithField() {
+        String photo;
+        String testId = "c35e90d8-5707-4693-a6be-3a17fbfb251a";
+        CInterventionStudentData.setCurrentStudentId(testId);
+
+        // test multiple times for randomness factor
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("MATH");
+        assertEquals(photo, "P1_Helena.png");
+
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("MATH");
+        assertEquals(photo, "P1_Helena.png");
+
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("MATH");
+        assertEquals(photo, "P1_Helena.png");
+
+        // test multiple times for randomness factor
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("LIT");
+        assertEquals(photo, "P1_Helena.png");
+
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("LIT");
+        assertEquals(photo, "P1_Helena.png");
+
+        photo = CInterventionStudentData.getPhotoForKnowledgeSupport("LIT");
+        assertEquals(photo, "P1_Helena.png");
     }
 
 

@@ -270,7 +270,7 @@ public class CInterventionPopup extends RelativeLayout {
             default:
                 // TZ_V2 test that this works!!!
                 imgRef = CInterventionStudentData.getPhotoForKnowledgeSupport(
-                        GlobalStaticsEngine.getCurrentDomain(), GlobalStaticsEngine.getCurrentLevel());
+                        GlobalStaticsEngine.getCurrentDomain());
                 break;
         }
 
