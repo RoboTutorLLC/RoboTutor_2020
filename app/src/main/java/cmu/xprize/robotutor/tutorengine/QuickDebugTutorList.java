@@ -61,6 +61,13 @@ public class QuickDebugTutorList {
         toFixBugMap.put("demo_hesitate", hesitateSupport);
     }
 
+    public static final String INTERVENTION_AKIRA = "intervention_akira";
+    public static final String INTERVENTION_BPOP = "intervention_bpop";
+    public static final String INTERVENTION_SPELLING = "intervention_spelling";
+    public static final String INTERVENTION_WRITE = "intervention_write";
+    public static final String INTERVENTION_NUMCOMPARE = "intervention_numcompare";
+    public static final String INTERVENTION_PICMATCH = "intervention_picmatch";
+
     static {
         // ----
         QuickDebugInterventionTutor interventionAkira = new QuickDebugInterventionTutor(
@@ -75,8 +82,15 @@ public class QuickDebugTutorList {
         interventionAkira.setHesitate("???");
         interventionAkira.setFailure("???");
 
-        toFixBugMap.put("intervention_akira", interventionAkira);
+        toFixBugMap.put(INTERVENTION_AKIRA, interventionAkira);
 
+
+        QuickDebugTutor hesitateSupport = new QuickDebugTutor(
+                "picmatch",
+                "picmatch:food",
+                "[file]picmatch_food.json"
+        );
+        toFixBugMap.put(INTERVENTION_PICMATCH, hesitateSupport);
 
         // ----
         QuickDebugInterventionTutor interventionBpop = new QuickDebugInterventionTutor(
@@ -85,7 +99,7 @@ public class QuickDebugTutorList {
                 "[file]bpop.ltr.lc_A..Z.all.asc.all.stat.show.126.json"
         );
         interventionBpop.setComment("Testing intervention in Bpop");
-        toFixBugMap.put("intervention_bpop", interventionBpop);
+        toFixBugMap.put(INTERVENTION_BPOP, interventionBpop);
 
 
         // ----
@@ -95,7 +109,7 @@ public class QuickDebugTutorList {
                 "[file]spelling_datasource_2.json"
         );
         interventionSpelling.setComment("Testing intervention in Spelling");
-        toFixBugMap.put("intervention_spelling", interventionSpelling);
+        toFixBugMap.put(INTERVENTION_SPELLING, interventionSpelling);
 
 
         // ----
@@ -127,7 +141,7 @@ public class QuickDebugTutorList {
 
         interventionNumCompare.setHesitate("√√O"); // still some weirdness
         interventionNumCompare.setFailure("OOO"); // trackAndLog
-        toFixBugMap.put("intervention_numcompare", interventionNumCompare);
+        toFixBugMap.put(INTERVENTION_NUMCOMPARE, interventionNumCompare);
 
 
         // ----
@@ -145,7 +159,7 @@ public class QuickDebugTutorList {
                 "write.wrd.trc:syl.3ch..3ch..6",
                 "[file]write.wrd.trc_syl.3ch..3ch..6.json"
         );
-        toFixBugMap.put("intervention_writing", interventionWriting);
+        toFixBugMap.put(INTERVENTION_WRITE, interventionWriting);
 
     }
     static {
