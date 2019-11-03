@@ -25,7 +25,6 @@ import cmu.xprize.util.CPlacementTest_Tutor;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 import static cmu.xprize.util.TCONST.DEBUG_CSV;
-import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.LANG_SW;
 import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
 import static cmu.xprize.util.TCONST.WRITING_PLACEMENT_INDEX;

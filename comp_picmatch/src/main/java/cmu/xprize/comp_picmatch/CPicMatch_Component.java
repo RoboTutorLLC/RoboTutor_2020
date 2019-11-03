@@ -35,11 +35,8 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
 
-import static cmu.xprize.util.FailureInterventionHelper.Tutor.PICMATCH;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_PICMATCH;
 import static cmu.xprize.util.TCONST.HESITATE_TIME_PICMATCH;
-import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
-import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
 import static cmu.xprize.util.TCONST.STUCK_TIME_PICMATCH;
 
 /**

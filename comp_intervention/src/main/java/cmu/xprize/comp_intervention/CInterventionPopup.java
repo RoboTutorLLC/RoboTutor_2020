@@ -260,7 +260,6 @@ public class CInterventionPopup extends RelativeLayout {
         switch (interventionType) {
             case I_TRIGGER_GESTURE:
             case I_TRIGGER_STUCK:
-                // TZ_V2 test that this works!!!
                 imgRef = CInterventionStudentData.getPhotoForApplicationSupport(
                         GlobalStaticsEngine.getCurrentTutorType());
                 break;
@@ -268,7 +267,6 @@ public class CInterventionPopup extends RelativeLayout {
             case I_TRIGGER_FAILURE:
             case I_TRIGGER_HESITATE:
             default:
-                // TZ_V2 test that this works!!!
                 imgRef = CInterventionStudentData.getPhotoForKnowledgeSupport(
                         GlobalStaticsEngine.getCurrentDomain());
                 break;

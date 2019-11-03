@@ -494,8 +494,6 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
             // the next tutor to be launched
             CAt_Data tutorToLaunch = menu.getTutorToLaunch(buttonBehavior);
 
-            // TZ_V2 does this always work... i.e. for placement mode?
-            // TZ_V2 this current level is needed
             saveGlobalTutorVars(tutorToLaunch);
 
             // #Mod 330 Show TutorID in Banner in debug builds
