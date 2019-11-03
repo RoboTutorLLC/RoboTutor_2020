@@ -67,7 +67,8 @@ public class TimerMaster {
     }
 
     private void triggerStuckTimer() {
-        Log.v(_TAG, "trigger stuck timer");
+        Log.v(_TAG, String.format("trigger stuck timer: %s, %s, %d",
+                STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay));
         _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
     }
 
@@ -86,7 +87,8 @@ public class TimerMaster {
     }
 
     private void triggerHesitationTimer() {
-        Log.v(_TAG, "trigger hesitation timer");
+        Log.v(_TAG, String.format("trigger hesitation timer: %s, %s, %d",
+                HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay));
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
     }
 

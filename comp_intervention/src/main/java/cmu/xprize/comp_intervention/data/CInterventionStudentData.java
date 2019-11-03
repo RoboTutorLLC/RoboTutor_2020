@@ -140,7 +140,8 @@ public class CInterventionStudentData {
         List<String> possibles = new ArrayList<String>();
 
         for (Student s : groupMates) {
-            if (s.levels.get(domain) > level) // could be > or >=
+            Integer sLevel = s.levels.get(domain);
+            if (sLevel != null && sLevel > level) // could be > or >=
                 possibles.add(s.photoFile); // add student photo to list
         }
 
@@ -195,7 +196,8 @@ public class CInterventionStudentData {
         String studentPhotoWithHighestLevel = null;
 
         for (Student s : groupMates) {
-            if (s.levels.get(domain) > maxLevel) {
+            Integer sLevel = s.levels.get(domain);
+            if (sLevel != null && sLevel > maxLevel) {
                 maxLevel = s.levels.get(domain);
                 studentPhotoWithHighestLevel = s.photoFile;
             }

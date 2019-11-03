@@ -87,7 +87,7 @@ public class CInterventionTimes {
         try {
             return timesById.get(id);
         } catch (Exception e) {
-            return 6000; // default?
+            return 6; // default?
         }
 
     }

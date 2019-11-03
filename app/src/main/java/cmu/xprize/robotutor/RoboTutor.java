@@ -83,6 +83,8 @@ import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.MATH_MATRIX
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.SONGS_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.STORIES_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.UNKNOWN_MATRIX;
+import static cmu.xprize.robotutor.tutorengine.QuickDebugTutorList.INTERVENTION_BPOP;
+import static cmu.xprize.robotutor.tutorengine.QuickDebugTutorList.INTERVENTION_NUMCOMPARE;
 import static cmu.xprize.util.TCONST.ENGLISH_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.GRAPH_MSG;
 import static cmu.xprize.util.TCONST.INTERVENTION_STUDENT_FILE;
@@ -108,7 +110,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     // DEVELOPER VARIABLES FOR QUICK DEBUG LAUNCH
     private static final boolean QUICK_DEBUG_TUTOR = false;
-    private static final String QUICK_DEBUG_TUTOR_KEY = "intervention_bpop";// "demo_failure"; //"demo_gesture"; // "demo_stuck"; // "demo_hesitate";
+    private static final String QUICK_DEBUG_TUTOR_KEY = INTERVENTION_BPOP;
 
     // for devs, this is faster than changing the config file
     private static final boolean QUICK_DEBUG_CONFIG = false;
