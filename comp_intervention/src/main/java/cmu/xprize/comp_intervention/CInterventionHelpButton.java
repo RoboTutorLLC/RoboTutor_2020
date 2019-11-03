@@ -47,8 +47,10 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
     private boolean hasBeenTriggered;
     private boolean isFlashing;
     private String currentIntervention;
-
     private boolean popupIsShowing;
+
+    private InterventionButtonMessageReceiver receiver;
+
 
     private CMessageQueueFactory _queue;
 
@@ -92,7 +94,13 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
 
         filter.addAction(EXIT_FROM_INTERVENTION);
 
-        bManager.registerReceiver(new InterventionButtonMessageReceiver(), filter);
+        receiver = InterventionButtonMessageReceiver.getInstance();
+
+        receiver.setHelpButton(this);
+
+        // unregister receiver, since it's a singleton??
+        bManager.unregisterReceiver(receiver);
+        bManager.registerReceiver(receiver, filter);
 
         this.setOnTouchListener(new HelpButtonTouchListener());
 
@@ -101,7 +109,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         COLOR_ON = getResources().getColor(R.color.helpButtonHighlight);
         COLOR_OFF = getResources().getColor(R.color.helpButtonNormal);
 
-        if (!CONFIG_INTERVENTION) {
+        if (!InterventionButtonMessageReceiver.CONFIG_INTERVENTION) {
             this.setVisibility(View.INVISIBLE);
         }
 
@@ -182,90 +190,60 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
     }
 
     /**
+     * Called from InterventionButtonMessageReceiver
+     * @param action
+     */
+    public void triggerIntervention(String action) {
+        if (popupIsShowing) return;
+        hasBeenTriggered = true;
+        if(currentIntervention == null)
+            currentIntervention = action;
+
+        startFlashing(currentIntervention);
+    }
+
+    /**
+     * Called from InterventionButtonMessageReceiver
+     */
+     public void cancelStuck() {
+        Log.wtf("trigger", "Cancelling stuck");
+        Log.wtf("trigger", "currentIntervention: " + currentIntervention);
+        if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_STUCK)) {
+            currentIntervention = null;
+            hasBeenTriggered = false;
+            cancelFlashing();
+        }
+    }
+
+    public void cancelHesitate() {
+        // this is triggered when they tap
+        Log.wtf("trigger", "Cancelling hesitate");
+        Log.wtf("trigger", "currentIntervention: " + currentIntervention);
+        if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_HESITATE)) {
+            currentIntervention = null;
+            hasBeenTriggered = false;
+            cancelFlashing();
+        }
+    }
+
+    public void setPopupShowing(boolean b) {
+        popupIsShowing = b;
+    }
+
+    // TZ_V2 - there are like ten instances of this, all registered
+    /**
      * Message Receiver for Interventions
      * When receiving an Intervention message:
      *      - set the current action
      *      - start flashing the Help Button
      */
-    class InterventionButtonMessageReceiver extends BroadcastReceiver {
+    /*class InterventionButtonMessageReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            // for turning off intervention mode
-            if (!CONFIG_INTERVENTION) {
-                return;
-            }
-
-            Log.wtf("trigger", "REceived trigger: " + intent.getAction());
-
-            String action = intent.getAction();
-            boolean modal = intent.getBooleanExtra(I_MODAL_EXTRA, false);
-            if (modal) return;
-            if (action == null) return;
-
-            // DO THIS THING where it's looking for the thing
-            switch(action) {
-
-                // all these are legit
-                case I_TRIGGER_GESTURE:
-                case I_TRIGGER_HESITATE:
-                case I_TRIGGER_STUCK:
-                case I_TRIGGER_FAILURE:
-                    // don't start flashing if the popup is already showing // NEXT test this...
-                    if (popupIsShowing) return;
-                    hasBeenTriggered = true;
-                    if(currentIntervention == null)
-                        currentIntervention = action;
-
-                    startFlashing(currentIntervention);
-                    break;
-
-
-                // JUDITH - CANCEL_INTERVENTION:
-                case I_CANCEL_STUCK:
-                    Log.wtf("trigger", "Cancelling stuck");
-                    Log.wtf("trigger", "currentIntervention: " + currentIntervention);
-                    if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_STUCK)) {
-                        currentIntervention = null;
-                        hasBeenTriggered = false;
-                        cancelFlashing();
-                    }
-
-                    break;
-
-                case I_CANCEL_HESITATE:
-                    // this is triggered when they tap
-                    Log.wtf("trigger", "Cancelling hesitate");
-                    Log.wtf("trigger", "currentIntervention: " + currentIntervention);
-                    if (currentIntervention != null && currentIntervention.equals(I_TRIGGER_HESITATE)) {
-                        currentIntervention = null;
-                        hasBeenTriggered = false;
-                        cancelFlashing();
-                    }
-                    break;
-
-                case I_CANCEL_GESTURE:
-                    // this is triggered when they do correct gesture
-                    break;
-
-                case EXIT_FROM_INTERVENTION:
-                    popupIsShowing = false;
-                    break;
-
-            }
-
-            CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(
-                    (new Date()).getTime(),
-                    CInterventionStudentData.getCurrentStudentId(),
-                    null,
-                    GlobalStaticsEngine.getCurrentTutorId(),
-                    null,
-                    action,
-                    null
-            ));
         }
-    }
+    }*/
 
     // TODO make new option for if kid self-chooses to ask for help without a trigger
     /**
