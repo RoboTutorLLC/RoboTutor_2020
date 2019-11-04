@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.Date;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
+import cmu.xprize.comp_intervention.views.CInterventionHelpButton;
 import cmu.xprize.comp_logging.CInterventionLogManager;
 import cmu.xprize.comp_logging.InterventionLogItem;
 import cmu.xprize.util.GlobalStaticsEngine;

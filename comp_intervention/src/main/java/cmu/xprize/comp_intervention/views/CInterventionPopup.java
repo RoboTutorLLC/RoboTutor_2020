@@ -1,4 +1,4 @@
-package cmu.xprize.comp_intervention;
+package cmu.xprize.comp_intervention.views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

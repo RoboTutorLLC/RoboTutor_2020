@@ -1,4 +1,4 @@
-package cmu.xprize.comp_intervention;
+package cmu.xprize.comp_intervention.views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.view.View;
 
 import java.util.Date;
 
+import cmu.xprize.comp_intervention.InterventionButtonMessageReceiver;
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_logging.CInterventionLogManager;
 import cmu.xprize.comp_logging.InterventionLogItem;

@@ -3,7 +3,7 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import cmu.xprize.comp_intervention.CInterventionPopup;
+import cmu.xprize.comp_intervention.views.CInterventionPopup;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.tutorengine.CTutor;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
