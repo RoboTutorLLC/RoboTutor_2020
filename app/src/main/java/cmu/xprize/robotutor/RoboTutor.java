@@ -497,8 +497,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
                 // Find and install (move to ext_asset_path) any new or updated audio/story assets
                 //
-                tutorAssetManager.updateAssetPackages(ENGLISH_ASSET_PATTERN, RoboTutor.EXT_ASSET_PATH);
                 tutorAssetManager.updateAssetPackages(SWAHILI_ASSET_PATTERN, RoboTutor.EXT_ASSET_PATH);
+                tutorAssetManager.updateAssetPackages(ENGLISH_ASSET_PATTERN, RoboTutor.EXT_ASSET_PATH);
 
                 // Create the one system levelFolder LTKPLUS recognizer
                 //
