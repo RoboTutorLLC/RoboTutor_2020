@@ -70,6 +70,47 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"/>
 
+    <cmu.xprize.comp_intervention.views.CInterventionDebuggerMenu
+        android:id="@+id/SinterventionDebugger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="400sp"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/background_light"
+        >
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Shesitate"
+            android:text="HESITATE:"
+             />
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Sstuck"
+            android:text="STUCK:"
+            />
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Sgesture"
+            android:text="GESTURE:"
+            />
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/Sfailure"
+            android:text="FAILURE:"
+            />
+
+    </cmu.xprize.comp_intervention.views.CInterventionDebuggerMenu>
+
 
     <ImageButton
         android:id="@+id/exitButton"

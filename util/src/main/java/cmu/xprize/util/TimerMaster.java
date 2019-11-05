@@ -1,7 +1,15 @@
 package cmu.xprize.util;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.util.Date;
+
+import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_GESTURE_UPDATE;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_HESITATION_UPDATE;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_STUCK_UPDATE;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.EXTRA_TIME_EXPECT;
 import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
@@ -19,6 +27,7 @@ public class TimerMaster {
 
     private IInterventionSource _intervention;
     private CMessageQueueFactory _queue;
+    private LocalBroadcastManager _manager;
     private long _hesitateDelay, _stuckDelay, _gestureDelay;
 
     private static final String HESITATION_TIMER_RUNNABLE = "HESITATION_TIMER";
@@ -40,11 +49,13 @@ public class TimerMaster {
      * @param stuckDelay delay time to trigger STUCK
      * @param gestureDelay delay time to trigger GESTURE
      */
-    public TimerMaster(IInterventionSource intervention, CMessageQueueFactory queue, String TAG,
+    public TimerMaster(IInterventionSource intervention, CMessageQueueFactory queue,
+                       LocalBroadcastManager manager, String TAG,
                        long hesitateDelay, long stuckDelay, long gestureDelay) {
 
         this._intervention = intervention;
         this._queue = queue;
+        this._manager = manager;
         this._hesitateDelay = hesitateDelay;
         this._stuckDelay = stuckDelay;
         this._gestureDelay = gestureDelay;
@@ -70,6 +81,11 @@ public class TimerMaster {
         Log.v(_TAG, String.format("trigger stuck timer: %s, %s, %d",
                 STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay));
         _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
+
+        Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
+        long expectedTrigger = (new Date()).getTime() + _stuckDelay;
+        stuckIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
+        _manager.sendBroadcast(stuckIntent);
     }
 
     /**
@@ -90,6 +106,11 @@ public class TimerMaster {
         Log.v(_TAG, String.format("trigger hesitation timer: %s, %s, %d",
                 HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay));
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
+
+        Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
+        long expectedTrigger = (new Date()).getTime() + _hesitateDelay;
+        hesitateIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
+        _manager.sendBroadcast(hesitateIntent);
     }
 
     /**
@@ -112,6 +133,11 @@ public class TimerMaster {
 
         _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
         gestureTriggered = true;
+
+        Intent gestureIntent = new Intent(BROADCAST_GESTURE_UPDATE);
+        long expectedTrigger = (new Date()).getTime() + _gestureDelay;
+        gestureIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
+        _manager.sendBroadcast(gestureIntent);
     }
 
     /**

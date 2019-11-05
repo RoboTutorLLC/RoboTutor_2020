@@ -491,6 +491,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
         } else {
             mTutor.countIncorrect();
             _wrongAnyAttempts++;
+            _failson.sendBroadcastUpdate(bManager, _wrongAnyAttempts);
             if(_failson.shouldTriggerIntervention(_wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }

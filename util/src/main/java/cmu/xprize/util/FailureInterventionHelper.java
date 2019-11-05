@@ -1,6 +1,12 @@
 package cmu.xprize.util;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_FAILURE_UPDATE;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.FAILS_HAPPENED;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.FAILS_NEEDED;
 
 /**
  * FailureInterventionHelper
@@ -59,5 +65,13 @@ public class FailureInterventionHelper {
                 Log.wtf("FailureInterventionHelper", "_tutorType not found: " + _tutorType);
                 return false;
         }
+    }
+
+    public void sendBroadcastUpdate(LocalBroadcastManager manager, int numWrong) {
+        Intent failureIntent = new Intent(BROADCAST_FAILURE_UPDATE);
+        failureIntent.putExtra(FAILS_HAPPENED, numWrong);
+        failureIntent.putExtra(FAILS_NEEDED, 9);
+        manager.sendBroadcast(failureIntent);
+
     }
 }

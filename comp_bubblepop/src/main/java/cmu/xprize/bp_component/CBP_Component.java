@@ -210,7 +210,7 @@ public class CBP_Component extends FrameLayout implements IEventDispatcher, ILoa
         _queue = new CMessageQueueFactory(this, "CBpop");
 
         long hesTime = 3 * lookupHesitateTimeForThisTutor();
-        _timer = new TimerMaster(this, _queue, "BpopTimer",
+        _timer = new TimerMaster(this, _queue, bManager,"BpopTimer",
                 hesTime, hesTime, hesTime);
 
         // Allow onDraw to be called to start animations

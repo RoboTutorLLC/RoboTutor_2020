@@ -842,6 +842,8 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
 
             wrongAnyAttempts++;
 
+            _failson.sendBroadcastUpdate(bManager, wrongAnyAttempts);
+
             if (_failson.shouldTriggerIntervention(wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }

@@ -1,6 +1,5 @@
 package cmu.xprize.comp_intervention.views;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,19 +9,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.Date;
-
 import cmu.xprize.comp_intervention.InterventionButtonMessageReceiver;
-import cmu.xprize.comp_intervention.data.CInterventionStudentData;
-import cmu.xprize.comp_logging.CInterventionLogManager;
-import cmu.xprize.comp_logging.InterventionLogItem;
 import cmu.xprize.util.CMessageQueueFactory;
-import cmu.xprize.util.GlobalStaticsEngine;
 import cmu.xprize.util.IMessageQueueRunner;
 import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
-import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
 import static cmu.xprize.util.TCONST.I_CANCEL_HESITATE;
 import static cmu.xprize.util.TCONST.I_CANCEL_STUCK;
 import static cmu.xprize.util.TCONST.I_MODAL_EXTRA;
@@ -41,7 +33,6 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         implements IMessageQueueRunner {
 
 
-    private static final boolean CONFIG_INTERVENTION = true;
     private LocalBroadcastManager bManager;
 
     // tracks which intervention has been triggered

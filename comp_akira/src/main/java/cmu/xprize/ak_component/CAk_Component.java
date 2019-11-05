@@ -225,7 +225,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         bManager = LocalBroadcastManager.getInstance(mContext);
 
         _queue = new CMessageQueueFactory(this, "CAkira");
-        _timer = new TimerMaster(this, _queue, "AkiraTimer",
+        _timer = new TimerMaster(this, _queue, bManager, "AkiraTimer",
                 HESITATE_TIME_AKIRA, STUCK_TIME_AKIRA, GESTURE_TIME_AKIRA);
 
 

@@ -1,6 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -159,6 +160,8 @@ public class TPicMatchComponent extends CPicMatch_Component implements ITutorObj
             mTutor.countCorrect();
         } else {
             mTutor.countIncorrect();
+            _failson.sendBroadcastUpdate(LocalBroadcastManager.getInstance(context),
+                    mTutor.getIncorrect());
             if(_failson.shouldTriggerIntervention(mTutor.getIncorrect())) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }

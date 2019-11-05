@@ -205,7 +205,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
         _queue = new CMessageQueueFactory(this, "CSpelling");
 
         long hesTime = lookupHesitateTimeForThisTutor();
-        _timer = new TimerMaster(this, _queue, "SpellTimer",
+        _timer = new TimerMaster(this, _queue, _bManager, "SpellTimer",
                 (int) hesTime, STUCK_TIME_SPELL, GESTURE_TIME_SPELL);
 
         mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(_timer));
@@ -262,6 +262,8 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
 
         if (!isCorrect) {
             wrongFirstAttempts++;
+
+            _failson.sendBroadcastUpdate(_bManager, wrongFirstAttempts);
             if (_failson.shouldTriggerIntervention(wrongFirstAttempts)) {
                 triggerIntervention(TCONST.I_TRIGGER_FAILURE);
             }

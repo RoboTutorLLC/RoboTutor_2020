@@ -246,7 +246,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         // Capture the local broadcast manager
         bManager = LocalBroadcastManager.getInstance(getContext());
 
-        _timer = new TimerMaster(this, _queue, "WriteTimer",
+        _timer = new TimerMaster(this, _queue, bManager, "WriteTimer",
                 HESITATE_TIME_WRITE, STUCK_TIME_WRITE, GESTURE_TIME_WRITE);
         mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(_timer));
 

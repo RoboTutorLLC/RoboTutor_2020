@@ -604,6 +604,7 @@ public class TAkComponent extends CAk_Component implements ITutorObject, IDataSi
             mTutor.countIncorrect();
             wrongAnyAttempts++;
 
+            _failson.sendBroadcastUpdate(bManager, wrongAnyAttempts);
             if (_failson.shouldTriggerIntervention(wrongAnyAttempts)) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }

@@ -1,6 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -245,6 +246,9 @@ public class TNdComponent extends CNd_Component implements ITutorObject, IDataSi
             mTutor.countCorrect();
         } else {
             mTutor.countIncorrect();
+
+            _failson.sendBroadcastUpdate(LocalBroadcastManager.getInstance(mContext),
+                    mTutor.getIncorrect());
             if(_failson.shouldTriggerIntervention(mTutor.getIncorrect())) {
                 triggerIntervention(I_TRIGGER_FAILURE);
             }

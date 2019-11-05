@@ -173,7 +173,7 @@ public class CNd_Component extends RelativeLayout implements ILoadableObject,
         _queue = new CMessageQueueFactory(this, "CNumCompare");
 
         long hesTime = getTimeForThisTutor();
-        _timer = new TimerMaster(this, _queue, "NcompareTimer",
+        _timer = new TimerMaster(this, _queue, _bManager, "NcompareTimer",
                 hesTime, STUCK_TIME_NUMCOMPARE, GESTURE_TIME_NUMCOMPARE);
         mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(_timer));
 

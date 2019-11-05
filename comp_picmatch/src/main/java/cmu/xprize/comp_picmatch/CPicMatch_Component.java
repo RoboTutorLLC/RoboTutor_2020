@@ -116,7 +116,7 @@ public class CPicMatch_Component extends RelativeLayout implements
         bManager = LocalBroadcastManager.getInstance(getContext());
 
         _queue = new CMessageQueueFactory(this, "CPicMatch");
-        _timer = new TimerMaster(this, _queue, "PicMatchTimer",
+        _timer = new TimerMaster(this, _queue, bManager, "PicMatchTimer",
                 HESITATE_TIME_PICMATCH, STUCK_TIME_PICMATCH, GESTURE_TIME_PICMATCH);
 
         Scontent.setOnTouchListener(new HesitationCancelListener());
