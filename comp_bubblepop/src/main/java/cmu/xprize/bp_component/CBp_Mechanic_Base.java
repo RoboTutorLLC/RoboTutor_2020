@@ -528,6 +528,8 @@ public class CBp_Mechanic_Base implements IBubbleMechanic, View.OnTouchListener,
         Log.v(QGRAPH_MSG, "event.click: " + " CBp_Mechanic_Base: bubble touch");
         CBubble bubble = (CBubble)view;
 
+        mComponent.getTimer().resetHesitationTimer();
+
         if(_enableTouchEvent) {
 
             _enableTouchEvent = false;
