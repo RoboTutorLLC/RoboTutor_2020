@@ -34,6 +34,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
+import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.util.TCONST.GESTURE_TIME_PICMATCH;
 import static cmu.xprize.util.TCONST.HESITATE_TIME_PICMATCH;
@@ -118,6 +119,7 @@ public class CPicMatch_Component extends RelativeLayout implements
         _queue = new CMessageQueueFactory(this, "CPicMatch");
         _timer = new TimerMaster(this, _queue, bManager, "PicMatchTimer",
                 HESITATE_TIME_PICMATCH, STUCK_TIME_PICMATCH, GESTURE_TIME_PICMATCH);
+        mDetector = new GestureDetector(context, new ExpectTapGestureListener(_timer));
 
         Scontent.setOnTouchListener(new HesitationCancelListener());
     }

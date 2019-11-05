@@ -485,6 +485,7 @@ public class TWritingComponent extends CWritingComponent implements IBehaviorMan
 
     private void trackAndLogPerformance(boolean isCorrect, String reason) {
 
+        _timer.resetHesitationTimer();
         // this is actually handled via the animator_graph
         if(isCorrect) {
             mTutor.countCorrect();

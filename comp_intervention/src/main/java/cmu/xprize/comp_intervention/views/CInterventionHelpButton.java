@@ -12,6 +12,7 @@ import android.view.View;
 import cmu.xprize.comp_intervention.InterventionButtonMessageReceiver;
 import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IMessageQueueRunner;
+import cmu.xprize.util.consts.INTERVENTION_CONST;
 import me.delandbeforeti.comp_intervention.R;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
@@ -101,7 +102,7 @@ public class CInterventionHelpButton extends android.support.v7.widget.AppCompat
         COLOR_ON = getResources().getColor(R.color.helpButtonHighlight);
         COLOR_OFF = getResources().getColor(R.color.helpButtonNormal);
 
-        if (!InterventionButtonMessageReceiver.CONFIG_INTERVENTION) {
+        if (!INTERVENTION_CONST.CONFIG_INTERVENTION) {
             this.setVisibility(View.INVISIBLE);
         }
 

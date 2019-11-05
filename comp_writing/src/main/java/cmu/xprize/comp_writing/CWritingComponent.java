@@ -217,8 +217,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
     protected String task;
     protected String level;
 
-    private TimerMaster _timer;
-    private GestureDetector mDetector;
+    protected TimerMaster _timer;
+    protected GestureDetector mDetector;
     protected boolean gestureTimerStarted;
 
     public CWritingComponent(Context context) {
@@ -246,6 +246,7 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         // Capture the local broadcast manager
         bManager = LocalBroadcastManager.getInstance(getContext());
 
+        _queue = new CMessageQueueFactory(this, "CWrite");
         _timer = new TimerMaster(this, _queue, bManager, "WriteTimer",
                 HESITATE_TIME_WRITE, STUCK_TIME_WRITE, GESTURE_TIME_WRITE);
         mDetector = new GestureDetector(mContext, new ExpectWriteGestureListener(_timer));
@@ -253,12 +254,11 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         this.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                _timer.resetHesitationTimer();
                 mDetector.onTouchEvent(motionEvent); // INT_WRITE where else can I put this to make it trigger all the time?
                 return true;
             }
         });
-
-        _queue = new CMessageQueueFactory(this, "CWrite");
     }
 
 
@@ -2046,6 +2046,8 @@ public class CWritingComponent extends PercentRelativeLayout implements IEventLi
         try {
             if (_data != null) {
 
+                _timer.resetStuckTimer();
+                _timer.resetHesitationTimer();
                 retractFeature(WR_FEATURES.FTR_HAD_ERRORS);
 
                 // XYZ

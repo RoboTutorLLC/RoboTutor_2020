@@ -16,6 +16,7 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -42,6 +43,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
+import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
 import static cmu.xprize.util.TCONST.GESTURE_TIME_AKIRA;
 import static cmu.xprize.util.TCONST.HESITATE_TIME_AKIRA;
@@ -120,6 +122,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     protected CMessageQueueFactory _queue;
     protected int wrongAnyAttempts = 0;
     protected TimerMaster _timer;
+    protected GestureDetector mDetector;
 
     public CAk_Component(Context context) {
         super(context);
@@ -227,8 +230,14 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
         _queue = new CMessageQueueFactory(this, "CAkira");
         _timer = new TimerMaster(this, _queue, bManager, "AkiraTimer",
                 HESITATE_TIME_AKIRA, STUCK_TIME_AKIRA, GESTURE_TIME_AKIRA);
+        mDetector = new GestureDetector(mContext, new ExpectTapGestureListener(_timer));
 
+    }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
     /**
@@ -479,6 +488,7 @@ public class CAk_Component extends RelativeLayout implements ILoadableObject,
     public boolean onTouchEvent(MotionEvent event) {
 
         _timer.resetHesitationTimer();
+        mDetector.onTouchEvent(event);
 
         if(event.getAction()==MotionEvent.ACTION_DOWN){
 

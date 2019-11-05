@@ -233,6 +233,7 @@ public class CSpelling_Component extends ConstraintLayout implements ILoadableOb
                 Log.v("event.thing", "This is a touch");
                 _timer.resetHesitationTimer();
             }
+            mDetector.onTouchEvent(motionEvent);
             return false;
         }
     }

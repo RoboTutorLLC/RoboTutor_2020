@@ -176,7 +176,8 @@ public class CInterventionStudentData {
                         break;
 
                     case "LIT":
-                        level = s.levels.get("MATH");
+                    default:
+                        level = s.levels.get("LIT");
                         break;
 
                 }

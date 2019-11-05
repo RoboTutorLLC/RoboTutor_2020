@@ -22,6 +22,7 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_FAILURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_GESTURE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
+import static cmu.xprize.util.consts.INTERVENTION_CONST.CONFIG_INTERVENTION;
 
 /**
  * InterventionButtonMessageReceiver
@@ -44,7 +45,7 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
         return singleton;
     }
 
-    public static boolean CONFIG_INTERVENTION = true;
+
 
     private CInterventionHelpButton helpButton;
 
@@ -76,6 +77,15 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
             case I_TRIGGER_FAILURE:
                 // don't start flashing if the popup is already showing // NEXT test this...
                 helpButton.triggerIntervention(action);
+                CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(
+                        (new Date()).getTime(),
+                        CInterventionStudentData.getCurrentStudentId(),
+                        null,
+                        GlobalStaticsEngine.getCurrentTutorId(),
+                        null,
+                        action,
+                        null
+                ));
                 break;
 
 
@@ -98,15 +108,5 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
                 break;
 
         }
-
-        CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(
-                (new Date()).getTime(),
-                CInterventionStudentData.getCurrentStudentId(),
-                null,
-                GlobalStaticsEngine.getCurrentTutorId(),
-                null,
-                action,
-                null
-        ));
     }
 }

@@ -278,6 +278,8 @@ public class CTutorEngine implements ILoadableObject2 {
 
         initializeBindingPattern(tutorBinding, tutorFile);
 
+        GlobalStaticsEngine.setCurrentDomain("LIT"); // for quickLaunch, just hardwire it, whatever
+
         createAndLaunchTutor(tutorDescriptor.tutorName , tutorDescriptor.features, tutorId, tutorBinding, null);
     }
 
