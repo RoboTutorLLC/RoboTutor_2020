@@ -9,6 +9,7 @@ public class INTERVENTION_CONST {
 
     // whether to show the intervention button
     public static final boolean CONFIG_INTERVENTION = true;
+    public static final boolean CONFIG_INTERVENTION_DEBUGGER = false;
 
     // broadcasting intervention updates
     public static final String EXTRA_TIME_EXPECT = "TIME_EXPECT";

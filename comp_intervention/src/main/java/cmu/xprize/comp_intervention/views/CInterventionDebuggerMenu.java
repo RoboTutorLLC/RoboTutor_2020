@@ -10,11 +10,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Date;
 import java.util.Locale;
+
+import cmu.xprize.util.consts.INTERVENTION_CONST;
 
 import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_FAILURE_UPDATE;
 import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_GESTURE_UPDATE;
@@ -182,6 +185,11 @@ public class CInterventionDebuggerMenu extends LinearLayout {
         };
 
         mManager.registerReceiver(mReceiver, filter);
+
+        // only show ths if we're configged to do so
+        if (!INTERVENTION_CONST.CONFIG_INTERVENTION_DEBUGGER) {
+            setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
