@@ -23,6 +23,13 @@
         app:layout_heightPercent="90%"
         android:layout_below="@+id/Sbanner"/>
 
+    <cmu.xprize.robotutor.tutorengine.widgets.core.TInterventionShield
+        android:id="@+id/SInterventionShield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_heightPercent="90%"
+        android:layout_below="@+id/Sbanner"/>
+
     <cmu.xprize.robotutor.tutorengine.widgets.core.TInterventionPopup
         android:id="@+id/SIntervention"
         android:layout_width="match_parent"
