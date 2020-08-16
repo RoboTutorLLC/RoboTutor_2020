@@ -29,6 +29,7 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.2.0'
@@ -36,4 +37,12 @@ dependencies {
     compile project(path: ':comp_intervention')
     compile project(':comp_logging')
     compile project(':comp_clickmask')
+=======
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    api 'com.android.support:appcompat-v7:25.2.0'
+    api project(path: ':util')
+    api project(':comp_logging')
+    api project(':comp_clickmask')
+>>>>>>> eac62034... Fixed issue with enabling narrate mode on startup
 }
