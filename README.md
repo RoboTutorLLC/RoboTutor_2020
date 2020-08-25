@@ -3,14 +3,15 @@
 # **RoboTutor**
 
 
-Welcome to RoboTutor: this version was uploaded to XPrize 11/20/2018. For subsequent changes, see [https://github.com/RoboTutorLLC/RoboTutor](https://github.com/RoboTutorLLC/RoboTutor).
+Welcome to RoboTutor_2020:  XPRIZE's repo has the version of RoboTutor uploaded on 11/20/2018, but RoboTutor has been updated here since then.  **This is the newest version.**
 
+For changes prior to 3/16/2020, see [https://github.com/RoboTutorLLC/RoboTutor_2019](https://github.com/RoboTutorLLC/RoboTutor_2019).  However, it's no longer the newest.
 
 --- 
 ## Quick Installation
 To quickly install the most recent version of RoboTutor without having to download the full source code, follow these steps:
 
-1. Go to [this Google Drive folder](https://drive.google.com/drive/u/0/folders/13vswCljNvESgZoqXbIqZJQCp9mAlaBT5) (updated 9/12/2019).
+1. Go to [this Google Drive folder](https://docs.google.com/document/d/1YoVx1K0LdHVNayiFUhkgffE5v28SPcg0FGIvaU84A_U/edit#) (updated 6/16/2020).
 
 2. Download the APK to your tablet (do not install yet).
 
