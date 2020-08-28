@@ -45,7 +45,8 @@ RoboTutor uses a large volume of external assets at runtime.  To successfully ru
 4. There are a number of build variants you can select to generate versions that support static language selections and also vesions that permit dynamic language selection at runtime. In order to generate any flavor that depends on the key signature, you must generate your own keystore (see next steps). Note that the version used in the XPrize code drop 1 submission usees flavor *release_sw*, which depends on a signed APK.
 
 
-5. If you do not already have one, follow the steps [here](https://stackoverflow.com/questions/3997748/how-can-i-create-a-keystore) to generate a keystore.
+5. If you do not already have one, follow the steps for Android Studio [here] (https://stackoverflow.com/a/30254012) (for [this question]
+(https://stackoverflow.com/questions/3997748/how-can-i-create-a-keystore)) to generate a keystore.
 
 6. Add a file named "keystore.properties" to your root project directory, and give it the following contents. The values should be based on the values you used to generate the keystore.
 ```
