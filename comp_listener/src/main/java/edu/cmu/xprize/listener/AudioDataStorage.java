@@ -1,5 +1,6 @@
 package edu.cmu.xprize.listener;
 
+import android.util.JsonReader;
 import android.util.Log;
 
 import java.io.File;
@@ -100,14 +101,16 @@ public class AudioDataStorage {
         // Update Storydata.json
         try {
             boolean isSentence = true;
-            JSONObject sentenceData = storyData
+            JSONObject sentenceData = new JSONObject();
+            JSONArray narrationData = storyData
                     .getJSONArray("data")
                     .getJSONObject(currentSentence)
                     .getJSONArray("text")
                     .getJSONArray(0)
                     .getJSONObject(0)
-                    .getJSONArray("narration")
-                    .getJSONObject(0);
+                    .getJSONArray("narration");
+
+            // put data
 
             JSONArray segm = sentenceData.getJSONArray("segmentation");
             long finalEndTime = 0;

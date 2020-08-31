@@ -428,34 +428,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mSay      = (ImageButton) mEvenPage.findViewById(R.id.Sspeak);
         }
 
-        if (mCurrPage % 2 == 0) {
-            //ViewGroup frameLayout = mEvenPage.findViewById(R.id.SfullViewQuestion);
-            //ViewGroup narrateModeControls = frameLayout.findViewById(R.id.NarrateControls);
-            backButton = mOddPage.findViewById(R.id.backButton);
-            forwardButton = mOddPage.findViewById(R.id.forwardButton);
-        } else {
-            //ViewGroup frameLayout = mOddPage.findViewById(R.id.SfullViewQuestion);
-            //ViewGroup narrateModeControls = frameLayout.findViewById(R.id.NarrateControls);
-            backButton = mEvenPage.findViewById(R.id.backButton);
-            forwardButton = mEvenPage.findViewById(R.id.forwardButton);
-        }
-
-        // CAUSING A LOTTA PROBLEMS IDK WHY!!!!
-        // findViewById is returning null for backButton and forwardButton and causing a fiasco over here
-        /* backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prevSentence();
-            }
-        });
-
-        forwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                skipSentence();
-            }
-        });*/
-
         // Ensure the buttons reflect the current states
         //
         updateButtons();
@@ -775,6 +747,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         if (!storyBooting)
             speakOrListen();
 
+        feedSentence();
     }
 
 
@@ -1110,7 +1083,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         mParent.animatePageFlip(true, mCurrViewIndex);
 
-        feedSentence();
+        // feedSentence();
     }
     @Override
     public void prevPage() {
@@ -1140,6 +1113,42 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         // NOTE: we reset mCurrPara, mCurrLine and mCurrWord
         //
         seekToStoryPosition(mCurrPage, TCONST.ZERO, TCONST.ZERO, TCONST.ZERO);
+        updateButtonPositions();
+    }
+
+    private void updateButtonPositions() {
+        if (mCurrPage % 2 == 0) {
+            backButton = (Button) mOddPage.findViewById(R.id.backButton);
+            forwardButton = (Button) mOddPage.findViewById(R.id.forwardButton);
+            Log.d("CRt_ViewManagerASB", "Chirag look here! backButton and ");
+        } else {
+            backButton = (Button) mEvenPage.findViewById(R.id.backButton);
+            forwardButton = (Button) mEvenPage.findViewById(R.id.forwardButton);
+        }
+
+
+        // CAUSING A LOTTA PROBLEMS IDK WHY!!!!
+        // findViewById is returning null for backButton and forwardButton and causing a fiasco over here
+        try {
+            Log.d("CRt_ViewManagerASB", "Chirag Look here!" + backButton.toString());
+            Log.d("CRt_ViewManagerASB", "Chirag forwardBUtton this time!" + forwardButton.toString());
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    prevSentence();
+                }
+            });
+
+            forwardButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    skipSentence();
+                }
+            });
+        } catch (NullPointerException e) {
+            Log.d("Chirag!", "The OnClickListener Threw and Error!");
+        }
+
     }
 
 
@@ -1167,7 +1176,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             incPara(TCONST.INCR);
         }
 
-        feedSentence();
+        // feedSentence();
     }
 
     @Override
@@ -1213,7 +1222,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             incLine(TCONST.INCR);
         }
 
-        feedSentence();
+        // feedSentence();
     }
     @Override
     public void prevLine() {
@@ -1712,7 +1721,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         Log.d("CRt_ saveToFile", "Telling AudioDataStorage to being writing file");
         AudioDataStorage.saveAudioData(fileName, mAsset);
-
     }
 
     @Override
@@ -1727,21 +1735,21 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
     }
 
-    // This definitely does not work
+    // DO NOT CONFUSE THIS WITH prevLine().
+    // THIS IS USED TO GO BACK A SENTENCE REGARDLESS OF CURRENT STORY POSITION. IT'S ORIGINAL PURPOSE IS TO ALLOW FOR NAVIGATION WITHIN THE STORY
+    // prevLine() GOES BACK TO THE PREVIOUS SENTENCE INSOFAR AS THERE IS A SENTENCE WITHIN THE PARAGRAPH BEFORE IT
     @Override
     public void prevSentence() {
         Log.d("NavButton", "Back Button has been pressed");
         AudioWriter.abortOperation();
-        // Not sure if it is zero-index or not. Right now treating the counting like it starts at 1
-        if (mCurrLine > 2) {
-            mCurrLine--;
-            mCurrWord = 1;
-        } else if (mCurrPage > 2) {
-            mCurrPage--;
-            mCurrLine = 1;
-            mCurrWord = 1;
+        // It is zero-index
+        if (mCurrLine > 0) {
+            prevLine();
+        } else if (mCurrPara > 0) {
+            prevPara();
+        } else if (mCurrPage > 0) {
+            prevPage();
         }
-        seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, mCurrWord);
     }
 
     public void feedSentence() {

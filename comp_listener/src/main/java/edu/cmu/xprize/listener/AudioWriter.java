@@ -104,7 +104,10 @@ public class AudioWriter {
             dataLen += noOfShorts;
             Log.d("AudioWriter", "Just wrote " + noOfShorts + " shorts to the audio file!");
         } catch (IOException e) {
-            Log.wtf("AudioWriterFail", Log.getStackTraceString(e));
+            if(!e.getMessage().equals("Stream Closed")) {
+                Log.wtf("AudioWriterFail", Log.getStackTraceString(e));
+
+            }
         }
     }
 
