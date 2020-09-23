@@ -934,4 +934,6 @@ public class TCONST {
     public static final String WRITING_PLACEMENT_INDEX = "WRITING_PLACEMENT_INDEX";
 
     public static final String DEBUG_CSV = "DEBUG_CSV";
+
+    public static final String HYP_LOG_FILE_LOCATION = "/sdcard/Download/RTNarrateHypLogs/";
 }

@@ -40,4 +40,13 @@ public class CASB_Narration implements ILoadableObject {
         JSON_Helper.parseSelf(jsonObj, this, CClassMap.classMap, scope);
     }
 
+    CASB_Narration(String audio, int from, int until, String utterances, CASB_Seg[] segmentation) {
+        this.audio = audio;
+        this.from = from;
+        this.until = until;
+        this.utterances = utterances;
+        this.segmentation = segmentation;
+    }
+
+    public CASB_Narration() {}
 }

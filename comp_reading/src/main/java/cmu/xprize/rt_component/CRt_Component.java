@@ -841,4 +841,16 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
         JSON_Helper.parseSelf(jsonData, this, CClassMap.classMap, scope);
     }
+
+    /**
+     * Bypasses the normal json procedure to efficiently play narrations at runtime
+     * Overridden by TClass
+     *
+     * @param dataSource
+     * @param assetLocation
+     */
+    public void updateJSONData(String dataSource, String assetLocation) {
+
+    }
+
 }

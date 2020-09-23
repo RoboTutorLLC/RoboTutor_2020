@@ -582,6 +582,8 @@ public class CMediaManager {
 
         protected void createPlayer(String dataSource, String location) {
 
+            Log.d("CMediaManager", "CHIRAG dataSource is: " + dataSource);
+
             try {
                 mIsReady = false;
 
@@ -600,7 +602,7 @@ public class CMediaManager {
                     case TCONST.EXTERNAL:
                         FileInputStream soundFile = new FileInputStream(dataSource);
 
-                        mPlayer.setDataSource(soundFile.getFD());
+                        mPlayer.setDataSource(soundFile.getFD()); // Chirag chirag this one is failing
                         break;
 
                     default:
@@ -613,6 +615,7 @@ public class CMediaManager {
                 mPlayer.setOnPreparedListener(this);
                 mPlayer.setOnCompletionListener(this);
                 mPlayer.setLooping(mOwner.isLooping());
+                Log.d("CMediaManager","Chirag - isLooping is: " + mOwner.isLooping());
 
                 float volume = mOwner.getVolume();
 
@@ -627,6 +630,7 @@ public class CMediaManager {
             } catch (Exception e) {
                 Log.e(GRAPH_MSG, "CMediaManager.mediaplayer.ERROR: " + mOwner.sourceName() + " => " + mOwner.resolvedName() + " => " + e);
 
+                Log.getStackTraceString(e);
                 // Do the completion event to keep the tutor moving.
                 //
                 onCompletion(mPlayer);

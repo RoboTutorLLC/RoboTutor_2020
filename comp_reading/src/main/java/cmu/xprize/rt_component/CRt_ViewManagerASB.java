@@ -30,16 +30,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 
 import cmu.xprize.util.CPersonaObservable;
@@ -169,6 +171,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public Button forwardButton;
 
     public String buttonState;
+
+    String narrateFileName;
+
+    boolean isUserNarrating;
+
     /**
      *
      * @param parent
@@ -228,11 +235,24 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     }
 
+    boolean isNarrateMode = false;
     // Narrate mode gets activated here
-    public void enableNarrateMode(boolean isNarrateMode) {
-        if (isNarrateMode) {
+    public void enableNarrateMode(boolean narrateModeStatus) {
+        if (narrateModeStatus) {
             mParent.setFeature(TCONST.FTR_NARRATE_MODE, TCONST.ADD_FEATURE);
             Log.d("CRT_ViewManagerASB", "Narrate Mode has been activated through setNarrateMode()");
+            isNarrateMode = true;
+            isUserNarrating = true;
+
+            AudioDataStorage.contentCreationOn = true;
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+            String date = formatter.format(new Date(System.currentTimeMillis()));
+            String hyplogFile = TCONST.HYP_LOG_FILE_LOCATION + date + ".log";
+            try {
+                FileOutputStream fos = new FileOutputStream(hyplogFile);
+                fos.close();
+                AudioWriter.current_log_location = hyplogFile;
+            } catch (IOException e) { Log.getStackTraceString(e); }
         }
     }
 
@@ -742,12 +762,13 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         UpdateDisplay();
 
+        feedSentence();
+
         // Once past the storyName initialization stage - Listen for the target word -
         //
         if (!storyBooting)
             speakOrListen();
 
-        feedSentence();
     }
 
 
@@ -797,9 +818,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
             spokenWords   = new ArrayList<String>();
 
-            // Tell the script to speak the new uttereance
-            //
-            mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+                // Tell the script to speak the new uttereance
+                // when its not in narrate mode, that
+                //
+                mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+
 
             postDelayedTracker();
         } else {
@@ -829,6 +852,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 Log.d(TAG, "HERE");
             }
 
+            Log.d("ArrayError_Chirag", spokenWords.size() + " is spokenWords.size(). Current word: " + spokenWords.get(spokenWords.size() - 1));
             // Update the display
             //
             onUpdate(spokenWords.toArray(new String[spokenWords.size()]));
@@ -836,6 +860,13 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             // If the segment word is complete continue to the next segment - note that this is
             // generally the case.  Words are not usually split by pubctuation
             //
+            // The method originally got called again recursively if splitIndex was less than splitSegment.length
+            // However, this meant that it got called again even on the last word (because the last word has the index [splitSegment.length - 1])
+            // This seems to be causing an ArrayIndexOutOfBoundsException in onUpdate since the last word gets added to heardWords twice
+            // I changed the if statement to make sure to move on to the next segment if splitIndex is >= splitSegment.length - 1 rather than >= splitSegment.length
+            // - Chirag
+            // jk turns out that was completely wrong
+            // - Chirag
             if (splitIndex >= splitSegment.length) {
 
                 splitIndex = TCONST.INITSPLIT;
@@ -967,7 +998,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         String cummulativeState = TCONST.RTC_CLEAR;
 
-        // ensure encho state has a valid value.
+        // ensure echo state has a valid value.
         //
         mParent.publishValue(TCONST.RTC_VAR_ECHOSTATE, TCONST.FALSE);
         mParent.publishValue(TCONST.RTC_VAR_PARROTSTATE, TCONST.FALSE);
@@ -987,15 +1018,15 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         if (mCurrWord >= mWordCount) {
 
-            // In echo mode - After line has been echoed we switch to Read mode and
-            // read the next sentence.
-            //
-            if (mParent.testFeature(TCONST.FTR_USER_ECHO) || mParent.testFeature(TCONST.FTR_USER_REVEAL) || mParent.testFeature(TCONST.FTR_USER_PARROT)) {
+                    // In echo mode - After line has been echoed we switch to Read mode and
+                    // read the next sentence.
+                    //
+                    if (mParent.testFeature(TCONST.FTR_USER_ECHO) || mParent.testFeature(TCONST.FTR_USER_REVEAL) || mParent.testFeature(TCONST.FTR_USER_PARROT)) {
 
-                // Read Mode - When user finishes reading switch to Narrate mode and
-                // narrate the same sentence - i.e. echo
-                //
-                if (hearRead.equals(FTR_USER_READ)) {
+                        // Read Mode - When user finishes reading switch to Narrate mode and
+                        // narrate the same sentence - i.e. echo
+                        //
+                        if (hearRead.equals(FTR_USER_READ)) {
 
                     if (!mParent.testFeature(TCONST.FTR_USER_PARROT)) mParent.publishValue(TCONST.RTC_VAR_ECHOSTATE, TCONST.TRUE);
 
@@ -1120,34 +1151,37 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         if (mCurrPage % 2 == 0) {
             backButton = (Button) mOddPage.findViewById(R.id.backButton);
             forwardButton = (Button) mOddPage.findViewById(R.id.forwardButton);
-            Log.d("CRt_ViewManagerASB", "Chirag look here! backButton and ");
         } else {
             backButton = (Button) mEvenPage.findViewById(R.id.backButton);
             forwardButton = (Button) mEvenPage.findViewById(R.id.forwardButton);
         }
 
+        if (isNarrateMode) {
 
-        // CAUSING A LOTTA PROBLEMS IDK WHY!!!!
-        // findViewById is returning null for backButton and forwardButton and causing a fiasco over here
-        try {
-            Log.d("CRt_ViewManagerASB", "Chirag Look here!" + backButton.toString());
-            Log.d("CRt_ViewManagerASB", "Chirag forwardBUtton this time!" + forwardButton.toString());
-            backButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    prevSentence();
-                }
-            });
+            try {
+                backButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        prevSentence();
+                    }
+                });
 
-            forwardButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    skipSentence();
-                }
-            });
-        } catch (NullPointerException e) {
-            Log.d("Chirag!", "The OnClickListener Threw and Error!");
+                forwardButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        skipSentence();
+                    }
+                });
+            } catch (NullPointerException e) {
+                Log.d("CRt_ViewManagerASB", "Couldn't find forwardbutton and backbutton");
+            }
+
+        } else {
+            //backButton.setVisibility(View.GONE);
+            //forwardButton.setVisibility(View.GONE);
         }
+
+
 
     }
 
@@ -1177,6 +1211,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         }
 
         // feedSentence();
+
+
     }
 
     @Override
@@ -1185,6 +1221,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         if (mCurrPara > 0) {
             incPara(TCONST.DECR);
         }
+
     }
 
     // NOTE: we reset mCurrLine and mCurrWord
@@ -1223,6 +1260,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         }
 
         // feedSentence();
+
     }
     @Override
     public void prevLine() {
@@ -1261,6 +1299,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      */
     @Override
     public void echoLine() {
+
+        isUserNarrating = true;
+        saveToFile();
 
         // reset the echo flag
         //
@@ -1555,7 +1596,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         while (mHeardWord < heardWords.length) {
 
+            Log.d("CRt_ViewManager", "Heardwords length: " + heardWords.length + ". Current heardWord: " + mHeardWord
+             + "wordsToSpeak length: " + wordsToSpeak.length + "current word " + mCurrWord);
+
             if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) { // VMC_QA these are not equal. one of these is out of bounds (probably wordsToSpeak)
+                // wordsToSpeak is in fact out of bounds here. It is 1 shorter than heardWords
 
                 nextWord();
                 mHeardWord++;
@@ -1572,6 +1617,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 attemptNum = 0;
                 result = true;
             }
+
             mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1], attemptNum, false, result);
         }
 
@@ -1709,18 +1755,66 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     @Override
     public void saveToFile() {
-        Log.d("CRt_ saveToFile", "Preparing to save audio data");
-        // Step 1. get sentence text
-        StringBuilder fileNameBuilder = new StringBuilder();
-        for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
-            fileNameBuilder.append(word).append(" ");
+
+        if (isUserNarrating) {
+            Log.d("CRt_ saveToFile", "Preparing to save audio data");
+            // Step 1. get sentence text
+            StringBuilder fileNameBuilder = new StringBuilder();
+            for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
+                fileNameBuilder.append(word).append(" ");
+            }
+            fileNameBuilder.setLength(fileNameBuilder.length() - 1);
+
+            String fileName = fileNameBuilder.toString();
+
+            StringBuilder sentenceNameBuilder = new StringBuilder();
+            for (String word : wordsToDisplay) { // This uses the wordsToDisplay String[] because it contains punctuation
+                fileNameBuilder.append(word).append(" ");
+            }
+            fileNameBuilder.setLength(fileNameBuilder.length() - 1);
+
+            String sentence = fileNameBuilder.toString();
+
+            Log.d("CRt_ saveToFile", "Telling AudioDataStorage to save story stuff");
+            JSONObject sdata = AudioDataStorage.saveAudioData(fileName, mAsset, mCurrLine, mCurrPara, mCurrPage, sentence);
+
+            ArrayList<ListenerBase.HeardWord> seg = AudioDataStorage.segmentation;
+            CASB_Seg[] segObj = new CASB_Seg[seg.size()];
+            int index = 0;
+            for(ListenerBase.HeardWord s : seg) {
+                segObj[index] = new CASB_Seg((int) s.startFrame, (int) s.endFrame, s.hypWord);
+                index++;
+            }
+            CASB_Narration narration = new CASB_Narration(
+                    fileName.toLowerCase().replace(" ", "_") + ".mp3", (int) seg.get(0).startFrame, (int) seg.get(seg.size() - 1).endFrame, fileName.toLowerCase(), segObj);
+
+            CASB_Narration[] futureRawNarration =  data[mCurrPage].text[mCurrPara][mCurrLine].narration;
+            Log.d("CRt_ViewManagerASB", "FutureRawNarration Length " + futureRawNarration.length);
+            if(futureRawNarration.length > 0) {
+                CASB_Narration[] narrations = new CASB_Narration[futureRawNarration.length + 1];
+                index = 0;
+                for(CASB_Narration n : futureRawNarration) {
+                    narrations[index] = n;
+                    index++;
+                }
+                narrations[index] = narration;
+            } else {
+                Log.d("CRt_ViewManager", "rawNarration is null");
+                futureRawNarration = new CASB_Narration[1];
+                futureRawNarration[0] = narration;
+            }
+
+            data[mCurrPage].text[mCurrPara][mCurrLine].narration = futureRawNarration;
+
+            //add in data because the storydata.json has changed
+            //mParent.updateJSONData(mAsset, TCONST.EXTERN);
+
+            /*rawNarration = data[currPage].text[currPara][currLine].narration;
+            rawSentence  = data[currPage].text[currPara][currLine].sentence;*/
+
+            isUserNarrating = false;
         }
-        fileNameBuilder.setLength(fileNameBuilder.length() - 1);
 
-        String fileName = fileNameBuilder.toString();
-
-        Log.d("CRt_ saveToFile", "Telling AudioDataStorage to being writing file");
-        AudioDataStorage.saveAudioData(fileName, mAsset);
     }
 
     @Override
@@ -1733,6 +1827,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public void startLine() {
         // Goes back to the beginning of the line
         seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
+
     }
 
     // DO NOT CONFUSE THIS WITH prevLine().
@@ -1753,7 +1848,15 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     public void feedSentence() {
-        // Step 1. get sentence text
+        Log.d("Narrate-Debug", "Sentence being fed");
+        if (!storyBooting) {
+            if (hearRead.equals(TCONST.FTR_USER_HEAR)) {
+                AudioWriter.pauseRecording();
+                Log.d("Narrate-Debug", "Recording paused (in hear mode)");
+                return;
+            }
+        }
+
         StringBuilder fileNameBuilder = new StringBuilder();
         for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
             fileNameBuilder.append(word).append(" ");
@@ -1762,8 +1865,10 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         String fileName = fileNameBuilder.toString();
 
-        Log.d("CRt_ saveToFile", "Telling AudioDataStorage to being writing file");
+        Log.d("CRt_ saveToFile", "Telling Audiowriter to being writing file. File is: " + fileName);
         AudioWriter.initializePath(fileName, mAsset);
+
+        narrateFileName = fileName;
     }
 
     @Override

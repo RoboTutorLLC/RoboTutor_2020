@@ -1,6 +1,8 @@
 package edu.cmu.xprize.listener;
 
+import android.app.Activity;
 import android.media.AudioRecord;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -18,6 +20,15 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 
+import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
+import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
+import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
+import cafe.adriel.androidaudioconverter.model.AudioFormat;
+
+
+
+import de.sciss.jump3r.Mp3Encoder;
+
 public class AudioWriter {
 
     public static volatile short[] audioData = new short[160 * 60 * 100];
@@ -33,6 +44,9 @@ public class AudioWriter {
     public static int dataLen;
 
     static byte[] savedFileData;
+    public static String current_log_location;
+
+    public static Activity activity;
 
     public static void closeStreams() {
         try {
@@ -56,7 +70,13 @@ public class AudioWriter {
 
         //Reopen to add header to the beginning of the file
         try {
+            // probably unnecessary because PAUSERECORDING is where the file is completed
             addHeader(new RandomAccessFile(completeFilePath, "rws"));
+            /*
+            Mp3Encoder mp3Encoder = new Mp3Encoder();
+            mp3Encoder.run(new String[]{"-h", "-r", "-b", "256", completeFilePath, completeFilePath.replace(".wav", ".mp3")});
+            // This is not even close to the most optimal way to do this - the jar being used is meant for command line arguments. TODO: recompile jump3r to use without command line arguments
+                                                                                                                                    */
         } catch (Exception e) {
             Log.d("AudioWriterHeaderFail", Log.getStackTraceString(e));
         }
@@ -72,7 +92,7 @@ public class AudioWriter {
             FileInputStream input = new FileInputStream(inFile);
             savedFileData = new byte[(int) inFile.length()];
             BufferedInputStream bis =new BufferedInputStream(input);
-            bis.read(savedFileData,0,savedFileData.length);
+            bis.read(savedFileData,0, savedFileData.length);
             bis.close();
             input.close();
         } catch (IOException ignored) {}
@@ -88,6 +108,18 @@ public class AudioWriter {
         } catch (IOException e) {
             Log.wtf("AudioWriterFail", Log.getStackTraceString(e));
         }
+
+        AndroidAudioConverter.load(activity, new ILoadCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d("AudioWriter" , "Success in loading FFMPEG");
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Log.d("AudioWriter", "failed to load FFMPEG \n" + Log.getStackTraceString(error));
+            }
+        });
     }
 
     public static void addAudio(int noOfShorts, short[] dataBuffer) {
@@ -102,12 +134,14 @@ public class AudioWriter {
             dataOutputStream.write(bytes.array());
             dataOutputStream.flush();
             dataLen += noOfShorts;
-            Log.d("AudioWriter", "Just wrote " + noOfShorts + " shorts to the audio file!");
+            // Log.d("AudioWriter", "Just wrote " + noOfShorts + " shorts to the audio file!");
         } catch (IOException e) {
             if(!e.getMessage().equals("Stream Closed")) {
                 Log.wtf("AudioWriterFail", Log.getStackTraceString(e));
 
             }
+        } catch (NullPointerException e) {
+            Log.d("AudioWriter", "Not writing data because stream does not exist");
         }
     }
 
@@ -189,6 +223,52 @@ public class AudioWriter {
 
         } catch (NullPointerException ignored) {// this is thrown if file doesn't exist
         }
+
+    }
+
+    /**
+     * File is saved and put away as an mp3. the viewmanager has now moved to hear mode
+     */
+    public static void pauseRecording() {
+        dataLen = 0;
+        // Close up  old file
+        closeStreams();
+
+        //Reopen to add header to the beginning of the file
+        try {
+            addHeader(new RandomAccessFile(completeFilePath, "rws"));
+            convertToMp3();
+        } catch (Exception e) {
+            Log.d("AudioWriterHeaderFail", Log.getStackTraceString(e));
+        }
+    }
+
+    private static void convertToMp3() {
+        File wavFile = new File(completeFilePath);
+
+        Log.d("AudioWriter1", "AndroidAudioConverter loaded: " + AndroidAudioConverter.isLoaded());
+
+        IConvertCallback callback = new IConvertCallback() {
+            @Override
+            public void onSuccess(File convertedFile) {
+                Log.d("AudioWriter", "successfully wrote mp3: " + convertedFile.getAbsolutePath());
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+
+                Log.d("AudioWriter", "Failed to write mp3 " + Log.getStackTraceString(error));
+                // Log.getStackTraceString(error);
+            }
+        };
+
+        Log.d("AudioWriter2", "AndroidAudioConverter loaded: " + AndroidAudioConverter.isLoaded());
+        AndroidAudioConverter.with(activity)
+                .setFile(wavFile)
+                .setFormat(AudioFormat.MP3)
+                .setCallback(callback)
+                .convert();
+        Log.d("AudioWriter", "Successfully created mp3");
 
     }
 }

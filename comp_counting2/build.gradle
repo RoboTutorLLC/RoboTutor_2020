@@ -29,7 +29,7 @@ dependencies {
     api 'com.android.support:percent:25.2.0'
 
     testImplementation 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     api project(path: ':util')

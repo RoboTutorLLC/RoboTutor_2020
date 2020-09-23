@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -48,6 +49,7 @@ import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
 import cmu.xprize.robotutor.tutorengine.ITutorObject;
 import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
+import cmu.xprize.robotutor.tutorengine.graph.type_audio;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScriptable2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TBoolean;
@@ -1244,4 +1246,28 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
 
     @Override
     public void skipSentence() {mViewManager.skipSentence(); }
+
+    @Override
+    public void updateJSONData(String dataSource, String assetLocation) {
+        /*
+        type_audio audioObj = new type_audio(true);
+
+        // json loadable fields are being hijacked here
+        audioObj.command = "PLAY";
+        audioObj.lang = "";
+        audioObj.soundsource = dataSource;
+        audioObj.soundpackage = "";
+        audioObj.hijackScope(mTutor.getScope());
+        audioObj.applyNode();
+        */
+
+        String jsondata = JSON_Helper.cacheData(STORYSOURCEPATH + "storydata.json");
+
+        try {
+            mViewManager.loadJSON(new JSONObject(jsondata), null);
+        } catch (JSONException e) {
+            Log.getStackTraceString(e);
+        }
+
+    }
 }

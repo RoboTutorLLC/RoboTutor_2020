@@ -43,15 +43,19 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import cmu.xprize.util.TCONST;
@@ -578,7 +582,6 @@ public class SpeechRecognizer {
                             decoder.processRaw(buffer, nread, false, false);
                             //Log.d("ASR", "Time in processRaw: " + (System.currentTimeMillis() - ASRTimer));
 
-                            AudioDataStorage.addAudioData(nread, buffer);
                             AudioWriter.addAudio(nread, buffer);
 
                             nSamples += nread;
@@ -723,6 +726,23 @@ public class SpeechRecognizer {
         hypString = hypothesis.getHypstr();
 
         Log.d("STABLE", "HYP LIST: " + hypString);
+
+        try {
+
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+            String date = formatter.format(new Date(System.currentTimeMillis()));
+
+            FileWriter writer = new FileWriter(AudioWriter.current_log_location, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            Log.d("Speechrecognizer", "Writing to log file: " + AudioWriter.current_log_location);
+            bufferedWriter.write(date + " HYP LIST: " + hypString);
+            writer.close();
+            bufferedWriter.close();
+        } catch (IOException e) {
+            Log.getStackTraceString(e);
+        } catch (Exception e) {
+            Log.d("SpeechRecognizer", "No log file");
+        }
 
         String[] asrWords = hypString.split("\\s+");
 

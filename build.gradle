@@ -17,6 +17,7 @@ buildscript {
 allprojects {
     repositories {
         maven { url "https://maven.google.com" }
+        maven { url "https://jitpack.io"}
         jcenter()
     }
 
@@ -40,11 +41,7 @@ allprojects {
         // <Milestone release> <Feature Release> <Patch release> <Asset Compatibility INDEX>
 
 
-<<<<<<< HEAD
-        rtVersionName="3.4.2.1" //TODO: move this out of build so we don't have to rebuild to unzip assets
-=======
         rtVersionName="3.3.1.2"
->>>>>>> 4b280492... Merge remote-tracking branch 'remotes/origin/launch_specified_totor' into narrate_mode
 
     }
 }
