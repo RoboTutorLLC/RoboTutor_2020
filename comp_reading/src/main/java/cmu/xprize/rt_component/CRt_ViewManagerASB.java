@@ -915,8 +915,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
     private void postDelayedTracker() {
-
-        narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
+narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
 
         segmentCurr = utterancePrev + narrationSegment.end;
 
@@ -1177,8 +1176,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
 
         } else {
-            //backButton.setVisibility(View.GONE);
-            //forwardButton.setVisibility(View.GONE);
+            backButton.setVisibility(View.GONE);
+            forwardButton.setVisibility(View.GONE);
         }
 
 
@@ -1781,12 +1780,15 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             ArrayList<ListenerBase.HeardWord> seg = AudioDataStorage.segmentation;
             CASB_Seg[] segObj = new CASB_Seg[seg.size()];
             int index = 0;
+            long first = seg.get(0).startFrame;
             for(ListenerBase.HeardWord s : seg) {
-                segObj[index] = new CASB_Seg((int) s.startFrame, (int) s.endFrame, s.hypWord);
+                // subtracted startFrame of first word from every timestamp in the segmentation as a hack until we know the true startFrame of the utterance
+                // Now I'm trying it after only storing audio that is recorded once the decoder turns on
+                segObj[index] = new CASB_Seg((int) (s.startFrame), (int) (s.endFrame), s.hypWord);
                 index++;
             }
             CASB_Narration narration = new CASB_Narration(
-                    fileName.toLowerCase().replace(" ", "_") + ".mp3", (int) seg.get(0).startFrame, (int) seg.get(seg.size() - 1).endFrame, fileName.toLowerCase(), segObj);
+                    fileName.toLowerCase().replace(" ", "_") + ".mp3", (int) (seg.get(0).startFrame), (int) (seg.get(seg.size() - 1).endFrame), fileName.toLowerCase(), segObj);
 
             CASB_Narration[] futureRawNarration =  data[mCurrPage].text[mCurrPara][mCurrLine].narration;
             Log.d("CRt_ViewManagerASB", "FutureRawNarration Length " + futureRawNarration.length);
@@ -1805,12 +1807,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
 
             data[mCurrPage].text[mCurrPara][mCurrLine].narration = futureRawNarration;
-
-            //add in data because the storydata.json has changed
-            //mParent.updateJSONData(mAsset, TCONST.EXTERN);
-
-            /*rawNarration = data[currPage].text[currPara][currLine].narration;
-            rawSentence  = data[currPage].text[currPara][currLine].sentence;*/
 
             isUserNarrating = false;
         }

@@ -139,6 +139,7 @@ public class ListenerBase {
 
         // initialize recognizer for our task
         //
+
         setupRecognizer(assets.getExternalDir(), configFile, dictMap.get(langFTR));
     }
 

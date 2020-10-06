@@ -83,6 +83,7 @@ public class ListenerPLRT extends ListenerBase {
      * @param wordsToHear -- array of upper-case ASR dictionary words
      * @param startWord   -- 0-based index of word to expect next
      */
+    @Override
     public void listenFor(String[] wordsToHear, int startWord) {
 
         Log.d("STABLE", "ListenFor: " + TextUtils.join(" ", wordsToHear));
@@ -117,6 +118,7 @@ public class ListenerPLRT extends ListenerBase {
             // save stream offset of start of utterance, for converting stream-based frame times
             // to utterance-based times.
             sentenceStartSamples = recognizer.nSamples;
+
             // record start time now
             sentenceStartTime = System.currentTimeMillis();
 

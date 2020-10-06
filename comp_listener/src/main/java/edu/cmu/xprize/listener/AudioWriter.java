@@ -68,19 +68,6 @@ public class AudioWriter {
         // Close up  old file
         closeStreams();
 
-        //Reopen to add header to the beginning of the file
-        try {
-            // probably unnecessary because PAUSERECORDING is where the file is completed
-            addHeader(new RandomAccessFile(completeFilePath, "rws"));
-            /*
-            Mp3Encoder mp3Encoder = new Mp3Encoder();
-            mp3Encoder.run(new String[]{"-h", "-r", "-b", "256", completeFilePath, completeFilePath.replace(".wav", ".mp3")});
-            // This is not even close to the most optimal way to do this - the jar being used is meant for command line arguments. TODO: recompile jump3r to use without command line arguments
-                                                                                                                                    */
-        } catch (Exception e) {
-            Log.d("AudioWriterHeaderFail", Log.getStackTraceString(e));
-        }
-
         // Prepare new file
         audioFileName = fileName.toLowerCase().replace(" ", "_");
         audioAssetLocation = assetLocation;
@@ -138,7 +125,6 @@ public class AudioWriter {
         } catch (IOException e) {
             if(!e.getMessage().equals("Stream Closed")) {
                 Log.wtf("AudioWriterFail", Log.getStackTraceString(e));
-
             }
         } catch (NullPointerException e) {
             Log.d("AudioWriter", "Not writing data because stream does not exist");
@@ -146,7 +132,7 @@ public class AudioWriter {
     }
 
     public static void destroyContent() {
-        initializePath(audioFileName, audioAssetLocation);
+        //initializePath(audioFileName, audioAssetLocation);
     }
 
     public static void addHeader(RandomAccessFile raf) throws IOException {

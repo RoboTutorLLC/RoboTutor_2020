@@ -457,7 +457,7 @@ public class SpeechRecognizer {
 
                 try {
                     recorder = new AudioRecord(
-                            AudioSource.VOICE_RECOGNITION, sampleRate,
+                            AudioSource.MIC, sampleRate, // switched VOICE_RECOGNITION to MIC to possibly get better ASR results -- Chirag, 9-23-20
                             AudioFormat.CHANNEL_IN_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, 8192);
                 }
@@ -538,6 +538,7 @@ public class SpeechRecognizer {
                         wordLastChanged = new ArrayList<Long>();
                         lastAudioEvent  = TCONST.UNKNOWN_TYPE;
                         isDecoding      = true;
+                        // AudioWriter.destroyContent();
                     }
 
                     // Ensure we are recording while the thread is running.

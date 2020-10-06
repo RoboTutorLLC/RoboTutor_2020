@@ -24,9 +24,10 @@ import org.json.JSONObject;
 public class AudioDataStorage {
 
     public static ArrayList<ListenerBase.HeardWord> segmentation = new ArrayList<ListenerBase.HeardWord>();
-    static JSONObject storyData;
-    static int currentSentence = 0;
-    static int sampleRate;
+    static JSONObject                               storyData;
+
+    static long decoderStartTime;
+    static long writerStartTime;
 
     static FileOutputStream outputStream;
     static FileChannel outChannel;
@@ -100,10 +101,12 @@ public class AudioDataStorage {
 
             JSONArray segm = new JSONArray();
             long finalEndTime = 0;
+            // Hack #2 - subtracting the difference in time between the instatiation of the decoder and the time for the recorder to begin recording
+            // Hack #3 - subtracting first word again but this time after ensuring that recording coincides with decoding
             for(ListenerBase.HeardWord heardWord : segmentation) {
                 JSONObject segObj = new JSONObject();
                 segObj.put("end", heardWord.endFrame);
-                segObj.put("start", heardWord.startFrame);
+                segObj.put("start", heardWord.startFrame );
                 segObj.put("word", heardWord.hypWord.toLowerCase());
                 segm.put(segObj);
                 finalEndTime = heardWord.endFrame;
