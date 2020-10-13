@@ -232,8 +232,9 @@ public class ListenerBase {
 
                                 .setFloat("-pip", 1f)
 
-                                .setBoolean("-remove_noise", true)     // yes in default
-                                .setBoolean("-remove_silence", true)   // yes in default
+                                .setBoolean("-remove_noise", false)     // yes in default
+                                // I HAVE SET remove_noise AND remove_noise TO FALSE 
+                                .setBoolean("-remove_silence", false)   // yes in default
 
                                 .setFloat("-silprob", 1f)               // 0.005 in default
                                 .setInteger("-topn",  4)

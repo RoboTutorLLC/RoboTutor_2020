@@ -735,7 +735,7 @@ public class SpeechRecognizer {
 
             FileWriter writer = new FileWriter(AudioWriter.current_log_location, true);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
-            Log.d("Speechrecognizer", "Writing to log file: " + AudioWriter.current_log_location);
+            //Log.d("Speechrecognizer", "Writing to log file: " + AudioWriter.current_log_location);
             bufferedWriter.write(date + " HYP LIST: " + hypString);
             writer.close();
             bufferedWriter.close();

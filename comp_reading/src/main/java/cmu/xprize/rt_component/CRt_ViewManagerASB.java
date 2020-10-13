@@ -20,6 +20,7 @@ package cmu.xprize.rt_component;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.text.Html;
 import android.text.Layout;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -144,6 +146,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     private ArrayList<String>       wordsSpoken;
     private ArrayList<String>       futureSpoken;
+
+    boolean                         alreadyNarrated;
 
 
     // json loadable
@@ -915,7 +919,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
     private void postDelayedTracker() {
-narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
+        narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
 
         segmentCurr = utterancePrev + narrationSegment.end;
 
@@ -1176,6 +1180,7 @@ narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
             }
 
         } else {
+            // broken and I don't know why -- Chirag
             backButton.setVisibility(View.GONE);
             forwardButton.setVisibility(View.GONE);
         }
@@ -1208,9 +1213,6 @@ narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
         if (mCurrPara < mParaCount-1) {
             incPara(TCONST.INCR);
         }
-
-        // feedSentence();
-
 
     }
 
@@ -1257,8 +1259,6 @@ narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
         if (mCurrLine < mLineCount-1) {
             incLine(TCONST.INCR);
         }
-
-        // feedSentence();
 
     }
     @Override
@@ -1757,6 +1757,7 @@ narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
 
         if (isUserNarrating) {
             Log.d("CRt_ saveToFile", "Preparing to save audio data");
+
             // Step 1. get sentence text
             StringBuilder fileNameBuilder = new StringBuilder();
             for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
@@ -1865,6 +1866,25 @@ narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
         AudioWriter.initializePath(fileName, mAsset);
 
         narrateFileName = fileName;
+
+        // Check if the current narration exists
+        try {
+            String currNarrationLocation = data[mCurrPage].text[mCurrPara][mCurrLine].narration[0].audio;
+            if (currNarrationLocation != null) {
+                mPageText.setBackgroundColor(Color.CYAN);
+                alreadyNarrated = true;
+            } else {
+                
+                alreadyNarrated = false;
+            }
+            // temporary solution.
+            // If the storydata.json says there is a narration here, then it is assumed that this piece has already been narrated.
+            // Currently works for single-utterance narrations
+            // It'll throw an exception if the narration doesn't exist because then the array of narrations will be empty (uninitialized)
+            // Additionally, the actual filename can't be null
+        } catch (Exception e) {
+            alreadyNarrated = false;
+        }
     }
 
     @Override
