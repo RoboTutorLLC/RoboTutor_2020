@@ -755,14 +755,13 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
                 configListenerLanguage(mMediaManager.getLanguageFeature(mTutor));
                 mMediaManager.addSoundPackage(mTutor, MEDIA_STORY, new CMediaPackage(LANG_AUTO, AUDIOSOURCEPATH, LOCAL_STORY_AUDIO));
 
-                loadStory(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN);
+                loadStoryCheckNarrate(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()));
 
 
             } else {
                 throw (new Exception("BadDataSource"));
             }
-
-            enableNarrateMode(Configuration.getContentCreationMode(getContext()));
+            //enableNarrateMode(Configuration.getContentCreationMode(getContext()));
         }
         catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source for : " + mTutor.getTutorName(), e, true);

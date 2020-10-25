@@ -604,6 +604,45 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
     }
 
+    public void loadStoryCheckNarrate(String EXTERNPATH, String viewType, String assetLocation, Boolean isNarrateMode) {
+
+        Log.d(TCONST.DEBUG_STORY_TAG, String.format("assetLocation=%s -- EXTERNPATH=%s", assetLocation, EXTERNPATH));
+
+        Class<?> storyClass = viewClassMap.get(viewType);
+
+        try {
+            // Generate the View manager for the storyName - specified in the data
+            //
+            // ooooh maybe check if it's math and make text closer to image
+            mViewManager = (ICRt_ViewManager)storyClass.getConstructor(new Class[]{CRt_Component.class, ListenerBase.class}).newInstance(this,mListener);
+
+            // ZZZ it loads the story data JUST FINE
+            String jsonData = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYDATA);
+            AudioDataStorage.initStoryData(jsonData);
+            Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonData:");
+
+            mViewManager.loadJSON(new JSONObject(jsonData), null);
+
+        } catch (Exception e) {
+            // TODO: Manage Exceptions
+            CErrorManager.logEvent(TAG, "Story Parse Error: ", e, false);
+        }
+
+        if (assetLocation.equals(TCONST.EXTERN_SHARED)) {
+            Log.d(TCONST.DEBUG_STORY_TAG, "SHARED!");
+            // we are done using sharedAssetLocation
+            EXTERNPATH = null;
+        }
+
+        mViewManager.enableNarrateMode(isNarrateMode);
+        //
+        // ZZZ what are these values?
+        // ZZZ EXTERNPATH = TCONST.EXTERN
+        // ZZZ assetLocation contains storydata.json and images
+        mViewManager.initStory(this, EXTERNPATH, assetLocation);
+
+    }
+
     public void enableNarrateMode(boolean isNarrateMode) {
         mViewManager.enableNarrateMode(isNarrateMode);
     }

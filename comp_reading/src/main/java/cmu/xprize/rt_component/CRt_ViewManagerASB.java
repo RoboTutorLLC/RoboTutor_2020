@@ -24,7 +24,11 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.text.Html;
 import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,8 +175,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     static final String TAG = "CRt_ViewManagerASB";
 
 
-    public Button backButton;
-    public Button forwardButton;
+    public ImageButton backButton;
+    public ImageButton forwardButton;
 
     public String buttonState;
 
@@ -235,11 +239,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //TODO: CHECK
         mParent.animatePageFlip(true,mCurrViewIndex);
 
-        feedSentence();
+        // feedSentence();
 
     }
 
-    boolean isNarrateMode = false;
+    boolean isNarrateMode;
     // Narrate mode gets activated here
     public void enableNarrateMode(boolean narrateModeStatus) {
         if (narrateModeStatus) {
@@ -256,7 +260,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 FileOutputStream fos = new FileOutputStream(hyplogFile);
                 fos.close();
                 AudioWriter.current_log_location = hyplogFile;
-            } catch (IOException e) { Log.getStackTraceString(e); }
+            } catch (IOException e) {
+                isNarrateMode = false;
+                Log.getStackTraceString(e); }
+        } else {
+            isNarrateMode = false;
         }
     }
 
@@ -766,7 +774,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         UpdateDisplay();
 
-        feedSentence();
+        if (isNarrateMode)
+            feedSentence();
 
         // Once past the storyName initialization stage - Listen for the target word -
         //
@@ -1151,16 +1160,17 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     private void updateButtonPositions() {
+       Log.d("CRt_ViewManager", "isNarrateMode is" + isNarrateMode);
         if (mCurrPage % 2 == 0) {
-            backButton = (Button) mOddPage.findViewById(R.id.backButton);
-            forwardButton = (Button) mOddPage.findViewById(R.id.forwardButton);
+            backButton = (ImageButton) mOddPage.findViewById(R.id.backButton);
+            forwardButton = (ImageButton) mOddPage.findViewById(R.id.forwardButton);
         } else {
-            backButton = (Button) mEvenPage.findViewById(R.id.backButton);
-            forwardButton = (Button) mEvenPage.findViewById(R.id.forwardButton);
+            backButton = (ImageButton) mEvenPage.findViewById(R.id.backButton);
+            forwardButton = (ImageButton) mEvenPage.findViewById(R.id.forwardButton);
         }
 
         if (isNarrateMode) {
-
+            Log.d("CRT_Chirag", "isNarrateMode is true");
             try {
                 backButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -1175,16 +1185,16 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         skipSentence();
                     }
                 });
+
+                forwardButton.setVisibility(View.VISIBLE);
+                backButton.setVisibility(View.VISIBLE);
             } catch (NullPointerException e) {
                 Log.d("CRt_ViewManagerASB", "Couldn't find forwardbutton and backbutton");
             }
-
         } else {
-            // broken and I don't know why -- Chirag
-            backButton.setVisibility(View.GONE);
-            forwardButton.setVisibility(View.GONE);
-        }
+            // make buttons invisible
 
+        }
 
 
     }
@@ -1300,7 +1310,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public void echoLine() {
 
         isUserNarrating = true;
-        saveToFile();
+        if (isNarrateMode)
+            saveToFile();
 
         // reset the echo flag
         //
@@ -1824,24 +1835,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public void startLine() {
         // Goes back to the beginning of the line
         seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
-
-    }
-
-    // DO NOT CONFUSE THIS WITH prevLine().
-    // THIS IS USED TO GO BACK A SENTENCE REGARDLESS OF CURRENT STORY POSITION. IT'S ORIGINAL PURPOSE IS TO ALLOW FOR NAVIGATION WITHIN THE STORY
-    // prevLine() GOES BACK TO THE PREVIOUS SENTENCE INSOFAR AS THERE IS A SENTENCE WITHIN THE PARAGRAPH BEFORE IT
-    @Override
-    public void prevSentence() {
-        Log.d("NavButton", "Back Button has been pressed");
-        AudioWriter.abortOperation();
-        // It is zero-index
-        if (mCurrLine > 0) {
-            prevLine();
-        } else if (mCurrPara > 0) {
-            prevPara();
-        } else if (mCurrPage > 0) {
-            prevPage();
-        }
     }
 
     public void feedSentence() {
@@ -1855,7 +1848,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         }
 
         StringBuilder fileNameBuilder = new StringBuilder();
-        for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
+        for (String word : wordsToSpeak) { // This uses the wordsToSpeak String[] because it does not contain punctuation
             fileNameBuilder.append(word).append(" ");
         }
         fileNameBuilder.setLength(fileNameBuilder.length() - 1);
@@ -1868,22 +1861,50 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         narrateFileName = fileName;
 
         // Check if the current narration exists
+        String currDisplaySentence = data[mCurrPage].text[mCurrPara][mCurrLine].sentence;
         try {
             String currNarrationLocation = data[mCurrPage].text[mCurrPara][mCurrLine].narration[0].audio;
             if (currNarrationLocation != null) {
-                mPageText.setBackgroundColor(Color.CYAN);
+                // mPageText.setBackgroundColor(Color.CYAN);
                 alreadyNarrated = true;
             } else {
-                
+                int textStartIndex = mPageText.getText().toString().indexOf(currDisplaySentence);
+                int textEndIndex = textStartIndex + currDisplaySentence.length();
+                Spannable spannable = new SpannableString(mPageText.getText());
+                spannable.setSpan(new BackgroundColorSpan(Color.CYAN), textStartIndex, textEndIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                mPageText.setText(spannable);
                 alreadyNarrated = false;
             }
             // temporary solution.
             // If the storydata.json says there is a narration here, then it is assumed that this piece has already been narrated.
             // Currently works for single-utterance narrations
             // It'll throw an exception if the narration doesn't exist because then the array of narrations will be empty (uninitialized)
-            // Additionally, the actual filename can't be null
         } catch (Exception e) {
+            int textStartIndex = mPageText.getText().toString().indexOf(currDisplaySentence);
+            int textEndIndex = textStartIndex + currDisplaySentence.length();
+            Spannable spannable = new SpannableString(mPageText.getText());
+            spannable.setSpan(new BackgroundColorSpan(Color.CYAN), textStartIndex, textEndIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mPageText.setText(spannable);
             alreadyNarrated = false;
+        }
+    }
+
+    // DO NOT CONFUSE THIS WITH prevLine().
+    // THIS IS USED TO GO BACK A SENTENCE REGARDLESS OF CURRENT STORY POSITION. IT'S ORIGINAL PURPOSE IS TO ALLOW FOR NAVIGATION WITHIN THE STORY
+    // prevLine() GOES BACK TO THE PREVIOUS SENTENCE IF AND ONLY IF THERE IS A SENTENCE WITHIN THE PARAGRAPH BEFORE IT
+    //
+    @Override
+    public void prevSentence() {
+        Log.d("NavButton", "Back Button has been pressed");
+        AudioWriter.abortOperation();
+        hearRead = TCONST.FTR_USER_HEAR;
+        // It is zero-index
+        if (mCurrLine > 0) {
+            prevLine();
+        } else if (mCurrPara > 0) {
+            prevPara();
+        } else if (mCurrPage > 0) {
+            prevPage();
         }
     }
 
@@ -1893,6 +1914,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         AudioWriter.abortOperation();
         mCurrWord = mWordCount; // go to the end of the sentence
         publishStateValues();
+        hearRead = TCONST.FTR_USER_HEAR;
         if(buttonState.equals(TCONST.RTC_PAGECOMPLETE)) {
             nextPage();
         } else if(buttonState.equals(TCONST.RTC_PARAGRAPHCOMPLETE)) {
