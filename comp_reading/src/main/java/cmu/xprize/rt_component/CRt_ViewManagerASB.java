@@ -152,6 +152,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     private ArrayList<String>       futureSpoken;
 
     boolean                         alreadyNarrated;
+    boolean                         doNotTruncate;
 
 
     // json loadable
@@ -774,7 +775,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         UpdateDisplay();
 
-        if (isNarrateMode)
+        if (isNarrateMode && !doNotTruncate)
             feedSentence();
 
         // Once past the storyName initialization stage - Listen for the target word -
@@ -1834,7 +1835,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     @Override
     public void startLine() {
         // Goes back to the beginning of the line
+        doNotTruncate = true; // set to FALSE if you want to truncate the file
         seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
+        doNotTruncate = false;
     }
 
     public void feedSentence() {
