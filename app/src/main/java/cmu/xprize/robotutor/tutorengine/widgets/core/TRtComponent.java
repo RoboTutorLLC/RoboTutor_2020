@@ -755,7 +755,13 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
                 configListenerLanguage(mMediaManager.getLanguageFeature(mTutor));
                 mMediaManager.addSoundPackage(mTutor, MEDIA_STORY, new CMediaPackage(LANG_AUTO, AUDIOSOURCEPATH, LOCAL_STORY_AUDIO));
 
-                loadStoryCheckNarrate(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()));
+                boolean keepOnlyRelevantAudio;
+                if (CDebugLauncher.getDebugVar("delete_extra_audio") == "true")
+                    keepOnlyRelevantAudio = true;
+                else
+                    keepOnlyRelevantAudio = false;
+
+                loadStoryCheckNarrate(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()), keepOnlyRelevantAudio);
 
 
             } else {

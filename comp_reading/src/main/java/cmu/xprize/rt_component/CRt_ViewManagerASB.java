@@ -152,7 +152,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     private ArrayList<String>       futureSpoken;
 
     boolean                         alreadyNarrated;
-    boolean                         doNotTruncate;
+    boolean                         keepOnlyRelevantAudio; // true if narrate mode is deleting all audio that is wrong, false if the entire file including mistakes is to be kept
+    boolean                         deleteRecording; // if there is a mistake in NARRATE MODE, then the current recording is deleted
 
 
     // json loadable
@@ -245,8 +246,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     boolean isNarrateMode;
-    // Narrate mode gets activated here
-    public void enableNarrateMode(boolean narrateModeStatus) {
+    // Narrate mode -- as in CONTENT CREATION and not NARRATING -- gets activated here
+    public void enableNarrateMode(boolean narrateModeStatus, boolean keepExtraAudio) {
         if (narrateModeStatus) {
             mParent.setFeature(TCONST.FTR_NARRATE_MODE, TCONST.ADD_FEATURE);
             Log.d("CRT_ViewManagerASB", "Narrate Mode has been activated through setNarrateMode()");
@@ -267,6 +268,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         } else {
             isNarrateMode = false;
         }
+
+        keepOnlyRelevantAudio = keepExtraAudio;
     }
 
     /**
@@ -775,7 +778,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         UpdateDisplay();
 
-        if (isNarrateMode && !doNotTruncate)
+        if (isNarrateMode && deleteRecording)
             feedSentence();
 
         // Once past the storyName initialization stage - Listen for the target word -
@@ -1832,12 +1835,14 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         AudioWriter.destroyContent();
     }
 
+    /**
+     * Line is restarted after a wrong narration in NARRATE MODE
+     */
     @Override
     public void startLine() {
-        // Goes back to the beginning of the line
-        doNotTruncate = true; // set to FALSE if you want to truncate the file
+        deleteRecording = keepOnlyRelevantAudio;
         seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
-        doNotTruncate = false;
+        deleteRecording = true;
     }
 
     public void feedSentence() {
