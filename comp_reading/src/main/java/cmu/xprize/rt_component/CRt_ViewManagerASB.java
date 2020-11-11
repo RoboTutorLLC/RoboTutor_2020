@@ -869,7 +869,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 Log.d(TAG, "HERE");
             }
 
-            Log.d("ArrayError_Chirag", spokenWords.size() + " is spokenWords.size(). Current word: " + spokenWords.get(spokenWords.size() - 1));
             // Update the display
             //
             onUpdate(spokenWords.toArray(new String[spokenWords.size()]));

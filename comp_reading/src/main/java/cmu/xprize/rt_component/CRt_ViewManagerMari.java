@@ -614,6 +614,11 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
 
     }
 
+    @Override
+    public void enableNarrateMode(boolean isNarrateMode, boolean keepExtraAudio) {
+
+    }
+
     public void enableNarrateMode(boolean isNarrateMode) {
 
     }

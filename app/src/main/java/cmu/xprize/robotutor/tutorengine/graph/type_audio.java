@@ -22,11 +22,13 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
 import cmu.xprize.robotutor.tutorengine.IMediaListener;
@@ -242,7 +244,8 @@ public class type_audio extends type_action implements IMediaListener {
 
         mPathResolved = getScope().parseTemplate(mSourcePath);
 
-        if(AudioDataStorage.contentCreationOn) {
+
+        if(AudioDataStorage.contentCreationOn || Objects.equals(CDebugLauncher.getDebugVar("use_hash_name"), "false")) {
             mPathResolved = mPathResolved.replace("sdcard/Download/RoboTutor/assets/story_questions/audio/en//", "");
             _useHashName = false;
         }

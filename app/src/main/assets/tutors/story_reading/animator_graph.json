@@ -328,7 +328,7 @@
         "CLEARAUDIO": {
           "type": "MODULE",
           "reuse": true,
-          "COMMENT": "module that deletes current audio data",
+          "COMMENT": "module that deletes current audio data recorded for this utterance in Narrate Mode",
           "tracks": [
             {"type": "COMMAND","id": "SstoryReading","method": "clearAudioData","parms": "none","features": ""}
           ]
