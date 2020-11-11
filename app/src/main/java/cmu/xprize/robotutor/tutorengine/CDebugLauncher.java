@@ -23,7 +23,7 @@ public class CDebugLauncher {
     String tutorId;
     String matrix;
 
-    private static HashMap<String, String> debugVars = new HashMap<String, String>();
+    public static HashMap<String, String> debugVars = new HashMap<String, String>();
 
     public Boolean launchIfDebug() {
         try {
@@ -86,6 +86,9 @@ public class CDebugLauncher {
     }
 
     public static String getDebugVar(String key) {
-        return debugVars.get(key);
+        if (debugVars.containsKey(key))
+            return debugVars.get(key);
+        else
+            return null;
     }
 }
