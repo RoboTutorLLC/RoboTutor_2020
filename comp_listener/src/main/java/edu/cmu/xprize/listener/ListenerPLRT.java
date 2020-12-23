@@ -69,6 +69,7 @@ public class ListenerPLRT extends ListenerBase {
     private boolean     useTruncations = true;       // Flag whether or not to use truncations.
     private boolean     speaking = false;            // speaking state. [currently unused]
 
+
     /**
      * Attach event listener to receive notification callbacks
      */
@@ -477,12 +478,17 @@ public class ListenerPLRT extends ListenerBase {
             //
             if (eventListener != null) {
                 eventListener.onUpdate(heardWords, finalResult);
+                if(AudioDataStorage.contentCreationOn) { // if in NARRATION CAPTURE MODE
+                    allSegments = segments;    // todo: unsafe, ensure that the objects in allSegments must stay unchanged
+                }
             }
 
             // log the partial hypothesis
-            if(IS_LOGGING)
+            if(IS_LOGGING) {
                 logHyp(timestamp, TextUtils.join(" ", asrWords), segments, heardWords);
                 AudioDataStorage.updateHypothesis(heardWords);
+            }
+
         }
     }
 

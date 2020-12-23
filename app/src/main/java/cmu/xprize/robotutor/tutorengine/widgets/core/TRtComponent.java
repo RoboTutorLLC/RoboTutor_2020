@@ -23,7 +23,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +35,6 @@ import java.util.Map;
 
 import cmu.xprize.comp_logging.ITutorLogger;
 import cmu.xprize.comp_logging.PerformanceLogItem;
-import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.startup.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
@@ -49,7 +47,6 @@ import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
 import cmu.xprize.robotutor.tutorengine.ITutorObject;
 import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
-import cmu.xprize.robotutor.tutorengine.graph.type_audio;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScriptable2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TBoolean;
@@ -761,7 +758,7 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
                 else
                     keepOnlyRelevantAudio = false;
 
-                loadStoryCheckNarrate(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()), keepOnlyRelevantAudio);
+                loadStoryANDEnableContentCreation(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()), keepOnlyRelevantAudio);
 
 
             } else {
@@ -1244,6 +1241,11 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     @Override
     public void startLine() {
         mViewManager.startLine();
+    }
+
+    @Override
+    public void restartUtterance() {
+        mViewManager.restartUtterance();
     }
 
     @Override

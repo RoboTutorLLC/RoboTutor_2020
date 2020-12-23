@@ -218,6 +218,11 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
 
     }
 
+    @Override
+    public void restartUtterance() {
+
+    }
+
 
     @Override
     public void onUpdate(ListenerBase.HeardWord[] heardWords, boolean finalResult) {
@@ -615,7 +620,7 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
     }
 
     @Override
-    public void enableNarrateMode(boolean isNarrateMode, boolean keepExtraAudio) {
+    public void enableNarrationCaptureMode(boolean isNarrateMode, boolean keepExtraAudio) {
 
     }
 

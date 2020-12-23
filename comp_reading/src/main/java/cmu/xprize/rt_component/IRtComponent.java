@@ -58,5 +58,6 @@ public interface IRtComponent {
     public void clearAudioData();
     public void startLine();
     public void prevSentence();
+    public void restartUtterance();
     public void skipSentence();
 }

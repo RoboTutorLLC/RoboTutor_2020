@@ -32,14 +32,12 @@ import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,6 +45,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -55,6 +54,7 @@ import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
+import edu.cmu.pocketsphinx.Segment;
 import edu.cmu.xprize.listener.AudioDataStorage;
 import edu.cmu.xprize.listener.AudioWriter;
 import edu.cmu.xprize.listener.ListenerBase;
@@ -152,8 +152,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     private ArrayList<String>       futureSpoken;
 
     boolean                         alreadyNarrated;
-    boolean                         keepOnlyRelevantAudio; // true if narrate mode is deleting all audio that is wrong, false if the entire file including mistakes is to be kept
-    boolean                         deleteRecording; // if there is a mistake in NARRATE MODE, then the current recording is deleted
+    boolean                         keepOnlyRelevantAudio; // true if NARRATION CAPTURE MODE is deleting all audio that is wrong, false if the entire file including mistakes is to be kept
+    boolean                         deleteRecording; // if there is a mistake in NARRATION CAPTURE MODE, then the current recording is deleted
+
+    int                             currUtt;
+    ArrayList<CASB_Narration>       utterances = new ArrayList<>();
 
 
     // json loadable
@@ -182,7 +185,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     public String buttonState;
 
-    String narrateFileName;
+    String narrationFileName;
 
     boolean isUserNarrating;
 
@@ -241,20 +244,21 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //TODO: CHECK
         mParent.animatePageFlip(true,mCurrViewIndex);
 
-        // feedSentence();
+        deleteRecording = true;
 
     }
 
-    boolean isNarrateMode;
-    // Narrate mode -- as in CONTENT CREATION and not NARRATING -- gets activated here
-    public void enableNarrateMode(boolean narrateModeStatus, boolean keepExtraAudio) {
-        if (narrateModeStatus) {
-            mParent.setFeature(TCONST.FTR_NARRATE_MODE, TCONST.ADD_FEATURE);
+    boolean isNarrationCaptureMode;
+    // NARRATION CAPTURE mode -- as in CONTENT CREATION and not NARRATING -- gets activated here
+    public void enableNarrationCaptureMode(boolean capturingNarration, boolean keepExtraAudio) {
+        if (capturingNarration) {
+            mParent.setFeature(TCONST.FTR_NARRATION_CAPTURE, TCONST.ADD_FEATURE);
             Log.d("CRT_ViewManagerASB", "Narrate Mode has been activated through setNarrateMode()");
-            isNarrateMode = true;
+            isNarrationCaptureMode = true;
             isUserNarrating = true;
 
             AudioDataStorage.contentCreationOn = true;
+
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
             String date = formatter.format(new Date(System.currentTimeMillis()));
             String hyplogFile = TCONST.HYP_LOG_FILE_LOCATION + date + ".log";
@@ -263,10 +267,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 fos.close();
                 AudioWriter.current_log_location = hyplogFile;
             } catch (IOException e) {
-                isNarrateMode = false;
-                Log.getStackTraceString(e); }
+                isNarrationCaptureMode = false;
+                Log.getStackTraceString(e);
+            }
         } else {
-            isNarrateMode = false;
+            isNarrationCaptureMode = false;
         }
 
         keepOnlyRelevantAudio = keepExtraAudio;
@@ -778,8 +783,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         UpdateDisplay();
 
-        if (isNarrateMode && deleteRecording)
-            feedSentence();
+        if (isNarrationCaptureMode)
+            feedSentence(mCurrWord);
 
         // Once past the storyName initialization stage - Listen for the target word -
         //
@@ -1129,7 +1134,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         //
         mParent.animatePageFlip(true, mCurrViewIndex);
 
-        // feedSentence();
     }
     @Override
     public void prevPage() {
@@ -1163,7 +1167,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     private void updateButtonPositions() {
-       Log.d("CRt_ViewManager", "isNarrateMode is" + isNarrateMode);
+       Log.d("CRt_ViewManager", "isNarrateMode is" + isNarrationCaptureMode);
         if (mCurrPage % 2 == 0) {
             backButton = (ImageButton) mOddPage.findViewById(R.id.backButton);
             forwardButton = (ImageButton) mOddPage.findViewById(R.id.forwardButton);
@@ -1172,7 +1176,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             forwardButton = (ImageButton) mEvenPage.findViewById(R.id.forwardButton);
         }
 
-        if (isNarrateMode) {
+        if (isNarrationCaptureMode) {
             Log.d("CRT_Chirag", "isNarrateMode is true");
             try {
                 backButton.setOnClickListener(new View.OnClickListener() {
@@ -1313,7 +1317,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public void echoLine() {
 
         isUserNarrating = true;
-        if (isNarrateMode)
+
+        if (isNarrationCaptureMode)
             saveToFile();
 
         // reset the echo flag
@@ -1427,7 +1432,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         // for the current target word.
         // 1. Start with the target word on the target sentence
         // 2. Add the words from there to the end of the sentence - just to permit them
-        // 3. Add the words alread spoken from the other lines - just to permit them
+        // 3. Add the words already spoken from the other lines - just to permit them
         //
         // "Permit them": So the language model is listening for them as possibilities.
         //
@@ -1766,46 +1771,46 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         JSON_Helper.parseSelf(jsonData, this, CClassMap.classMap, scope);
     }
 
+    /**
+     * In Narration capture mode, the audio recording data is saved to the storydata file and updated by RoboTutor in order to then echo the file
+     */
     @Override
-    public void saveToFile() {
+    public void saveToFile() { //todo: (chirag) refactor this guy--confusing name
 
         if (isUserNarrating) {
-            Log.d("CRt_ saveToFile", "Preparing to save audio data");
+            Log.d(TAG, "Preparing to save audio data in narrate mode");
 
-            // Step 1. get sentence text
-            StringBuilder fileNameBuilder = new StringBuilder();
-            for (String word : wordsToSpeak) { // This uses the wordsToDisplay String[] because it contains punctuation
-                fileNameBuilder.append(word).append(" ");
-            }
-            fileNameBuilder.setLength(fileNameBuilder.length() - 1);
+            // todo: (chirag) do not duplicate process
 
-            String fileName = fileNameBuilder.toString();
+            StringBuilder withPunctuation = new StringBuilder();
 
-            StringBuilder sentenceNameBuilder = new StringBuilder();
             for (String word : wordsToDisplay) { // This uses the wordsToDisplay String[] because it contains punctuation
-                fileNameBuilder.append(word).append(" ");
+                withPunctuation.append(word).append(" ");
             }
-            fileNameBuilder.setLength(fileNameBuilder.length() - 1);
+            withPunctuation.setLength(withPunctuation.length() - 1);
 
-            String sentence = fileNameBuilder.toString();
-
-            Log.d("CRt_ saveToFile", "Telling AudioDataStorage to save story stuff");
-            JSONObject sdata = AudioDataStorage.saveAudioData(fileName, mAsset, mCurrLine, mCurrPara, mCurrPage, sentence);
+            Log.d(TAG, "Telling AudioDataStorage to save story stuff");
+            JSONObject sdata = AudioDataStorage.saveAudioData(narrationFileName, mAsset, mCurrLine, mCurrPara, mCurrPage, withPunctuation.toString(), currUtt);
 
             ArrayList<ListenerBase.HeardWord> seg = AudioDataStorage.segmentation;
-            CASB_Seg[] segObj = new CASB_Seg[seg.size()];
             int index = 0;
+            int i = narrationFileName.split(" ").length;
             long first = seg.get(0).startFrame;
+            ArrayList<CASB_Seg> segList = new ArrayList<>();
+            CASB_Seg[] segObj = new CASB_Seg[i];
             for(ListenerBase.HeardWord s : seg) {
-                // subtracted startFrame of first word from every timestamp in the segmentation as a hack until we know the true startFrame of the utterance
-                // Now I'm trying it after only storing audio that is recorded once the decoder turns on
-                segObj[index] = new CASB_Seg((int) (s.startFrame), (int) (s.endFrame), s.hypWord);
-                index++;
+                if (i >= 0) {
+                    segList.add(new CASB_Seg((int) (s.startFrame), (int) (s.endFrame), s.hypWord));
+                    //segObj[index] = new CASB_Seg((int) (s.startFrame), (int) (s.endFrame), s.hypWord);
+                    //index++;
+                }
+                i--;
             }
             CASB_Narration narration = new CASB_Narration(
-                    fileName.toLowerCase().replace(" ", "_") + ".mp3", (int) (seg.get(0).startFrame), (int) (seg.get(seg.size() - 1).endFrame), fileName.toLowerCase(), segObj);
+                    narrationFileName.toLowerCase().replace(" ", "_") + ".mp3", segList.get(0).start, segList.get(segList.size()-1).end, narrationFileName.toLowerCase(), segList.toArray(new CASB_Seg[segList.size()]));
 
             CASB_Narration[] futureRawNarration =  data[mCurrPage].text[mCurrPara][mCurrLine].narration;
+
             Log.d("CRt_ViewManagerASB", "FutureRawNarration Length " + futureRawNarration.length);
             if(futureRawNarration.length > 0) {
                 CASB_Narration[] narrations = new CASB_Narration[futureRawNarration.length + 1];
@@ -1828,14 +1833,19 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     }
 
+    /**
+     * for an incorrect utterance in NARRATION CAPTURE MODE
+     */
     @Override
     public void clearAudioData() {
-        AudioDataStorage.clearAudioData();
-        AudioWriter.destroyContent();
+        //AudioDataStorage.clearAudioData();
+        //AudioWriter.destroyContent();
+
+
     }
 
     /**
-     * Line is restarted after a wrong narration in NARRATE MODE
+     * Line is restarted after a wrong narration in NARRATION CAPTURE MODE
      */
     @Override
     public void startLine() {
@@ -1844,8 +1854,76 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         deleteRecording = true;
     }
 
-    public void feedSentence() {
-        Log.d("Narrate-Debug", "Sentence being fed");
+    /**
+     * Restart utterance if the narration is wrong in Narration Capture Mode, preventing the user from having to restart the entire sentence
+     */
+    @Override
+    public void restartUtterance() {
+        // todo: (chirag) the mumbo jumbo here does not work
+        // Because any word can be said in any order, I need to be able to match where the silence is to the text words
+        // How can I get silences post multimatch?
+
+        Log.d(TAG, "Method restart utterance being called");
+        String heardwords = "";
+        for(ListenerBase.HeardWord h : AudioDataStorage.segmentation) {
+            heardwords += h.hypWord;
+            heardwords += " ";
+        }
+        Log.d(TAG, "Audiodatastorage segmentation: " + heardwords);
+        int silLoc = 2;
+
+
+        /*
+
+        for (int i = AudioDataStorage.segmentation.size() - 1; i >= 0; i--) {
+            if (AudioDataStorage.segmentation.get(i).startFrame - AudioDataStorage.segmentation.get(i-1).endFrame > 50 ) { // gap between words must be greater than 50 centiseconds
+                silLoc = i;
+                break;
+            }
+        }
+
+         */
+
+        Log.d(TAG, "Restarting Utterance. CurrWord: " + silLoc + " " + wordsToSpeak[silLoc] + ". Prev start from " + prevStartFrom);
+
+        StringBuilder newFileName = new StringBuilder();
+
+        for(int i = prevStartFrom; i <= silLoc; i++) {
+            newFileName.append(wordsToSpeak[i]).append(" ");
+        }
+
+
+        Log.d(TAG, "Chirag: New File Name is " + newFileName.toString() + ".");
+
+        if (newFileName.length() > 0) {
+            newFileName.setLength(newFileName.length() - 1);
+
+            String oldFileName = narrationFileName; // make a copy to be safe
+            renameNarration(oldFileName, newFileName.toString());
+
+            narrationFileName = newFileName.toString();
+
+            isUserNarrating = true;
+            saveToFile();
+        }
+
+        seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, silLoc + 1); // currword is not 0 indexed
+    }
+
+    void renameNarration(String oldFileName, String newFileName) {
+        //AudioWriter.pauseRecording();
+        //AudioWriter.renameFile(oldFileName, newFileName, mAsset);
+        AudioWriter.pauseNRename(oldFileName, newFileName, mAsset);
+    }
+
+    int prevStartFrom = 0;
+    /**
+     * Gives the file location to save the current recording to the AudioWriter so that the data collected is immediately written to file
+     * @param startFrom
+     */
+    public void feedSentence(int startFrom) {
+        Log.d(TAG, "Chirag: currUtt is " + currUtt);
+
         if (!storyBooting) {
             if (hearRead.equals(TCONST.FTR_USER_HEAR)) {
                 AudioWriter.pauseRecording();
@@ -1855,8 +1933,12 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         }
 
         StringBuilder fileNameBuilder = new StringBuilder();
+        int i = 0;
         for (String word : wordsToSpeak) { // This uses the wordsToSpeak String[] because it does not contain punctuation
-            fileNameBuilder.append(word).append(" ");
+            if (i >= startFrom) {
+                fileNameBuilder.append(word).append(" ");
+            }
+            i++;
         }
         fileNameBuilder.setLength(fileNameBuilder.length() - 1);
 
@@ -1865,18 +1947,22 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         Log.d("CRt_ saveToFile", "Telling Audiowriter to being writing file. File is: " + fileName);
         AudioWriter.initializePath(fileName, mAsset);
 
-        narrateFileName = fileName;
+        narrationFileName = fileName;
 
-        // Check if the current narration exists
+        // Highlight words already covered by narration
         String currDisplaySentence = data[mCurrPage].text[mCurrPara][mCurrLine].sentence;
         try {
-            String currNarrationLocation = data[mCurrPage].text[mCurrPara][mCurrLine].narration[0].audio;
-            if (currNarrationLocation != null) {
+            StringBuilder currNarratedWordsBuilder = new StringBuilder();
+            for(CASB_Narration narration : data[mCurrPage].text[mCurrPara][mCurrLine].narration) {
+                currNarratedWordsBuilder.append(narration.utterances);
+            }
+            String currNarratedWords = currNarratedWordsBuilder.toString();
+            if (currNarratedWordsBuilder.length() > 0) {
                 // mPageText.setBackgroundColor(Color.CYAN);
                 alreadyNarrated = true;
             } else {
-                int textStartIndex = mPageText.getText().toString().indexOf(currDisplaySentence);
-                int textEndIndex = textStartIndex + currDisplaySentence.length();
+                int textStartIndex = mPageText.getText().toString().indexOf(currNarratedWords);
+                int textEndIndex = textStartIndex + currNarratedWords.length();
                 Spannable spannable = new SpannableString(mPageText.getText());
                 spannable.setSpan(new BackgroundColorSpan(Color.CYAN), textStartIndex, textEndIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 mPageText.setText(spannable);
@@ -1894,6 +1980,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mPageText.setText(spannable);
             alreadyNarrated = false;
         }
+
+        prevStartFrom = startFrom;
     }
 
     // DO NOT CONFUSE THIS WITH prevLine().

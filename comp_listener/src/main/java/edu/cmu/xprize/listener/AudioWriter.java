@@ -48,25 +48,23 @@ public class AudioWriter {
 
     public static Activity activity;
 
-    public static void closeStreams() {
-        try {
+    public static void closeStreams() throws IOException, NullPointerException {
+
             outputStream.close();
-        } catch (Exception ignored) {}
-
-        try {
             bufferedOutputStream.close();
-        } catch (Exception ignored) {}
-
-        try {
             dataOutputStream.close();
-        } catch (Exception ignored) {}
     }
 
     // AudioWriter is updated with a new filepath
+    // todo: stop using exceptions as logic
     public static void initializePath(String fileName, String assetLocation) {
+        Log.d("AudioWriter", "initializing to save narration capture");
         dataLen = 0;
         // Close up  old file
-        closeStreams();
+        try {
+            closeStreams();
+        } catch (IOException | NullPointerException ignored) {}
+
 
         // Prepare new file
         audioFileName = fileName.toLowerCase().replace(" ", "_");
@@ -218,14 +216,16 @@ public class AudioWriter {
     public static void pauseRecording() {
         dataLen = 0;
         // Close up  old file
-        closeStreams();
+        try {
+            closeStreams();
+        } catch (IOException ignored) {}
 
         //Reopen to add header to the beginning of the file
         try {
             addHeader(new RandomAccessFile(completeFilePath, "rws"));
             convertToMp3();
         } catch (Exception e) {
-            Log.d("AudioWriterHeaderFail", Log.getStackTraceString(e));
+            Log.wtf("AudioWriter", "Could not write header to wav file." + Log.getStackTraceString(e));
         }
     }
 
@@ -256,5 +256,79 @@ public class AudioWriter {
                 .convert();
         Log.d("AudioWriter", "Successfully created mp3");
 
+    }
+
+    void saveUtterance(int centiseconds, int noOfSentenceWords) {
+
+    }
+
+    /**
+     *
+     * @param recordingName is the name of recording to keep (with no filetype ending)
+     */
+    public static void endUtterance(String recordingName) {
+        try {
+            closeStreams();
+        } catch (IOException e) {
+            Log.wtf("AudioWriter", "attempt to end utterance but no audio input recorded. outputstreams were not open");
+            Log.getStackTraceString(e);
+            return;
+        } catch (NullPointerException ignored) {}
+
+        try {
+            addHeader(new RandomAccessFile(completeFilePath, "rws"));
+        } catch (IOException e) {
+            Log.wtf("AudioWriter", "Unable to add wav header to file: " + completeFilePath);
+            Log.getStackTraceString(e);
+            return;
+        }
+
+        try {
+            File unTruncated = new File(completeFilePath);
+
+            audioFileName = recordingName;
+            completeFilePath = audioAssetLocation + audioFileName + ".wav";
+
+            boolean success = unTruncated.renameTo(new File(completeFilePath));
+
+            if(success) {
+                convertToMp3();
+            } else {
+                throw new IOException("unable to rename recording");
+            }
+        } catch (IOException e) {
+            Log.wtf("AudioWriter", "Unable to rename file to save partial recording (utterance)");
+            Log.getStackTraceString(e);
+        }
+    }
+
+    public static boolean renameFile(String prevName, String newName, String assetLocation) {
+        String previousName = prevName.toLowerCase().replace(" ", "_");
+        String newNameFixed = newName.toLowerCase().replace(" ", "_");
+        //File oldWavFile = new File(assetLocation + previousName + ".wav");
+        //File newWavFile = new File(assetLocation + newNameFixed + ".wav");
+        //oldWavFile.renameTo(newWavFile);
+
+        File oldMP3File = new File(assetLocation + previousName + ".mp3");
+        File newMP3File = new File(assetLocation + newNameFixed + ".mp3");
+        boolean renamed = oldMP3File.renameTo(newMP3File);
+
+        // if (newMP3File.exists() /* &&  newWavFile.exists() */ ) {
+        if (renamed) {
+            return true;
+        } else {
+            Log.wtf("AudioWriter", "File Rename Failed:" + prevName + " to " + newName);
+
+            return false;
+        }
+    }
+
+
+    public static void pauseNRename(String prevName, String newName, String assetLocation) {
+        pauseRecording();
+        try {
+            Thread.sleep(100);
+        } catch (Exception e) {}
+        renameFile(prevName, newName, assetLocation);
     }
 }

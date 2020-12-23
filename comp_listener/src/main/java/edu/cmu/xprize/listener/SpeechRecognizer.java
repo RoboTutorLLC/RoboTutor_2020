@@ -538,7 +538,6 @@ public class SpeechRecognizer {
                         wordLastChanged = new ArrayList<Long>();
                         lastAudioEvent  = TCONST.UNKNOWN_TYPE;
                         isDecoding      = true;
-                        // AudioWriter.destroyContent();
                     }
 
                     // Ensure we are recording while the thread is running.

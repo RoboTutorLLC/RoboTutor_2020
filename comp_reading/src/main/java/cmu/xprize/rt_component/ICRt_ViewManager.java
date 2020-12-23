@@ -80,9 +80,11 @@ public interface ICRt_ViewManager extends ILoadableObject {
     public void clearAudioData();
     public void startLine();
 
+    public void restartUtterance();
+
     public void prevSentence();
 
-    public void enableNarrateMode(boolean isNarrateMode, boolean keepExtraAudio);
+    public void enableNarrationCaptureMode(boolean isNarrationCaptureMode, boolean keepExtraAudio);
 
     public void skipSentence();
 }

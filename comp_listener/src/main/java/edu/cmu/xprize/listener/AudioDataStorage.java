@@ -47,23 +47,28 @@ public class AudioDataStorage {
         // ? chirag what did you write here
     }
 
-    public static JSONObject saveAudioData(String fileName, String assetLocation, int currLine, int currPara, int currPage, String sentenceWPunc) {
+    public static JSONObject saveAudioData(String fileName, String assetLocation, int currLine, int currPara, int currPage, String sentenceWPunc, int currUtt) {
         // Todo: optimize this code (the process is being Duplicated)
+        // where?
         Log.d("ADSSave", "attempting to save audiodata.");
 
         String completeFilePath = assetLocation + fileName + ".mp3";
 
         Log.d("ADSSave", completeFilePath);
 
-        // write segmentation to file
+        // write segmentation to .seg file
         try {
             FileOutputStream os = new FileOutputStream(assetLocation + "/" + fileName.toLowerCase().replace(" ", "_") + ".seg");
             StringBuilder segData = new StringBuilder("");
 
-            Log.d("Segprogress", "FileOutputStream Created at " + assetLocation + "/" + fileName + ".seg");
+            Log.d("AudioDataStorage", "FileOutputStream Created at " + assetLocation + "/" + fileName + ".seg");
+            int i = fileName.split(" ").length;
             for(ListenerBase.HeardWord word: segmentation) {
-                segData.append(word.hypWord.toLowerCase() + "\t" + word.startFrame + "\t" + word.endFrame);
-                segData.append("\n");
+                if (i >= 0) {
+                    segData.append(word.hypWord.toLowerCase() + "\t" + word.startFrame + "\t" + word.endFrame);
+                    segData.append("\n");
+                }
+                i--;
             }
             segData.deleteCharAt(segData.lastIndexOf("\n"));
 
@@ -77,9 +82,10 @@ public class AudioDataStorage {
         }
 
         Log.d("AudioDataStorage", "About to update storydata.json");
+
         // Update Storydata.json
         try {
-            int currUtterance = 0;
+            int currUtterance = currUtt;
             boolean isSentence = true;
 
             JSONObject rawData = storyData
@@ -87,22 +93,22 @@ public class AudioDataStorage {
                     .getJSONObject(currPage)
                     .getJSONArray("text")
                     .getJSONArray(currPara)
-                    .getJSONObject(0);
+                    .getJSONObject(currLine);
 
             JSONObject rawNarration;
+            JSONArray narrationArray;
             try {
-                rawNarration = rawData
-                        .getJSONArray("narration")
-                        .getJSONObject(currUtterance);
+                narrationArray = rawData
+                        .getJSONArray("narration");
             } catch (JSONException e) {
-                rawNarration = new JSONObject();
-                rawData.getJSONArray("narration").put(rawNarration);
+                narrationArray = new JSONArray();
+                rawData.put("narration", narrationArray);
             }
+
+            rawNarration = new JSONObject();
 
             JSONArray segm = new JSONArray();
             long finalEndTime = 0;
-            // Hack #2 - subtracting the difference in time between the instatiation of the decoder and the time for the recorder to begin recording
-            // Hack #3 - subtracting first word again but this time after ensuring that recording coincides with decoding
             for(ListenerBase.HeardWord heardWord : segmentation) {
                 JSONObject segObj = new JSONObject();
                 segObj.put("end", heardWord.endFrame);
@@ -116,6 +122,9 @@ public class AudioDataStorage {
             rawNarration.put("audio", fileName.toLowerCase().replace(" ", "_") + ".mp3");
             rawNarration.put("until", finalEndTime);
             rawNarration.put("utterances", fileName.toLowerCase());
+
+
+            narrationArray.put(rawNarration);
 
             FileOutputStream outJson = new FileOutputStream(assetLocation + "/storydata.json");
             Log.d("AudioDataStorage", "writing out audio to " + assetLocation + "/storydata.json");
@@ -156,6 +165,10 @@ public class AudioDataStorage {
 
     static void setSampleRate(int samplerate) {
         // samplerate is always 16000 from my experience
+    }
+
+    public static void saveSegmentation() {
+
     }
 
 

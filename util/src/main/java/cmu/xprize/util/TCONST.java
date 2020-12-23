@@ -226,7 +226,7 @@ public class TCONST {
     public static final String FTR_USER_REVEAL     = "FTR_USER_REVEAL";
     public static final String FTR_USER_PARROT     = "FTR_USER_PARROT";
     public static final String FTR_USER_READING    = "FTR_USER_READING";
-    public static final String FTR_NARRATE_MODE    = "NARRATE_MODE";
+    public static final String FTR_NARRATION_CAPTURE = "NARRATION_CAPTURE_MODE";
     // UHQ
     public static final String FTR_GEN             = "FTR_GEN";
     public static final String FTR_PIC             = "FTR_PIC";

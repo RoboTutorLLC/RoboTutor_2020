@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ViewAnimator;
 
 import org.json.JSONObject;
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import cmu.xprize.comp_debug.IDebugLauncher;
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
@@ -605,7 +603,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
     }
 
-    public void loadStoryCheckNarrate(String EXTERNPATH, String viewType, String assetLocation, Boolean isNarrateMode, boolean keepOnlyRelevantAudio) {
+    public void loadStoryANDEnableContentCreation(String EXTERNPATH, String viewType, String assetLocation, Boolean narrationCaptureMode, boolean keepOnlyRelevantAudio) {
 
         Log.d(TCONST.DEBUG_STORY_TAG, String.format("assetLocation=%s -- EXTERNPATH=%s", assetLocation, EXTERNPATH));
 
@@ -635,7 +633,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
             EXTERNPATH = null;
         }
 
-        mViewManager.enableNarrateMode(isNarrateMode, keepOnlyRelevantAudio);
+        mViewManager.enableNarrationCaptureMode(narrationCaptureMode, keepOnlyRelevantAudio);
         //
         // ZZZ what are these values?
         // ZZZ EXTERNPATH = TCONST.EXTERN

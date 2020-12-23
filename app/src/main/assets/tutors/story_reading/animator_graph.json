@@ -3,109 +3,193 @@
     "COMMENT": "Animation Graph for the Reading Tutor",
 
     "story_reading": {
-
       "type": "ANIMATOR",
       "title": "Story Reading Tutor",
       "COMMENT": "",
       "version": "1.0.0",
       "rootnode": "INTRO_STATE",
-
       "queueMap": {
-
         "SPEAK_WORD_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",
-          "preenter": ["CLR_ONCLICK", "TIMER_CANCEL_HINT_BUTTON"],
+          "preenter": [
+            "CLR_ONCLICK",
+            "TIMER_CANCEL_HINT_BUTTON"
+          ],
           "reuse": true,
           "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "logState", "parms": "type#prompt,value#SPEAK_WORD_BEHAVIOR:String", "features": ""},
-
-            {"type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "{{SstoryReading.currentWord}}.mp3", "soundpackage": "words", "mode": "flow", "features": ""},
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "post", "parms": "NEXT_WORD:String" , "features": ""}
-
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#prompt,value#SPEAK_WORD_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDAUDIO",
+              "command": "PLAY",
+              "soundsource": "{{SstoryReading.currentWord}}.mp3",
+              "soundpackage": "words",
+              "mode": "flow",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "post",
+              "parms": "NEXT_WORD:String",
+              "features": ""
+            }
           ],
           "preexit": [],
           "edges": []
         },
-
         "CONFIG_SPEAK_BUTTON": {
           "type": "QUEUE",
           "reuse": true,
           "COMMENT": "TBD",
           "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "logState", "parms": "type#behavior,value#CONFIG_SPEAK_BUTTON:String", "features": ""},
-
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#behavior,value#CONFIG_SPEAK_BUTTON:String",
+              "features": ""
+            },
             // NOTE: the button must be in a valid state before showing
             // TODO: put check in to catch invalid behaviors
 
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "setStickyBehavior", "parms": "SPEAK_CLICK:String|SPEAK_WORD_BEHAVIOR:String" , "features": ""},
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "setSpeakButton",    "parms": "ENABLE:String",     "features": ""},
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "setSpeakButton",    "parms": "SHOW:String",       "features": ""}
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "setStickyBehavior",
+              "parms": "SPEAK_CLICK:String|SPEAK_WORD_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "setSpeakButton",
+              "parms": "ENABLE:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "setSpeakButton",
+              "parms": "SHOW:String",
+              "features": ""
+            }
           ]
         },
-
         "NARRATE_SENTENCE_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",
-
           "preenter": [],
           "reuse": true,
           "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "logState", "parms": "type#behavior,value#NARRATE_SENTENCE_BEHAVIOR:String", "features": ""},
-
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "post", "parms": "START_NARRATION:String|1000:long" , "features": ""}
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#behavior,value#NARRATE_SENTENCE_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "post",
+              "parms": "START_NARRATION:String|1000:long",
+              "features": ""
+            }
           ],
           "preexit": [],
           "edges": []
         },
-
         "SPEAK_UTTERANCE_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",
           "preenter": [],
           "reuse": true,
           "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "logState", "parms": "type#behavior,value#SPEAK_UTTERANCE_BEHAVIOR:String", "features": ""},
-
-            {"type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "{{SstoryReading.utterance}}.mp3", "listeners": "SstoryReading", "oncomplete": "TRACK_SEGMENT" , "soundpackage": "story", "mode": "flow", "features": ""}
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#behavior,value#SPEAK_UTTERANCE_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDAUDIO",
+              "command": "PLAY",
+              "soundsource": "{{SstoryReading.utterance}}.mp3",
+              "listeners": "SstoryReading",
+              "oncomplete": "TRACK_SEGMENT",
+              "soundpackage": "story",
+              "mode": "flow",
+              "features": ""
+            }
           ],
           "preexit": [],
           "edges": []
         },
-
         "SPEAK_SENTENCE_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",
           "preenter": [],
           "reuse": true,
           "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "logState", "parms": "type#behavior,value#SPEAK_SENTENCE_BEHAVIOR:String", "features": ""},
-
-            {"type": "QUEUEDAUDIO", "command": "PLAY", "soundsource": "{{SstoryReading.sentence}}.mp3", "listeners": "SstoryReading", "oncomplete": "TRACK_SEGMENT", "soundpackage": "story", "mode": "flow", "features": ""},
-            {"type": "QUEUEDCOMMAND", "id": "SstoryReading", "method": "nextSentence" , "features": ""}
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#behavior,value#SPEAK_SENTENCE_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDAUDIO",
+              "command": "PLAY",
+              "soundsource": "{{SstoryReading.sentence}}.mp3",
+              "listeners": "SstoryReading",
+              "oncomplete": "TRACK_SEGMENT",
+              "soundpackage": "story",
+              "mode": "flow",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "nextSentence",
+              "features": ""
+            }
           ],
           "preexit": [],
           "edges": []
         }
-
       },
-
       "nodeMap": {
-
         "COMMENT": "@@@@@  CNodes  @@@@@",
-
         "INTRO_STATE": {
           "type": "NODE",
           "COMMENT": "Intro Clip",
-          "preenter": ["SET_VERSION"],
+          "preenter": [
+            "SET_VERSION"
+          ],
           "maptype": "moduleMap",
           "mapname": "PLAYINTRO",
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "NEXT_STEP"}
+            {
+              "constraint": "",
+              "edge": "NEXT_STEP"
+            }
           ]
         },
-
         "NEXT_STEP": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "node",
@@ -114,43 +198,88 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "STORY_STARTING", "edge": "BEGIN_STORY"},
-            {"constraint": "ECHO_LINEMODE", "edge": "ECHO_LINE_NODE"},
-            {"constraint": "PARROT_LINEMODE", "edge": "PARROT_LINE_NODE"},
-            {"constraint": "STORY_COMPLETE", "edge": "NEXT_SCENE"},
-            {"constraint": "PAGE_COMPLETE", "edge": "NEXT_PAGE_NODE"},
-            {"constraint": "PARAGRAPH_COMPLETE", "edge": "NEXT_PARA_NODE"},
-            {"constraint": "LINE_COMPLETE", "edge": "NEXT_LINE_NODE"},
-            {"constraint": "", "edge": "NEXT_WORD_NODE"}
+            {
+              "constraint": "STORY_STARTING",
+              "edge": "BEGIN_STORY"
+            },
+            {
+              "constraint": "ECHO_LINEMODE",
+              "edge": "ECHO_LINE_NODE"
+            },
+            {
+              "constraint": "PARROT_LINEMODE",
+              "edge": "PARROT_LINE_NODE"
+            },
+            {
+              "constraint": "STORY_COMPLETE",
+              "edge": "NEXT_SCENE"
+            },
+            {
+              "constraint": "PAGE_COMPLETE",
+              "edge": "NEXT_PAGE_NODE"
+            },
+            {
+              "constraint": "PARAGRAPH_COMPLETE",
+              "edge": "NEXT_PARA_NODE"
+            },
+            {
+              "constraint": "LINE_COMPLETE",
+              "edge": "NEXT_LINE_NODE"
+            },
+            {
+              "constraint": "",
+              "edge": "NEXT_WORD_NODE"
+            }
           ]
         },
-
         "BEGIN_STORY": {
           "type": "NODE",
           "COMMENT": "",
           "maptype": "actionMap",
           "mapname": "START_STORY",
-          "preenter": ["SET_NARRATOR", "SET_UTTERANCE"],
+          "preenter": [
+            "SET_NARRATOR",
+            "SET_UTTERANCE"
+          ],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "LISTEN": {
           "COMMENT": "",
           "type": "node",
-          "preenter": ["SET_UTTERANCE_BEHAVIOR", "SET_HYPOTHESIS_BEHAVIOR", "SET_ONCLICK_SPEAK_WORD", "TIMER_HINT_BUTTON"],
+          "preenter": [
+            "SET_UTTERANCE_BEHAVIOR",
+            "SET_HYPOTHESIS_BEHAVIOR",
+            "SET_ONCLICK_SPEAK_WORD",
+            "TIMER_HINT_BUTTON"
+          ],
           "maptype": "moduleMap",
           "mapname": "LISTENING",
-          "preexit": ["CLR_HYPOTHESIS_BEHAVIOR", "CLR_ONCLICK", "TIMER_CANCEL_HINT_BUTTON"],
+          "preexit": [
+            "CLR_HYPOTHESIS_BEHAVIOR",
+            "CLR_ONCLICK",
+            "TIMER_CANCEL_HINT_BUTTON"
+          ],
           "edges": [
-            {"constraint": "FTR_RIGHT", "edge": "CORRECT"},
-            {"constraint": "SECOND_ERROR", "edge": "WRONG_2"},
-            {"constraint": "", "edge": "WRONG"}
+            {
+              "constraint": "FTR_RIGHT",
+              "edge": "CORRECT"
+            },
+            {
+              "constraint": "SECOND_ERROR",
+              "edge": "WRONG_2"
+            },
+            {
+              "constraint": "",
+              "edge": "WRONG"
+            }
           ]
         },
-
         "CORRECT": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "node",
@@ -159,10 +288,12 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "NEXT_STEP"}
+            {
+              "constraint": "",
+              "edge": "NEXT_STEP"
+            }
           ]
         },
-
         "WRONG": {
           "COMMENT": "When user says an incorrect word...",
           "type": "node",
@@ -171,24 +302,36 @@
           "mapname": "PLAYWRONG",
           "preexit": [],
           "edges": [
-            {"constraint": "NARRATE_MODE", "edge": "NARRATE_WRONG"},
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "NARRATE_WRONG"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "WRONG_2": {
           "COMMENT": "When user says an incorrect word...",
           "type": "node",
           "maptype": "moduleMap",
-          "preenter": ["SET_SPEAK_EVENT"],
+          "preenter": [
+            "SET_SPEAK_EVENT"
+          ],
           "mapname": "SPEAK_EVENT_MODULE",
           "preexit": [],
           "edges": [
-            {"constraint": "NARRATE_MODE", "edge": "NARRATE_WRONG"},
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "NARRATE_WRONG"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "ECHO_LINE_NODE": {
           "type": "NODE",
           "COMMENT": "When in echo mode - we repeat the last line",
@@ -197,10 +340,12 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "PARROT_LINE_NODE": {
           "type": "NODE",
           "COMMENT": "When in parrot mode - we listen to the student repeat the last line",
@@ -209,10 +354,12 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "NEXT_WORD_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
@@ -221,10 +368,12 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "NEXT_LINE_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
@@ -233,11 +382,16 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "NARRATE_MODE", "edge": "NARRATE_RIGHT"},
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "NARRATE_RIGHT"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "NEXT_PARA_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
@@ -246,11 +400,16 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "NARRATE_MODE", "edge": "NARRATE_RIGHT"},
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "NARRATE_RIGHT"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "NEXT_PAGE_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
@@ -259,11 +418,16 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "NARRATE_MODE", "edge": "NARRATE_RIGHT"},
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "NARRATE_RIGHT"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "NEXT_SCENE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
@@ -274,32 +438,34 @@
           "edges": [
           ]
         },
-
         "NARRATE_RIGHT": {
           "type": "NODE",
-          "COMMENT": "node that triggers audio saving for NARRATE mode",
+          "COMMENT": "Node that triggers audio saving for Narration capture",
           "maptype": "moduleMap",
           "mapname": "SAVEAUDIO",
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
-
         "NARRATE_WRONG": {
           "type": "NODE",
-          "COMMENT": "For the 'mean' mode of NARRATE that deletes audio as soon as it hears something wrong.",
+          "COMMENT": "In narrate mode, a word is pronounced incorrectly.",
           "maptype": "moduleMap",
-          "mapname": "CLEARAUDIO",
+          "mapname": "START_UTTERANCE",
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "","edge": "RESTART_LINE_NODE"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
         },
-
         "RESTART_LINE_NODE": {
           "type": "NODE",
           "COMMENT": "Goes back to the beginning of the line",
@@ -308,10 +474,28 @@
           "preenter": [],
           "preexit": [],
           "edges": [
-            {"constraint": "", "edge": "LISTEN"}
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
           ]
-        }
-      },
+        },
+
+      "RESTART_UTTERANCE_NODE": {
+        "type": "NODE",
+        "COMMENT": "Goes back to the start of the utterance",
+        "maptype": "moduleMap",
+        "mapname": "START_UTTERANCE",
+        "preenter": [],
+        "preexit": [],
+        "edges": [
+          {
+            "constrant": "",
+            "edge": "LISTEN"
+          }
+        ]
+      }
+    },
 
       "moduleMap": {
         "COMMENT": "@@@@@  CModules  @@@@@",
@@ -319,7 +503,7 @@
         "SAVEAUDIO": {
           "type": "MODULE",
           "reuse": true,
-          "COMMENT": "module that saves audio for NARRATE mode",
+          "COMMENT": "module that saves audio for narration capture",
           "tracks" : [
             {"type": "COMMAND", "id": "SstoryReading", "method": "saveToFile", "parms": "none", "features": "" }
           ]
@@ -485,7 +669,16 @@
           "reuse": true,
           "COMMENT": "goes back to the beginning of the sentence",
           "tracks": [
-            {"type": "COMMAND", "id": "SstoryReading", "method": "startLine", "pamrms": "none"}
+            {"type": "COMMAND", "id": "SstoryReading", "method": "startLine", "parms": "none"}
+          ]
+        },
+
+        "START_UTTERANCE": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "",
+          "tracks": [
+            {"type":"COMMAND", "id": "SstoryReading", "method": "restartUtterance", "parms": "none"}
           ]
         }
 
@@ -638,9 +831,9 @@
           "test": "FTR_WRONG"
         },
 
-        "NARRATE_MODE": {
+        "NARRATION_CAPTURE_MODE": {
           "type": "CONDITION",
-          "test": "NARRATE_MODE"
+          "test": "NARRATION_CAPTURE_MODE"
         }
       }
     }

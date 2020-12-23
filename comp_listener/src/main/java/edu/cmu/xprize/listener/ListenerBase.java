@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +84,8 @@ public class ListenerBase {
     // Note: on Android these are case sensitive filenames
     //
     static private HashMap<String, String> dictMap = new HashMap<String, String>();
+    public ArrayList<Segment> allSegments;
+
 
     static {
         dictMap.put("LANG_EN", "CMU07A-CAPS.DIC");
