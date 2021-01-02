@@ -20,8 +20,16 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+
+import com.google.gson.JsonParser;
+
+import org.json.JSONObject;
+
+import java.io.FileReader;
 
 import cmu.xprize.banner.CBanner;
 import cmu.xprize.comp_logging.ILogManager;
@@ -35,6 +43,9 @@ import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.robotutor.tutorengine.ITutorGraph;
 import cmu.xprize.robotutor.tutorengine.ITutorObject;
 import cmu.xprize.robotutor.tutorengine.ITutorSceneImpl;
+import cmu.xprize.comp_intervention.views.CInterventionHelpButton;
+import cmu.xprize.util.JSON_Helper;
+import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.TUTOR_STATE_MSG;
 
@@ -44,6 +55,7 @@ public class TBanner extends CBanner implements ITutorObject, View.OnClickListen
     private CObjectDelegate mSceneObject;
     private TTextView       mVersion;
     private ImageButton     mBackButton;
+    private CInterventionHelpButton mHelpButton;
 
     private String          mTutor_Ver;
 
@@ -75,6 +87,27 @@ public class TBanner extends CBanner implements ITutorObject, View.OnClickListen
         mBackButton = (ImageButton)findViewById(R.id.Sbackbutton);
 
         mBackButton.setOnClickListener(this);
+
+        // conditional rendering of the hello button
+        mHelpButton = (CInterventionHelpButton) findViewById(R.id.SHelpButton);
+        mHelpButton.setVisibility(View.GONE);
+
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+        JsonParser parser = new JsonParser();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            Boolean visiblity = (Boolean) jsonObject.get("show_helper_button");
+            Log.i("JSON Object", "" + visiblity);
+            if (visiblity==true) {
+                mHelpButton.setVisibility(View.VISIBLE);
+            } else {
+                mHelpButton.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Invalid Data Source for : " + dataPath, e);
+        }
     }
 
 
