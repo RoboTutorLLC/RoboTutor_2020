@@ -68,7 +68,7 @@ android {
             def version = variant.versionName
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
-            output.outputFile = new File(output.outputFile.parent, newApkName)
+            output.outputFileName = new File(output.outputFile.parent, newApkName)
         }
     }
 
