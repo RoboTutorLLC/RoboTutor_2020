@@ -78,6 +78,45 @@ public class JSON_Helper {
         return cacheData(fileName, TCONST.DEFINED);
     }
 
+    static public String createValueAcronym(String jsonData) {
+
+        String outputAcronym = new String();
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key=="language_feature_id") {
+                    String value = jsonObject.getString(key);
+                    if (value=="LANG_NULL") {
+                        outputAcronym += "NULL";
+                    }
+                    else if (value=="EN") {
+                        outputAcronym += "EN";
+                    }
+                    else if  (value=="SW") {
+                        outputAcronym +="SW";
+                    }
+                }
+                else if (key=="menu_type") {
+                    String value = jsonObject.getString(key);
+                    outputAcronym += value.charAt(value.length()-1);
+                }
+                else {
+                    Boolean value = jsonObject.getBoolean(key);
+                    outputAcronym += value.toString().charAt(0);
+                }
+
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return outputAcronym;
+    }
 
     static public String cacheData(String fileName, String localcacheSource) {
 

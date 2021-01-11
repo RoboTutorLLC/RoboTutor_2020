@@ -94,7 +94,6 @@ public class TBanner extends CBanner implements ITutorObject, View.OnClickListen
 
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
-        JsonParser parser = new JsonParser();
 
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
