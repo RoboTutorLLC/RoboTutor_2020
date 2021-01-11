@@ -64,11 +64,12 @@ android {
         variant.outputs.each { output ->
             def project = "robotutor"
             def SEP = "."
-            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def buildType = variant.buildType.name
             def version = variant.versionName
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
-            output.outputFileName = new File(output.outputFile.parent, newApkName)
+//            new File(output.outputFile.parent, newApkName)
+            output.outputFileName = newApkName
         }
     }
 

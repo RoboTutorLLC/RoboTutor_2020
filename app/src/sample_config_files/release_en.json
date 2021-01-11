@@ -6,5 +6,6 @@
   "language_switcher": false,
   "no_asr_apps": false,
   "language_feature_id": "LANG_EN",
-  "show_demo_vids": false
+  "show_demo_vids": false,
+  "show_helper_button": false
 }
