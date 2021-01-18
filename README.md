@@ -25,6 +25,10 @@ To quickly install the most recent version of RoboTutor without having to downlo
 
 ---
 
+## Contribution and Developer Practices
+
+- Please read our best practices and the community guidelines in our [Dev Docs](https://github.com/RoboTutorLLC/RoboTutor_2020/blob/master/DEVDOCS.md).
+
 ## **Setup and Configuration:**
 
 [Install Android Studio](http://developer.android.com/sdk/index.html)<br>
