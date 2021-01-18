@@ -1,6 +1,6 @@
 //*********************************************************************************
 //
-//    Copyright(c) 2016-2017  Kevin Willows All Rights Reserved
+//    Copyright(c) 2016-2021  RoboTutorLLC All Rights Reserved
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -79,7 +79,24 @@ public class JSON_Helper {
     }
 
     static public String createValueAcronym(String jsonData) {
+        /*
+            @params: jsonData - A serialised jsonString, e.g.
+            {
+                "config_version": "ftttfNULLfCD2", → compute instead
+                "language_override": false,
+                "show_tutorversion": true,
+                "show_debug_launcher": true,
+                "language_switcher": true,
+                "no_asr_apps": false,
+                "language_feature_id": "LANG_NULL", → NULL | EN | SW
+                "show_demo_vids": false,
+                "menu_type": "CD2" → 1 or 2 in acronym
 
+            }
+
+            The config_version will be replaced with a custom acronym, which is generated below.
+
+         */
         String outputAcronym = new String();
         try {
             JSONObject jsonObject = new JSONObject(jsonData);
@@ -87,28 +104,40 @@ public class JSON_Helper {
 
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
-                if (key=="language_feature_id") {
+                if (key == "language_feature_id") {
+                    /*
+                        This is checking for the key: "language_feature_id".
+                        Replacing the values with the corresponding acronyms:
+                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
+                     */
                     String value = jsonObject.getString(key);
-                    if (value=="LANG_NULL") {
+                    if (value == "LANG_NULL") {
                         outputAcronym += "NULL";
                     }
-                    else if (value=="EN") {
+                    else if (value == "EN") {
                         outputAcronym += "EN";
                     }
-                    else if  (value=="SW") {
+                    else if  (value == "SW") {
                         outputAcronym +="SW";
                     }
                 }
-                else if (key=="menu_type") {
+                else if (key == "menu_type") {
+                    /*
+                        This is checking for the key: "menu_type".
+                        Replacing the values with the corresponding acronyms:
+                        Menu Type can have the following values: CD2 and CD1
+                        We are only using the last digit in the acronym.
+                     */
                     String value = jsonObject.getString(key);
                     outputAcronym += value.charAt(value.length()-1);
                 }
                 else {
+                    /*
+                        For every boolean value, we are only using their first character.
+                     */
                     Boolean value = jsonObject.getBoolean(key);
                     outputAcronym += value.toString().charAt(0);
                 }
-
-
             }
 
         } catch (JSONException e) {
