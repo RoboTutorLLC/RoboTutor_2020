@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 apply plugin: 'com.android.application'
 
 android {
@@ -80,6 +82,27 @@ android {
         abortOnError false
         // if true, only report errors
         ignoreWarnings true
+    }
+}
+
+task('increaseVersionCode') {
+    def buildGradle = file("../build.gradle")
+    def buildGradleContents = buildGradle.getText()
+
+
+    def matcher = Pattern.compile(".*rtVersionName.*").matcher(buildGradleContents)
+
+    project.logger.lifecycle(buildGradleContents)
+    project.logger.lifecycle(matcher.matches().toString())
+
+    def versionCode = android.defaultConfig.versionCode
+//    project.logger.lifecycle(versionCode+" "+"Hello World")
+//    buildGradle.write(matcher.replaceAll("rtVersionName=" + ++versionCode))
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'generateReleaseBuildConfig') {
+        task.dependsOn 'increaseVersionCode'
     }
 }
 
