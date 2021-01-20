@@ -30,3 +30,17 @@ Follow throug [these slides](https://docs.google.com/presentation/d/1eXESVDWKcZs
 #### Other useful things
 - Learn a coding strategy I use to make TODO comments [here](https://docs.google.com/document/d/15UEfdJw6MXRogx7gKiw07lI_auZNXz6n886I6dFli7A/edit#).
 - Here's [a list](https://docs.google.com/document/d/1JS9Q4wUUM56wd7vVOQ5aZKFJrlbfMYIg9sRK1prReaI/edit) of the most common things you might need to know. Unfortunately, none of them are documented.
+
+
+#### Developer Practices to be followed
+- We follow a [ feature branch workflow ](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow) in our repository.
+
+1. Please do not fork any repos.
+2. Instead, to add or modify a feature, create a new branch off the "development" branch:
+    - `git checkout development`
+    -  `git checkout -b YOUR_BRANCH_NAME development`
+3. Commit your changes to your branch.
+4. Push to the RoboTutorLLC repo, but only to your branch.  Then we can see your code but it won’t hurt anything else.
+5. When your code is ready for others to use, make a Pull request to the development branch so we can check your changes.
+6. **Do not push to the development or master branch.**
+
