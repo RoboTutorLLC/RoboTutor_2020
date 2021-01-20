@@ -44,6 +44,12 @@ public class ConfigurationItems implements ILoadableObject {
 
         try {
             loadJSON(new JSONObject(jsonData), null);
+            /*
+            The JSON object is logged here to make the app logs more identifiable
+            and searchable.
+            */
+            Log.i(TAG, new JSONObject(jsonData).toString(4));
+            this.setConfigVersion();
         } catch (Exception e) {
             Log.e(TAG, "Invalid Data Source for : " + dataPath, e);
             setDefaults();
@@ -58,7 +64,8 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean use_placement, boolean record_audio,
                               String menu_type) {
 
-        this.config_version = config_version;
+//        this.config_version = config_version;
+        this.setConfigVersion();
         this.language_override = language_override;
         this.show_tutorversion = show_tutorversion;
         this.show_debug_launcher = show_debug_launcher;
@@ -73,7 +80,8 @@ public class ConfigurationItems implements ILoadableObject {
 
     public void setDefaults() {
         // use the swahili versions as default
-        config_version = "release_sw";
+//        config_version = "release_sw"; // shouldn't it be fttt...?
+        this.setConfigVersion();
         language_override = true;
         show_tutorversion = true;
         show_debug_launcher = false;
@@ -84,6 +92,13 @@ public class ConfigurationItems implements ILoadableObject {
         use_placement = true;
         record_audio = false;
         menu_type = "CD1";
+    }
+
+    private void setConfigVersion() {
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+        String configAcronym = JSON_Helper.createValueAcronym(jsonData);
+        this.config_version = configAcronym;
     }
 
     @Override
