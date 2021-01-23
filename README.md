@@ -38,6 +38,7 @@ To quickly install the most recent version of RoboTutor without having to downlo
 RoboTutor uses a large volume of external assets at runtime.  To successfully run RoboTutor you must first install these assets on your target device: [English](https://github.com/XPRIZE/GLEXP-Team-RoboTutor-EnglishAssets). [Swahili](https://github.com/XPRIZE/GLEXP-Team-RoboTutor-CodeDrop2-Assets). Once you have cloned and run the associated tools to push the data assets to your device you can proceed with building RoboTutor.
 
 
+
 ## **Building RoboTutor:**
 
 1. Clone RoboTutor to your computer using Git/GitHub
@@ -79,6 +80,10 @@ storeFile=<path_to_location_of_keystore>
 ```
 
 7. Use Android Studio or gradlew to generate a signed APK with the flavor *release_sw*. This will generate the file *robotutor.release_sw.1.8.8.1.apk*. This APK should be transferred to the apk in your local SystemBuild directory.
+
+[Installation Standalone](./INSTALL-STANDALONE.md)
+
+You can refer to the above Guide if you are still facing any errors.
 
 ## **Common Errors**
 
