@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -533,7 +534,13 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param tutorVariant
      * @param intentType
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static public void launch(String intentType, String tutorVariant, String dataSource, String tutorId, String matrix) {
+
+        // start recording when launching a menu screen
+        // end recording when entering the menu
+        RoboTutor act = (RoboTutor)getActivity();
+        act.startRecording();
 
         Log.d(TAG, "launch: tutorId=" + tutorId);
 

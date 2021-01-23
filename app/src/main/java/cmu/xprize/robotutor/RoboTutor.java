@@ -21,18 +21,22 @@ package cmu.xprize.robotutor;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.nanchen.screenrecordhelper.ScreenrecordHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,6 +109,7 @@ import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
  * <h3>Developer Overview</h3>
  *
  */
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
 
@@ -179,6 +184,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     private final  String  TAG = "CRoboTutor";
     private final String ID_TAG = "StudentId";
+    ScreenRecordHelper screenRecordHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,10 +207,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // TODO: this doesn't work as expected
         //
 
-        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath));
-
-        PACKAGE_NAME = getApplicationContext().getPackageName();
         ACTIVITY     = this;
+        PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath, ACTIVITY));
+
+
+
 
         // Prep the CPreferenceCache
         // Update the globally accessible id object for this engine instance.
@@ -260,6 +269,36 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         masterContainer.addAndShow(progressView);
 
         // testCrashHandler();
+    }
+
+    /**
+     * Start Recording
+     * store it in the folder of /sdcard/roboscreen
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void startRecording(){
+        if (screenRecordHelper == null) {
+            screenRecordHelper = new ScreenRecordHelper(this, null, "/sdcard/roboscreen",
+                    "video_" + String.valueOf(System.currentTimeMillis()));
+            screenRecordHelper.setRecordAudio(true);
+        }
+        screenRecordHelper.startRecord();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void endRecording(){
+        screenRecordHelper.stopRecord(0, 0, null);
+        screenRecordHelper = null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (screenRecordHelper != null) {
+            screenRecordHelper.onActivityResult(requestCode, resultCode, data);
+        }
+        setFullScreen();
     }
 
     /**
