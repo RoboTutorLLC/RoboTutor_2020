@@ -6,8 +6,11 @@ jdk:
 android:
   components:
     - tools
-    - android-28
-    - build-tools-28.0.3
+    # - android-26
+    # - android-28
+    - build-tools-26.0.1
+    # - build-tools-28.0.3
+    # - build-tools-29.0.2
     - platform-tools
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -19,7 +22,9 @@ cache:
     - "$HOME/.gradle/wrapper/"
 script:
   # - ./gradlew spotlessCheck
-  - ./gradlew build
+  - cp -v app/src/sample_config_files/sample_keystore.properties keystore.properties
+  - keytool -genkeypair -dname "cn=TravisCI, ou=TravisCI, o=Sun, c=US" -alias business -keypass kpi135 -keystore android.keystore -storepass ab987c -validity 20000
+  # - ./gradlew build
 after_success:
   - bash scripts/update-apk.sh
 
