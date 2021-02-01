@@ -7,7 +7,7 @@ git config --global user.email "noreply+travis@robotutor.org"
 
 export DEPLOY_BRANCH=${DEPLOY_BRANCH:-development}
 export PUBLISH_BRANCH=${PUBLISH_BRANCH:-master}
-DATE_TODAY=$(date  +%Y-%m-%d)
+DATE_TODAY=$(date +%Y-%m-%d)
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "roboTutorLLC/RoboTutor_2020" ] ; then
     echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
