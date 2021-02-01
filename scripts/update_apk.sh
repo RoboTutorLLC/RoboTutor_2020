@@ -7,7 +7,7 @@ git config --global user.email "noreply+travis@robotutor.org"
 
 export DEPLOY_BRANCH=${DEPLOY_BRANCH:-development}
 export PUBLISH_BRANCH=${PUBLISH_BRANCH:-master}
-DATE_TODAY=$(date + '%m/%d/%y')
+DATE_TODAY=$(date  +%Y-%m-%d)
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "roboTutorLLC/RoboTutor_2020" ] ; then
     echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
@@ -34,7 +34,7 @@ fi
 git clone --quiet --branch=apk https://robotutor:$GITHUB_API_KEY@github.com/RoboTutorLLC/RoboTutor_2020 apk > /dev/null
 cd apk
 
-
+echo `ls`
 find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.apk \;
 find ../app/build/outputs -type f -name '*.aab' -exec cp -v {} temp.aab \;
 
@@ -42,9 +42,12 @@ find ../app/build/outputs -type f -name '*.aab' -exec cp -v {} temp.aab \;
 mv temp.apk RoboTutor-${TRAVIS_BRANCH}-${DATE_TODAY}.apk
 mv temp.aab RoboTutor-${TRAVIS_BRANCH}-${DATE_TODAY}.aab
 
+ls
+echo `ls`
 
 # Create a new branch that will contains only latest apk
 # git checkout --orphan temporary
+
 
 # Add generated APK
 git add --all .
