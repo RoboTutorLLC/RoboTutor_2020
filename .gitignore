@@ -1,0 +1,51 @@
+# Built application files
+**/repo*
+**/build
+**/captures
+**/keystore
+
+keystore.properties
+
+# The tutor audio data is now externalized and is managed by the 
+# RTAssetPackager
+
+/app/src/main/assets/tutors/trackdata/LIBRARY/audio/*
+
+# We keep a copy of the live story data to support the RTAssetMAnager 
+# building the transitions and checking the datasource validity
+# however the canonical data is in the RTAssetPublisher
+
+/app/src/verify/assets/tutors/*
+
+# External Assets
+/app/audio_assets/*
+
+local.properties
+
+# Gradle generated files
+.gradle/
+
+# IntelliJ - User-specific configurations
+.idea/*
+.idea/gradle.xml
+.idea/libraries/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/.name
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+**/*.iml
+*.apk
+
+# OS-specific files
+**/.DS_Store
+
+app/src/main/assets/tutors/word_copy/debug_animator_graph.json
+util/a.java
+LICENCE.md
+README.md
