@@ -2,33 +2,32 @@ language: android
 dist: trusty
 sudo: false
 jdk:
-  - oraclejdk8
+- oraclejdk8
 android:
   components:
-    - tools
-    # - android-26
-    # - android-28
-    - build-tools-26.0.1
-    # - build-tools-28.0.3
-    # - build-tools-29.0.2
-    - platform-tools
+  - tools
+  - android-26
+  - build-tools-26.0.1
+  - build-tools-29.0.2
+  - platform-tools
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
-    - "${TRAVIS_BUILD_DIR}/gradle/caches/"
-    - "${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/"
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper/"
+  - "${TRAVIS_BUILD_DIR}/gradle/caches/"
+  - "${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/"
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
 script:
-  # - ./gradlew spotlessCheck
-  - cp -v app/src/sample_config_files/sample_keystore.properties keystore.properties
-  - keytool -genkeypair -dname "cn=TravisCI, ou=TravisCI, o=Sun, c=US" -alias business -keypass kpi135 -keystore android.keystore -storepass ab987c -validity 20000
-  # - ./gradlew build
+- cp -v app/src/sample_config_files/sample_keystore.properties keystore.properties
+- keytool -genkeypair -dname "cn=TravisCI, ou=TravisCI, o=Sun, c=US" -alias business
+  -keypass kpi135 -keystore android.keystore -storepass ab987c -validity 20000
 after_success:
-  - bash scripts/update_apk.sh
-
+- bash scripts/update_apk.sh
 branches:
   only:
-    - master
-    - development
+  - master
+  - development
+env:
+  global:
+    secure: pwb10gK8Vwo4Ig1hJSbPsBSDlh/2qwqKMM1tBA5FtbVw65f3f+iTYRakYBJnmH2btrKyf0UtDiyYDc8f33zLgviFVWJa8Tj/ATIe/IKhBq50VnybIkBdXdO42fIGK4m8vOnZ0l2cg2/GFxJvy61AExaHu3Nw2NU6C3Xm7Apjwi2a2OO9fTX9KLWtPJtE4hZzs9jCVw8vW4YyiaWtwL66hemR8sxIiMAycFtIyMo9upAgxqnRviG02qbL4KBKcykxOk3IuFnkc5PzHwoZ/w+vq8RKY58Us0nlhtTENoYpDJNGRgEpO/y0W309/kDfm4uyHLlqCOly1mDXvNhAuN3vRHDNy6T5JIWInjRd40dl18/dIlClgzPxOw1y/0apQapIsZX9mSmY4rU4kjQASi2E9dyHZKE1dc9EXHAH7hdGT/YD2aaVS2slGXcQmGPxVvXrm3pEqFp2S9DO3zI44cPL9TppJpxWEa+oBgs/CzCINNMZuC2J9ov0w6XNBV8DLVE5CJEkUSL9QgifuQMq6U5wYlTSAMmOn/VnUbBK6OCJ6xAauyy6kl/uM24ZKY6dHKQ6GcL3v5Y+bdWZkdWJmTkDUK2bVQT1c2OY2Y7av4nJyL4TLslWUg4s5AQhzfBX/NTYHwK5tBErZNX9r0Vy2P4opmym6hdVO3eivVNS8MRtqVc=

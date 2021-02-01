@@ -2,6 +2,11 @@
 
 set -e
 
+if [ "${TRAVIS_PULL_REQUEST_BRANCH}" == "false" ]; then
+    echo "We only work with pull request";
+    exit 0;
+fi
+
 git config --global user.name "Travis CI"
 git config --global user.email "noreply+travis@robotutor.org"
 
@@ -9,48 +14,51 @@ export DEPLOY_BRANCH=${DEPLOY_BRANCH:-development}
 export PUBLISH_BRANCH=${PUBLISH_BRANCH:-master}
 DATE_TODAY=$(date +%Y-%m-%d)
 
-if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "roboTutorLLC/RoboTutor_2020" ] ; then
-    echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
-    exit 0
-fi
+echo $TRAVIS_REPO_SLUG, $TRAVIS_PULL_REQUEST;
+# if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "RoboTutorLLC/RoboTutor_2020" ] ; then
+#     echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
+#     exit 0
+# fi
 
 
 release_apk_build () {
+    echo "Building release apk";
     ./gradlew bundlePlayStoreRelease;
 }
 
 debug_apk_build () {
-    ./gradlew assembleDebug
+    echo "Building debug apk";
+    ./gradlew assembleDebug;
 }
 
-if [ "${TRAVIS_BRANCH}" == "${PUBLISH_BRANCH}"]; then
-    release_apk_build()
+# yes | sdkmanager --licenses
+if [ "${TRAVIS_BRANCH}" == "${PUBLISH_BRANCH}" ]; then
+    release_apk_build
 else
-    debug_apk_build()
+    debug_apk_build
 fi
 
 
 
-git clone --quiet --branch=apk https://robotutor:$GITHUB_API_KEY@github.com/RoboTutorLLC/RoboTutor_2020 apk > /dev/null
+git clone --quiet --branch=apk https://robotutor:$GH_TOKEN@github.com/RoboTutorLLC/RoboTutor_2020 apk > /dev/null
 cd apk
 
 echo `ls`
 find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.apk \;
-find ../app/build/outputs -type f -name '*.aab' -exec cp -v {} temp.aab \;
 
 
-mv temp.apk RoboTutor-${TRAVIS_BRANCH}-${DATE_TODAY}.apk
-mv temp.aab RoboTutor-${TRAVIS_BRANCH}-${DATE_TODAY}.aab
+mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}.apk
 
 ls
-echo `ls`
-
+echo `ls -al`
+git status
+echo $(git status)
 # Create a new branch that will contains only latest apk
 # git checkout --orphan temporary
 
 
 # Add generated APK
-git add --all .
+git add .
 git commit -am "[Auto] Update Test Apk ($(date +%Y-%m-%d.%H:%M:%S))"
 
 # Delete current apk branch
