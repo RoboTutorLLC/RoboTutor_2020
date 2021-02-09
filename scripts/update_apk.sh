@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${TRAVIS_PULL_REQUEST_BRANCH}" == "false" ]; then
+if [ "${TRAVIS_PULL_REQUEST_BRANCH}" == "" ]; then
     echo "We only work with pull request";
     exit 0;
 fi
