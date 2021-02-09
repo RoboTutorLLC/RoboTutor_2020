@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: "com.github.spotbugs"
+
+// spot bug implementation referenced from https://stackoverflow.com/questions/52643805/minimal-working-spotbugs-setup-for-android-studio
 
 android {
 
@@ -75,11 +78,11 @@ android {
 
     lintOptions {
         // set to true to turn off analysis progress reporting by lint
-        quiet true
+        quiet false
         // if true, stop the gradle build if errors are found
         abortOnError false
         // if true, only report errors
-        ignoreWarnings true
+        ignoreWarnings false
     }
 }
 
@@ -117,4 +120,31 @@ dependencies {
 
     implementation project(path: ':comp_intervention')
 }
+
+// For SpotBugs to create 'spotbugsMain' gradle task
+sourceSets {
+    main {
+        java.srcDirs = []
+    }
+}
+
+spotbugs {
+    ignoreFailures = true
+    reportsDir = file("$project.buildDir/SpotBugsReports")
+    effort = "max"
+    reportLevel = "high"
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    dependsOn 'assembleDebug'
+    classes = files("$project.buildDir/intermediates/javac") // Important to use this path
+    excludeFilter = file("$project/spot-bugs-exclude.xml") // Optional - Explained below
+    source = fileTree('src/main/java')
+    reports {
+        // Enable HTML report only
+        html.enabled = true
+        xml.enabled = false
+    }
+}
+
 
