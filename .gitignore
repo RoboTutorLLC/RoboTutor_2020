@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Built application files:
 **/repo*
 **/build
@@ -100,7 +99,6 @@ local.properties
 
 app/src/main/assets/tutors/word_copy/debug_animator_graph.json
 util/a.java
->>>>>>> becdb3ca13cc6a28de64509406512f9cc28bd60f
 LICENCE.md
 README.md
 .vscode
