@@ -36,7 +36,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.nanchen.screenrecordhelper.ScreenrecordHelper;
+//import com.nanchen.screenrecordhelper.ScreenRecordHelper;
+//import com.RoboTutorLLC.ScreenRecordHelper.ScreenrecordHelper;
+import com.nanchen.screenrecordhelper.ScreenRecordHelper;
+//com.github.RoboTutorLLC:ScreenRecordHelper
 
 import java.io.File;
 import java.io.IOException;
@@ -151,7 +154,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public String        APP_PRIVATE_FILES;
     static public String        LOG_ID = "STARTUP";
 
-    static public Activity      ACTIVITY;
+    static public RoboTutor      ACTIVITY;
     static public String        PACKAGE_NAME;
     static public boolean       DELETE_INSTALLED_ASSETS = false;
 

@@ -1,4 +1,4 @@
-# Built application files
+# Built application files:
 **/repo*
 **/build
 **/captures
@@ -6,12 +6,12 @@
 
 keystore.properties
 
-# The tutor audio data is now externalized and is managed by the 
+# The tutor audio data is now externalized and is managed by the
 # RTAssetPackager
 
 /app/src/main/assets/tutors/trackdata/LIBRARY/audio/*
 
-# We keep a copy of the live story data to support the RTAssetMAnager 
+# We keep a copy of the live story data to support the RTAssetMAnager
 # building the transitions and checking the datasource validity
 # however the canonical data is in the RTAssetPublisher
 
@@ -21,6 +21,7 @@ keystore.properties
 /app/audio_assets/*
 
 local.properties
+./android.keystore
 
 # Gradle generated files
 .gradle/

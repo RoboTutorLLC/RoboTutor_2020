@@ -117,5 +117,6 @@ dependencies {
 
     compile project(path: ':comp_intervention')
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
+//    implementation 'com.github.nanchen2251:ScreenRecordHelper:1.0.2'
 }
 
