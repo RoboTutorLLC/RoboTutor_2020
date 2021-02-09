@@ -2,65 +2,72 @@
 
 set -e
 
+if [ "${TRAVIS_PULL_REQUEST_BRANCH}" == "false" ]; then
+    echo "We only work with pull request";
+    exit 0;
+fi
+
 git config --global user.name "Travis CI"
 git config --global user.email "noreply+travis@robotutor.org"
 
 export DEPLOY_BRANCH=${DEPLOY_BRANCH:-development}
 export PUBLISH_BRANCH=${PUBLISH_BRANCH:-master}
+DATE_TODAY=$(date +%Y-%m-%d)
 
-if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "fossasia/open-event-organizer-android" ] || ! [ "$TRAVIS_BRANCH" == "$DEPLOY_BRANCH" -o "$TRAVIS_BRANCH" == "$PUBLISH_BRANCH" ]; then
-    echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
-    exit 0
+echo $TRAVIS_REPO_SLUG, $TRAVIS_PULL_REQUEST;
+# if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "RoboTutorLLC/RoboTutor_2020" ] ; then
+#     echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
+#     exit 0
+# fi
+
+
+release_apk_build () {
+    echo "Building release apk";
+    ./gradlew bundlePlayStoreRelease;
+}
+
+debug_apk_build () {
+    echo "Building debug apk";
+    ./gradlew assembleDebug;
+}
+
+# yes | sdkmanager --licenses
+if [ "${TRAVIS_BRANCH}" == "${PUBLISH_BRANCH}" ]; then
+    release_apk_build
+else
+    debug_apk_build
 fi
 
-./gradlew bundlePlayStoreRelease
 
-git clone --quiet --branch=apk https://robotutor:$GITHUB_API_KEY@github.com/RoboTutorLLC/RoboTutor_2020 apk > /dev/null
+
+git clone --quiet --branch=apk https://robotutor:$GH_TOKEN@github.com/RoboTutorLLC/RoboTutor_2020 apk > /dev/null
 cd apk
 
-if [ "$TRAVIS_BRANCH" == "$PUBLISH_BRANCH" ]; then
-	/bin/rm -f *
-else
-	/bin/rm -f eventyay-organizer-dev-*
-fi
+echo `ls`
+find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.apk \;
 
-find ../app/build/outputs -type f -name '*.apk' -exec cp -v {} . \;
-find ../app/build/outputs -type f -name '*.aab' -exec cp -v {} . \;
 
-for file in app*; do
+mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}.apk
 
-    if [ "$TRAVIS_BRANCH" == "$PUBLISH_BRANCH" ]; then
-        if [[ ${file} =~ ".aab" ]]; then
-            mv $file eventyay-organizer-master-${file}
-        else
-            mv $file eventyay-organizer-master-${file:4}
-        fi
-
-    elif [ "$TRAVIS_BRANCH" == "$DEPLOY_BRANCH" ]; then
-        if [[ ${file} =~ ".aab" ]]; then
-                mv $file eventyay-organizer-dev-${file}
-        else
-                mv $file eventyay-organizer-dev-${file:4}
-        fi
-
-    fi
-
-done
-
+ls
+echo `ls -al`
+git status
+echo $(git status)
 # Create a new branch that will contains only latest apk
-git checkout --orphan temporary
+# git checkout --orphan temporary
+
 
 # Add generated APK
-git add --all .
+git add .
 git commit -am "[Auto] Update Test Apk ($(date +%Y-%m-%d.%H:%M:%S))"
 
 # Delete current apk branch
-git branch -D apk
+# git branch -D apk
 # Rename current branch to apk
-git branch -m apk
+# git branch -m apk
 
 # Force push to origin since histories are unrelated
-git push origin apk --force --quiet > /dev/null
+git push origin apk > /dev/null
 
 # Publish App to Play Store
 # if [ "$TRAVIS_BRANCH" != "$PUBLISH_BRANCH" ]; then

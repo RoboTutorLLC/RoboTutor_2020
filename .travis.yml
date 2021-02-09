@@ -2,28 +2,32 @@ language: android
 dist: trusty
 sudo: false
 jdk:
-  - oraclejdk8
+- oraclejdk8
 android:
   components:
-    - tools
-    - android-28
-    - build-tools-28.0.3
-    - platform-tools
+  - tools
+  - android-26
+  - build-tools-26.0.1
+  - build-tools-29.0.2
+  - platform-tools
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
-    - "${TRAVIS_BUILD_DIR}/gradle/caches/"
-    - "${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/"
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper/"
+  - "${TRAVIS_BUILD_DIR}/gradle/caches/"
+  - "${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/"
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
 script:
-  # - ./gradlew spotlessCheck
-  - ./gradlew build
+- cp -v app/src/sample_config_files/sample_keystore.properties keystore.properties
+- keytool -genkeypair -dname "cn=TravisCI, ou=TravisCI, o=Sun, c=US" -alias business
+  -keypass kpi135 -keystore android.keystore -storepass ab987c -validity 20000
 after_success:
-  - bash scripts/update-apk.sh
-
+- bash scripts/update_apk.sh
 branches:
   only:
-    - master
-    - development
+  - master
+  - development
+env:
+  global:
+    secure: IIQRAmd5kAgnIdaWYtN2f8eyTgLNdyfUQKz0cwQMY+glfWHDqV3zPvCBNqoVNHoTSpfIBWDYY9y4mCDDZPMZntXS3yBfD5zk79Y3ReI2ZgGCs40wSQQQL3Hlw3WT9i/JO1f0boEyDYpN7BdomWGsAE7JJW+Eue7Z+j+2z/ltc7IiLUSCcgZO0IObEFKQEdZekmXNA8kopR2SI3pTED//JB49r3BT7foNPv0dnIOb+7WoeKBlesFOidxcSmtx5ccn21/CWlYP1gFOFFt/z5w+zBzDxVtGLGOqu7mwb4D3CkXoVKpVvcGbtl2y8b/9whs2eYlpAysvz7ULtPr8Em4GHNj+YAHxQMK9YSIK3SWZ9kPDxK9vVmzHYkAGTeysEiXLiHeqTFWFPZ8ndJGnaJIe07PDYLypcEckOjltiY/Hl5aOYIPmoajFeI3cfbTcNTS5XXKbAmgbgl9ln5bgviOvLZ28Jxlg4oAHchA4ILSgKDk292mqCBCHYPpPTSI/83rxpx94/T0wJiF62JO1GxGHgLCxv5Vu3SRL6xq3vHbrFSa2Pw2joBxMcRKJD83sCMzZY2jPA992JcHIDaRfeqdXedcDWYNHUoTHVkh9mRixcXjH1Yh0GiDBwoB/uk8EAeDCKoU204VpIwh0bYNdQ2jI2hbvfLanAYjPJpJ88xhewA8=
