@@ -15,11 +15,6 @@ export PUBLISH_BRANCH=${PUBLISH_BRANCH:-master}
 DATE_TODAY=$(date +%Y-%m-%d)
 
 echo $TRAVIS_REPO_SLUG, $TRAVIS_PULL_REQUEST;
-# if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_REPO_SLUG" != "RoboTutorLLC/RoboTutor_2020" ] ; then
-#     echo "We upload apk only for changes in development or master, and not PRs. So, let's skip this shall we ? :)"
-#     exit 0
-# fi
-
 
 release_apk_build () {
     echo "Building release apk";
@@ -59,7 +54,7 @@ echo $(git status)
 
 # Add generated APK
 git add .
-git commit -am "[Auto] Update Test Apk ($(date +%Y-%m-%d.%H:%M:%S))"
+git commit -am " ${TRAVIS_BRANCH} : ($(git rev-parse --short HEAD)) : ($(date +%Y-%m-%d.%H:%M:%S))"
 
 # Delete current apk branch
 # git branch -D apk
@@ -78,4 +73,3 @@ git push origin apk > /dev/null
 # cd ..
 # gem install fastlane
 # fastlane supply --aab ./apk/eventyay-organizer-master-app-playStore-release.aab --skip_upload_apk true --track alpha --json_key ./scripts/fastlane.json --package_name $PACKAGE_NAME
-
