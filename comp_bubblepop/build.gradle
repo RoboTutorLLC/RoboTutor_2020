@@ -16,6 +16,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        release_debug {
+        }
+        release_dbg {
+        }
     }
 
     lintOptions {
@@ -35,5 +39,5 @@ dependencies {
     api project(path: ':util')
     api project(path: ':comp_intervention')
     api project(':comp_logging')
-    api project(':comp_clickmask')
+    implementation project(':comp_clickmask')
 }
