@@ -1229,8 +1229,8 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     }
 
     @Override
-    public void saveToFile() {
-        mViewManager.saveToFile();
+    public void constructAudioStoryData() {
+        mViewManager.constructAudioStoryData();
     }
 
     @Override

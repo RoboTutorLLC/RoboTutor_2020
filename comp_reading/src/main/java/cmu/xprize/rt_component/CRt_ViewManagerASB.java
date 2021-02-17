@@ -39,10 +39,15 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
@@ -1324,7 +1329,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         if (isNarrationCaptureMode) {
             capturedUtt = AudioDataStorage.segmentation;
-            saveToFile();
+            endOfUtteranceCapture();
+            constructAudioStoryData();
         }
         // reset the echo flag
         //
@@ -1499,29 +1505,74 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         if (showWords) {
             String fmtSentence = "";
+            int index = 0;
+            for (String word : wordsToDisplay) {
+                index++;
+                fmtSentence += word;
+                if (word.endsWith("'") || word.endsWith("-")) {
+                    fmtSentence += word;
+                } else {
+                    fmtSentence += word + ((index < wordsToDisplay.length) ? TCONST.WORD_SPACE : TCONST.NO_SPACE);
+                }
+            }
 
             for (int i = 0; i < wordsToDisplay.length; i++) {
 
                 String styledWord = wordsToDisplay[i];                           // default plain
 
                 if (i < mCurrWord) {
-                    styledWord = "<font color='#00B600'>" + styledWord + "</font>";
+                    fmtSentence = fmtSentence.replace(styledWord, "<font color='#00B600'>" + styledWord + "</font>");
                 }
 
                 if (i == mCurrWord) {// style the next expected word
 
                     if (!mCurrHighlight.equals(TCONST.EMPTY))
-                        styledWord = "<font color='" + mCurrHighlight + "'>" + styledWord + "</font>";
+                        fmtSentence = fmtSentence.replace(styledWord, "<font color='" + mCurrHighlight + "'>" + styledWord + "</font>");
 
-                    styledWord = "<u>" + styledWord + "</u>";
+                    // should there be an else statement here?
+                    fmtSentence = fmtSentence.replace(styledWord, "<u>" + styledWord + "</u>");
                 }
 
-                if (showFutureWords || i < mCurrWord) {
-                    if (wordsToDisplay[i].endsWith("'") || wordsToDisplay[i].endsWith("-")) {
-                        fmtSentence += styledWord;
-                    } else {
-                        fmtSentence += styledWord + ((i < wordsToDisplay.length - 1) ? TCONST.WORD_SPACE : TCONST.NO_SPACE);
-                    }
+                if (isNarrationCaptureMode) {
+                    ArrayList<String> toHighlight = new ArrayList<>();
+                    int startSegment = 0;
+                    int prev_i_loc = 0;
+                    int endSegment = wordsToSpeak.length - 1;
+                    boolean narrationCovered = false;
+                    do {
+                        boolean foundNarration = false;
+                        StringBuilder searchFor = new StringBuilder();
+                        for (i = startSegment; i <= endSegment; i++) {
+                            searchFor.append(wordsToSpeak[i])
+                            .append(" ");
+                        }
+                        searchFor.deleteCharAt(searchFor.length() - 1);
+                        for (String s : acceptedUtterances) {
+                            if (searchFor.toString().equals(s)) {
+                                foundNarration = true;
+                            }
+                        }
+                        if (foundNarration) {
+                            StringBuilder phrase = new StringBuilder();
+                            for (int j = startSegment; j <= endSegment; j++) {
+                                phrase.append(wordsToSpeak[j]);
+                            }
+                            toHighlight.add(phrase.toString());
+                            prev_i_loc = startSegment;
+                            startSegment = endSegment +1;
+                            endSegment = wordsToSpeak.length - 1;
+                        } else if(endSegment > (startSegment+1) ) {
+                            endSegment--;
+                        } else {
+                            toHighlight.remove(toHighlight.size()-1);
+                            endSegment = startSegment -1;
+                            startSegment = prev_i_loc;
+                        }
+                        if(startSegment == wordsToSpeak.length)
+                            narrationCovered = true;
+                    } while (!narrationCovered);
+
+                    // how to convert wordsToSpeak to wordsToDisplay
                 }
             }
 
@@ -1789,79 +1840,97 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      * In Narration capture mode, the audio recording data is saved to the storydata file and updated by RoboTutor in order to then echo the file
      */
     @Override
-    public void saveToFile() {
-
-        //todo: (chirag) refactor this guy--confusing name
+    public void constructAudioStoryData() {
 
         if (isUserNarrating) {
 
-            Log.d(TAG, "Preparing to save audio data in narrate mode");
+            // runtime greedy tiling algorithm to build narrations
 
-            // todo: (chirag) do not duplicate process
-            //  ? where is this being duplicated? a: it is being duplicated by AudioDataStorage
+            int startSegment = 0;
+            int prev_i_loc = 0;
+            int endSegment = wordsToSpeak.length - 1;
 
-            StringBuilder withPunctuation = new StringBuilder();
+            ArrayList<CASB_Narration> narrationList = new ArrayList<>();
 
-            for (ListenerBase.HeardWord h : capturedUtt) {
-                withPunctuation.append(wordsToDisplay[h.iSentenceWord]).append(" ");
-            }
-            withPunctuation.setLength(withPunctuation.length() - 1);
+            boolean narrationCovered = false;
 
-            Log.d(TAG, "Telling AudioDataStorage to save story stuff");
-            JSONObject sdata = AudioDataStorage.saveAudioData(narrationFileName, mAsset, mCurrLine, mCurrPara, mCurrPage, withPunctuation.toString(), currUtt);
+            do {
 
+                CASB_Narration narration = new CASB_Narration();
+                ArrayList<CASB_Seg> segList = new ArrayList<>();
 
-            int index = 0;
-            int i = narrationFileName.split(" ").length;
-            ArrayList<CASB_Seg> segList = new ArrayList<>();
-            for (ListenerBase.HeardWord s : capturedUtt) {
-                if (i >= 0) {
-                    segList.add(new CASB_Seg((int) (s.startFrame), (int) (s.endFrame), s.hypWord));
+                // build phrase file name
+                StringBuilder fileName = new StringBuilder(mAsset);
+                for (int i = startSegment; i <= endSegment; i++) {
+                    fileName.append(wordsToSpeak[i].toLowerCase()).append("_");
                 }
-                i--;
-            }
+                fileName.deleteCharAt(fileName.lastIndexOf("_"));
+                String fileString = fileName.toString() + ".mp3";
 
-            // todo (chirag) make sure chop off the part of the segmentation that comes after the silence
-            CASB_Narration narration;
-            if (narrateWordsToDelete > 1) {
-                narration = new CASB_Narration(
-                        narrationFileName.toLowerCase().replace(" ", "_") + ".mp3", segList.get(0).start, segList.get((segList.size() - 1) - narrateWordsToDelete).end, narrationFileName.toLowerCase(), segList.toArray(new CASB_Seg[segList.size()]));
-            } else {
-                narration = new CASB_Narration(
-                        narrationFileName.toLowerCase().replace(" ", "_") + ".mp3", segList.get(0).start, segList.get((segList.size() - 1)).end, narrationFileName.toLowerCase(), segList.toArray(new CASB_Seg[segList.size()]));
-            }
-            CASB_Narration[] oldNarrations = data[mCurrPage].text[mCurrPara][mCurrLine].narration;
+                File audioFile = new File(fileString);
 
-            if (capturedUtt.get(0).iSentenceWord == TCONST.ZERO) {
+                Log.d(TAG, "Greedy algorithm " + "endsegment: " + endSegment + " startsegment: " + startSegment);
 
-                data[mCurrPage].text[mCurrPara][mCurrLine].narration = new CASB_Narration[]{narration};
+                if(audioFile.exists()) {
+                    Log.d(TAG, "Narration Construction: found file: " + fileString);
+                    prev_i_loc = startSegment;
+                    startSegment = endSegment + 1;
+                    endSegment = wordsToSpeak.length - 1;
 
+                    // add segmentation data
+                    try {
+                        narration.audio = fileString.replace(mAsset, "");
 
-            } else {
-                Log.d("CRt_ViewManagerASB", "oldNarrations Length " + oldNarrations.length);
-                CASB_Narration[] narrations = new CASB_Narration[oldNarrations.length + 1];
-                if (oldNarrations.length > 0) {
-                    index = 0;
-                    for (CASB_Narration n : oldNarrations) {
-                        narrations[index] = n;
-                        index++;
+                        FileInputStream segmentationDataFile = new FileInputStream(new File(fileName.toString() + ".seg"));
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(segmentationDataFile));
+                        String line;
+
+                        while ((line = reader.readLine()) != null) {
+                            String[] data = line.split("\t");
+
+                            segList.add(new CASB_Seg(Integer.parseInt(data[1]), Integer.parseInt(data[2]), data[0]));
+                        }
+
+                        narration.from = segList.get(0).start;
+                        narration.until = segList.get(segList.size()-1).end;
+                        narration.utterances = fileName.toString().replace("_", " ");
+                        narration.segmentation = segList.toArray(new CASB_Seg[segList.size()]);
+
+                        narrationList.add(narration);
+                    } catch (FileNotFoundException e) {
+                        Log.wtf(TAG, "Unable to construct narration for " + fileString + " because " + fileName.toString() + ".seg does not exist");
+                        return;
+                    } catch (IOException e) {
+                        Log.wtf(TAG, "Unable to construct narration for " + fileString);
+                        Log.getStackTraceString(e);
+                        return;
                     }
-                    narrations[index] = narration;
+
+                } else if(endSegment > (startSegment+1) ) {
+                    // if the file doesn't exist, look for a file that is 1 word shorter
+                    endSegment--;
+
                 } else {
-                    Log.d("CRt_ViewManager", "rawNarration is null");
-                    oldNarrations = new CASB_Narration[1];
-                    oldNarrations[0] = narration;
-                    narrations[0] = narration;
-                }
-
-                data[mCurrPage].text[mCurrPara][mCurrLine].narration = narrations;
-
-                for (CASB_Narration n : narrations) {
-                    for (CASB_Seg s : n.segmentation) {
-                        Log.d(TAG, s.word);
+                    // if we are down to the last word then an adequate recording doesn't exist. Start search again, but start from a shorter recording than last time
+                    try {
+                        narrationList.remove(narrationList.size() - 1);
+                        endSegment = startSegment - 1;
+                        startSegment = prev_i_loc;
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        Log.d(TAG, "Narration Capture: There is no possible narration that can be built");
+                        break;
                     }
                 }
-            }
+
+
+                if(startSegment == wordsToSpeak.length)
+                    narrationCovered = true;
+            } while(!narrationCovered);
+
+            data[mCurrPage].text[mCurrPara][mCurrLine].narration = narrationList.toArray(new CASB_Narration[narrationList.size()]);
+
+            // todo (chirag): Updated internal representation. now update storydata.json
+
             isUserNarrating = false;
 
         }
@@ -1875,7 +1944,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     public void clearAudioData() {
         //AudioDataStorage.clearAudioData();
         //AudioWriter.destroyContent();
-
     }
 
     /**
@@ -1889,6 +1957,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     int narrateWordsToDelete;
+    ArrayList<String> acceptedUtterances = new ArrayList<>();
+
     /**
      * Restart utterance if the narration is wrong in Narration Capture Mode, preventing the user from having to restart the entire sentence
      */
@@ -1933,19 +2003,135 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
         }
 
+        StringBuilder uttMapDiagram = new StringBuilder("");
+
         ArrayList<ListenerBase.HeardWord> latestUtterance = new ArrayList<>();
         for (ArrayList<ListenerBase.HeardWord> seq : uttMap) {
+            uttMapDiagram.append("\n");
+            for (ListenerBase.HeardWord hd : seq) {
+                uttMapDiagram.append(hd.hypWord).append(" (").append(hd.matchLevel).append(") ");
+            }
+
             if (seq.size() > 0) {
                 int firstindex = seq.get(0).iSentenceWord;
-                if (firstindex == TCONST.ZERO || firstindex == prevStartFrom) {
+                if (firstindex == TCONST.ZERO || firstindex == prevStartFrom || startPoints.contains(firstindex) ) {
 
-                        // Truncate this subsequence so that it ends in a silence
-                        for (int i = seq.size() - 1; i > 0; i--) {
-                            if (seq.size() < 2) break; // no use trying to make a 1 word utterance
-                            if (seq.get(i).startFrame - seq.get(i - 1).endFrame < 50) { // 50 centiseconds gap is treated like a silence
-                                seq.remove(i);
-                            }
+
+                    // Truncate this subsequence so that it ends in a silence
+                    for (int i = seq.size() - 1; i > 0; i--) {
+                        if (seq.size() < 2) break; // no use trying to make a 1 word utterance
+                        if (seq.get(i).startFrame - seq.get(i - 1).endFrame < 50) { // 50 centiseconds gap is treated like a silence
+                            seq.remove(i);
+                        } else {
+                            break; // break if silence found
                         }
+                    }
+                    // If this is the farthest reaching subsequence so far save it
+                    if (latestUtterance.size() > 0) {
+                        if (seq.get(seq.size() - 1).iSentenceWord > latestUtterance.get(latestUtterance.size() - 1).iSentenceWord) {
+                            latestUtterance.clear();
+                            latestUtterance.addAll(seq);
+                        }
+                    } else {
+                        latestUtterance.clear();
+                        latestUtterance.addAll(seq);
+                    }
+                }
+            }
+        }
+        Log.d("Utterance_Map", uttMapDiagram.toString());
+        Log.d(TAG, Integer.toString(latestUtterance.size()));
+
+        Log.d("CRt_ViewmanagerASB", "Utterance Map");
+
+
+        if (latestUtterance.size() > 0) {
+            StringBuilder newFileName = new StringBuilder();
+            for (ListenerBase.HeardWord h : latestUtterance) {
+                newFileName.append(h.hypWord.toLowerCase()).append(" ");
+            }
+            newFileName.deleteCharAt(newFileName.length() - 1);
+            Log.d(TAG, "Narration file name: " + newFileName.toString());
+            String oldFileName = narrationFileName; // make a copy to be safe
+            renameNarration(oldFileName, newFileName.toString());
+            narrationFileName = newFileName.toString();
+
+            isUserNarrating = true;
+            narrateWordsToDelete = mCurrWord - (latestUtterance.get(latestUtterance.size() - 1).iSentenceWord + 1);
+            capturedUtt = latestUtterance;
+
+            // output a .seg file
+            StringBuilder withPunctuation = new StringBuilder();
+            for (ListenerBase.HeardWord w : latestUtterance) {
+                withPunctuation.append(w.hypWord).append(" ");
+            }
+            withPunctuation.deleteCharAt(withPunctuation.length() - 1);
+            AudioDataStorage.saveAudioData(narrationFileName, mAsset, mCurrLine, mCurrPara, mCurrPage, withPunctuation.toString(), currUtt, latestUtterance);
+
+            acceptedUtterances.add(narrationFileName);
+
+            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, latestUtterance.get(latestUtterance.size() - 1).iSentenceWord + 1);
+        } else {
+            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, prevStartFrom);
+        }
+
+    }
+
+    public void endOfUtteranceCapture() {
+
+        // creates a 2d HeardWord list of all continuous utterances spoken
+        // todo (chirag): write segmentation data to file also
+
+        ArrayList<ArrayList<ListenerBase.HeardWord>> uttMap = new ArrayList<>();
+
+        uttMap.add(new ArrayList<ListenerBase.HeardWord>());
+
+        int start = 1;
+        for(int i = 0; i < AudioDataStorage.segmentation.size(); i++) {
+            if(AudioDataStorage.segmentation.get(i).matchLevel == ListenerBase.HeardWord.MATCH_EXACT) {
+                uttMap.get(0).add(AudioDataStorage.segmentation.get(i));
+                start = i + 1;
+                break;
+            }
+        }
+
+        for (int i = start; i < AudioDataStorage.segmentation.size(); i++) {
+
+            // heardword currently being 'investigated'
+            ListenerBase.HeardWord currHeardWord = AudioDataStorage.segmentation.get(i);
+            // if the word is not an exact match, ignore
+            if (currHeardWord.matchLevel == ListenerBase.HeardWord.MATCH_EXACT) {
+                ArrayList<ListenerBase.HeardWord> latestSubSeq = uttMap.get(uttMap.size() - 1);
+
+                if (latestSubSeq.size() == 0) {
+                    latestSubSeq.add(currHeardWord);
+                    // check word is the next sentence word
+                } else if (latestSubSeq.get(latestSubSeq.size() - 1).iSentenceWord == currHeardWord.iSentenceWord - 1) {
+                    latestSubSeq.add(currHeardWord);
+                } else {
+                    ArrayList<ListenerBase.HeardWord> nextSubseq = new ArrayList<>();
+                    nextSubseq.add(currHeardWord);
+                    uttMap.add(nextSubseq);
+                }
+            } else {
+                uttMap.add(new ArrayList<ListenerBase.HeardWord>());
+            }
+        }
+
+        StringBuilder uttMapDiagram = new StringBuilder("");
+
+        ArrayList<ListenerBase.HeardWord> latestUtterance = new ArrayList<>();
+        for (ArrayList<ListenerBase.HeardWord> seq : uttMap) {
+            uttMapDiagram.append("\n");
+            for (ListenerBase.HeardWord hd : seq) {
+                uttMapDiagram.append(hd.hypWord).append(" ").append(hd.matchLevel);
+            }
+
+            if (seq.size() > 0) {
+                int firstindex = seq.get(0).iSentenceWord;
+                if (firstindex == TCONST.ZERO || firstindex == prevStartFrom || startPoints.contains(firstindex) || true /* temporary */ ) {
+
+                    // no need to end in a silence for the last utterance in the sentence
 
                     // If this is the farthest reaching subsequence so far save it
                     if (latestUtterance.size() > 0) {
@@ -1960,6 +2146,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 }
             }
         }
+        Log.d("Utterance_Map", "End of capture" + uttMapDiagram.toString());
+        Log.d(TAG, Integer.toString(latestUtterance.size()));
+
+        Log.d("CRt_ViewmanagerASB", "Utterance Map");
+
 
         if (latestUtterance.size() > 0) {
             StringBuilder newFileName = new StringBuilder();
@@ -1967,19 +2158,25 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 newFileName.append(h.hypWord.toLowerCase()).append(" ");
             }
             newFileName.deleteCharAt(newFileName.length() - 1);
-            String oldFileName = narrationFileName; // make a copy to be safe
+            String oldFileName = narrationFileName; // make a copy to be thread safe
             renameNarration(oldFileName, newFileName.toString());
             narrationFileName = newFileName.toString();
 
             isUserNarrating = true;
             narrateWordsToDelete = mCurrWord - (latestUtterance.get(latestUtterance.size() - 1).iSentenceWord + 1);
             capturedUtt = latestUtterance;
-            saveToFile();
-            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, latestUtterance.get(latestUtterance.size() - 1).iSentenceWord + 1);
-        } else {
-            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, prevStartFrom);
-        }
 
+            // output a .seg file
+            StringBuilder withPunctuation = new StringBuilder();
+            for (ListenerBase.HeardWord w : latestUtterance) {
+                withPunctuation.append(w.hypWord).append(" ");
+            }
+            withPunctuation.deleteCharAt(withPunctuation.length() - 1);
+            AudioDataStorage.saveAudioData(narrationFileName, mAsset, mCurrLine, mCurrPara, mCurrPage, withPunctuation.toString(), currUtt, latestUtterance);
+            // constructAudioStoryData();
+        } else {
+            Log.wtf(TAG, "Unable to save final part of narration");
+        }
 
     }
 
@@ -1989,9 +2186,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     int prevStartFrom = 0;
+    ArrayList<Integer> startPoints = new ArrayList<>();
+
     /**
      * Gives the file location to save the current recording to the AudioWriter so that the data collected is immediately written to file
-     * @param startFrom
+     * @param startFrom is the location of the sentence to start the recording from
      */
     public void feedSentence(int startFrom) {
         Log.d(TAG, "Chirag: currUtt is " + currUtt);
@@ -2006,14 +2205,16 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         StringBuilder fileNameBuilder = new StringBuilder();
         int i = 0;
-        for (String word : wordsToSpeak) { // This uses the wordsToSpeak String[] because it does not contain punctuation
-            if (i >= startFrom) {
+        for (String word : wordsToSpeak) {
+            // This uses the wordsToSpeak String[] because it does not contain punctuation
+            //if (i >= startFrom) {
                 fileNameBuilder.append(word).append(" ");
-            }
-            i++;
+            //}
+            //i++;
         }
         fileNameBuilder.setLength(fileNameBuilder.length() - 1);
 
+        fileNameBuilder.append("TEMP");
         String fileName = fileNameBuilder.toString();
 
         Log.d("CRt_ saveToFile", "Telling Audiowriter to being writing file. File is: " + fileName);
@@ -2052,8 +2253,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mPageText.setText(spannable);
             alreadyNarrated = false;
         }
-
-        prevStartFrom = startFrom;
+        if (startFrom == 0) startPoints.clear();
+        else {
+            prevStartFrom = startFrom;
+            startPoints.add(startFrom);
+        }
     }
 
     // DO NOT CONFUSE THIS WITH prevLine().

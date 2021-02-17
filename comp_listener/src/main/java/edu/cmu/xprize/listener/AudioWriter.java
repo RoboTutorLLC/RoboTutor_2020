@@ -317,7 +317,7 @@ public class AudioWriter {
         if (renamed) {
             return true;
         } else {
-            Log.wtf("AudioWriter", "File Rename Failed:" + prevName + " to " + newName);
+            Log.wtf("AudioWriter", "File Rename Failed:" + previousName + " to " + newNameFixed);
 
             return false;
         }
@@ -326,9 +326,12 @@ public class AudioWriter {
 
     public static void pauseNRename(String prevName, String newName, String assetLocation) {
         pauseRecording();
+
         try {
-            Thread.sleep(100);
-        } catch (Exception e) {}
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            Log.getStackTraceString(e);
+        }
         renameFile(prevName, newName, assetLocation);
     }
 }

@@ -47,7 +47,7 @@ public class AudioDataStorage {
         // ? chirag what did you write here
     }
 
-    public static JSONObject saveAudioData(String fileName, String assetLocation, int currLine, int currPara, int currPage, String sentenceWPunc, int currUtt) {
+    public static JSONObject saveAudioData(String fileName, String assetLocation, int currLine, int currPara, int currPage, String sentenceWPunc, int currUtt, List<ListenerBase.HeardWord> seg) {
         // Todo: optimize this code (the process is being Duplicated)
         // where?
         Log.d("ADSSave", "attempting to save audiodata.");
@@ -63,7 +63,7 @@ public class AudioDataStorage {
 
             Log.d("AudioDataStorage", "FileOutputStream Created at " + assetLocation + "/" + fileName + ".seg");
             int i = fileName.split(" ").length;
-            for(ListenerBase.HeardWord word: segmentation) {
+            for(ListenerBase.HeardWord word: seg) {
                 if (i >= 0) {
                     segData.append(word.hypWord.toLowerCase() + "\t" + word.startFrame + "\t" + word.endFrame);
                     segData.append("\n");

@@ -76,7 +76,7 @@ public interface ICRt_ViewManager extends ILoadableObject {
 
     public void execCommand(String _command, Object _target);
 
-    public void saveToFile();
+    public void constructAudioStoryData();
     public void clearAudioData();
     public void startLine();
 

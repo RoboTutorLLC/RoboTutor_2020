@@ -715,6 +715,7 @@ public class CTutor implements ILoadableObject2, IEventSource {
             }
         }
         catch(Exception e) {
+            Log.getStackTraceString(e);
             Log.d(TAG, "automateScene Error: " + e);
         }
     }
