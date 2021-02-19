@@ -15,9 +15,6 @@ android {
         multiDexEnabled true
     }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
 
     // Create a variable called keystorePropertiesFile, and initialize it to your
     // keystore.properties file, in the rootProject folder.
@@ -41,7 +38,7 @@ android {
     buildTypes {
 
         release {
-            signingConfig signingConfigs.android
+//            signingConfig signingConfigs.android
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -53,7 +50,8 @@ android {
         //
         release_dbg {
             debuggable true
-            signingConfig signingConfigs.android
+//            signingConfig signingConfigs.android
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
     }
@@ -79,7 +77,7 @@ android {
         // if true, stop the gradle build if errors are found
         abortOnError false
         // if true, only report errors
-        ignoreWarnings true
+        ignoreWarnings true //
     }
 }
 

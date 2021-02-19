@@ -39,5 +39,5 @@ dependencies {
     api project(path: ':util')
     api project(path: ':comp_intervention')
     api project(':comp_logging')
-    implementation project(':comp_clickmask')
+    api project(':comp_clickmask')
 }
