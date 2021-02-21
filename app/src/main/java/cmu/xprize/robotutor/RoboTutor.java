@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
@@ -170,7 +171,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public String            SELECTOR_MODE = TCONST.FTR_TUTOR_SELECT; // this is only used as a feature, when launching TActivitySelector...
     static public boolean           STUDENT_CHOSE_REPEAT = false;
 //    static public String        SELECTOR_MODE = TCONST.FTR_DEBUG_SELECT;
-
+    static private String[] videoNames = new String[]{"video1", "video2"};
+    private int videoNamesIterator = 0;
 
     // TODO: This is a temporary log update mechanism - see below
     //
@@ -281,8 +283,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void startRecording(){
         if (screenRecordHelper == null) {
+            videoNamesIterator = (videoNamesIterator + 1)%2; // creating a two name cycle and iterating between the cycle
+            String videoName = videoNames[videoNamesIterator];
             screenRecordHelper = new ScreenRecordHelper(this, null, "/sdcard/roboscreen",
-                    "video_" + String.valueOf(System.currentTimeMillis()));
+                    videoName);
             screenRecordHelper.setRecordAudio(true);
         }
         screenRecordHelper.startRecord();
