@@ -171,6 +171,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public String            SELECTOR_MODE = TCONST.FTR_TUTOR_SELECT; // this is only used as a feature, when launching TActivitySelector...
     static public boolean           STUDENT_CHOSE_REPEAT = false;
 //    static public String        SELECTOR_MODE = TCONST.FTR_DEBUG_SELECT;
+
     static private String[] videoNames = new String[]{"video1", "video2"};
     private int videoNamesIterator = 0;
 
@@ -190,6 +191,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     private final  String  TAG = "CRoboTutor";
     private final String ID_TAG = "StudentId";
     ScreenRecordHelper screenRecordHelper;
+    private ScreenRecorder screenRecorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,6 +276,14 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         masterContainer.addAndShow(progressView);
 
         // testCrashHandler();
+
+        // creating a recorder instance
+        try{
+            this.screenRecorder = new ScreenRecorder(this);
+        }
+        catch (Exception e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     /**
@@ -282,29 +292,19 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void startRecording(){
-        if (screenRecordHelper == null) {
-            videoNamesIterator = (videoNamesIterator + 1)%2; // creating a two name cycle and iterating between the cycle
-            String videoName = videoNames[videoNamesIterator];
-            screenRecordHelper = new ScreenRecordHelper(this, null, "/sdcard/roboscreen",
-                    videoName);
-            screenRecordHelper.setRecordAudio(true);
-        }
-        screenRecordHelper.startRecord();
+        screenRecorder.startRecording();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void endRecording(){
-        screenRecordHelper.stopRecord(0, 0, null);
-        screenRecordHelper = null;
+        screenRecorder.endRecording();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (screenRecordHelper != null) {
-            screenRecordHelper.onActivityResult(requestCode, resultCode, data);
-        }
+        screenRecorder.onActivityResult(requestCode, resultCode, data);
         setFullScreen();
     }
 
