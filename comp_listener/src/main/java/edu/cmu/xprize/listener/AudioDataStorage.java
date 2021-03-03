@@ -109,13 +109,20 @@ public class AudioDataStorage {
 
             JSONArray segm = new JSONArray();
             long finalEndTime = 0;
+            int i = 0;
             for(ListenerBase.HeardWord heardWord : segmentation) {
+                if (i > 1) {
+                    if (segmentation.get(i).iSentenceWord != heardWord.iSentenceWord - 1)
+                        break;
+                }
                 JSONObject segObj = new JSONObject();
                 segObj.put("end", heardWord.endFrame);
                 segObj.put("start", heardWord.startFrame );
                 segObj.put("word", heardWord.hypWord.toLowerCase());
+                segObj.put("matchLevel", heardWord.matchLevel);
                 segm.put(segObj);
                 finalEndTime = heardWord.endFrame;
+                i++;
             }
             rawNarration.put("segmentation", segm);
             rawNarration.put("from", segmentation.get(0).startFrame);
