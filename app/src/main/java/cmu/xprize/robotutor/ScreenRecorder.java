@@ -1,29 +1,22 @@
 package cmu.xprize.robotutor;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.rtp.AudioStream;
-import android.nfc.Tag;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import com.nanchen.screenrecordhelper.ScreenRecordHelper;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.SequenceInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.Time;
-import java.util.Base64;
 import java.util.Date;
-import java.util.Timer;
 import java.util.Vector;
 
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
@@ -59,6 +52,7 @@ public class ScreenRecorder {
     static private String[] videoNames = new String[]{"video1.mp4", "video2.mp4"};
     private int videoNamesIterator = 0;
     private Date videoTimeStamp = null;
+    private Vector<File> ve = new Vector<File>();
 
 
 
@@ -95,6 +89,7 @@ public class ScreenRecorder {
         }
         this.activity = activity;
         this.isInstantiated = true;
+        this.videoTimeStamp = new Date();
     }
 
     /**
@@ -132,19 +127,113 @@ public class ScreenRecorder {
             a.endDate = a.endDate - startingTime;
         }
 
-        Vector<File> ve = new Vector<File>();
+//        Vector<File> ve = new Vector<File>();
+        this.spliceSong(audioFiles.firstElement());
         for(int i=0; i<audioFiles.size(); i++) {
             AudioObject audioObject = audioFiles.get(i);
-            ve.add(new File(audioObject.path));
+            this.ve.add(new File(audioObject.path));
+            this.ve.add(new File("/sdcard/robotutor/silence.mp3"));
             Log.d("BBruhhh", audioObject.path);
         }
 
 
 
-        mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"), ve);
+
+        mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
     }
 
-    private void mergeSongs(File mergedFile, Vector<File> mp3Files){
+    private void createSilenceFile(AudioObject audioObject){
+//        String[] command = {"-ss", ""+audioObject.endDate, audioObject.path.toString(), dest.toString()};
+        //        ffmpeg -i "concat:20181021_080743.MP3|20181021_090745.MP3|20181021_100745.MP3" -acodec copy 20181021.mp3
+
+        FFmpeg ffmpeg = FFmpeg.getInstance(null);
+        // to execute "ffmpeg -version" command you just need to pass "-version"
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                    Log.d("Internal Testing", "final work done");
+                }
+
+                @Override
+                public void onProgress(String message) {}
+
+                @Override
+                public void onFailure(String message) {}
+
+                @Override
+                public void onSuccess(String message) {}
+
+                @Override
+                public void onFinish() {}
+
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void spliceSong(AudioObject audioObject) {
+        File folder = new File(Environment.getExternalStorageDirectory()+"/TempVideos");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        String fileName = new File(audioObject.path).getName();
+        String fileExtension = ".mp3";
+        File dest = new File(folder, fileName + fileExtension);
+        if (!dest.exists()){
+            try {
+                dest.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String[] command = {"-ss", ""+audioObject.endDate, audioObject.path.toString(), dest.toString()};
+
+        FFmpeg ffmpeg = FFmpeg.getInstance(null);
+        // to execute "ffmpeg -version" command you just need to pass "-version"
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                    Log.d("Internal Testing", "final work done");
+                }
+
+                @Override
+                public void onProgress(String message) {}
+
+                @Override
+                public void onFailure(String message) {}
+
+                @Override
+                public void onSuccess(String message) {}
+
+                @Override
+                public void onFinish() {}
+
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            e.printStackTrace();
+        }
+
+//        return File
+    }
+
+    private void mergeSongs(File mergedFile){
+        Vector<File> mp3Files = this.ve;
+        if (!mergedFile.exists()){
+            try {
+                mergedFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+//        ffmpeg -i "concat:20181021_080743.MP3|20181021_090745.MP3|20181021_100745.MP3" -acodec copy 20181021.mp3
+
         Log.i("TAG", "mergeSongs: merging shizz");
         FileInputStream fisToFinal = null;
         FileOutputStream fos = null;
@@ -172,6 +261,7 @@ public class ScreenRecorder {
         } catch (IOException e) {
             e.printStackTrace();
         }finally{
+            this.ve = new Vector<File>();
             try {
                 if(fos!=null){
                     fos.flush();

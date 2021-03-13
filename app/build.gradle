@@ -89,7 +89,7 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    implementation 'nl.bravobit:android-ffmpeg:1.1.7'
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
     implementation 'com.google.guava:guava:22.0-android'
     implementation 'com.android.support:appcompat-v7:25.2.0'
     implementation 'com.android.support:percent:25.2.0'

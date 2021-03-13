@@ -234,6 +234,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         // start recording when launching a tutor
         // end recording when entering the menu
         RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
+        Log.d(TAG, roboTutor_act.getClass().getSimpleName());
         roboTutor_act.endRecording();
     }
 
