@@ -57,7 +57,7 @@ public class ScreenRecorder {
     static boolean isInstantiated = false;
     private RoboTutor activity = null;
     ScreenRecordHelper recorderInstance = null;
-    static private String[] videoNames = new String[]{"video1.mp4", "video2.mp4"};
+    static private String[] videoNames = new String[]{"video1.mp4"};
     private int videoNamesIterator = 0;
     private Date videoTimeStamp = null;
     private Vector<File> ve = new Vector<File>();
@@ -112,7 +112,7 @@ public class ScreenRecorder {
             this.videoNamesIterator = (videoNamesIterator + 1)%2; // creating a two name cycle and iterating between the cycle
             String videoName = videoNames[videoNamesIterator];
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
-                    "/sdcard/roboscreen/" + videoName);
+                    "/sdcard/roboscreen/video1.mp4" );
             this.recorderInstance.setRecordAudio(true);
         }
         this.recorderInstance.startRecord();
@@ -147,6 +147,7 @@ public class ScreenRecorder {
             AudioObject audioObject = audioFiles.get(i);
 //            this.ve.add(new File(audioObject.path));
 //            this.ve.add(new File("/sdcard/robotutor/silence.mp3"));
+            this.spliceSong(audioObject);
             Log.d("BBruhhh", audioObject.path);
         }
 
@@ -264,7 +265,10 @@ public class ScreenRecorder {
             fos = new FileOutputStream(mergedFile);
             fisToFinal = new FileInputStream(mergedFile);
             for(AudioObject temp:mp3Files){
-                File mp3File = new File(temp.path);
+                String fileName = new File(temp.path).getName();
+                String path = "/sdcard/roboscreen/TempVideos/"+fileName; // this will concatenate
+
+                File mp3File = new File(path);
                 if(!mp3File.exists())
                     continue;
 
@@ -321,7 +325,7 @@ public class ScreenRecorder {
 
             String root = Environment.getExternalStorageDirectory().toString();
             String audio = "/sdcard/roboscreen/audio123.mp3";
-            String video = "/sdcard/roboscreen/finalvideo.mp4";
+            String video = "/sdcard/roboscreen/video1.mp4";
 
 
             File file = new File(Environment.getExternalStorageDirectory() + File.separator + "final2.mp4");
