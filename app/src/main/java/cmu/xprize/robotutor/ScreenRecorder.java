@@ -1,5 +1,6 @@
 package cmu.xprize.robotutor;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec;
@@ -14,7 +15,9 @@ import android.widget.Toast;
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.nanchen.screenrecordhelper.ScreenRecordHelper;
 
 import java.io.File;
@@ -62,6 +65,7 @@ public class ScreenRecorder {
     private Date videoTimeStamp = null;
     private Vector<File> ve = new Vector<File>();
     private String TAG = "ScreenRecorder";
+    Context context;
 
 
 
@@ -91,12 +95,13 @@ public class ScreenRecorder {
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public ScreenRecorder(RoboTutor activity) throws Exception {
+    public ScreenRecorder(RoboTutor activity, Context context) throws Exception {
         if (isInstantiated){
             // raise Error and quit
             throw new Exception("One instance already instantiated");
         }
         this.activity = activity;
+        this.context = context;
         this.isInstantiated = true;
         this.videoTimeStamp = new Date();
     }
@@ -109,10 +114,10 @@ public class ScreenRecorder {
     public void startRecording(){
         this.videoTimeStamp = new Date();
         if (this.recorderInstance == null) {
-            this.videoNamesIterator = (videoNamesIterator + 1)%2; // creating a two name cycle and iterating between the cycle
+            this.videoNamesIterator = 0; // creating a two name cycle and iterating between the cycle
             String videoName = videoNames[videoNamesIterator];
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
-                    "/sdcard/roboscreen/video1.mp4" );
+                    "/sdcard/roboscreen/videos/" );
             this.recorderInstance.setRecordAudio(true);
         }
         this.recorderInstance.startRecord();
@@ -128,31 +133,38 @@ public class ScreenRecorder {
         Date currentTimeStamp = new Date();
         this.recorderInstance.stopRecord(0, 0, null);
         // not nulling the instance here as we want to make a singleton and not unnecessary declaration
-        this.recorderInstance = null;
 
-        // TODO: add here the code to merge all the audio files
-//        audioFiles.forEach();
 
-//        audioFiles.forEach(audioObjct -> Log.d("Screen Recorder", ""));
-//      prefill it with silence and add add silence
-        long startingTime = audioFiles.firstElement().startDate;
-        for (AudioObject a: audioFiles) {
-            a.startDate = a.startDate - startingTime;
-            a.endDate = a.endDate - startingTime;
-        }
+        //      Check if this snippet is required or not
+//        long startingTime = audioFiles.firstElement().startDate;
+//        for (AudioObject a: audioFiles) {
+//            a.startDate = a.startDate - startingTime;
+//            a.endDate = a.endDate - startingTime;
+//        }
 
 //        Vector<File> ve = new Vector<File>();
 //        this.spliceSong(audioFiles.firstElement());
+        Log.d(TAG, "splicing shizz" + audioFiles.size());
         for(int i=0; i<audioFiles.size(); i++) {
             AudioObject audioObject = audioFiles.get(i);
-//            this.ve.add(new File(audioObject.path));
+
+
+            if(audioObject.endDate!=0){
+                Log.d(TAG, "audio object" +
+                        audioObject.endDate);
+                this.ve.add(new File(audioObject.path));
+                this.spliceSong(audioObject);
+            }
 //            this.ve.add(new File("/sdcard/robotutor/silence.mp3"));
-            this.spliceSong(audioObject);
-            Log.d("BBruhhh", audioObject.path);
+            Log.d(TAG, "index "+i);
+//            Log.d(TAG, audioObject.path);
         }
 
+
+        Log.d(TAG, "Merging all the songs");
         mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
         this.muxing();
+        this.recorderInstance = null;
     }
 
     private void createSilenceFile(Long duration){
@@ -170,7 +182,8 @@ public class ScreenRecorder {
         String[] command = {"-i", temp, "-acodec", "copy", "/sdcard/tempRoboScreen/finalSilence.mp3"};
         //        ffmpeg -i "concat:20181021_080743.MP3|20181021_090745.MP3|20181021_100745.MP3" -acodec copy 20181021.mp3
 
-        FFmpeg ffmpeg = FFmpeg.getInstance(null);
+        FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
+
         // to execute "ffmpeg -version" command you just need to pass "-version"
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
@@ -200,14 +213,14 @@ public class ScreenRecorder {
 
 
     private void spliceSong(AudioObject audioObject) {
-        File folder = new File(Environment.getExternalStorageDirectory()+"/TempVideos");
+        File folder = new File( "/sdcard/roboscreen/TempAudio");
         if (!folder.exists()) {
             folder.mkdir();
         }
 
         String fileName = new File(audioObject.path).getName();
-        String fileExtension = ".mp3";
-        File dest = new File(folder, fileName + fileExtension);
+        File dest = new File(folder, fileName);
+        Log.d(TAG, "Destination Filename is " + fileName);
         if (!dest.exists()){
             try {
                 dest.createNewFile();
@@ -216,34 +229,61 @@ public class ScreenRecorder {
             }
         }
 
-        String[] command = {"-ss", ""+audioObject.endDate, audioObject.path.toString(), dest.toString()};
 
-        FFmpeg ffmpeg = FFmpeg.getInstance(null);
-        // to execute "ffmpeg -version" command you just need to pass "-version"
+        String path = new File(audioObject.path).getPath();
+        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + audioObject.endDate + "  " + audioObject.startDate + "  " + path);
+        String[] command = {"-ss", "2", "-i", "/sdcard/robotutor_assets/assets/audio/en/cmu/xprize/literacy/0832c1202da8d382318e329a7c133ea0.mp3", dest.toString()};
+
+        Log.d(TAG, "spliceSong: " + (this.context==null));
+        FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
+//        // to execute "ffmpeg -version" command you just need to pass "-version"
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    Log.d(TAG, "onSuccess: bruhhhhh");
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+//            Log.d(TAG, "Kaam Tamaam");
+            e.printStackTrace();
+        }
+
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
 
                 @Override
                 public void onStart() {
-                    Log.d("Internal Testing", "final work done");
+                    Log.d(TAG, "Work Started done");
                 }
 
                 @Override
-                public void onProgress(String message) {}
+                public void onProgress(String message) {
+                    Log.d(TAG, "Doing some work");
+                }
 
                 @Override
-                public void onFailure(String message) {}
+                public void onFailure(String message) {
+                    Log.d(TAG, "Conversion failure " + message);
+                }
 
                 @Override
-                public void onSuccess(String message) {}
+                public void onSuccess(String message) {
+                    Log.d(TAG, "Conversion Successful");
+                }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                    Log.d(TAG, "Work Dome");
+                }
 
             });
         } catch (FFmpegCommandAlreadyRunningException e) {
+            Log.d(TAG, e.toString());
             e.printStackTrace();
         }
+//        Log.d(TAG, "spliced");
 
 //        return File
     }

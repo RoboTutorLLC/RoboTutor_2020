@@ -769,6 +769,8 @@ public class CMediaManager {
 
             pause();
             seek(0L);
+            // This stops the last audio recording file
+            ScreenRecorder.stopLastAudioFile();
 
             //#Mod issue #335 - give the tracka chance to shutdown.  The audio runs in
             // JNI code so this seems to allow it to shutdown and not restart if we are
@@ -780,6 +782,7 @@ public class CMediaManager {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
 
 

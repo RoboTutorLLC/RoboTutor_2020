@@ -279,7 +279,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         // creating a recorder instance
         try{
-            this.screenRecorder = new ScreenRecorder(this);
+            this.screenRecorder = new ScreenRecorder(this, getApplicationContext());
         }
         catch (Exception e) {
             Log.wtf(TAG, e);
