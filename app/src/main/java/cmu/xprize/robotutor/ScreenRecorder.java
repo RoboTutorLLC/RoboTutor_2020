@@ -117,8 +117,8 @@ public class ScreenRecorder {
             this.videoNamesIterator = 0; // creating a two name cycle and iterating between the cycle
             String videoName = videoNames[videoNamesIterator];
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
-                    "/sdcard/roboscreen/videos/" );
-            this.recorderInstance.setRecordAudio(true);
+                    "/sdcard/roboscreen/videos/", "final_video" );
+//            this.recorderInstance.setRecordAudio(true);
         }
         this.recorderInstance.startRecord();
     }
@@ -129,21 +129,11 @@ public class ScreenRecorder {
          * this method is used to generate empty silence files required when we merge and fill the songs
          * in between
          */
+        // not nulling the instance here as we want to make a singleton and not unnecessary declaration
 
         Date currentTimeStamp = new Date();
         this.recorderInstance.stopRecord(0, 0, null);
-        // not nulling the instance here as we want to make a singleton and not unnecessary declaration
-
-
-        //      Check if this snippet is required or not
-//        long startingTime = audioFiles.firstElement().startDate;
-//        for (AudioObject a: audioFiles) {
-//            a.startDate = a.startDate - startingTime;
-//            a.endDate = a.endDate - startingTime;
-//        }
-
-//        Vector<File> ve = new Vector<File>();
-//        this.spliceSong(audioFiles.firstElement());
+        this.recorderInstance = null;
         Log.d(TAG, "splicing shizz" + audioFiles.size());
         for(int i=0; i<audioFiles.size(); i++) {
             AudioObject audioObject = audioFiles.get(i);
@@ -154,17 +144,17 @@ public class ScreenRecorder {
                         audioObject.endDate);
                 this.ve.add(new File(audioObject.path));
                 this.spliceSong(audioObject);
+                this.ve.add(new File("/sdcard/RoboTutor/silence.mp3"));
             }
-//            this.ve.add(new File("/sdcard/robotutor/silence.mp3"));
             Log.d(TAG, "index "+i);
-//            Log.d(TAG, audioObject.path);
         }
 
 
         Log.d(TAG, "Merging all the songs");
-        mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
+        this.mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
         this.muxing();
         this.recorderInstance = null;
+        this.cleanUp();
     }
 
     private void createSilenceFile(Long duration){
@@ -173,18 +163,30 @@ public class ScreenRecorder {
          * in between
          * duration in seconds
         */
+
+//        https://itectec.com/superuser/ffmpeg-command-for-concatenate-two-mp3-files/
         String temp = "";
 
         for (int i = 0; i<Math.floor(duration); i++){
-            temp+="silence.MP3|";
+            temp+="/sdcard/RoboTutor/silence.mp3|";
         }
 
-        String[] command = {"-i", temp, "-acodec", "copy", "/sdcard/tempRoboScreen/finalSilence.mp3"};
-        //        ffmpeg -i "concat:20181021_080743.MP3|20181021_090745.MP3|20181021_100745.MP3" -acodec copy 20181021.mp3
+        String[] command = {"-i", temp.substring(0,temp.length()-1), "-acodec", "copy", "/sdcard/roboscreen/finalSilence.mp3", "-y"};
 
         FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
 
-        // to execute "ffmpeg -version" command you just need to pass "-version"
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    Log.d(TAG, "onSuccess: silence binary loaded");
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+            e.printStackTrace();
+        }
+
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
 
@@ -200,7 +202,9 @@ public class ScreenRecorder {
                 public void onFailure(String message) {}
 
                 @Override
-                public void onSuccess(String message) {}
+                public void onSuccess(String message) {
+                    Log.d(TAG, "onSuccess: finally loaded andorid ffmpeg binary");
+                }
 
                 @Override
                 public void onFinish() {}
@@ -221,71 +225,50 @@ public class ScreenRecorder {
         String fileName = new File(audioObject.path).getName();
         File dest = new File(folder, fileName);
         Log.d(TAG, "Destination Filename is " + fileName);
-        if (!dest.exists()){
-            try {
-                dest.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        String path = new File(audioObject.path).getAbsolutePath();
+        Long duration = (Math.abs(audioObject.endDate - audioObject.startDate)/1000)%60;
+        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + audioObject.endDate + "  " + audioObject.startDate + "  " + path + " Duration " + duration);
+        String[] command = { "-i", path, "-to", duration.toString() , dest.getAbsolutePath(), "-y"};
 
-
-        String path = new File(audioObject.path).getPath();
-        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + audioObject.endDate + "  " + audioObject.startDate + "  " + path);
-        String[] command = {"-ss", "2", "-i", "/sdcard/robotutor_assets/assets/audio/en/cmu/xprize/literacy/0832c1202da8d382318e329a7c133ea0.mp3", dest.toString()};
-
-        Log.d(TAG, "spliceSong: " + (this.context==null));
         FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
-//        // to execute "ffmpeg -version" command you just need to pass "-version"
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
                 @Override
                 public void onSuccess() {
                     super.onSuccess();
-                    Log.d(TAG, "onSuccess: bruhhhhh");
                 }
             });
         } catch (FFmpegNotSupportedException e) {
-//            Log.d(TAG, "Kaam Tamaam");
             e.printStackTrace();
         }
 
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
-
                 @Override
                 public void onStart() {
-                    Log.d(TAG, "Work Started done");
+                    Log.d(TAG, "Work Started");
                 }
-
                 @Override
                 public void onProgress(String message) {
                     Log.d(TAG, "Doing some work");
                 }
-
                 @Override
                 public void onFailure(String message) {
                     Log.d(TAG, "Conversion failure " + message);
                 }
-
                 @Override
                 public void onSuccess(String message) {
                     Log.d(TAG, "Conversion Successful");
                 }
-
                 @Override
                 public void onFinish() {
                     Log.d(TAG, "Work Dome");
                 }
-
             });
         } catch (FFmpegCommandAlreadyRunningException e) {
-            Log.d(TAG, e.toString());
+            Log.d(TAG, "FFMPEG running bruhh " + e.toString());
             e.printStackTrace();
         }
-//        Log.d(TAG, "spliced");
-
-//        return File
     }
 
     private void mergeSongs(File mergedFile){
@@ -298,7 +281,7 @@ public class ScreenRecorder {
             }
         }
 
-        Log.i("TAG", "mergeSongs: merging shizz");
+        Log.i(TAG, "mergeSongs: merging shizz");
         FileInputStream fisToFinal = null;
         FileOutputStream fos = null;
         try {
@@ -306,20 +289,19 @@ public class ScreenRecorder {
             fisToFinal = new FileInputStream(mergedFile);
             for(AudioObject temp:mp3Files){
                 String fileName = new File(temp.path).getName();
-                String path = "/sdcard/roboscreen/TempVideos/"+fileName; // this will concatenate
-
+                String path = "/sdcard/roboscreen/TempAudio/"+fileName; // this will concatenate
+                Log.d(TAG, "mergeSongs: merging songs with " + fileName + " the path is " + path);
                 File mp3File = new File(path);
-                if(!mp3File.exists())
-                    continue;
 
-                if(mp3File.getAbsolutePath()=="/sdcard/robotutor/silence.mp3") {
+                if(mp3File.getAbsolutePath()=="/sdcard/RoboTutor/silence.mp3") {
                     int index = mp3Files.indexOf(temp);
+                    Log.d(TAG, "mergeSongs: silence is detected and silece is being created");
                     // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
                     int prev = index - 1;
                     int next = index + 1;
                     Long duration = mp3Files.get(next).startDate - mp3Files.get(prev).endDate;
                     this.createSilenceFile(duration);
-                    mp3File = new File("/sdcard/tempRoboScreen/finalSilence.mp3");
+                    mp3File = new File("/sdcard/roboscreen/finalSilence.mp3");
                 }
 
                 FileInputStream fisSong = new FileInputStream(mp3File);
@@ -336,10 +318,14 @@ public class ScreenRecorder {
                         sis.close();
                     }
                 }
+
+                Log.d(TAG, "file merged at " + mergedFile.getAbsolutePath());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally{
+        }
+        catch (Exception e){
+            Log.d(TAG, "mergeSongs: Error is "+ e.getMessage());
+        }
+        finally{
             mp3Files = new Vector<AudioObject>();
             try {
                 if(fos!=null){
@@ -359,122 +345,75 @@ public class ScreenRecorder {
     private void muxing() {
 
 
-        String outputFile = "";
+//        String outputFile = "";
+
+        String audio = "/sdcard/roboscreen/audio123.mp3";
+        String video = "/sdcard/roboscreen/videos/final_video.mp4";
+
+
+        String outputFile = "/sdcard/roboscreen/final2.mp4";
+
+        String[] command = {"-i", video, "-i", audio, "-c", "copy", "-map", "0:v:0", "-map", "1:a:0", outputFile , "-y"};
+
+        FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
 
         try {
-
-            String root = Environment.getExternalStorageDirectory().toString();
-            String audio = "/sdcard/roboscreen/audio123.mp3";
-            String video = "/sdcard/roboscreen/video1.mp4";
-
-
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "final2.mp4");
-            file.createNewFile();
-            outputFile = file.getAbsolutePath();
-
-
-            MediaExtractor videoExtractor = new MediaExtractor();
-            videoExtractor.setDataSource(video);
-
-            MediaExtractor audioExtractor = new MediaExtractor();
-            audioExtractor.setDataSource(audio);
-
-            Log.d(TAG, "Video Extractor Track Count " + videoExtractor.getTrackCount());
-            Log.d(TAG, "Audio Extractor Track Count " + audioExtractor.getTrackCount());
-
-            MediaMuxer muxer = new MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-
-            videoExtractor.selectTrack(0);
-            MediaFormat videoFormat = videoExtractor.getTrackFormat(0);
-            int videoTrack = muxer.addTrack(videoFormat);
-
-            audioExtractor.selectTrack(0);
-            MediaFormat audioFormat = audioExtractor.getTrackFormat(0);
-            int audioTrack = muxer.addTrack(audioFormat);
-
-            Log.d(TAG, "Video Format " + videoFormat.toString());
-            Log.d(TAG, "Audio Format " + audioFormat.toString());
-
-            boolean sawEOS = false;
-            int frameCount = 0;
-            int offset = 100;
-            int sampleSize = 256 * 1024;
-            ByteBuffer videoBuf = ByteBuffer.allocate(sampleSize);
-            ByteBuffer audioBuf = ByteBuffer.allocate(sampleSize);
-            MediaCodec.BufferInfo videoBufferInfo = new MediaCodec.BufferInfo();
-            MediaCodec.BufferInfo audioBufferInfo = new MediaCodec.BufferInfo();
-
-
-            videoExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
-            audioExtractor.seekTo(0, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
-
-            muxer.start();
-
-            while (!sawEOS) {
-                videoBufferInfo.offset = offset;
-                videoBufferInfo.size = videoExtractor.readSampleData(videoBuf, offset);
-
-
-                if (videoBufferInfo.size < 0 || audioBufferInfo.size < 0) {
-                    Log.d(TAG, "saw input EOS.");
-                    sawEOS = true;
-                    videoBufferInfo.size = 0;
-
-                } else {
-                    videoBufferInfo.presentationTimeUs = videoExtractor.getSampleTime();
-                    videoBufferInfo.flags = MediaCodec.BUFFER_FLAG_KEY_FRAME;
-                    muxer.writeSampleData(videoTrack, videoBuf, videoBufferInfo);
-                    videoExtractor.advance();
-
-
-                    frameCount++;
-                    Log.d(TAG, "Frame (" + frameCount + ") Video PresentationTimeUs:" + videoBufferInfo.presentationTimeUs + " Flags:" + videoBufferInfo.flags + " Size(KB) " + videoBufferInfo.size / 1024);
-                    Log.d(TAG, "Frame (" + frameCount + ") Audio PresentationTimeUs:" + audioBufferInfo.presentationTimeUs + " Flags:" + audioBufferInfo.flags + " Size(KB) " + audioBufferInfo.size / 1024);
-
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    Log.d(TAG, "onSuccess: silence binary loaded");
                 }
-            }
-
-//            Toast.makeText(getApplicationContext(), "frame:" + frameCount, Toast.LENGTH_SHORT).show();
-
-
-            boolean sawEOS2 = false;
-            int frameCount2 = 0;
-            while (!sawEOS2) {
-                frameCount2++;
-
-                audioBufferInfo.offset = offset;
-                audioBufferInfo.size = audioExtractor.readSampleData(audioBuf, offset);
-
-                if (videoBufferInfo.size < 0 || audioBufferInfo.size < 0) {
-                    Log.d(TAG, "saw input EOS.");
-                    sawEOS2 = true;
-                    audioBufferInfo.size = 0;
-                } else {
-                    audioBufferInfo.presentationTimeUs = audioExtractor.getSampleTime();
-                    audioBufferInfo.flags = MediaCodec.BUFFER_FLAG_KEY_FRAME;
-                    muxer.writeSampleData(audioTrack, audioBuf, audioBufferInfo);
-                    audioExtractor.advance();
-
-
-                    Log.d(TAG, "Frame (" + frameCount + ") Video PresentationTimeUs:" + videoBufferInfo.presentationTimeUs + " Flags:" + videoBufferInfo.flags + " Size(KB) " + videoBufferInfo.size / 1024);
-                    Log.d(TAG, "Frame (" + frameCount + ") Audio PresentationTimeUs:" + audioBufferInfo.presentationTimeUs + " Flags:" + audioBufferInfo.flags + " Size(KB) " + audioBufferInfo.size / 1024);
-
-                }
-            }
-
-//            Toast.makeText(getApplicationContext(), "frame:" + frameCount2, Toast.LENGTH_SHORT).show();
-
-            muxer.stop();
-            muxer.release();
-
-
-        } catch (IOException e) {
-            Log.d(TAG, "Mixer Error 1 " + e.getMessage());
-        } catch (Exception e) {
-            Log.d(TAG, "Mixer Error 2 " + e.getMessage());
+            });
+        } catch (FFmpegNotSupportedException e) {
+            e.printStackTrace();
         }
+
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                    Log.d("Internal Testing", "final work done");
+                }
+
+                @Override
+                public void onProgress(String message) {}
+
+                @Override
+                public void onFailure(String message) {}
+
+                @Override
+                public void onSuccess(String message) {
+                    Log.d(TAG, "onSuccess: muxed this shizz");
+                }
+
+                @Override
+                public void onFinish() {}
+
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
+    private void cleanUp() {
+        File root = new File("/sdcard/roboscreen/TempAudio");
+        File[] Files = root.listFiles();
+        if(Files != null) {
+            int j;
+            for(j = 0; j < Files.length; j++) {
+                Log.d(TAG, "cleanUp: " + Files[j].getAbsolutePath());
+                Log.d(TAG, "cleanUp: " + Files[j].delete());
+            }
+        }
+
+        File audioFile = new File("/sdcard/roboscreen/final2.mp4");
+        audioFile.delete();
+
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
