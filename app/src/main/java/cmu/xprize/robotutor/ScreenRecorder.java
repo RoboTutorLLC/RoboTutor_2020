@@ -153,8 +153,8 @@ public class ScreenRecorder {
         Log.d(TAG, "Merging all the songs");
         this.mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
         this.muxing();
-        this.recorderInstance = null;
-        this.cleanUp();
+//        this.recorderInstance = null;
+//        this.cleanUp();
     }
 
     private void createSilenceFile(Long duration){
@@ -293,6 +293,8 @@ public class ScreenRecorder {
                 Log.d(TAG, "mergeSongs: merging songs with " + fileName + " the path is " + path);
                 File mp3File = new File(path);
 
+                if (!mp3File.exists()) continue;
+
                 if(mp3File.getAbsolutePath()=="/sdcard/RoboTutor/silence.mp3") {
                     int index = mp3Files.indexOf(temp);
                     Log.d(TAG, "mergeSongs: silence is detected and silece is being created");
@@ -374,14 +376,16 @@ public class ScreenRecorder {
 
                 @Override
                 public void onStart() {
-                    Log.d("Internal Testing", "final work done");
+                    Log.d(TAG, "final work done");
                 }
 
                 @Override
                 public void onProgress(String message) {}
 
                 @Override
-                public void onFailure(String message) {}
+                public void onFailure(String message) {
+                    Log.d(TAG, "Error and failure " + message);
+                }
 
                 @Override
                 public void onSuccess(String message) {
