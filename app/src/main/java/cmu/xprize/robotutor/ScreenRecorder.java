@@ -63,7 +63,6 @@ public class ScreenRecorder {
     static private String[] videoNames = new String[]{"video1.mp4"};
     private int videoNamesIterator = 0;
     private Date videoTimeStamp = null;
-    private Vector<File> ve = new Vector<File>();
     private String TAG = "ScreenRecorder";
     Context context;
 
@@ -142,9 +141,7 @@ public class ScreenRecorder {
             if(audioObject.endDate!=0){
                 Log.d(TAG, "audio object" +
                         audioObject.endDate);
-                this.ve.add(new File(audioObject.path));
                 this.spliceSong(audioObject);
-                this.ve.add(new File("/sdcard/RoboTutor/silence.mp3"));
             }
             Log.d(TAG, "index "+i);
         }
@@ -157,62 +154,71 @@ public class ScreenRecorder {
 //        this.cleanUp();
     }
 
-    private void createSilenceFile(Long duration){
+    private String createSilenceFile(Long duration){
         /**
          * this method is used to generate empty silence files required when we merge and fill the songs
          * in between
          * duration in seconds
         */
 
-//        https://itectec.com/superuser/ffmpeg-command-for-concatenate-two-mp3-files/
-        String temp = "";
+//        File folder = new File( "/sdcard/roboscreen/TempAudio");
+//        if (!folder.exists()) {
+//            folder.mkdir();
+//        }
 
-        for (int i = 0; i<Math.floor(duration); i++){
-            temp+="/sdcard/RoboTutor/silence.mp3|";
-        }
+        File silenceSource = new File("/sdcard/roboscreen/silence.mp3");
 
-        String[] command = {"-i", temp.substring(0,temp.length()-1), "-acodec", "copy", "/sdcard/roboscreen/finalSilence.mp3", "-y"};
+//        String fileName = new File(audioObject.path).getName();
+        File dest = new File("/sdcard/roboscreen/TempAudio/finalSilence.mp3");
+//        Log.d(TAG, "Destination Filename is " + fileName);
+        String path = silenceSource.getAbsolutePath();
+//        Long duration = (Math.abs(audioObject.endDate - audioObject.startDate)/1000)%60;
+        Log.d(TAG, "createSilenceFile: silence file is originally present at "+ path);
+//        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + silenceSource.endDate + "  " + audioObject.startDate + "  " + path + " Duration " + duration);
+        String[] command = { "-i", path, "-to", duration.toString() , dest.getAbsolutePath(), "-y"};
 
         FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
-
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
                 @Override
                 public void onSuccess() {
                     super.onSuccess();
-                    Log.d(TAG, "onSuccess: silence binary loaded");
                 }
             });
         } catch (FFmpegNotSupportedException e) {
+            Log.d(TAG, "createSilenceFile:  error in loading FFMPEG");
             e.printStackTrace();
         }
 
         try {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
-
                 @Override
                 public void onStart() {
-                    Log.d("Internal Testing", "final work done");
+                    Log.d(TAG, "Work Started for silence shizz");
                 }
-
                 @Override
-                public void onProgress(String message) {}
-
+                public void onProgress(String message) {
+                    Log.d(TAG, "Doing some work silence");
+                }
                 @Override
-                public void onFailure(String message) {}
-
+                public void onFailure(String message) {
+                    Log.d(TAG, "Conversion failure silence " + message);
+                }
                 @Override
                 public void onSuccess(String message) {
-                    Log.d(TAG, "onSuccess: finally loaded andorid ffmpeg binary");
+                    Log.d(TAG, "Silence created");
                 }
-
                 @Override
-                public void onFinish() {}
-
+                public void onFinish() {
+                    Log.d(TAG, "Silence created Work Dome");
+                }
             });
         } catch (FFmpegCommandAlreadyRunningException e) {
+            Log.d(TAG, "FFMPEG running bruhh " + e.toString());
             e.printStackTrace();
         }
+
+        return dest.getAbsolutePath();
     }
 
 
@@ -272,7 +278,6 @@ public class ScreenRecorder {
     }
 
     private void mergeSongs(File mergedFile){
-        Vector<AudioObject> mp3Files = audioFiles;
         if (!mergedFile.exists()){
             try {
                 mergedFile.createNewFile();
@@ -280,31 +285,55 @@ public class ScreenRecorder {
                 e.printStackTrace();
             }
         }
+        
+        Vector<AudioObject> finalMp3Files = new Vector<>();
+        
+        
 
-        Log.i(TAG, "mergeSongs: merging shizz");
+        for (AudioObject a:audioFiles) {
+//            if(a.endDate==0){
+//                continue;
+//            }
+            finalMp3Files.add(a);
+            finalMp3Files.add(null);
+            Log.d(TAG, "mergeSongs: array index " + a.path + " " + a.startDate + " " + a.endDate);
+            Log.d(TAG, "mergeSongs: array index null file");
+        }
+
         FileInputStream fisToFinal = null;
         FileOutputStream fos = null;
+
         try {
             fos = new FileOutputStream(mergedFile);
             fisToFinal = new FileInputStream(mergedFile);
-            for(AudioObject temp:mp3Files){
-                String fileName = new File(temp.path).getName();
-                String path = "/sdcard/roboscreen/TempAudio/"+fileName; // this will concatenate
-                Log.d(TAG, "mergeSongs: merging songs with " + fileName + " the path is " + path);
-                File mp3File = new File(path);
+
+            for(int index=0; index<finalMp3Files.size(); index++){
+                AudioObject temp = finalMp3Files.get(index);
+                File mp3File;
+                Log.d(TAG, "mergeSongs: merging the final songs "+index);
+                if (temp == null) {
+//                    if(index==finalMp3Files.size()-1){
+//                        continue;
+//                    }
+//                    Log.d(TAG, "mergeSongs: silence is detected and silece is being created");
+//                    // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
+//                    int prev = index - 1;
+//                    int next = index + 1;
+//                    Long duration = (Math.abs(finalMp3Files.get(next).startDate - finalMp3Files.get(prev).endDate)/1000)%60;
+//                    Log.d(TAG, "mergeSongs: Duration of silence path is " + duration);
+//                    String silencePath = this.createSilenceFile(duration);
+//                    Log.d(TAG, "mergeSongs: Silence file is"+silencePath);
+//                    mp3File = new File(silencePath);
+                    continue;
+                }
+                else {
+                    String fileName = new File(temp.path).getName();
+                    // this will concatenate
+                    String path = "/sdcard/roboscreen/TempAudio/" + fileName;
+                    mp3File = new File(path);
+                }
 
                 if (!mp3File.exists()) continue;
-
-                if(mp3File.getAbsolutePath()=="/sdcard/RoboTutor/silence.mp3") {
-                    int index = mp3Files.indexOf(temp);
-                    Log.d(TAG, "mergeSongs: silence is detected and silece is being created");
-                    // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
-                    int prev = index - 1;
-                    int next = index + 1;
-                    Long duration = mp3Files.get(next).startDate - mp3Files.get(prev).endDate;
-                    this.createSilenceFile(duration);
-                    mp3File = new File("/sdcard/roboscreen/finalSilence.mp3");
-                }
 
                 FileInputStream fisSong = new FileInputStream(mp3File);
                 SequenceInputStream sis = new SequenceInputStream(fisToFinal, fisSong);
@@ -320,7 +349,6 @@ public class ScreenRecorder {
                         sis.close();
                     }
                 }
-
                 Log.d(TAG, "file merged at " + mergedFile.getAbsolutePath());
             }
         }
@@ -328,7 +356,7 @@ public class ScreenRecorder {
             Log.d(TAG, "mergeSongs: Error is "+ e.getMessage());
         }
         finally{
-            mp3Files = new Vector<AudioObject>();
+            audioFiles = new Vector<>();
             try {
                 if(fos!=null){
                     fos.flush();
@@ -364,7 +392,7 @@ public class ScreenRecorder {
                 @Override
                 public void onSuccess() {
                     super.onSuccess();
-                    Log.d(TAG, "onSuccess: silence binary loaded");
+                    Log.d(TAG, "onSuccess: merging binary loaded");
                 }
             });
         } catch (FFmpegNotSupportedException e) {
@@ -380,7 +408,9 @@ public class ScreenRecorder {
                 }
 
                 @Override
-                public void onProgress(String message) {}
+                public void onProgress(String message) {
+                    Log.d(TAG, "onProgress: muxed this shizz");
+                }
 
                 @Override
                 public void onFailure(String message) {
@@ -393,7 +423,9 @@ public class ScreenRecorder {
                 }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                    Log.d(TAG, "onSuccess: muxed this shizz");
+                }
 
             });
         } catch (FFmpegCommandAlreadyRunningException e) {
