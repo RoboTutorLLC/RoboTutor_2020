@@ -542,9 +542,10 @@ public class CTutorEngine implements ILoadableObject2 {
         RoboTutor act = (RoboTutor)getActivity();
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
-//        if (JSON_Helper.shouldRecord(jsonData)) {
-            act.startRecording();
-//        }
+        if (JSON_Helper.shouldRecord(jsonData)) {
+            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
+            act.startRecording(baseDirectory);
+        }
 
 
         Log.d(TAG, "launch: tutorId=" + tutorId);

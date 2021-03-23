@@ -37,6 +37,10 @@ class AudioObject {
     long startDate;
     long endDate;
 
+    AudioObject(String path) {
+        this.path = path;
+    }
+
     AudioObject(String path, Date startDate) {
         this.path = path;
         this.startDate = startDate.getTime();
@@ -64,6 +68,7 @@ public class ScreenRecorder {
     private int videoNamesIterator = 0;
     private Date videoTimeStamp = null;
     private String TAG = "ScreenRecorder";
+    private String baseDirectory = "roboscreen";
     Context context;
 
 
@@ -110,13 +115,14 @@ public class ScreenRecorder {
      * store it in the folder of /sdcard/roboscreen
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void startRecording(){
+    public void startRecording(String baseDirectory){
         this.videoTimeStamp = new Date();
+        this.baseDirectory = baseDirectory;
         if (this.recorderInstance == null) {
             this.videoNamesIterator = 0; // creating a two name cycle and iterating between the cycle
             String videoName = videoNames[videoNamesIterator];
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
-                    "/sdcard/roboscreen/videos/", "final_video" );
+                    "/sdcard/"+this.baseDirectory+"/videos/", "final_video" );
 //            this.recorderInstance.setRecordAudio(true);
         }
         this.recorderInstance.startRecord();
@@ -133,7 +139,7 @@ public class ScreenRecorder {
         Date currentTimeStamp = new Date();
         this.recorderInstance.stopRecord(0, 0, null);
         this.recorderInstance = null;
-        Log.d(TAG, "splicing shizz" + audioFiles.size());
+        Log.d(TAG, "splicing " + audioFiles.size());
         for(int i=0; i<audioFiles.size(); i++) {
             AudioObject audioObject = audioFiles.get(i);
 
@@ -148,10 +154,10 @@ public class ScreenRecorder {
 
 
         Log.d(TAG, "Merging all the songs");
-        this.mergeSongs(new File("/sdcard/roboscreen/audio123.mp3"));
+        this.mergeSongs(new File("/sdcard/"+this.baseDirectory+"/audio123.mp3"));
         this.muxing();
-//        this.recorderInstance = null;
-//        this.cleanUp();
+        this.recorderInstance = null;
+        this.cleanUp();
     }
 
     private String createSilenceFile(Long duration){
@@ -161,21 +167,13 @@ public class ScreenRecorder {
          * duration in seconds
         */
 
-//        File folder = new File( "/sdcard/roboscreen/TempAudio");
-//        if (!folder.exists()) {
-//            folder.mkdir();
-//        }
 
-        File silenceSource = new File("/sdcard/roboscreen/silence.mp3");
-
-//        String fileName = new File(audioObject.path).getName();
-        File dest = new File("/sdcard/roboscreen/TempAudio/finalSilence.mp3");
-//        Log.d(TAG, "Destination Filename is " + fileName);
+        File silenceSource = new File("/sdcard/"+this.baseDirectory+"/silence.mp3");
+        File dest = new File("/sdcard/"+this.baseDirectory+"/TempAudio/finalSilence.mp3");
         String path = silenceSource.getAbsolutePath();
-//        Long duration = (Math.abs(audioObject.endDate - audioObject.startDate)/1000)%60;
-        Log.d(TAG, "createSilenceFile: silence file is originally present at "+ path);
-//        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + silenceSource.endDate + "  " + audioObject.startDate + "  " + path + " Duration " + duration);
-        String[] command = { "-i", path, "-to", duration.toString() , dest.getAbsolutePath(), "-y"};
+        Log.d(TAG, "createSilenceFile: silence file is originally present at $$"+ duration);
+        duration = new Long(duration/10);
+        String[] command = {"-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", duration.toString(), "-q:a", "9", "-acodec", "libmp3lame", dest.getAbsolutePath(), "-y"};
 
         FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
         try {
@@ -194,7 +192,7 @@ public class ScreenRecorder {
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
                 @Override
                 public void onStart() {
-                    Log.d(TAG, "Work Started for silence shizz");
+                    Log.d(TAG, "Work Started for silence ");
                 }
                 @Override
                 public void onProgress(String message) {
@@ -223,7 +221,7 @@ public class ScreenRecorder {
 
 
     private void spliceSong(AudioObject audioObject) {
-        File folder = new File( "/sdcard/roboscreen/TempAudio");
+        File folder = new File( "/sdcard/"+this.baseDirectory+"/TempAudio");
         if (!folder.exists()) {
             folder.mkdir();
         }
@@ -278,6 +276,7 @@ public class ScreenRecorder {
     }
 
     private void mergeSongs(File mergedFile){
+        Vector<AudioObject> mp3Files = audioFiles;
         if (!mergedFile.exists()){
             try {
                 mergedFile.createNewFile();
@@ -285,52 +284,41 @@ public class ScreenRecorder {
                 e.printStackTrace();
             }
         }
-        
-        Vector<AudioObject> finalMp3Files = new Vector<>();
-        
-        
 
-        for (AudioObject a:audioFiles) {
-//            if(a.endDate==0){
-//                continue;
-//            }
-            finalMp3Files.add(a);
-            finalMp3Files.add(null);
-            Log.d(TAG, "mergeSongs: array index " + a.path + " " + a.startDate + " " + a.endDate);
-            Log.d(TAG, "mergeSongs: array index null file");
+        // test op
+
+        Vector <AudioObject> finalMP3files = new Vector<>();
+        for (AudioObject audioObject:mp3Files){
+            finalMP3files.add(audioObject);
+            finalMP3files.add(new AudioObject("/sdcard/RoboTutor/silence.mp3"));
         }
 
+
+        Log.i(TAG, "mergeSongs: merging ");
         FileInputStream fisToFinal = null;
         FileOutputStream fos = null;
-
         try {
             fos = new FileOutputStream(mergedFile);
             fisToFinal = new FileInputStream(mergedFile);
+            for(AudioObject temp:finalMP3files){
 
-            for(int index=0; index<finalMp3Files.size(); index++){
-                AudioObject temp = finalMp3Files.get(index);
-                File mp3File;
-                Log.d(TAG, "mergeSongs: merging the final songs "+index);
-                if (temp == null) {
-//                    if(index==finalMp3Files.size()-1){
-//                        continue;
-//                    }
-//                    Log.d(TAG, "mergeSongs: silence is detected and silece is being created");
-//                    // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
-//                    int prev = index - 1;
-//                    int next = index + 1;
-//                    Long duration = (Math.abs(finalMp3Files.get(next).startDate - finalMp3Files.get(prev).endDate)/1000)%60;
-//                    Log.d(TAG, "mergeSongs: Duration of silence path is " + duration);
-//                    String silencePath = this.createSilenceFile(duration);
-//                    Log.d(TAG, "mergeSongs: Silence file is"+silencePath);
-//                    mp3File = new File(silencePath);
-                    continue;
-                }
-                else {
-                    String fileName = new File(temp.path).getName();
-                    // this will concatenate
-                    String path = "/sdcard/roboscreen/TempAudio/" + fileName;
-                    mp3File = new File(path);
+                String fileName = new File(temp.path).getName();
+                String path = "/sdcard/"+this.baseDirectory+"/TempAudio/"+fileName; // this will concatenate
+                Log.d(TAG, "mergeSongs: merging songs with ## " + fileName + (fileName.contains("silence")) + " the path is " + path);
+                File mp3File = new File(path);
+
+                if(fileName.contains("silence")) {
+                    int index = finalMP3files.indexOf(temp);
+
+                    // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
+                    int prev = index - 1;
+                    int next = index + 1;
+                    Long duration = (Math.abs(finalMP3files.get(next).startDate - finalMP3files.get(prev).endDate)/1000)%60;
+                    Log.d(TAG, "mergeSongs: silence is detected and silence is being created " + duration );
+                    String pathOfSilence = this.createSilenceFile(duration);
+                    Log.d(TAG, "mergeSongs: this is the path of silence " + pathOfSilence);
+
+                    mp3File = new File(pathOfSilence);
                 }
 
                 if (!mp3File.exists()) continue;
@@ -349,6 +337,7 @@ public class ScreenRecorder {
                         sis.close();
                     }
                 }
+
                 Log.d(TAG, "file merged at " + mergedFile.getAbsolutePath());
             }
         }
@@ -369,19 +358,17 @@ public class ScreenRecorder {
                 e.printStackTrace();
             }
         }
+
     }
 
 
     private void muxing() {
 
 
-//        String outputFile = "";
+        String audio = "/sdcard/"+this.baseDirectory+"/audio123.mp3";
+        String video = "/sdcard/"+this.baseDirectory+"/videos/final_video.mp4";
 
-        String audio = "/sdcard/roboscreen/audio123.mp3";
-        String video = "/sdcard/roboscreen/videos/final_video.mp4";
-
-
-        String outputFile = "/sdcard/roboscreen/final2.mp4";
+        String outputFile = "/sdcard/"+this.baseDirectory+"/"+this.activity.getLocalClassName()+new Date().toString()+Build.SERIAL+".mp4";
 
         String[] command = {"-i", video, "-i", audio, "-c", "copy", "-map", "0:v:0", "-map", "1:a:0", outputFile , "-y"};
 
@@ -419,12 +406,12 @@ public class ScreenRecorder {
 
                 @Override
                 public void onSuccess(String message) {
-                    Log.d(TAG, "onSuccess: muxed this shizz");
+                    Log.d(TAG, "onSuccess: muxed this");
                 }
 
                 @Override
                 public void onFinish() {
-                    Log.d(TAG, "onSuccess: muxed this shizz");
+                    Log.d(TAG, "onSuccess: muxed this");
                 }
 
             });
@@ -436,7 +423,7 @@ public class ScreenRecorder {
     }
 
     private void cleanUp() {
-        File root = new File("/sdcard/roboscreen/TempAudio");
+        File root = new File("/sdcard/"+this.baseDirectory+"/TempAudio/");
         File[] Files = root.listFiles();
         if(Files != null) {
             int j;
@@ -446,8 +433,7 @@ public class ScreenRecorder {
             }
         }
 
-        File audioFile = new File("/sdcard/roboscreen/final2.mp4");
-        audioFile.delete();
+//        audioFile.delete();
 
     }
 

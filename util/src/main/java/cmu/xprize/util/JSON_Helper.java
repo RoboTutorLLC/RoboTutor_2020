@@ -234,6 +234,31 @@ public class JSON_Helper {
         return false;
     }
 
+    static public String baseDirectory(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key == "baseDirectory") {
+                    /*
+                        This is checking for the key: "language_feature_id".
+                        Replacing the values with the corresponding acronyms:
+                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
+                     */
+                    String value = jsonObject.getString(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "roboscreen";
+    }
+
 
     /**
      * This is called from within an object to parse its own structure from a JSON spec

@@ -291,8 +291,9 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
      * store it in the folder of /sdcard/roboscreen
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void startRecording(){
-        screenRecorder.startRecording();
+    public void startRecording(String baseDirectory){
+
+        screenRecorder.startRecording(baseDirectory);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
