@@ -49,20 +49,20 @@ public class AudioDataStorage {
 
     public static JSONObject saveAudioData(String fileName, String assetLocation, int currLine, int currPara, int currPage, String sentenceWPunc, int currUtt, List<ListenerBase.HeardWord> seg) {
         // Todo: optimize this code (the process is being Duplicated)
-        // where?
-        Log.d("ADSSave", "attempting to save audiodata.");
+            // where?
+            Log.d("ADSSave", "attempting to save audiodata.");
 
-        String completeFilePath = assetLocation + fileName + ".mp3";
+            String completeFilePath = assetLocation + fileName + ".mp3";
 
-        Log.d("ADSSave", completeFilePath);
+            Log.d("ADSSave", completeFilePath);
 
-        // write segmentation to .seg file
-        try {
-            FileOutputStream os = new FileOutputStream(assetLocation + "/" + fileName.toLowerCase().replace(" ", "_") + ".seg");
-            StringBuilder segData = new StringBuilder("");
+            // write segmentation to .seg file
+            try {
+                FileOutputStream os = new FileOutputStream(assetLocation + "/" + fileName.toLowerCase().replace(" ", "_") + ".seg");
+                StringBuilder segData = new StringBuilder("");
 
-            Log.d("AudioDataStorage", "FileOutputStream Created at " + assetLocation + "/" + fileName + ".seg");
-            int i = fileName.split(" ").length;
+                Log.d("AudioDataStorage", "FileOutputStream Created at " + assetLocation + "/" + fileName + ".seg");
+                int i = fileName.split(" ").length;
             for(ListenerBase.HeardWord word: seg) {
                 if (i >= 0) {
                     segData.append(word.hypWord.toLowerCase() + "\t" + word.startFrame + "\t" + word.endFrame);
@@ -85,8 +85,6 @@ public class AudioDataStorage {
 
         // Update Storydata.json
         try {
-            int currUtterance = currUtt;
-            boolean isSentence = true;
 
             JSONObject rawData = storyData
                     .getJSONArray("data")
@@ -110,9 +108,9 @@ public class AudioDataStorage {
             JSONArray segm = new JSONArray();
             long finalEndTime = 0;
             int i = 0;
-            for(ListenerBase.HeardWord heardWord : segmentation) {
+            for(ListenerBase.HeardWord heardWord : seg) {
                 if (i > 1) {
-                    if (segmentation.get(i).iSentenceWord != heardWord.iSentenceWord - 1)
+                    if (seg.get(i).iSentenceWord != heardWord.iSentenceWord - 1)
                         break;
                 }
                 JSONObject segObj = new JSONObject();
@@ -125,7 +123,7 @@ public class AudioDataStorage {
                 i++;
             }
             rawNarration.put("segmentation", segm);
-            rawNarration.put("from", segmentation.get(0).startFrame);
+            rawNarration.put("from", seg.get(0).startFrame);
             rawNarration.put("audio", fileName.toLowerCase().replace(" ", "_") + ".mp3");
             rawNarration.put("until", finalEndTime);
             rawNarration.put("utterances", fileName.toLowerCase());
@@ -164,7 +162,7 @@ public class AudioDataStorage {
 
     }
 
-    static void updateHypothesis(ListenerBase.HeardWord[] heardWords) {
+    public static void updateHypothesis(ListenerBase.HeardWord[] heardWords) {
         Log.d("AudioDataStorageHyp", "Hypothesis Updated");
         segmentation.clear();
         segmentation.addAll(Arrays.asList(heardWords));

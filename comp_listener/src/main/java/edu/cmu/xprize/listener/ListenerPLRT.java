@@ -479,16 +479,15 @@ public class ListenerPLRT extends ListenerBase {
             if (eventListener != null) {
                 eventListener.onUpdate(heardWords, finalResult);
                 if(AudioDataStorage.contentCreationOn) { // if in NARRATION CAPTURE MODE
-                    allSegments = segments;    // todo: unsafe, ensure that the objects in allSegments must stay unchanged
+                    allSegments = segments; // todo: unsafe, ensure that the objects in allSegments must stay unchanged
                 }
             }
 
             // log the partial hypothesis
             if(IS_LOGGING) {
                 logHyp(timestamp, TextUtils.join(" ", asrWords), segments, heardWords);
-                AudioDataStorage.updateHypothesis(heardWords);
             }
-
+            AudioDataStorage.updateHypothesis(heardWords);
         }
     }
 
