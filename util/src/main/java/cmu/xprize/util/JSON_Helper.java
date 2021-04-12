@@ -135,7 +135,7 @@ public class JSON_Helper {
                     /*
                         For every boolean value, we are only using their first character.
                      */
-                    Boolean value = jsonObject.getBoolean(key);
+                    Boolean value = (Boolean) jsonObject.get(key);
                     outputAcronym += value.toString().charAt(0);
                 }
             }
@@ -217,12 +217,7 @@ public class JSON_Helper {
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
                 if (key == "recording") {
-                    /*
-                        This is checking for the key: "language_feature_id".
-                        Replacing the values with the corresponding acronyms:
-                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
-                     */
-                    boolean value = jsonObject.getBoolean(key);
+                    Boolean value = (Boolean) jsonObject.get(key);
                     return value;
                 }
             }
