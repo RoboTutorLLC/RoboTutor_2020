@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
@@ -40,29 +39,8 @@ allprojects {
         // Semantic versioning description:
         // <Milestone release> <Feature Release> <Patch release> <Asset Compatibility INDEX>
 
-        def versionPropsFile = file('version.properties')
 
-        if (versionPropsFile.canRead()) {
-            def Properties versionProps = new Properties()
-
-            versionProps.load(new FileInputStream(versionPropsFile))
-
-            def milestone_release = versionProps['MILESTONE_RELEASE']
-            def feature_release = versionProps['FEATURE_RELEASE']
-            def patch_release = versionProps['PATCH_RELEASE'].toInteger() + 1
-            def asset_compatibility_index = versionProps['ASSET_COMPATIBILITY_INDEX']
-
-            versionProps['PATCH_RELEASE']=patch_release.toString()
-            versionProps.store(versionPropsFile.newWriter(), null)
-
-            rtVersionName = milestone_release + '.' + feature_release + '.' + patch_release.toString() + '.' + asset_compatibility_index  //TODO: move this out of build so we don't have to rebuild to unzip assets
-        }
-        else {
-            throw new GradleException("Could not read version.properties!")
-        }
-
-
-
+        rtVersionName="3.4.2.1" //TODO: move this out of build so we don't have to rebuild to unzip assets
 
     }
 }
@@ -70,3 +48,5 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
