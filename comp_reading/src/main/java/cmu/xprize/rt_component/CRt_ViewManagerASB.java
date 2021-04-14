@@ -1550,7 +1550,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                             textBuilder.append(" ");
                         for (int i = segment[0]; i <= segment[1]; i++) {
 
-                            textBuilder.append(wordsToDisplay[i]);
+                            if(wordsToDisplay.length > i)
+                                textBuilder.append(wordsToDisplay[i]);
                             if(!wordsToDisplay[i].endsWith("-") || !wordsToDisplay[i].endsWith("'")  )
                                 textBuilder.append(" ");
                         }
@@ -1684,7 +1685,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
     /**
-     * This is where we process words being narrated
+     * This is where we process words being narrated (by the premade narration, not the live user)
      * VMC_QA why does this get called twice for the last word???
      */
     @Override
@@ -1711,10 +1712,10 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 match = true;
             }
 
-            /* if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) { // VMC_QA these are not equal. one of these is out of bounds (probably wordsToSpeak)
+            if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) { // VMC_QA these are not equal. one of these is out of bounds (probably wordsToSpeak)
                 // wordsToSpeak is in fact out of bounds here. It is 1 shorter than heardWords */
             // the above was commented out by Chirag in order to ensure that if heardwords is too long (because it often accidentally contains an extra word)
-            if (match) {
+            //if (match) {
                 nextWord();
                 mHeardWord++;
 
@@ -1770,6 +1771,13 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
             while ((mCurrWord < wordsToSpeak.length) && (mHeardWord < heardWords.length)) {
 
+                int wordIndex = wordsToSpeak.length;
+                for (int i = 0; i < wordsToSpeak.length; i++) {
+                    if(wordsToSpeak[i].equals(heardWords[mHeardWord].hypWord)) {
+                        wordIndex = i;
+                        break;
+                    }
+                }
                 if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord].hypWord)) {
 
                     nextWord();
@@ -1778,6 +1786,18 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     mListener.updateNextWordIndex(mHeardWord);
 
                     Log.i("ASR", "RIGHT");
+                    attemptNum = 0;
+                    result = true;
+                    mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
+
+                } else if (isNarrationCaptureMode && wordIndex <= mCurrWord) {
+
+                    while(mCurrWord > wordIndex+1) {
+                        prevWord();
+                    }
+                    mHeardWord++;
+                    mListener.updateNextWordIndex(mHeardWord);
+                    Log.i("ASR", "Wrong But Continuing");
                     attemptNum = 0;
                     result = true;
                     mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
@@ -1970,6 +1990,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
             isUserNarrating = false;
 
+            resetNarration();
         }
 
     }
@@ -2056,7 +2077,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             if (seq.size() > 0) {
                 int firstindex = seq.get(0).iSentenceWord;
                 // The sequence must pick up where the narrator left off
-                if (firstindex == TCONST.ZERO /* ||  firstindex == prevStartFrom || startPoints.contains(firstindex) */ ) {
+                if (firstindex == TCONST.ZERO || firstindex > (wordsToSpeak.length - prevStartFrom - 1)/* ||  firstindex == prevStartFrom || startPoints.contains(firstindex) */ ) {
 
                     if(!lastUtteranceOfSentence) {
                         // Truncate this subsequence so that it ends in a silence
@@ -2155,6 +2176,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         ArrayList<ListenerBase.HeardWord> latestUtterance = determineUtterance(true);
 
         if (latestUtterance.size() > 0) {
+            while(!latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 1])) {
+                latestUtterance.remove(latestUtterance.size() - 1);
+            }
             StringBuilder newFileName = new StringBuilder();
             for (ListenerBase.HeardWord h : latestUtterance) {
                 newFileName.append(h.hypWord.toLowerCase()).append(" ");
@@ -2176,6 +2200,42 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             withPunctuation.deleteCharAt(withPunctuation.length() - 1);
             AudioDataStorage.saveAudioData(narrationFileName, mAsset, mCurrLine, mCurrPara, mCurrPage, withPunctuation.toString(), currUtt, latestUtterance);
             acceptedList.add(new int[] {prevStartFrom, wordsToSpeak.length - 1});
+
+            boolean narrationCovered = false;
+            int startSegment = 0;
+            int endSegment = wordsToSpeak.length - 1;
+            ArrayList<Integer> seams = new ArrayList();
+            seams.add(-1);
+            while(!narrationCovered) {
+                boolean segmentCovered = false;
+                for(int[] segment : acceptedList) {
+                    if (segment[0] == startSegment && segment[1] == endSegment) {
+                        segmentCovered = true;
+                        seams.add(endSegment);
+                        if(endSegment == wordsToSpeak.length - 1) {
+                            narrationCovered = true;
+                        } else {
+                            startSegment = endSegment + 1;
+                            endSegment = wordsToSpeak.length - 1;
+                            break;
+                        }
+                    }
+                }
+                if(!segmentCovered) {
+                    if((endSegment - startSegment) < 2) {
+                        if (startSegment > 0) {
+                            startSegment = seams.get(seams.size() - 2) + 1;
+                            endSegment = seams.get(seams.size() - 1) - 1;
+                        } else  {
+                            Log.d(TAG, "Sentence end reached however narration was not complete.");
+                            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
+                            return;
+                        }
+                    } else {
+                        endSegment--;
+                    }
+                }
+            }
             UpdateDisplay();
             acceptedList.clear();
             // constructAudioStoryData();
@@ -2231,17 +2291,20 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         prevStartFrom = startFrom;
     }
 
-    // DO NOT CONFUSE THIS WITH prevLine().
-    // THIS IS USED TO GO BACK A SENTENCE REGARDLESS OF CURRENT STORY POSITION. IT'S ORIGINAL PURPOSE IS TO ALLOW FOR NAVIGATION WITHIN THE STORY
-    // prevLine() GOES BACK TO THE PREVIOUS SENTENCE IF AND ONLY IF THERE IS A SENTENCE WITHIN THE PARAGRAPH BEFORE IT
-    //
+    /**
+     * DO NOT CONFUSE THIS WITH prevLine().
+     * THIS IS USED TO GO BACK A SENTENCE REGARDLESS OF CURRENT STORY POSITION. IT'S ORIGINAL PURPOSE IS TO ALLOW FOR NAVIGATION WITHIN THE STORY
+     * prevLine() GOES BACK TO THE PREVIOUS SENTENCE IF AND ONLY IF THERE IS A SENTENCE WITHIN THE PARAGRAPH BEFORE IT
+     */
     @Override
     public void prevSentence() {
         Log.d("NavButton", "Back Button has been pressed");
         AudioWriter.abortOperation();
         hearRead = TCONST.FTR_USER_HEAR;
         // It is zero-index
-        if (mCurrLine > 0) {
+        if (mCurrWord > prevStartFrom) {
+            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, prevStartFrom);
+        } else if (mCurrLine > 0) {
             prevLine();
         } else if (mCurrPara > 0) {
             prevPara();
@@ -2264,6 +2327,12 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         } else if(buttonState.equals(TCONST.RTC_LINECOMPLETE)) {
             nextLine();
         }
+    }
+
+    private void resetNarration() {
+        rawNarration = data[mCurrPage].text[mCurrPara][mCurrLine].narration;
+        rawSentence  = data[mCurrPage].text[mCurrPara][mCurrLine].sentence;
+        if (data[mCurrPage].prompt != null) page_prompt = data[mCurrPage].prompt;
     }
 
 }

@@ -817,6 +817,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     }
     private void enQueue(Queue qCommand, Long delay) {
 
+
         if (!_qDisabled) {
             queueMap.put(qCommand, qCommand);
 

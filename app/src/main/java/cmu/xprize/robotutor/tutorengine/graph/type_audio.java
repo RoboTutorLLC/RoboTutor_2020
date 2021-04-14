@@ -283,9 +283,6 @@ public class type_audio extends type_action implements IMediaListener {
         //
         mPathResolved = pathPart + mResolvedName + ".mp3";
 
-        if(AudioDataStorage.contentCreationOn && !mRawName.contains("Please read aloud")) {
-            //mPathResolved = mPathResolved.replace(".mp3", ".wav");
-        }
         Log.d("type_Audio", "The resolved name is: " + mResolvedName + ". The resolved path is " + mPathResolved);
         // This allocates a MediaPController for use by this audio_node. The media controller
         // is a managed global resource of CMediaManager
