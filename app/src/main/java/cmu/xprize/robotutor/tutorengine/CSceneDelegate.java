@@ -142,14 +142,10 @@ public class CSceneDelegate implements ITutorScene {
     public String name() { return mTutorId; }
 
     @Override
-    public void setParent(ITutorSceneImpl parent) {
-        mParent = parent;
-    }
+    public void setParent(ITutorSceneImpl parent) { mParent = parent; }
 
     @Override
-    public void setTutor(CTutor tutor) {
-        mTutor = tutor;
-    }
+    public void setTutor(CTutor tutor) { mTutor = tutor; }
 
     @Override
     public void onCreate() {}
