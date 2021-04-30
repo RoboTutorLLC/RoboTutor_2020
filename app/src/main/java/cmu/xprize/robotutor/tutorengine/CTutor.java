@@ -404,11 +404,8 @@ public class CTutor implements ILoadableObject2, IEventSource {
                         }
 
                         CTutorEngine.destroyCurrentTutor();
-                        cleanUpTutor();
-
                         updateStudentInterventionProgress(mTutorName);
-
-
+                        cleanUpTutor();
                         break;
 
 
