@@ -120,7 +120,6 @@ public class TBanner extends CBanner implements ITutorObject, View.OnClickListen
     public void onClick(View v) {
 
         RoboTutor.logManager.postEvent_I(TUTOR_STATE_MSG, "BACKBUTTON:PRESSED");
-
         PerformanceLogItem event = new PerformanceLogItem();
         event.setUserId(RoboTutor.STUDENT_ID);
         event.setSessionId(RoboTutor.SESSION_ID);
