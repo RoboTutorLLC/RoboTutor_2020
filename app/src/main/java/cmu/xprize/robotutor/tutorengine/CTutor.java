@@ -403,9 +403,15 @@ public class CTutor implements ILoadableObject2, IEventSource {
                             Log.wtf("STUDENT_MODEL:AFTER_ASSESSMENT", studentModel.toString());
                         }
 
+                        // Please be mindful when changing the order of execution of functional calls bellow.
+                        // The calls should be done in the following order:
+                        // 1. cleanUpTutor(); this allows the media player to exit gracefully
+                        // 2. CTutorEngine.destroyCurrentTutor(); // after the media player has ended, the view is nullified
+                        // 3. updateStudentInterventionProgress(mTutorName); // updates the tutor
+                        cleanUpTutor();
                         CTutorEngine.destroyCurrentTutor();
                         updateStudentInterventionProgress(mTutorName);
-                        cleanUpTutor();
+
                         break;
 
 
