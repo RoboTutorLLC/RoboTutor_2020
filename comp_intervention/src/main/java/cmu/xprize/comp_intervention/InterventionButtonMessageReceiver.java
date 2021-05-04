@@ -60,7 +60,7 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.wtf("trigger", "REceived trigger: " + intent.getAction());
+        Log.wtf("trigger", "Received trigger: " + intent.getAction());
 
         String action = intent.getAction();
         boolean modal = intent.getBooleanExtra(I_MODAL_EXTRA, false);
