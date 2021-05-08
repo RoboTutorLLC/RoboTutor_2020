@@ -22,20 +22,24 @@ import com.nanchen.screenrecordhelper.ScreenRecordHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.ByteBuffer;
 import java.sql.Time;
 import java.util.Date;
 import java.util.Vector;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
 
 class AudioObject {
     String path = "";
-    long startDate;
-    long endDate;
+    Date startDate = null;
+    Date endDate = null;
 
     AudioObject(String path) {
         this.path = path;
@@ -43,11 +47,11 @@ class AudioObject {
 
     AudioObject(String path, Date startDate) {
         this.path = path;
-        this.startDate = startDate.getTime();
+        this.startDate = startDate;
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate.getTime();
+        this.endDate = endDate;
     }
 
 }
@@ -143,11 +147,10 @@ public class ScreenRecorder {
         for(int i=0; i<audioFiles.size(); i++) {
             AudioObject audioObject = audioFiles.get(i);
 
-
-            if(audioObject.endDate!=0){
+            if(audioObject.endDate!=null){
                 Log.d(TAG, "audio object" +
                         audioObject.endDate);
-                this.spliceSong(audioObject);
+                this.spliceSong(audioObject, i);
             }
             Log.d(TAG, "index "+i);
         }
@@ -157,7 +160,7 @@ public class ScreenRecorder {
         this.mergeSongs(new File("/sdcard/"+this.baseDirectory+"/audio123.mp3"));
         this.muxing();
         this.recorderInstance = null;
-        this.cleanUp();
+//        this.cleanUp();
     }
 
     private String createSilenceFile(Long duration){
@@ -219,8 +222,12 @@ public class ScreenRecorder {
         return dest.getAbsolutePath();
     }
 
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    }
 
-    private void spliceSong(AudioObject audioObject) {
+    private void spliceSong(AudioObject audioObject, int index) {
         File folder = new File( "/sdcard/"+this.baseDirectory+"/TempAudio");
         if (!folder.exists()) {
             folder.mkdir();
@@ -229,17 +236,26 @@ public class ScreenRecorder {
         String fileName = new File(audioObject.path).getName();
         File dest = new File(folder, fileName);
         Log.d(TAG, "Destination Filename is " + fileName);
-        String path = new File(audioObject.path).getAbsolutePath();
-        Long duration = (Math.abs(audioObject.endDate - audioObject.startDate)/1000)%60;
-        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + audioObject.endDate + "  " + audioObject.startDate + "  " + path + " Duration " + duration);
-        String[] command = { "-i", path, "-to", duration.toString() , dest.getAbsolutePath(), "-y"};
+        final String path = new File(audioObject.path).getAbsolutePath();
+
+        Long duration = audioObject.endDate.getTime() - audioObject.startDate.getTime();
+        Double durationInSeconds = (duration.doubleValue())/1000.0;
+        Log.d(TAG, "File created " + dest.getAbsolutePath() + "  " + audioObject.endDate + "  " + audioObject.startDate + "  " + path + " Duration " + durationInSeconds);
+        String[] command = { "-i", path, "-to", durationInSeconds.toString() , dest.getAbsolutePath(), "-y"};
 
         FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
                 @Override
                 public void onSuccess() {
+                    Log.d(TAG, "onSuccess: successfully spliced the song");
                     super.onSuccess();
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.d(TAG, "onFailure: failed to splice the song " + path);
+                    super.onFailure();
                 }
             });
         } catch (FFmpegNotSupportedException e) {
@@ -288,75 +304,35 @@ public class ScreenRecorder {
         // test op
 
         Vector <AudioObject> finalMP3files = new Vector<>();
+        Vector <InputStream> streams = new Vector<>();
         for (AudioObject audioObject:mp3Files){
             finalMP3files.add(audioObject);
             finalMP3files.add(new AudioObject("/sdcard/RoboTutor/silence.mp3"));
-        }
-
-
-        Log.i(TAG, "mergeSongs: merging ");
-        FileInputStream fisToFinal = null;
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(mergedFile);
-            fisToFinal = new FileInputStream(mergedFile);
-            for(AudioObject temp:finalMP3files){
-
-                String fileName = new File(temp.path).getName();
-                String path = "/sdcard/"+this.baseDirectory+"/TempAudio/"+fileName; // this will concatenate
-                Log.d(TAG, "mergeSongs: merging songs with ## " + fileName + (fileName.contains("silence")) + " the path is " + path);
-                File mp3File = new File(path);
-
-                if(fileName.contains("silence")) {
-                    int index = finalMP3files.indexOf(temp);
-
-                    // here there is an assumption that silence will not be added at the last and there will always be elements surrounding it
-                    int prev = index - 1;
-                    int next = index + 1;
-                    Long duration = (Math.abs(finalMP3files.get(next).startDate - finalMP3files.get(prev).endDate)/1000)%60;
-                    Log.d(TAG, "mergeSongs: silence is detected and silence is being created " + duration );
-                    String pathOfSilence = this.createSilenceFile(duration);
-                    Log.d(TAG, "mergeSongs: this is the path of silence " + pathOfSilence);
-
-                    mp3File = new File(pathOfSilence);
-                }
-
-                if (!mp3File.exists()) continue;
-
-                FileInputStream fisSong = new FileInputStream(mp3File);
-                SequenceInputStream sis = new SequenceInputStream(fisToFinal, fisSong);
-                byte[] buf = new byte[1024];
-                try {
-                    for (int readNum; (readNum = fisSong.read(buf)) != -1;)
-                        fos.write(buf, 0, readNum);
-                } finally {
-                    if(fisSong!=null){
-                        fisSong.close();
-                    }
-                    if(sis!=null){
-                        sis.close();
-                    }
-                }
-
-                Log.d(TAG, "file merged at " + mergedFile.getAbsolutePath());
-            }
-        }
-        catch (Exception e){
-            Log.d(TAG, "mergeSongs: Error is "+ e.getMessage());
-        }
-        finally{
-            audioFiles = new Vector<>();
             try {
-                if(fos!=null){
-                    fos.flush();
-                    fos.close();
-                }
-                if(fisToFinal!=null){
-                    fisToFinal.close();
-                }
-            } catch (IOException e) {
+                String fileName = new File(audioObject.path).getName();
+                String path = "/sdcard/"+this.baseDirectory+"/TempAudio/"+fileName;
+                streams.add(new FileInputStream(path));
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+
+        SequenceInputStream sistream = new SequenceInputStream(streams.elements());
+        try {
+            FileOutputStream fostream = new FileOutputStream(mergedFile);
+            int temp;
+
+            while( ( temp = sistream.read() ) != -1)
+            {
+                // System.out.print( (char) temp ); // to print at DOS prompt
+                fostream.write(temp);   // to write to file
+            }
+            fostream.close();
+            sistream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -367,8 +343,8 @@ public class ScreenRecorder {
 
         String audio = "/sdcard/"+this.baseDirectory+"/audio123.mp3";
         String video = "/sdcard/"+this.baseDirectory+"/videos/final_video.mp4";
-
-        String outputFile = "/sdcard/"+this.baseDirectory+"/"+this.activity.getLocalClassName()+new Date().toString()+Build.SERIAL+".mp4";
+//        this.activity.getLocalClassName()+new Date().toString()+Build.SERIAL
+        String outputFile = "/sdcard/"+this.baseDirectory+"/testVideo123.mp4";
 
         String[] command = {"-i", video, "-i", audio, "-c", "copy", "-map", "0:v:0", "-map", "1:a:0", outputFile , "-y"};
 
