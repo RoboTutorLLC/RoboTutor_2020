@@ -131,11 +131,11 @@ public class JSON_Helper {
                     String value = jsonObject.getString(key);
                     outputAcronym += value.charAt(value.length()-1);
                 }
-                else if( key != "recording" ) {
+                else if( key.equals("recording") == false ) {
                     /*
                         For every boolean value, we are only using their first character.
                      */
-                    Boolean value = (Boolean) jsonObject.get(key);
+                    Boolean value = jsonObject.getBoolean(key);
                     outputAcronym += value.toString().charAt(0);
                 }
             }
@@ -216,8 +216,8 @@ public class JSON_Helper {
 
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
-                if (key == "recording") {
-                    Boolean value = (Boolean) jsonObject.get(key);
+                if (key.equals("recording")) {
+                    Boolean value = jsonObject.getBoolean(key);
                     return value;
                 }
             }
