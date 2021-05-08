@@ -303,7 +303,6 @@ public class CTutorEngine implements ILoadableObject2 {
 
         startSessionManager();
 
-        Log.d(TAG, "destroyCurrentTutor: " + deadTutor.getTutorName());
 
         // Get the tutor being killed and do a depth first destruction to allow
         // components to release resources etc.
