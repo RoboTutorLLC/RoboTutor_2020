@@ -3,6 +3,8 @@ package cmu.xprize.robotutor.startup.configuration;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import cmu.xprize.comp_logging.CLogManager;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class Configuration {
@@ -79,5 +81,20 @@ public class Configuration {
     public static String getMenuType(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getString(ConfigurationItems.MENU_TYPE, "CD1");
+    }
+
+    public static void logConfigurationItems(Context context) {
+        String config = "\n" + ConfigurationItems.CONFIG_VERSION + " - " + configVersion(context) + "\n" +
+                ConfigurationItems.LANGUAGE_OVERRIDE + " - " + languageOverride(context) + "\n" +
+                ConfigurationItems.SHOW_TUTOR_VERSION + " - " + showTutorVersion(context) + "\n" +
+                ConfigurationItems.SHOW_DEBUG_LAUNCHER + " - " + showDebugLauncher(context) + "\n" +
+                ConfigurationItems.LANGUAGE_SWITCHER + " - " + getLanguageSwitcher(context) + "\n" +
+                ConfigurationItems.NO_ASR_APPS + " - " + noAsrApps(context) + "\n" +
+                ConfigurationItems.LANGUAGE_FEATURE_ID + " - " + getLanguageFeatureID(context) + "\n" +
+                ConfigurationItems.SHOW_DEMO_VIDS + " - " + showDemoVids(context) + "\n" +
+                ConfigurationItems.USE_PLACEMENT + " - " + usePlacement(context) + "\n" +
+                ConfigurationItems.RECORD_AUDIO + " - " + recordAudio(context) + "\n" +
+                ConfigurationItems.MENU_TYPE + " - " + getMenuType(context);
+        CLogManager.getInstance().postEvent_I(ROBOTUTOR_CONFIGURATION, config);
     }
 }

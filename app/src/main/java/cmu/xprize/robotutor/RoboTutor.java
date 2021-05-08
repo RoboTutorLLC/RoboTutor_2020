@@ -222,6 +222,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         initializeAndStartLogs();
 
+        //Log current config data
+        //
+        Configuration.logConfigurationItems(this);
+
         Log.v(TAG, "External_Download:" + DOWNLOAD_PATH);
 
         // Get the primary container for tutors
