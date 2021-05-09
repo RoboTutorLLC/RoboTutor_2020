@@ -159,8 +159,9 @@ public class ScreenRecorder {
         Log.d(TAG, "Merging all the songs");
         this.mergeSongs(new File("/sdcard/"+this.baseDirectory+"/audio123.mp3"));
         this.muxing();
-        this.recorderInstance = null;
         this.cleanUp();
+        this.recorderInstance = null;
+
     }
 
     private String createSilenceFile(Double duration, int index){
@@ -228,6 +229,69 @@ public class ScreenRecorder {
         return dest.getAbsolutePath();
     }
 
+
+    private String spliceSong(String originalPath, int index, Double duration) { // duration in seconds
+        File folder = new File( "/sdcard/"+this.baseDirectory+"/TempAudio");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        // this file s
+        String originalFileName = new File(originalPath).getName();
+        final String path = "/sdcard/"+this.baseDirectory+"/TempAudio/"+originalFileName;
+        String dest = path.replace(".", index+".");
+        String[] command = { "-i", originalPath, "-to", duration.toString() , dest, "-y"};
+
+        Log.d(TAG, "spliceSong: the silence sound to be merged at "+ dest);
+        FFmpeg ffmpeg = FFmpeg.getInstance(this.context);
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
+                @Override
+                public void onSuccess() {
+                    Log.d(TAG, "onSuccess: successfully spliced silence the song");
+                    super.onSuccess();
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.d(TAG, "onFailure: failed to spliced silence the song " + path);
+                    super.onFailure();
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+                @Override
+                public void onStart() {
+                    Log.d(TAG, "Work Started");
+                }
+                @Override
+                public void onProgress(String message) {
+                    Log.d(TAG, "Doing some work");
+                }
+                @Override
+                public void onFailure(String message) {
+                    Log.d(TAG, "Conversion failure " + message);
+                }
+                @Override
+                public void onSuccess(String message) {
+                    Log.d(TAG, "Conversion Successful");
+                }
+                @Override
+                public void onFinish() {
+                    Log.d(TAG, "Work Dome");
+                }
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            Log.d(TAG, "FFMPEG running bruhh " + e.toString());
+            e.printStackTrace();
+        }
+
+        return dest;
+    }
 
     private void spliceSong(AudioObject audioObject, int index) {
         File folder = new File( "/sdcard/"+this.baseDirectory+"/TempAudio");
@@ -305,37 +369,47 @@ public class ScreenRecorder {
 
         // test op
 
-        Vector <AudioObject> finalMP3files = new Vector<>();
         Vector <InputStream> streams = new Vector<>();
         for(int i=0; i<mp3Files.size(); i++) {
             AudioObject audioObject = mp3Files.get(i);
-//            finalMP3files.add(audioObject);
-//            finalMP3files.add(new AudioObject("/sdcard/RoboTutor/silence.mp3"));
+
             try {
                 String fileName = new File(audioObject.path).getName();
                 String path = "/sdcard/"+this.baseDirectory+"/TempAudio/"+fileName;
+                Log.d(TAG, "mergeSongs: the stream path is silence"+path);
                 streams.add(new FileInputStream(path));
                 if(i==mp3Files.size()-1)
                     continue;
 
                 AudioObject next = mp3Files.get(i+1);
+                String pathOfSilence = "/sdcard/"+this.baseDirectory+"/silence.mp3";
                 Double duration = (next.startDate.getTime()-audioObject.endDate.getTime())/1000.0;
-//                streams.add(new FileInputStream(createSilenceFile(duration, i)));
+                try {
+                    String silenceStream = spliceSong(pathOfSilence, i, duration);
+                    Log.d(TAG, "mergeSongs: the stream path is silence "+silenceStream+" "+duration.toString());
+                    streams.add(new FileInputStream(silenceStream));
+
+                } catch (Exception e) {
+                    Log.d(TAG, "mergeSongs: the silence errror is brrr "+ Log.getStackTraceString(e));
+                }
+
                 i+=1;
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
+                Log.d(TAG, "mergeSongs: the silence errror is brrr 2" + Log.getStackTraceString(e));
                 e.printStackTrace();
             }
         }
 
 
         SequenceInputStream sistream = new SequenceInputStream(streams.elements());
+        Log.d(TAG, "mergeSongs: the number of elements in the input stream is "+streams.size());
         try {
             FileOutputStream fostream = new FileOutputStream(mergedFile);
             int temp;
 
             while( ( temp = sistream.read() ) != -1)
             {
-                Log.d(TAG, "mergeSongs: error is better");
+                Log.d(TAG, "mergeSongs: reading the songs");
                 // System.out.print( (char) temp ); // to print at DOS prompt
                 fostream.write(temp);   // to write to file
             }
