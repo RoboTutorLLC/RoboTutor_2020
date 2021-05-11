@@ -229,6 +229,26 @@ public class JSON_Helper {
         return false;
     }
 
+    static public Boolean shouldIncludeAudio(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("recording_with_audio_enabled")) {
+                    Boolean value = jsonObject.getBoolean(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     static public String baseDirectory(String jsonData) {
         try {
             JSONObject jsonObject = new JSONObject(jsonData);

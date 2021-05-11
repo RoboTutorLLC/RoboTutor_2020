@@ -544,7 +544,10 @@ public class CTutorEngine implements ILoadableObject2 {
         Log.i(TAG, "launch: the screen recording launcher will begin now");
         if (JSON_Helper.shouldRecord(jsonData)) {
             String baseDirectory = JSON_Helper.baseDirectory(jsonData);
-            act.startRecording(baseDirectory);
+            if (JSON_Helper.shouldIncludeAudio(jsonData))
+                act.startRecording(baseDirectory, true);
+            else
+                act.startRecording(baseDirectory, false);
         }
 
 

@@ -73,7 +73,9 @@ public class ScreenRecorder {
     private Date videoTimeStamp = null;
     private String TAG = "ScreenRecorder";
     private String baseDirectory = "roboscreen";
+    private Boolean includeAudio = true;
     Context context;
+    String saveName = "";
 
 
 
@@ -119,17 +121,21 @@ public class ScreenRecorder {
      * store it in the folder of /sdcard/roboscreen
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void startRecording(String baseDirectory){
+    public void startRecording(String baseDirectory, Boolean includeAudio){
         this.videoTimeStamp = new Date();
         this.baseDirectory = baseDirectory;
+        Long time =  new Date().getTime();
+        String timeInString = Long.toString(time);
+        Log.d(TAG, "startRecording: "+timeInString);
+        this.saveName = "recording__"+timeInString;
         if (this.recorderInstance == null) {
-            this.videoNamesIterator = 0; // creating a two name cycle and iterating between the cycle
-            String videoName = videoNames[videoNamesIterator];
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
-                    "/sdcard/"+this.baseDirectory+"/videos/", "final_video" );
+                    "/sdcard/"+this.baseDirectory+"/videos/",this.saveName);
 //            this.recorderInstance.setRecordAudio(true);
         }
         this.recorderInstance.startRecord();
+        this.includeAudio = includeAudio;
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -144,21 +150,22 @@ public class ScreenRecorder {
         this.recorderInstance.stopRecord(0, 0, null);
         this.recorderInstance = null;
         Log.d(TAG, "splicing " + audioFiles.size());
-        for(int i=0; i<audioFiles.size(); i++) {
-            AudioObject audioObject = audioFiles.get(i);
+        if(this.includeAudio) {
+            for(int i=0; i<audioFiles.size(); i++) {
+                AudioObject audioObject = audioFiles.get(i);
 
-            if(audioObject.endDate!=null){
-                Log.d(TAG, "audio object" +
-                        audioObject.endDate);
-                this.spliceSong(audioObject, i);
+                if(audioObject.endDate!=null){
+                    Log.d(TAG, "audio object" +
+                            audioObject.endDate);
+                    this.spliceSong(audioObject, i);
+                }
+                Log.d(TAG, "index "+i);
             }
-            Log.d(TAG, "index "+i);
+            Log.d(TAG, "Merging all the songs");
+            this.mergeSongs(new File("/sdcard/"+this.baseDirectory+"/audio123.mp3"));
+            this.muxing();
         }
 
-
-        Log.d(TAG, "Merging all the songs");
-        this.mergeSongs(new File("/sdcard/"+this.baseDirectory+"/audio123.mp3"));
-        this.muxing();
         this.cleanUp();
         this.recorderInstance = null;
 
@@ -430,7 +437,7 @@ public class ScreenRecorder {
 
 
         String audio = "/sdcard/"+this.baseDirectory+"/audio123.mp3";
-        String video = "/sdcard/"+this.baseDirectory+"/videos/final_video.mp4";
+        String video = "/sdcard/"+this.baseDirectory+"/videos/"+this.saveName;
 //        this.activity.getLocalClassName()+new Date().toString()+Build.SERIAL
         Log.d(TAG, "muxing: and finding the names of the shizz "+this.activity.getLocalClassName()+Build.getRadioVersion());
         String outputFile = "/sdcard/"+this.baseDirectory+"/testVideo123.mp4";
@@ -501,6 +508,7 @@ public class ScreenRecorder {
 //        audioFile.delete();
 
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
