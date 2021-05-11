@@ -2,6 +2,9 @@ package cmu.xprize.robotutor.startup.configuration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import java.util.Map;
 
 import cmu.xprize.comp_logging.CLogManager;
 
@@ -25,6 +28,10 @@ public class Configuration {
                 .putBoolean(ConfigurationItems.USE_PLACEMENT, configItems.use_placement)
                 .putBoolean(ConfigurationItems.RECORD_AUDIO, configItems.record_audio)
                 .putString(ConfigurationItems.MENU_TYPE, configItems.menu_type)
+                .putBoolean(ConfigurationItems.SHOW_HELPER_BUTTON, configItems.show_helper_button)
+                .putBoolean(ConfigurationItems.RECORDING, configItems.recording)
+                .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
+                .putBoolean(ConfigurationItems.RECORDING_WITH_AUDIO_ENABLED, configItems.recording_with_audio_enabled)
                 .apply();
     }
 
@@ -83,18 +90,36 @@ public class Configuration {
                 .getString(ConfigurationItems.MENU_TYPE, "CD1");
     }
 
+    public static String getBaseDirectory(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getString(ConfigurationItems.BASE_DIRECTORY, "roboscreen");
+    }
+
+    public static boolean getRecording(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getBoolean(ConfigurationItems.RECORDING, true);
+    }
+
+    public static boolean getRecordingWithAudioEnabled(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getBoolean(ConfigurationItems.RECORDING_WITH_AUDIO_ENABLED, false);
+    }
+
+    public static boolean getShowHelperButton(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getBoolean(ConfigurationItems.SHOW_HELPER_BUTTON, false);
+    }
+
+    /**
+     * logs all the config items.
+     */
     public static void logConfigurationItems(Context context) {
-        String config = "\n" + ConfigurationItems.CONFIG_VERSION + " - " + configVersion(context) + "\n" +
-                ConfigurationItems.LANGUAGE_OVERRIDE + " - " + languageOverride(context) + "\n" +
-                ConfigurationItems.SHOW_TUTOR_VERSION + " - " + showTutorVersion(context) + "\n" +
-                ConfigurationItems.SHOW_DEBUG_LAUNCHER + " - " + showDebugLauncher(context) + "\n" +
-                ConfigurationItems.LANGUAGE_SWITCHER + " - " + getLanguageSwitcher(context) + "\n" +
-                ConfigurationItems.NO_ASR_APPS + " - " + noAsrApps(context) + "\n" +
-                ConfigurationItems.LANGUAGE_FEATURE_ID + " - " + getLanguageFeatureID(context) + "\n" +
-                ConfigurationItems.SHOW_DEMO_VIDS + " - " + showDemoVids(context) + "\n" +
-                ConfigurationItems.USE_PLACEMENT + " - " + usePlacement(context) + "\n" +
-                ConfigurationItems.RECORD_AUDIO + " - " + recordAudio(context) + "\n" +
-                ConfigurationItems.MENU_TYPE + " - " + getMenuType(context);
-        CLogManager.getInstance().postEvent_I(ROBOTUTOR_CONFIGURATION, config);
+        StringBuilder config = new StringBuilder();
+        Map<String, ?> allConfig = context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE).getAll();
+        for (Map.Entry<String, ?> entry : allConfig.entrySet()) {
+            config.append("\n").append(entry.getKey().toLowerCase()).append(" - ").append(entry.getValue().toString());
+        }
+        Log.e(ROBOTUTOR_CONFIGURATION, "\n" + config.toString());
+        CLogManager.getInstance().postEvent_I(ROBOTUTOR_CONFIGURATION, config.toString());
     }
 }

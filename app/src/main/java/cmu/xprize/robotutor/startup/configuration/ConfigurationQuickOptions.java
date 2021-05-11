@@ -22,7 +22,11 @@ public class ConfigurationQuickOptions {
             false,
             false,
             false,
-            "CD1"
+            "CD1",
+            true,
+            false,
+            false,
+            "roboscreen"
     );
 
     // EN version, and they both have the debugger menu.
@@ -37,6 +41,10 @@ public class ConfigurationQuickOptions {
             false,
             false,
             false,
-            "CD1"
+            "CD1",
+            true,
+            false,
+            false,
+            "roboscreen"
     );
 }

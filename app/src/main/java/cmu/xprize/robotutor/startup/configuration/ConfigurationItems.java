@@ -25,6 +25,10 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String USE_PLACEMENT = "USE_PLACEMENT";
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
+    public static final String RECORDING = "RECORDING";
+    public static final String RECORDING_WITH_AUDIO_ENABLED = "RECORDING_WITH_AUDIO_ENABLED";
+    public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
+    public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
 
     public String config_version;
     public boolean language_override;
@@ -37,6 +41,10 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean use_placement;
     public boolean record_audio;
     public String menu_type;
+    public boolean recording;
+    public boolean show_helper_button;
+    public String baseDirectory;
+    public boolean recording_with_audio_enabled;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -62,7 +70,8 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-                              String menu_type) {
+                              String menu_type, boolean recording, boolean recording_with_audio_enabled,
+                              boolean show_helper_button, String baseDirectory) {
 
 //        this.config_version = config_version;
         this.setConfigVersion();
@@ -76,6 +85,10 @@ public class ConfigurationItems implements ILoadableObject {
         this.use_placement = use_placement;
         this.record_audio = record_audio;
         this.menu_type = menu_type;
+        this.recording = recording;
+        this.recording_with_audio_enabled = recording_with_audio_enabled;
+        this.show_helper_button = show_helper_button;
+        this.baseDirectory = baseDirectory;
     }
 
     public void setDefaults() {
@@ -92,6 +105,10 @@ public class ConfigurationItems implements ILoadableObject {
         use_placement = true;
         record_audio = false;
         menu_type = "CD1";
+        show_helper_button = false;
+        baseDirectory = "roboscreen";
+        recording = true;
+        recording_with_audio_enabled = false;
     }
 
     private void setConfigVersion() {
