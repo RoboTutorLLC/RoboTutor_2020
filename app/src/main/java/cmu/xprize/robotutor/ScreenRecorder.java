@@ -127,8 +127,8 @@ public class ScreenRecorder {
         this.baseDirectory = baseDirectory;
         Long time =  new Date().getTime();
         // formatting this below as / and : not allowed in the libary
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-        String currDate = formatter.format(new Date()).replace('/','_');
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        String currDate = formatter.format(new Date()).replace('/','_').replace(':','_').replace(' ','_');
         String timeInString = Long.toString(time);
         String formattedTutorId = tutorId.replace(":","_").replace(".","_");
         this.saveName = formattedTutorId+currDate+timeInString;
