@@ -538,16 +538,18 @@ public class CTutorEngine implements ILoadableObject2 {
 
         // start recording when launching a menu screen
         // end recording when entering the menu
-        RoboTutor act = (RoboTutor)getActivity();
+        Activity temp_act = getActivity();
+        RoboTutor act = (RoboTutor)temp_act;
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
         Log.i(TAG, "launch: the screen recording launcher will begin now");
         if (JSON_Helper.shouldRecord(jsonData)) {
             String baseDirectory = JSON_Helper.baseDirectory(jsonData);
+            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
             if (JSON_Helper.shouldIncludeAudio(jsonData))
-                act.startRecording(baseDirectory, true);
+                act.startRecording(baseDirectory, true, tutorId);
             else
-                act.startRecording(baseDirectory, false);
+                act.startRecording(baseDirectory, false, tutorId);
         }
 
 
