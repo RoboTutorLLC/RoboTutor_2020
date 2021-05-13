@@ -8,6 +8,6 @@
   "language_feature_id": "LANG_EN",
   "show_demo_vids": false,
   "show_helper_button": false,
-  "recording": true,
-  "recording_with_audio_enabled": false
+  "record_screen_video": true,
+  "include_audio_output_in_screen_video": false
 }

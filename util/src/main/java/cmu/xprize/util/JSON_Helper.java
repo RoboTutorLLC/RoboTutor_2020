@@ -131,7 +131,7 @@ public class JSON_Helper {
                     String value = jsonObject.getString(key);
                     outputAcronym += value.charAt(value.length()-1);
                 }
-                else if( key.equals("recording") == false ) {
+                else if( key.equals("record_screen_video") == false ) {
                     /*
                         For every boolean value, we are only using their first character.
                      */
@@ -216,7 +216,7 @@ public class JSON_Helper {
 
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
-                if (key.equals("recording")) {
+                if (key.equals("record_screen_video")) {
                     Boolean value = jsonObject.getBoolean(key);
                     return value;
                 }
@@ -236,7 +236,7 @@ public class JSON_Helper {
 
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
-                if (key.equals("recording_with_audio_enabled")) {
+                if (key.equals("include_audio_output_in_screen_video")) {
                     Boolean value = jsonObject.getBoolean(key);
                     return value;
                 }

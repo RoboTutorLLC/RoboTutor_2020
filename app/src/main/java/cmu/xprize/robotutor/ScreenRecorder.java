@@ -131,7 +131,7 @@ public class ScreenRecorder {
         String currDate = formatter.format(new Date()).replace('/','_').replace(':','_').replace(' ','_');
         String timeInString = Long.toString(time);
         String formattedTutorId = tutorId.replace(":","_").replace(".","_");
-        this.saveName = formattedTutorId+currDate+timeInString;
+        this.saveName = formattedTutorId+currDate+"_"+timeInString;
         Log.d(TAG, "startRecording: "+this.saveName);
         if (this.recorderInstance == null) {
             this.recorderInstance = new ScreenRecordHelper(this.activity, null,
