@@ -339,7 +339,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
 
         CLogManager logManager = CLogManager.getInstance();
 
-        logManager.postEvent_T(action, LABEL_TRIGGERED + ": " + expectedTime);
+        logManager.postEvent_T(action, LABEL_TRIGGERED + ":" + expectedTime);
     }
 
     class CyclicalUpdate implements Runnable {
