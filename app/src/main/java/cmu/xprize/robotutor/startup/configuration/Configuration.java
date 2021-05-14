@@ -29,9 +29,10 @@ public class Configuration {
                 .putBoolean(ConfigurationItems.RECORD_AUDIO, configItems.record_audio)
                 .putString(ConfigurationItems.MENU_TYPE, configItems.menu_type)
                 .putBoolean(ConfigurationItems.SHOW_HELPER_BUTTON, configItems.show_helper_button)
-                .putBoolean(ConfigurationItems.RECORDING, configItems.recording)
+                .putBoolean(ConfigurationItems.RECORD_SCREEN_VIDEO, configItems.record_screen_video)
                 .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
-                .putBoolean(ConfigurationItems.RECORDING_WITH_AUDIO_ENABLED, configItems.recording_with_audio_enabled)
+                .putBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, configItems.include_audio_output_in_screen_video)
+                .putBoolean(ConfigurationItems.PINNING_MODE, configItems.pinning_mode)
                 .apply();
     }
 
@@ -95,19 +96,24 @@ public class Configuration {
                 .getString(ConfigurationItems.BASE_DIRECTORY, "roboscreen");
     }
 
-    public static boolean getRecording(Context context) {
+    public static boolean getRecordScreenVideo(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getBoolean(ConfigurationItems.RECORDING, true);
+                .getBoolean(ConfigurationItems.RECORD_SCREEN_VIDEO, true);
     }
 
-    public static boolean getRecordingWithAudioEnabled(Context context) {
+    public static boolean getIncludeAudioOutputInScreenVideo(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getBoolean(ConfigurationItems.RECORDING_WITH_AUDIO_ENABLED, false);
+                .getBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, false);
     }
 
     public static boolean getShowHelperButton(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getBoolean(ConfigurationItems.SHOW_HELPER_BUTTON, false);
+    }
+
+    public static boolean getPinningMode(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getBoolean(ConfigurationItems.PINNING_MODE, false);
     }
 
     /**
@@ -117,9 +123,12 @@ public class Configuration {
         StringBuilder config = new StringBuilder();
         Map<String, ?> allConfig = context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE).getAll();
         for (Map.Entry<String, ?> entry : allConfig.entrySet()) {
-            config.append("\n").append(entry.getKey().toLowerCase()).append(" - ").append(entry.getValue().toString());
+            config.append(entry.getKey().toLowerCase()).append(":");
+            config.append(entry.getValue().toString());
+            config.append(",");
         }
-        Log.e(ROBOTUTOR_CONFIGURATION, "\n" + config.toString());
+        config.deleteCharAt(config.length()-1);
+        Log.e(ROBOTUTOR_CONFIGURATION, config.toString());
         CLogManager.getInstance().postEvent_I(ROBOTUTOR_CONFIGURATION, config.toString());
     }
 }
