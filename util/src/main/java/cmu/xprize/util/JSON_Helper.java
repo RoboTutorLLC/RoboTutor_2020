@@ -131,7 +131,7 @@ public class JSON_Helper {
                     String value = jsonObject.getString(key);
                     outputAcronym += value.charAt(value.length()-1);
                 }
-                else {
+                else if( key.equals("record_screen_video") == false ) {
                     /*
                         For every boolean value, we are only using their first character.
                      */
@@ -207,6 +207,71 @@ public class JSON_Helper {
         }
 
         return buffer.toString();
+    }
+
+    static public Boolean shouldRecord(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("record_screen_video")) {
+                    Boolean value = jsonObject.getBoolean(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    static public Boolean shouldIncludeAudio(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("include_audio_output_in_screen_video")) {
+                    Boolean value = jsonObject.getBoolean(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    static public String baseDirectory(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key == "baseDirectory") {
+                    /*
+                        This is checking for the key: "language_feature_id".
+                        Replacing the values with the corresponding acronyms:
+                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
+                     */
+                    String value = jsonObject.getString(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "roboscreen";
     }
 
 

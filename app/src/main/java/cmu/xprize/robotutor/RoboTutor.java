@@ -21,12 +21,14 @@ package cmu.xprize.robotutor;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,11 +36,17 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+//import com.nanchen.screenrecordhelper.ScreenRecordHelper;
+//import com.RoboTutorLLC.ScreenRecordHelper.ScreenrecordHelper;
+import com.nanchen.screenrecordhelper.ScreenRecordHelper;
+//com.github.RoboTutorLLC:ScreenRecordHelper
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
@@ -105,6 +113,7 @@ import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
  * <h3>Developer Overview</h3>
  *
  */
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
 
@@ -146,7 +155,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public String        APP_PRIVATE_FILES;
     static public String        LOG_ID = "STARTUP";
 
-    static public Activity      ACTIVITY;
+    static public RoboTutor      ACTIVITY;
     static public String        PACKAGE_NAME;
     static public boolean       DELETE_INSTALLED_ASSETS = false;
 
@@ -163,6 +172,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public boolean           STUDENT_CHOSE_REPEAT = false;
 //    static public String        SELECTOR_MODE = TCONST.FTR_DEBUG_SELECT;
 
+    static private String[] videoNames = new String[]{"video1", "video2"};
+    private int videoNamesIterator = 0;
 
     // TODO: This is a temporary log update mechanism - see below
     //
@@ -179,6 +190,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     private final  String  TAG = "CRoboTutor";
     private final String ID_TAG = "StudentId";
+    ScreenRecordHelper screenRecordHelper;
+    private ScreenRecorder screenRecorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,10 +214,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         // TODO: this doesn't work as expected
         //
 
-        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath));
-
-        PACKAGE_NAME = getApplicationContext().getPackageName();
         ACTIVITY     = this;
+        PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath, ACTIVITY));
+
+
+
 
         // Prep the CPreferenceCache
         // Update the globally accessible id object for this engine instance.
@@ -260,6 +276,37 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         masterContainer.addAndShow(progressView);
 
         // testCrashHandler();
+
+        // creating a recorder instance
+        try{
+            this.screenRecorder = new ScreenRecorder(this, getApplicationContext());
+        }
+        catch (Exception e) {
+            Log.wtf(TAG, e);
+        }
+    }
+
+    /**
+     * Start Recording
+     * store it in the folder of /sdcard/roboscreen
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void startRecording(String baseDirectory, Boolean includeAudio, String tutorId){
+
+        screenRecorder.startRecording(baseDirectory, includeAudio, tutorId);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void endRecording(){
+        screenRecorder.endRecording();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        screenRecorder.onActivityResult(requestCode, resultCode, data);
+        setFullScreen();
     }
 
     /**
