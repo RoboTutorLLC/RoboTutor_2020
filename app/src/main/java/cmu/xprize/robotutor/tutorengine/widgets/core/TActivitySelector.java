@@ -795,7 +795,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
             builder.append(",$features#").append(featureset.toString());
         }
     }
-
+//
     @Override
     public void logState(String logData) {
 
