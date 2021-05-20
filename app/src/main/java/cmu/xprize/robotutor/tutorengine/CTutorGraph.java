@@ -159,14 +159,13 @@ public class CTutorGraph implements ITutorGraph, ILoadableObject2, Animation.Ani
                 // If the scene has children - allow them to shutdown gracefully
                 //
                 if(scene.children != null) {
-                    Iterator<?> tObjects = scene.children.entrySet().iterator();
 
                     // Perform component level Folder cleanup first
                     //
-                    while(tObjects.hasNext() ) {
-                        Map.Entry entry = (Map.Entry) tObjects.next();
+                    for (Map.Entry<String, ITutorObject> stringITutorObjectEntry : scene.children.entrySet()) {
+                        Map.Entry entry = (Map.Entry) stringITutorObjectEntry;
 
-                        ((ITutorObject)(entry.getValue())).onDestroy();
+                        ((ITutorObject) (entry.getValue())).onDestroy();
                     }
                 }
 
@@ -259,12 +258,10 @@ public class CTutorGraph implements ITutorGraph, ILoadableObject2, Animation.Ani
      */
     private void flushQueue() {
 
-        Iterator<?> tObjects = queueMap.entrySet().iterator();
+        for (Object o : queueMap.entrySet()) {
+            Map.Entry entry = (Map.Entry) o;
 
-        while(tObjects.hasNext() ) {
-            Map.Entry entry = (Map.Entry) tObjects.next();
-
-            mainHandler.removeCallbacks((Queue)(entry.getValue()));
+            mainHandler.removeCallbacks((Queue) (entry.getValue()));
         }
 
     }

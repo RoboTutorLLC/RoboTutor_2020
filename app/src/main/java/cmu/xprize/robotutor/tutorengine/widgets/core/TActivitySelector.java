@@ -1,5 +1,6 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
@@ -127,6 +128,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         mTutorScene.init(context, attrs);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -751,17 +753,15 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
     private void extractHashContents(StringBuilder builder, HashMap map) {
 
-        Iterator<?> tObjects = map.entrySet().iterator();
-
-        while(tObjects.hasNext() ) {
+        for (Object o : map.entrySet()) {
 
             builder.append(',');
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Map.Entry entry = (Map.Entry) o;
 
             String QA_MATRIX_TAG = "QA_MATRIX";
             Log.wtf(QA_MATRIX_TAG, "key=" + entry.getKey().toString());
-            String key   = entry.getKey().toString();
+            String key = entry.getKey().toString();
             String value = "#" + entry.getValue() != null ? entry.getValue().toString() : "null";
 
             builder.append(key);
@@ -773,18 +773,16 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
         StringBuilder featureset = new StringBuilder();
 
-        Iterator<?> tObjects = map.entrySet().iterator();
-
         // Scan to build a list of active features
         //
-        while(tObjects.hasNext() ) {
+        for (Object o : map.entrySet()) {
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Map.Entry entry = (Map.Entry) o;
 
             Boolean value = (Boolean) entry.getValue();
 
-            if(value) {
-                featureset.append(entry.getKey().toString() + ";");
+            if (value) {
+                featureset.append(entry.getKey().toString()).append(";");
             }
         }
 
@@ -794,7 +792,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         if(featureset.length() != 0) {
             featureset.deleteCharAt(featureset.length()-1);
 
-            builder.append(",$features#" + featureset.toString());
+            builder.append(",$features#").append(featureset.toString());
         }
     }
 
@@ -1197,16 +1195,14 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
     @Override
     public void publishFeatureMap(HashMap featureMap) {
 
-        Iterator<?> tObjects = featureMap.entrySet().iterator();
+        for (Object o : featureMap.entrySet()) {
 
-        while(tObjects.hasNext() ) {
+            Map.Entry entry = (Map.Entry) o;
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Boolean active = (Boolean) entry.getValue();
 
-            Boolean active = (Boolean)entry.getValue();
-
-            if(active) {
-                String feature = (String)entry.getKey();
+            if (active) {
+                String feature = (String) entry.getKey();
 
                 mTutor.addFeature(feature);
             }
@@ -1220,16 +1216,14 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
     @Override
     public void retractFeatureMap(HashMap featureMap) {
 
-        Iterator<?> tObjects = featureMap.entrySet().iterator();
+        for (Object o : featureMap.entrySet()) {
 
-        while(tObjects.hasNext() ) {
+            Map.Entry entry = (Map.Entry) o;
 
-            Map.Entry entry = (Map.Entry) tObjects.next();
+            Boolean active = (Boolean) entry.getValue();
 
-            Boolean active = (Boolean)entry.getValue();
-
-            if(active) {
-                String feature = (String)entry.getKey();
+            if (active) {
+                String feature = (String) entry.getKey();
 
                 mTutor.delFeature(feature);
             }

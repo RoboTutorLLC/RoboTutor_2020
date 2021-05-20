@@ -469,12 +469,11 @@ public class CTutorEngine implements ILoadableObject2 {
             System.out.println(bindingPattern.scene_bindings.isEmpty());
             if(bindingPattern.scene_bindings.size() == 1) {
 
-                Iterator<?> scenes = bindingPattern.scene_bindings.entrySet().iterator();
-                while(scenes.hasNext() ) {
+                for (Map.Entry<String, defdata_scenes> stringdefdata_scenesEntry : bindingPattern.scene_bindings.entrySet()) {
 
-                    Map.Entry scene = (Map.Entry) scenes.next();
+                    Map.Entry scene = (Map.Entry) stringdefdata_scenesEntry;
 
-                    databinding[] scenebindings = ((defdata_scenes)scene.getValue()).databindings;
+                    databinding[] scenebindings = ((defdata_scenes) scene.getValue()).databindings;
 
                     initComponentBindings(scenebindings, databindings);
                 }
@@ -513,14 +512,12 @@ public class CTutorEngine implements ILoadableObject2 {
         System.out.println(dataSpec);
         defdata_tutor dataBindings = parseDataSpec(dataSpec);
 
-        Iterator<?> scenes = dataBindings.scene_bindings.entrySet().iterator();
+        for (Map.Entry<String, defdata_scenes> stringdefdata_scenesEntry : dataBindings.scene_bindings.entrySet()) {
 
-        while(scenes.hasNext() ) {
+            Map.Entry scene = (Map.Entry) stringdefdata_scenesEntry;
 
-            Map.Entry scene = (Map.Entry) scenes.next();
-
-            String sceneName           = (String)scene.getKey();
-            databinding[] databindings = ((defdata_scenes)scene.getValue()).databindings;
+            String sceneName = (String) scene.getKey();
+            databinding[] databindings = ((defdata_scenes) scene.getValue()).databindings;
 
             initSceneBindings(bindingPattern, sceneName, databindings);
         }

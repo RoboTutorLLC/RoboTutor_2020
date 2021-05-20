@@ -487,10 +487,9 @@ public class CTutor implements ILoadableObject2, IEventSource {
     private void flushQueue() {
 
         try {
-            Iterator<?> tObjects = queueMap.entrySet().iterator();
 
-            while (tObjects.hasNext()) {
-                Map.Entry entry = (Map.Entry) tObjects.next();
+            for (Object o : queueMap.entrySet()) {
+                Map.Entry entry = (Map.Entry) o;
 
                 mainHandler.removeCallbacks((Queue) (entry.getValue()));
             }
@@ -703,13 +702,12 @@ public class CTutor implements ILoadableObject2, IEventSource {
         mapChildren(tutorContainer, childMap);
 
         try {
-            Iterator<?> tObjects = childMap.entrySet().iterator();
 
             // post create / inflate / init / map - here everything is created including the
             // view map to permit findViewByName
             //
-            while (tObjects.hasNext()) {
-                Map.Entry entry = (Map.Entry) tObjects.next();
+            for (Object o : childMap.entrySet()) {
+                Map.Entry entry = (Map.Entry) o;
 
                 ((ITutorObject) (entry.getValue())).onCreate();
             }
@@ -842,10 +840,8 @@ public class CTutor implements ILoadableObject2, IEventSource {
         List<String> featArray = Arrays.asList(ftrSet.split(","));
 
         fFeatures.clear();
-        
-        for (String feature : featArray) {
-            fFeatures.add(feature);
-        }
+
+        fFeatures.addAll(featArray);
     }
 
 
@@ -855,7 +851,7 @@ public class CTutor implements ILoadableObject2, IEventSource {
     {
         // Add new features - no duplicates
 
-        if(fFeatures.indexOf(feature) == -1)
+        if(!fFeatures.contains(feature))
         {
             fFeatures.add(feature);
         }
@@ -882,10 +878,10 @@ public class CTutor implements ILoadableObject2, IEventSource {
     public boolean testFeature(String element) {
         if(element.charAt(0) == '!')
         {
-            return (fFeatures.indexOf(element.substring(1)) != -1)? false : true;
+            return !fFeatures.contains(element.substring(1));
         }
         else {
-            return (fFeatures.indexOf(element) != -1) ? true : false;
+            return fFeatures.contains(element);
         }
     }
 
@@ -893,12 +889,12 @@ public class CTutor implements ILoadableObject2, IEventSource {
         if(element.charAt(0) == '!') {
             if(element.substring(1).equals("true")) return "false";
             if(element.substring(1).equals("false")) return "true";
-            return (fFeatures.indexOf(element.substring(1)) != -1)? "false" : "true";
+            return (fFeatures.contains(element.substring(1)))? "false" : "true";
         }
         else {
             if(element.equals("true")) return "true";
             if(element.equals("false")) return "false";
-            return (fFeatures.indexOf(element) != -1) ? "true" : "false";
+            return (fFeatures.contains(element)) ? "true" : "false";
         }
     }
 
@@ -907,14 +903,14 @@ public class CTutor implements ILoadableObject2, IEventSource {
     // Doesn't allow inner paren matching
     public boolean testFeatureSet(String featSet) {
         String result = testFeatureSetHelper(featSet);
-        return result.equals("true") ? true : false;
+        return result.equals("true");
     }
 
     public String testFeatureSetHelper(String featSet) {
         int curParenCount = 0;
         int leftMostOpenParen = -1;
 
-        StringBuffer featSetBuffer = new StringBuffer(featSet);
+        StringBuilder featSetBuffer = new StringBuilder(featSet);
 
         while(featSetBuffer.indexOf("(") != -1) {
             for(int i = 0; i < featSetBuffer.length(); i++) {
@@ -963,11 +959,11 @@ public class CTutor implements ILoadableObject2, IEventSource {
             // Check that all conjunctive features are set in fFeatures
 
             for (String cfeature : conjFeat) {
-                if(!(testFeatureHelper(cfeature) == "true"))
+                if(!(testFeatureHelper(cfeature).equals("true")))
                     result = "false";
             }
 
-            if(result == "true")
+            if(result.equals("true"))
                 break;
         }
 
