@@ -238,6 +238,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         initializeAndStartLogs();
 
+        //Log current config data
+        //
+        Configuration.logConfigurationItems(this);
+
         Log.v(TAG, "External_Download:" + DOWNLOAD_PATH);
 
         // Get the primary container for tutors
@@ -854,6 +858,21 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         String restoredText = prefs.getString("text", null);
 
         if (restoredText != null) {
+        }
+
+        if (Configuration.getPinningMode(this) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // start lock task mode if it's not already active
+            ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            // ActivityManager.getLockTaskModeState api is not available in pre-M
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                if (!am.isInLockTaskMode()) {
+                    startLockTask();
+                }
+            } else {
+                if (am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_NONE) {
+                    startLockTask();
+                }
+            }
         }
     }
 

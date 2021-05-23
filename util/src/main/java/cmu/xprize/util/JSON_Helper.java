@@ -104,24 +104,24 @@ public class JSON_Helper {
 
             for (int i=0; i<keys.length(); i++) {
                 String key = keys.getString(i);
-                if (key == "language_feature_id") {
+                if (key.equals("language_feature_id")) {
                     /*
                         This is checking for the key: "language_feature_id".
                         Replacing the values with the corresponding acronyms:
                          { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
                      */
                     String value = jsonObject.getString(key);
-                    if (value == "LANG_NULL") {
+                    if (value.equals("LANG_NULL")) {
                         outputAcronym += "NULL";
                     }
-                    else if (value == "EN") {
+                    else if (value.equals("EN")) {
                         outputAcronym += "EN";
                     }
-                    else if  (value == "SW") {
+                    else if  (value.equals("SW")) {
                         outputAcronym +="SW";
                     }
                 }
-                else if (key == "menu_type") {
+                else if (key.equals("menu_type")) {
                     /*
                         This is checking for the key: "menu_type".
                         Replacing the values with the corresponding acronyms:
@@ -135,8 +135,9 @@ public class JSON_Helper {
                     /*
                         For every boolean value, we are only using their first character.
                      */
-                    Boolean value = jsonObject.getBoolean(key);
-                    outputAcronym += value.toString().charAt(0);
+                    Object value = jsonObject.get(key);
+                    if (value != null)
+                        outputAcronym += value.toString().charAt(0);
                 }
             }
 
