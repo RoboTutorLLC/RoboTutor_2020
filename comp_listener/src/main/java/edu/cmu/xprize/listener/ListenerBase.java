@@ -23,8 +23,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -36,6 +39,7 @@ import java.util.Locale;
 
 import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.IReadyListener;
+import cmu.xprize.util.TCONST;
 import edu.cmu.pocketsphinx.LogMath;
 import edu.cmu.pocketsphinx.Segment;
 
@@ -161,6 +165,43 @@ public class ListenerBase {
      */
     protected void setupRecognizer(File assetsDir, File configFile, String langDictionary) {
 
+        TCONST.START_WORD_CMN = 0;
+        TCONST.CURRENT_WORD = 0;
+
+        File cmnFile = new File(TCONST.LOGCAT_LOCATION, "cmn_values" + ".txt" );
+
+        if(!cmnFile.exists())
+        {
+            try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(TCONST.LOGCAT_LOCATION + "cmn_values.txt"))) {
+                writer.write("0,0,0,0,0,0,0,0,0,0,0,0,0");
+            }
+            catch(IOException e){
+                // Handle the exception
+            }
+        }
+
+        //Loading the CMN values
+        File cmn_value = new File(TCONST.LOGCAT_LOCATION + "cmn_values.txt");
+        BufferedReader br = null;
+        String[] arrOfStr = new String[0];
+        try {
+            br = new BufferedReader(new FileReader(cmn_value));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String cmninit_value = "";
+
+
+        try {
+            cmninit_value = br.readLine();
+            TCONST.CMNINIT_VALUE = cmninit_value;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         try {
             // save path to modelsDir for use when finding fsgs
             modelsDir = new File(assetsDir, "models");
@@ -214,6 +255,9 @@ public class ListenerBase {
 
 //                                .setString("-cmn", "current")
                                 .setString("-cmn", "prior")
+
+                                .setString("-cmninit", cmninit_value)
+
                                 .setBoolean("-compallsen", false)
                                 .setBoolean("-dictcase", false)
                                 .setFloat("-fillprob", 1e-2f)           // 1e-8 in default

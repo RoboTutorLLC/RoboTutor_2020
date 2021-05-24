@@ -1575,6 +1575,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mParent.UpdateValue(result);
 
             mParent.onASREvent(TCONST.RECOGNITION_EVENT);
+            TCONST.CURRENT_WORD = mCurrWord;
 
         } catch (Exception e) {
 

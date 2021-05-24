@@ -43,10 +43,13 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -560,6 +563,9 @@ public class SpeechRecognizer {
                     }
                     //Log.i("ASR","ASR RAW-BYTES: " + nread);
 
+
+                    File logFile = new File(TCONST.LOGCAT_LOCATION, "logcat" + ".txt" );
+
                     if (-1 == nread) {
                         Log.i("ASR","Read Error");
                         throw new RuntimeException("error reading audio buffer");
@@ -576,6 +582,104 @@ public class SpeechRecognizer {
                             //ASRTimer = System.currentTimeMillis();
                             decoder.processRaw(buffer, nread, false, false);
                             //Log.d("ASR", "Time in processRaw: " + (System.currentTimeMillis() - ASRTimer));
+
+                            if(TCONST.START_WORD_CMN == 0 && TCONST.CURRENT_WORD >= 0)
+                            {
+
+                                if(logFile.exists())
+                                {
+                                    logFile.delete();
+                                }
+
+                                Process process = null;
+
+                                try {
+                                    process = Runtime.getRuntime().exec("logcat -c");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                TCONST.START_WORD_CMN = 1;
+                                decoder.processRaw(buffer, nread, false, false);
+
+                                try {
+                                    process = Runtime.getRuntime().exec("logcat -s cmusphinx:I *:S" + logFile);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                try {
+                                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S  cmusphinx:I");
+
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            else
+                            {
+                                // LOG FILE PARSER for CMN values
+                                BufferedReader br = null;
+                                String[] arrOfStr = new String[0];
+                                try {
+                                    br = new BufferedReader(new FileReader(logFile));
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                                String sq = "";
+                                String sq1 = "";
+                                String cmn_values = "";
+
+                                while (true)
+                                {
+                                    try {
+                                        if (!((sq = br.readLine()) != null)) break;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if(sq.contains("cmn_prior_update: to"))
+                                    {
+
+                                        for(int i = 0 ; i < 13 ; i++) {
+                                            try {
+                                                sq1 = br.readLine();
+
+                                                if(i != 12) {
+                                                    cmn_values = cmn_values + sq1.split("cmusphinx: ")[1] + ",";
+                                                }
+
+                                                else
+                                                {
+                                                    cmn_values = cmn_values + sq1.split("cmusphinx: ")[1];
+                                                }
+
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        cmn_values = cmn_values.replaceAll("\\s", "");
+                                        TCONST.CMNINIT_VALUE = cmn_values;
+                                        Log.wtf("Prasad" , cmn_values);
+
+                                        try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(TCONST.LOGCAT_LOCATION + "cmn_values.txt"))) {
+                                            writer.write(cmn_values);
+                                        }
+                                        catch(IOException e){
+                                            e.printStackTrace(); // Handle the exception
+                                        }
+
+                                        cmn_values = "";
+
+
+                                    }
+                                }
+                            }
+
+
+
 
                             nSamples += nread;
 
