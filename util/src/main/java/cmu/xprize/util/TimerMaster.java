@@ -19,7 +19,7 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 
 /**
- * robotutor.TimerMaster
+ * TimerMaster
  * <p>Use this class to manage timers for Interventions</p>
  * Created by kevindeland on 9/4/19.
  */
