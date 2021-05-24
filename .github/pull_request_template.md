@@ -1,6 +1,6 @@
 # PR Info
 
-## Issue Deails
+## Issue Details
 
 <!-- Please choose the relevant option -->
 
@@ -17,6 +17,7 @@
 - **Bug Fix** <!--  non-breaking change which fixes an issue -->
 - **New Feature** <!-- non-breaking change which adds functionality -->
 - **Breaking Change** <!-- fix or feature that would cause existing functionality to not work as expected -->
+- **Other** <!-- please specify -->
 
 ## Additional Info
 
