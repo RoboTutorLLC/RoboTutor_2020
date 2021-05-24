@@ -3,6 +3,7 @@ package cmu.xprize.util;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import java.util.Date;
 
@@ -18,7 +19,7 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_HESITATE;
 import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
 
 /**
- * TimerMaster
+ * robotutor.TimerMaster
  * <p>Use this class to manage timers for Interventions</p>
  * Created by kevindeland on 9/4/19.
  */
@@ -129,7 +130,7 @@ public class TimerMaster {
      * trigger gesture timer
      */
     public void triggerGestureTimer() {
-       if (gestureTriggered) return; // only trigger once
+        if (gestureTriggered) return; // only trigger once
 
         _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
         gestureTriggered = true;
@@ -137,6 +138,19 @@ public class TimerMaster {
         Intent gestureIntent = new Intent(BROADCAST_GESTURE_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _gestureDelay;
         gestureIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
+        _manager.sendBroadcast(gestureIntent);
+    }
+
+    public void triggerGestureTimer(MotionEvent e) {
+        if (gestureTriggered) return; // only trigger once
+
+        _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
+        gestureTriggered = true;
+
+        Intent gestureIntent = new Intent(BROADCAST_GESTURE_UPDATE);
+        long expectedTrigger = (new Date()).getTime() + _gestureDelay;
+        gestureIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
+        gestureIntent.putExtra("motion_event", e);
         _manager.sendBroadcast(gestureIntent);
     }
 
@@ -150,6 +164,4 @@ public class TimerMaster {
         _intervention.triggerIntervention(I_CANCEL_GESTURE);
         gestureTriggered = false;
     }
-
-
 }

@@ -50,14 +50,14 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
     @Override
     public void onLongPress(MotionEvent e) {
         Log.i(TAG, "onLongPress: ");
-        iTimer.triggerGestureTimer();
+        iTimer.triggerGestureTimer(e);
 
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(TAG, "onDoubleTap: ");
-        iTimer.triggerGestureTimer();
+        iTimer.triggerGestureTimer(e);
 
 
         return true;
