@@ -145,7 +145,8 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) gestureTimeExpected = expectedTime;
 
-                        if (intent.hasExtra("motion_event")) {
+                    
+                     if (intent.hasExtra("motion_event")) {
                             Log.d("TAG_GESTURE", "Broadcast triggered with Motion Event");
 
                             MotionEvent motionEvent = null;
@@ -163,7 +164,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         }
                         else
                             Log.d("TAG_GESTURE", "Broadcast triggered without Motion Event");
-
 
                         break;
 
@@ -360,7 +360,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
 
         logManager.postEvent_T(action, LABEL_TRIGGERED + ":" + expectedTime);
     }
-
+  
     /**
      * This function essentially logs the actions specified
      *
@@ -381,7 +381,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
         );
 
     }
-
+  
     class CyclicalUpdate implements Runnable {
 
         @Override

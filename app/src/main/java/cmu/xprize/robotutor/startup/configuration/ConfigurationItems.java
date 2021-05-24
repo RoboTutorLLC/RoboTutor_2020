@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -25,6 +24,11 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String USE_PLACEMENT = "USE_PLACEMENT";
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
+    public static final String RECORD_SCREEN_VIDEO = "RECORD_SCREEN_VIDEO";
+    public static final String INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO = "INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO";
+    public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
+    public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
+    public static final String PINNING_MODE = "PINNING_MODE";
 
     public String config_version;
     public boolean language_override;
@@ -37,6 +41,11 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean use_placement;
     public boolean record_audio;
     public String menu_type;
+    public boolean record_screen_video;
+    public boolean show_helper_button;
+    public String baseDirectory;
+    public boolean include_audio_output_in_screen_video;
+    public boolean pinning_mode;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -62,7 +71,8 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-                              String menu_type) {
+                              String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
+                              boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
 
 //        this.config_version = config_version;
         this.setConfigVersion();
@@ -76,6 +86,11 @@ public class ConfigurationItems implements ILoadableObject {
         this.use_placement = use_placement;
         this.record_audio = record_audio;
         this.menu_type = menu_type;
+        this.record_screen_video = record_screen_video;
+        this.include_audio_output_in_screen_video = include_audio_output_in_screen_video;
+        this.show_helper_button = show_helper_button;
+        this.baseDirectory = baseDirectory;
+        this.pinning_mode = pinning_mode;
     }
 
     public void setDefaults() {
@@ -92,6 +107,11 @@ public class ConfigurationItems implements ILoadableObject {
         use_placement = true;
         record_audio = false;
         menu_type = "CD1";
+        show_helper_button = false;
+        baseDirectory = "roboscreen";
+        record_screen_video = true;
+        include_audio_output_in_screen_video = false;
+        pinning_mode = false;
     }
 
     private void setConfigVersion() {

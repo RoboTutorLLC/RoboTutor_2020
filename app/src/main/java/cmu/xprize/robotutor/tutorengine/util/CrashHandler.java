@@ -1,6 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.util;
 
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cmu.xprize.robotutor.BuildConfig;
+import cmu.xprize.robotutor.RoboTutor;
 
 /**
  * Created by shivenmian on 20/04/18.
@@ -18,13 +20,17 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private Thread.UncaughtExceptionHandler defaultUEH;
 
     private String _directory;
+    private RoboTutor activity;
 
-    public CrashHandler(String directory) {
+    public CrashHandler(String directory, RoboTutor activity) {
         this.defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
         this._directory = directory;
+        this.activity = activity;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void uncaughtException(Thread t, Throwable e) {
+        activity.endRecording();
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString()+"\n\n";
         report += "--------- Stack trace ---------\n\n";
