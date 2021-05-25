@@ -931,11 +931,10 @@ public class TCONST {
 
     public static final String DEBUG_CSV = "DEBUG_CSV";
 
-    //canned speech
-    public static int START_WORD_CMN = 0;
-    public static int CURRENT_WORD = 0;
-
     //cmninit
+    public static int START_WORD_CMN = 0;
+    public static int LOG_CMN_FLAG = 0;
+    public static int CURRENT_WORD = 0;
     public static String CMNINIT_VALUE;
     public static String LOGCAT_LOCATION = "/sdcard/robotutor_assets/";
 

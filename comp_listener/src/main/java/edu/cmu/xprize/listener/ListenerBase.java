@@ -165,6 +165,7 @@ public class ListenerBase {
      */
     protected void setupRecognizer(File assetsDir, File configFile, String langDictionary) {
 
+        TCONST.LOG_CMN_FLAG = 0;
         TCONST.START_WORD_CMN = 0;
         TCONST.CURRENT_WORD = 0;
 

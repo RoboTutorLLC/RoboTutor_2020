@@ -619,7 +619,7 @@ public class SpeechRecognizer {
 
                             }
 
-                            else
+                            else if(TCONST.LOG_CMN_FLAG == 0)
                             {
                                 // LOG FILE PARSER for CMN values
                                 BufferedReader br = null;
@@ -642,7 +642,7 @@ public class SpeechRecognizer {
                                     }
                                     if(sq.contains("cmn_prior_update: to"))
                                     {
-
+                                        TCONST.LOG_CMN_FLAG = 1;
                                         for(int i = 0 ; i < 13 ; i++) {
                                             try {
                                                 sq1 = br.readLine();
