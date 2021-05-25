@@ -74,4 +74,6 @@ public class CDebugLauncher {
     public String getMatrix() {
         return this.matrix;
     }
+
+    public static String getDebugVar(String key) { return null; }
 }
