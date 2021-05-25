@@ -1,5 +1,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+#**Intended to solve [Issue #29](https://github.com/RoboTutorLLC/RoboTutor_2020/issues/29)**
+
 # **RoboTutor**
 
 
