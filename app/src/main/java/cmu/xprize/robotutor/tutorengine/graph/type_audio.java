@@ -89,6 +89,8 @@ public class type_audio extends type_action implements IMediaListener {
 
     public boolean isNewNarration;
 
+    public static long playDuration = 0;
+
     // used for manually hijacking this to play audio
     public type_audio(boolean isNewNarration) {
         this();

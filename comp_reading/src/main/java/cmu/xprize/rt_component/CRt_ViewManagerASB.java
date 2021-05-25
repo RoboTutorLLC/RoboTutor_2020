@@ -168,6 +168,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     int                             currUtt;
     ArrayList<ListenerBase.HeardWord>       capturedUtt = new ArrayList<>();
 
+    boolean narrationTracking;
+
 
     // json loadable
     // ZZZ where the money gets loaded
@@ -200,6 +202,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     boolean isUserNarrating;
     ListenerBase.HeardWord[] allHeardWords;
     final int segmentGapLength = 100; // length of silence used to separate segments in narration capture mode
+    ArrayList<Integer> seamIndices = new ArrayList<>(); // list of indices of seams for narration capture mode
 
     /**
      *
@@ -843,6 +846,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     private void trackNarration(boolean start) {
 
+        narrationTracking = true;
+
         if (start) {
 
             mHeardWord    = 0;
@@ -922,6 +927,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     } else {
 
                         endOfSentence = true;
+                        narrationTracking = false;
                     }
                 }
                 // All the segments except the last one are timed based on the segmentation data.
@@ -1206,7 +1212,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
         } else {
             // make buttons invisible
-
+            forwardButton.setVisibility(View.GONE);
+            backButton.setVisibility(View.GONE);
         }
 
 
@@ -1543,6 +1550,13 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 SpannableStringBuilder preHighlight = new SpannableStringBuilder(Html.fromHtml(fmtSentence));
                 Log.d("Highlighting", "Updating narration highlighting");
 
+                // check for bugs with segments
+                StringBuilder s = new StringBuilder();
+                for(int[] segment : acceptedList) {
+                    s.append(segment[0] + " " + segment[1] + ", ");
+                }
+                Log.d("Highlighting", "Segments start and end as follows: " + s.toString());
+
                 for(int[] segment : acceptedList) {
                     if (segment[1] >= segment[0]) {
                         StringBuilder textBuilder = new StringBuilder();
@@ -1579,31 +1593,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     }
                 }
 
-
-
-                /* for (String segment : acceptedUtterances) {
-                    String text;
-                    if (prevStartFrom != 0) {
-                        text = " " + segment;
-                    } else {
-                        text = segment;
-                    }
-
-                    int index = TextUtils.indexOf(preHighlight, text);
-                    Log.d(TAG, "Highlight text: " + text + ". index: " + index);
-
-                    while (index >= 0) {
-                        if (text.length() >= index) {
-                            preHighlight.setSpan(new BackgroundColorSpan((cyan ? Color.parseColor("#00FFFF") : Color.parseColor("#96e3ff"))), index, index + text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            index = TextUtils.indexOf(preHighlight, text, index + text.length());
-                        } else {
-                            break;
-                        }
-                    }
-
-                    cyan = !cyan;
-                }
-                */
                 fmtSentence = preHighlight.toString();
 
                 preHighlight.insert(0, Html.fromHtml(completedSentencesFmtd));
@@ -1685,7 +1674,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
     /**
-     * This is where we process words being narrated (by the premade narration, not the live user)
+     * This is where we process words being narrated (by the pre-made narration, not the live user)
      * VMC_QA why does this get called twice for the last word???
      */
     @Override
@@ -1771,6 +1760,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
             while ((mCurrWord < wordsToSpeak.length) && (mHeardWord < heardWords.length)) {
 
+                // wordIndex is the sentence index of the first heard word, and is used to deduce the position in the sentence in narration capture mode
                 int wordIndex = wordsToSpeak.length;
                 for (int i = 0; i < wordsToSpeak.length; i++) {
                     if(wordsToSpeak[i].equals(heardWords[mHeardWord].hypWord)) {
@@ -1778,6 +1768,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         break;
                     }
                 }
+
                 if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord].hypWord)) {
 
                     nextWord();
@@ -1790,17 +1781,38 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     result = true;
                     mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
 
+                 // In narration capture mode, it is acceptable if the narrator says the wrong word because they may be starting from a different point than acceptable
                 } else if (isNarrationCaptureMode && wordIndex <= mCurrWord) {
 
-                    while(mCurrWord > wordIndex+1) {
-                        prevWord();
+                    boolean isAtSeam = false;
+                    for(int i : seamIndices) {
+                        if(wordIndex == i) {
+                            isAtSeam = true;
+                            break;
+                        }
                     }
-                    mHeardWord++;
-                    mListener.updateNextWordIndex(mHeardWord);
-                    Log.i("ASR", "Wrong But Continuing");
-                    attemptNum = 0;
-                    result = true;
-                    mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
+
+                    if(isAtSeam) {
+
+                        incWord(wordIndex+1 - mCurrWord);
+                        mHeardWord++;
+                        mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
+                        mListener.updateNextWordIndex(mHeardWord); // what does this do ?? - chirag
+
+                        Log.i("ASR", "Wrong But Continuing");
+                        attemptNum = 0;
+                        result = true;
+
+                    } else {
+                        mListener.setPauseListener(true);
+
+                        Log.i("ASR", "WRONG");
+                        attemptNum++;
+                        result = false;
+                        mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord, heardWords[mHeardWord].hypWord, attemptNum, heardWords[mHeardWord].utteranceId == "", result);
+                        break;
+                    }
+
 
                 } else {
 
@@ -2176,9 +2188,18 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         ArrayList<ListenerBase.HeardWord> latestUtterance = determineUtterance(true);
 
         if (latestUtterance.size() > 0) {
-            while(!latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 1])) {
+
+            while (!latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 1])) {
+                if(latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 2])) {
+
+                    Log.d(TAG, "Sentence end reached, however last word omitted.");
+                    seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
+                    return;
+
+                }
                 latestUtterance.remove(latestUtterance.size() - 1);
             }
+
             StringBuilder newFileName = new StringBuilder();
             for (ListenerBase.HeardWord h : latestUtterance) {
                 newFileName.append(h.hypWord.toLowerCase()).append(" ");
@@ -2238,6 +2259,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
             UpdateDisplay();
             acceptedList.clear();
+            seamIndices.clear();
             // constructAudioStoryData();
         } else {
             Log.wtf(TAG, "Unable to save final part of narration");
@@ -2257,6 +2279,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      * @param startFrom is the location of the sentence to start the recording from
      */
     public void feedSentence(int startFrom) {
+        seamIndices.add(startFrom);
         // acceptedList.add(new int[]{mCurrWord, 0});
         Log.d(TAG, "Chirag: currUtt is " + currUtt);
         Log.d(TAG, "Chirag: prevStartFrom will be" + startFrom);
@@ -2298,34 +2321,40 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      */
     @Override
     public void prevSentence() {
-        Log.d("NavButton", "Back Button has been pressed");
-        AudioWriter.abortOperation();
-        hearRead = TCONST.FTR_USER_HEAR;
-        // It is zero-index
-        if (mCurrWord > prevStartFrom) {
-            seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, prevStartFrom);
-        } else if (mCurrLine > 0) {
-            prevLine();
-        } else if (mCurrPara > 0) {
-            prevPara();
-        } else if (mCurrPage > 0) {
-            prevPage();
+
+        if (!narrationTracking) {
+
+            Log.d("NavButton", "Back Button has been pressed");
+            AudioWriter.abortOperation();
+            hearRead = TCONST.FTR_USER_HEAR;
+            // It is zero-index
+            if (mCurrWord > prevStartFrom) {
+                seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, prevStartFrom);
+            } else if (mCurrLine > 0) {
+                prevLine();
+            } else if (mCurrPara > 0) {
+                prevPara();
+            } else if (mCurrPage > 0) {
+                prevPage();
+            }
         }
     }
 
     @Override
     public void skipSentence() {
-        Log.d("NavButton", "Forward Button has been pressed");
-        AudioWriter.abortOperation();
-        mCurrWord = mWordCount; // go to the end of the sentence
-        publishStateValues();
-        hearRead = TCONST.FTR_USER_HEAR;
-        if(buttonState.equals(TCONST.RTC_PAGECOMPLETE)) {
-            nextPage();
-        } else if(buttonState.equals(TCONST.RTC_PARAGRAPHCOMPLETE)) {
-            nextPara();
-        } else if(buttonState.equals(TCONST.RTC_LINECOMPLETE)) {
-            nextLine();
+        if (!narrationTracking) {
+            Log.d("NavButton", "Forward Button has been pressed");
+            AudioWriter.abortOperation();
+            mCurrWord = mWordCount; // go to the end of the sentence
+            publishStateValues();
+            hearRead = TCONST.FTR_USER_HEAR;
+            if (buttonState.equals(TCONST.RTC_PAGECOMPLETE)) {
+                nextPage();
+            } else if (buttonState.equals(TCONST.RTC_PARAGRAPHCOMPLETE)) {
+                nextPara();
+            } else if (buttonState.equals(TCONST.RTC_LINECOMPLETE)) {
+                nextLine();
+            }
         }
     }
 
