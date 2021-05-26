@@ -248,7 +248,7 @@ public class type_audio extends type_action implements IMediaListener {
 
 
         if(AudioDataStorage.contentCreationOn || Objects.equals(CDebugLauncher.getDebugVar("use_hash_name"), "false")) {
-            mPathResolved = mPathResolved.replace("sdcard/Download/RoboTutor/assets/story_questions/audio/en//", "");
+            mPathResolved = mPathResolved.replace("sdcard/Download/RoboTutor/assets/story_questions/audio/en//", "").replace("sdcard/Download/RoboTutor/assets/story_questions/audio/sw//", "");
             _useHashName = false;
         }
         RoboTutor.logManager.postEvent_D(_logType, "target:node.audio,action:preload,name:" + mPathResolved);
