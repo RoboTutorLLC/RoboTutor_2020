@@ -4,8 +4,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import cmu.xprize.util.IInterventionSource;
-import cmu.xprize.util.TCONST;
+import cmu.xprize.util.LogTriggerHelper;
 import cmu.xprize.util.TimerMaster;
 
 /**
@@ -44,21 +43,35 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
         Log.i(TAG, "onSingleTapConfirmed: ");
         iTimer.cancelGestureTimer();
 
+        /*LogTriggerHelper.logScrollEvent(
+                "SCREEN_TAP",
+                e
+        );*/
+
         return true;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
         Log.i(TAG, "onLongPress: ");
-        iTimer.triggerGestureTimer(e);
+        iTimer.triggerGestureTimer();
+
+        LogTriggerHelper.logGestureEvent(
+                "SCREEN_LONG_PRESS",
+                e
+        );
 
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(TAG, "onDoubleTap: ");
-        iTimer.triggerGestureTimer(e);
+        iTimer.triggerGestureTimer();
 
+        LogTriggerHelper.logGestureEvent(
+                "SCREEN_DOUBLE_TAP",
+                e
+        );
 
         return true;
     }
@@ -68,6 +81,12 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
                             float distanceX, float distanceY) {
         Log.i(TAG, "onScroll: ");
 
+        /*LogTriggerHelper.logScrollEvent(
+                "SCREEN_SCROLL",
+                distanceX,
+                distanceY
+        );*/
+
         return true;
     }
 
@@ -76,6 +95,12 @@ public class ExpectTapGestureListener extends GestureDetector.SimpleOnGestureLis
                            float velocityX, float velocityY) {
         Log.d(TAG, "onFling: ");
         iTimer.triggerGestureTimer();
+
+        LogTriggerHelper.logFlingGesture(
+                "SCREEN_FLING",
+                velocityX,
+                velocityY
+        );
 
         return true;
     }

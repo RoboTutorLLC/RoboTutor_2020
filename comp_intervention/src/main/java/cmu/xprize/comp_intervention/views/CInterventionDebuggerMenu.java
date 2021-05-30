@@ -125,8 +125,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) stuckTimeExpected = expectedTime;
 
-                        logEvent(BROADCAST_STUCK_UPDATE, expectedTime);
-
                         break;
 
                     case BROADCAST_HESITATION_UPDATE:
@@ -135,8 +133,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) hesitateTimeExpected = expectedTime;
 
-                        logEvent(BROADCAST_HESITATION_UPDATE, expectedTime);
-
                         break;
 
                     case BROADCAST_GESTURE_UPDATE:
@@ -144,26 +140,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         expectedTime = intent.getLongExtra(EXTRA_TIME_EXPECT, -1);
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) gestureTimeExpected = expectedTime;
-
-                    
-                     if (intent.hasExtra("motion_event")) {
-                            Log.d("TAG_GESTURE", "Broadcast triggered with Motion Event");
-
-                            MotionEvent motionEvent = null;
-                            try {
-                                motionEvent = intent.getParcelableExtra("motion_event");
-                            } catch (Exception e) {
-                                Log.e("TAG_GESTURE", "Motion Event reading error", e);
-                            }
-
-                            if (motionEvent != null) {
-                                logEvent(BROADCAST_GESTURE_UPDATE, motionEvent);
-                            } else {
-                                logEvent(BROADCAST_GESTURE_UPDATE, expectedTime);
-                            }
-                        }
-                        else
-                            Log.d("TAG_GESTURE", "Broadcast triggered without Motion Event");
 
                         break;
 
@@ -342,44 +318,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
         mTextFailure.setText(String.format(Locale.getDefault(),
                 "%s:\t\t%s",
                 LABEL_FAILURE, LABEL_TRIGGERED));
-    }
-
-
-    /**
-     *
-     * This function essentially logs the actions specified
-     *
-     * @param action The action to be logged eg. stuck, hesitation, gesture etc.
-     *
-     * @param expectedTime The time in millis when the action is expected to be triggered
-     *
-     */
-    private void logEvent(String action, long expectedTime){
-
-        CLogManager logManager = CLogManager.getInstance();
-
-        logManager.postEvent_T(action, LABEL_TRIGGERED + ":" + expectedTime);
-    }
-  
-    /**
-     * This function essentially logs the actions specified
-     *
-     * @param action       The action to be logged eg. stuck, hesitation, gesture etc.
-     * @param motionEvent Motion event of gestures
-     */
-    private void logEvent(String action, MotionEvent motionEvent) {
-
-        CLogManager logManager = CLogManager.getInstance();
-
-        logManager.postEvent_T(
-                action,
-                "MotionEvent Action" + ":" + motionEvent.getAction() + "," +
-                        "MotionEvent X Coordinate" + ":" + motionEvent.getX() + "," +
-                        "MotionEvent Y Coordinate" + ":" + motionEvent.getY() + "," +
-                        "MotionEvent EventTime" + ":" + motionEvent.getEventTime() + "," +
-                        "MotionEvent DownTime" + ":" + motionEvent.getDownTime()
-        );
-
     }
   
     class CyclicalUpdate implements Runnable {

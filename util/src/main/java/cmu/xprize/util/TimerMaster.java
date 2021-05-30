@@ -3,7 +3,6 @@ package cmu.xprize.util;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.MotionEvent;
 
 import java.util.Date;
 
@@ -83,8 +82,12 @@ public class TimerMaster {
                 STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay));
         _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
 
-        Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _stuckDelay;
+
+        LogTriggerHelper.logStuckEvent(expectedTrigger);
+
+        Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
+
         stuckIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
         _manager.sendBroadcast(stuckIntent);
     }
@@ -108,8 +111,12 @@ public class TimerMaster {
                 HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay));
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
 
-        Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _hesitateDelay;
+
+        LogTriggerHelper.logHesitationEvent(expectedTrigger);
+
+        Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
+
         hesitateIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
         _manager.sendBroadcast(hesitateIntent);
     }
@@ -138,19 +145,6 @@ public class TimerMaster {
         Intent gestureIntent = new Intent(BROADCAST_GESTURE_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _gestureDelay;
         gestureIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
-        _manager.sendBroadcast(gestureIntent);
-    }
-
-    public void triggerGestureTimer(MotionEvent e) {
-        if (gestureTriggered) return; // only trigger once
-
-        _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
-        gestureTriggered = true;
-
-        Intent gestureIntent = new Intent(BROADCAST_GESTURE_UPDATE);
-        long expectedTrigger = (new Date()).getTime() + _gestureDelay;
-        gestureIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
-        gestureIntent.putExtra("motion_event", e);
         _manager.sendBroadcast(gestureIntent);
     }
 
