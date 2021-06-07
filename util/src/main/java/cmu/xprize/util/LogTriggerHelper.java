@@ -15,7 +15,7 @@ public class LogTriggerHelper {
 
         logEvent(
                 "GESTURE_" + action,
-                "MotionEvent Action" + ":" + motionEvent.getAction() + "," +
+                "MotionEvent Action" + ":" + motionEvent.getAction() + "," + //@JackMostow: Should we keep this? It's always 0!
                         "MotionEvent X Coordinate" + ":" + motionEvent.getX() + "," +
                         "MotionEvent Y Coordinate" + ":" + motionEvent.getY() + "," +
                         "MotionEvent EventTime" + ":" + motionEvent.getEventTime() + "," +
@@ -32,22 +32,22 @@ public class LogTriggerHelper {
                         "Velocity Y (px/s)" + ":" + velocityY
         );
 
-    }
+        /*
 
-    public static void logHesitationEvent(long t) {
+        @JackMostow:
 
-        logEvent(
-                "HESITATION",
-                "TRIGGERED" + ":" + t
-        );
+        */
 
     }
 
-    public static void logStuckEvent(long t) {
+    public static void logActionEvent(String action, String currentTutorId, String currentStudentId) {
+
+        currentTutorId = currentTutorId.replace(":", "-"); // Doing this hack since colons contain special meanings in logs!
 
         logEvent(
-                "STUCK",
-                "TRIGGERED" + ":" + t
+                action,
+                "CURRENT_TUTOR" + ":" + currentTutorId + "," +
+                        "CURRENT_STUDENT" + ":" + currentStudentId
         );
 
     }

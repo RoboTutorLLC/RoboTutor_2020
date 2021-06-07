@@ -84,8 +84,6 @@ public class TimerMaster {
 
         long expectedTrigger = (new Date()).getTime() + _stuckDelay;
 
-        LogTriggerHelper.logStuckEvent(expectedTrigger);
-
         Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
 
         stuckIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
@@ -112,8 +110,6 @@ public class TimerMaster {
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
 
         long expectedTrigger = (new Date()).getTime() + _hesitateDelay;
-
-        LogTriggerHelper.logHesitationEvent(expectedTrigger);
 
         Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
 
