@@ -28,7 +28,10 @@ public class Configuration {
                 .putBoolean(ConfigurationItems.USE_PLACEMENT, configItems.use_placement)
                 .putBoolean(ConfigurationItems.RECORD_AUDIO, configItems.record_audio)
                 .putString(ConfigurationItems.MENU_TYPE, configItems.menu_type)
+<<<<<<< HEAD
                 .putBoolean(ConfigurationItems.CONTENT_CREATION_MODE, configItems.content_creation_mode)
+=======
+>>>>>>> development
                 .putBoolean(ConfigurationItems.SHOW_HELPER_BUTTON, configItems.show_helper_button)
                 .putBoolean(ConfigurationItems.RECORD_SCREEN_VIDEO, configItems.record_screen_video)
                 .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
@@ -95,6 +98,8 @@ public class Configuration {
     public static boolean getContentCreationMode(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getBoolean(ConfigurationItems.CONTENT_CREATION_MODE, false);
+    }
+    
     public static String getBaseDirectory(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getString(ConfigurationItems.BASE_DIRECTORY, "roboscreen");

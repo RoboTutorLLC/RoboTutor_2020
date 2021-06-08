@@ -217,14 +217,20 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         ACTIVITY     = this;
 <<<<<<< HEAD
+<<<<<<< HEAD
         AudioWriter.activity = ACTIVITY;
 =======
+=======
+>>>>>>> development
         PACKAGE_NAME = getApplicationContext().getPackageName();
 
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath, ACTIVITY));
 
 
 
+<<<<<<< HEAD
+>>>>>>> development
+=======
 >>>>>>> development
 
         // Prep the CPreferenceCache
