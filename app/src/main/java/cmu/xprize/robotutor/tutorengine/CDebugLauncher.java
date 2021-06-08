@@ -51,15 +51,13 @@ public class CDebugLauncher {
             this.matrix = mResult.get("skill1");
 
             for (Map.Entry<String, String> element : mResult.entrySet()) {
-                String key = element.getKey();
-                if (!key.equals("tutor_desc") && !key.equals("native") && !key.equals("tutor_data") && !key.equals("tutor_id") && !key.equals("skill1")) {
-                    debugVars.put(element.getKey(), element.getValue());
-                }
+                debugVars.put(element.getKey(), element.getValue());
+
             }
 
             return true;
         } catch (Exception e) {
-            Log.wtf("CDebugLauncher", "/sdcard/Download/debug.json does not exist");
+            Log.d("CDebugLauncher", "/sdcard/Download/debug.json does not exist");
 
             return false;
         }
