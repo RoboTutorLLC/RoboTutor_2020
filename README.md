@@ -26,6 +26,10 @@ To quickly install the most recent version of RoboTutor without having to downlo
 
 ---
 
+## Contribution and Developer Practices
+
+- Please read our best practices and the community guidelines in our [Dev Docs](https://github.com/RoboTutorLLC/RoboTutor_2020/blob/master/DEVDOCS.md).
+
 ## **Setup and Configuration:**
 
 [Install Android Studio](http://developer.android.com/sdk/index.html)<br>
@@ -33,6 +37,7 @@ To quickly install the most recent version of RoboTutor without having to downlo
 [Install GitHub Desktop](https://desktop.github.com/)<br>
 
 RoboTutor uses a large volume of external assets at runtime.  To successfully run RoboTutor you must first install these assets on your target device: [English](https://github.com/XPRIZE/GLEXP-Team-RoboTutor-EnglishAssets). [Swahili](https://github.com/XPRIZE/GLEXP-Team-RoboTutor-CodeDrop2-Assets). Once you have cloned and run the associated tools to push the data assets to your device you can proceed with building RoboTutor.
+
 
 
 ## **Building RoboTutor:**
@@ -48,6 +53,24 @@ RoboTutor uses a large volume of external assets at runtime.  To successfully ru
 
 5. If you do not already have one, follow the steps for Android Studio (https://stackoverflow.com/a/30254012) (for
 (https://stackoverflow.com/questions/3997748/how-can-i-create-a-keystore)) to generate a keystore.
+Sample command:
+
+```
+keytool -genkeypair -dname "cn=Mark Jones, ou=JavaSoft, o=Sun, c=US" -alias business -keypass kpi135 -keystore /working/android.keystore -storepass ab987c -validity 20000
+```
+
+- *dname* is a unique identifier for the application in the .keystore
+
+    - *cn* the full name of the person or organization that generates the .keystore
+    - *ou* Organizational Unit that creates the project, its a subdivision of the Organization that creates it. Ex. android.google.com
+    - *o* Organization owner of the whole project. Its a higher scope than ou. Ex.: google.com
+    - *c* The country short code. Ex: For United States is "US"
+
+- *alias* Identifier of the app as an single entity inside the .keystore (it can have many)
+- *keypass* Password for protecting that specific alias.
+- *keystore* Path where the .keystore file shall be created (the standard extension is actually .ks)
+- storepass Password for protecting the whole .keystore content.
+- *validity* Amount of days the app will be valid with this .keystore
 
 6. Add a file named "keystore.properties" to your root project directory, and give it the following contents. The values should be based on the values you used to generate the keystore.
 ```
@@ -58,6 +81,17 @@ storeFile=<path_to_location_of_keystore>
 ```
 
 7. Use Android Studio or gradlew to generate a signed APK with the flavor *release_sw*. This will generate the file *robotutor.release_sw.1.8.8.1.apk*. This APK should be transferred to the apk in your local SystemBuild directory.
+
+[Installation Standalone](./INSTALL-STANDALONE.md)
+
+You can refer to the above Guide if you are still facing any errors.
+
+## **Common Errors**
+
+1. If you are getting an error `config.json not found`:
+    - With your device/simulator running, write the command `adb push robot-tutor/RoboTutor_2020/app/src/sample_config_files/release_en.json /sdcard/Download/config.json`
+2. If you are getting an error `debug.json not found`:
+    - With your device/simulator running, write the command `adb push robot-tutor/RoboTutor_2020/app/src/sample_config_files/debug/config.json /sdcard/Download/debug.json`
 
 
 ---

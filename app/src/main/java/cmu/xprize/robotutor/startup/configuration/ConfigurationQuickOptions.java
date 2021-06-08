@@ -23,6 +23,10 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "CD1",
+            true,
+            false,
+            false,
+            "roboscreen",
             false
     );
 
@@ -39,6 +43,10 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "CD1",
+            true,
+            false,
+            false,
+            "roboscreen",
             false
     );
 }

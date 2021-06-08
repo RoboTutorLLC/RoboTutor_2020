@@ -25,11 +25,11 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api 'com.android.support:appcompat-v7:25.2.0'
-    api 'com.android.support:percent:25.2.0'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:percent:25.2.0'
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     api project(path: ':util')

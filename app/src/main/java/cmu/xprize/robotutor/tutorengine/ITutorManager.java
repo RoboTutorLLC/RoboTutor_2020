@@ -22,7 +22,12 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+/*
+This is an interface to provide the base for the Master Animation Layout and other Layout Classes.
+This is used to ensure that the classes dealing with subviews have addView/removeView/addAndShow
+methods implemented
 
+ */
 public interface ITutorManager extends ITutorSceneImpl  {
 
     public void setOnTouchListener(View.OnTouchListener l);

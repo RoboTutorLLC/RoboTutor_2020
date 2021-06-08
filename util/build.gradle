@@ -36,8 +36,8 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'
-    api 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
     api 'com.android.support:percent:25.2.0'
-    api files('libs/datashop-logging.jar')
+    compile files('libs/datashop-logging.jar')
     api project(':comp_logging')
 }

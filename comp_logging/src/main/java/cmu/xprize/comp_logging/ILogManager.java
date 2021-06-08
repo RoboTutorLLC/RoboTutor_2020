@@ -28,6 +28,8 @@ public interface ILogManager {
 
     public void postEvent_A(String Tag, String Msg);
 
+    public void postEvent_T(String Tag, String Msg);
+
     public void postDateTimeStamp(String Tag, String Msg);
 
     public void post(String command);

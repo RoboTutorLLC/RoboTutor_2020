@@ -36,8 +36,8 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    api 'com.android.support:appcompat-v7:25.2.0'
-    api 'com.android.support:percent:25.2.0'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:percent:25.2.0'
     api project(':util')
     api project(':comp_logging')
 }

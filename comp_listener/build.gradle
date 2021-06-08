@@ -40,11 +40,9 @@ repositories {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
-    api files('libs/jump3rcode.jar')
-    implementation 'com.github.adrielcafe:AndroidAudioConverter:0.0.8'
+    api fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    api 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
     api project(':util')
     api files('libs/pocketsphinx-android-5prealpha-nolib.jar')
     api project(':comp_logging')

@@ -45,11 +45,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        /*
-        release_dbg {
-           debuggable true
+        debug {
+            debuggable true
         }
-         */
 
         // This release includes the DEBUG selector and other various debug support features.
         //
@@ -63,19 +61,15 @@ android {
     // define apk naming behavior
     // define apk naming behavior
     applicationVariants.all { variant ->
-        /* variant.outputs.each { output ->
+        variant.outputs.each { output ->
             def project = "robotutor"
             def SEP = "."
-            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def buildType = variant.buildType.name
             def version = variant.versionName
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
-            output.outputFile = new File(output.outputFile.parent, newApkName)
-        } */
-        // This allows the build to work on Windows.
-        // TODO: delete this for final commit
-        variant.outputs.all {
-            outputFileName = "robotutor.${variant.variantData.variantConfiguration.buildType.name}.${variant.versionName}.apk"
+//            new File(output.outputFile.parent, newApkName)
+            output.outputFileName = newApkName
         }
     }
 
@@ -89,38 +83,46 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     testImplementation 'junit:junit:4.12'
-    api 'com.android.support:appcompat-v7:25.2.0'
-    api 'com.android.support:percent:25.2.0'
-    api 'com.google.code.gson:gson:2.8.0'
-    api project(':comp_banner')
-    api project(':comp_ltkplus')
-    api project(':util')
-    api project(':mn_component')
-    api project(':comp_listener')
-    api project(':comp_reading')
-    api project(':comp_questions')
-    api project(':sm_component')
-    api project(':fw_component')
-    api project(':nl_component')
-    api project(':comp_math')
-    api project(':comp_akira')
-    api project(':comp_bubblepop')
-    api project(':comp_writing')
-    api project(':comp_pointtap')
-    api project(path: ':comp_ask')
-    api project(path: ':comp_session')
-    api project(path: ':comp_debug')
-    api project(':comp_logging')
-    api project(path: ':comp_counting')
-    api project(path: ':comp_counting2')
-    api project(path: ':comp_numberscale')
-    api project(path: ':comp_nd')
-    api project(path: ':comp_picmatch')
-    api project(path: ':comp_bigmath')
-    api project(path: ':comp_spelling')
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
+    implementation 'com.google.guava:guava:22.0-android'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'com.android.support:percent:25.2.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'org.mp4parser:isoparser:1.9.27'
+    implementation project(':comp_banner')
+    implementation project(':comp_ltkplus')
+    implementation project(':util')
+    implementation project(':mn_component')
+    implementation project(':comp_listener')
+    implementation project(':comp_reading')
+    implementation project(':comp_questions')
+    implementation project(':sm_component')
+    implementation project(':fw_component')
+    implementation project(':nl_component')
+    implementation project(':comp_math')
+    implementation project(':comp_akira')
+    implementation project(':comp_bubblepop')
+    implementation project(':comp_writing')
+    implementation project(':comp_pointtap')
+    implementation project(path: ':comp_ask')
+    implementation project(path: ':comp_session')
+    implementation project(path: ':comp_debug')
+    implementation project(':comp_logging')
+    implementation project(path: ':comp_counting')
+    implementation project(path: ':comp_counting2')
+    implementation project(path: ':comp_numberscale')
+    implementation project(path: ':comp_nd')
+    implementation project(path: ':comp_picmatch')
+    implementation project(path: ':comp_bigmath')
+    implementation project(path: ':comp_spelling')
 
-    compile project(path: ':comp_intervention')
+    implementation project(path: ':comp_intervention')
+    implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
 }
 

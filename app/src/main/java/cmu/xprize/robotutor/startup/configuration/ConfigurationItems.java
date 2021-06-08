@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import cmu.xprize.comp_logging.CErrorManager;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -26,6 +25,11 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
     public static final String CONTENT_CREATION_MODE = "CONTENT_CREATION_MODE";
+    public static final String RECORD_SCREEN_VIDEO = "RECORD_SCREEN_VIDEO";
+    public static final String INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO = "INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO";
+    public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
+    public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
+    public static final String PINNING_MODE = "PINNING_MODE";
 
     public String config_version;
     public boolean language_override;
@@ -39,6 +43,11 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean record_audio;
     public String menu_type;
     public boolean content_creation_mode;
+    public boolean record_screen_video;
+    public boolean show_helper_button;
+    public String baseDirectory;
+    public boolean include_audio_output_in_screen_video;
+    public boolean pinning_mode;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -46,6 +55,12 @@ public class ConfigurationItems implements ILoadableObject {
 
         try {
             loadJSON(new JSONObject(jsonData), null);
+            /*
+            The JSON object is logged here to make the app logs more identifiable
+            and searchable.
+            */
+            Log.i(TAG, new JSONObject(jsonData).toString(4));
+            this.setConfigVersion();
         } catch (Exception e) {
             Log.e(TAG, "Invalid Data Source for : " + dataPath, e);
             setDefaults();
@@ -58,9 +73,12 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-                              String menu_type, boolean content_creation_mode) {
+                              String menu_type, boolean content_creation_mode,
+                              String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
+                              boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
 
-        this.config_version = config_version;
+//        this.config_version = config_version;
+        this.setConfigVersion();
         this.language_override = language_override;
         this.show_tutorversion = show_tutorversion;
         this.show_debug_launcher = show_debug_launcher;
@@ -72,11 +90,17 @@ public class ConfigurationItems implements ILoadableObject {
         this.record_audio = record_audio;
         this.menu_type = menu_type;
         this.content_creation_mode = content_creation_mode;
+        this.record_screen_video = record_screen_video;
+        this.include_audio_output_in_screen_video = include_audio_output_in_screen_video;
+        this.show_helper_button = show_helper_button;
+        this.baseDirectory = baseDirectory;
+        this.pinning_mode = pinning_mode;
     }
 
     public void setDefaults() {
         // use the swahili versions as default
-        config_version = "release_sw";
+//        config_version = "release_sw"; // shouldn't it be fttt...?
+        this.setConfigVersion();
         language_override = true;
         show_tutorversion = true;
         show_debug_launcher = false;
@@ -88,6 +112,18 @@ public class ConfigurationItems implements ILoadableObject {
         record_audio = false;
         menu_type = "CD1";
         content_creation_mode = false;
+        show_helper_button = false;
+        baseDirectory = "roboscreen";
+        record_screen_video = true;
+        include_audio_output_in_screen_video = false;
+        pinning_mode = false;
+    }
+
+    private void setConfigVersion() {
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+        String configAcronym = JSON_Helper.createValueAcronym(jsonData);
+        this.config_version = configAcronym;
     }
 
     @Override

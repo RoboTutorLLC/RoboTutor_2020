@@ -22,13 +22,13 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'junit:junit:4.12'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    api project(path: ':util')
+    api project(':util')
     api project(':comp_ltkplus')
     api project(':comp_logging')
 }

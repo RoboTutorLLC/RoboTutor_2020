@@ -30,10 +30,10 @@ android {
 
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
-    api 'com.android.support:appcompat-v7:25.2.0'
+    api 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:25.2.0'
     api project(path: ':util')
     api project(':comp_logging')
     api project(path: ':comp_writebox')
-    api 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
