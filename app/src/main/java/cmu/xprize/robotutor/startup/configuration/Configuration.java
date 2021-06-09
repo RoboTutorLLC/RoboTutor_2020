@@ -23,6 +23,7 @@ public class Configuration {
                 .putBoolean(ConfigurationItems.USE_PLACEMENT, configItems.use_placement)
                 .putBoolean(ConfigurationItems.RECORD_AUDIO, configItems.record_audio)
                 .putString(ConfigurationItems.MENU_TYPE, configItems.menu_type)
+                .putString(ConfigurationItems.MATRIX_FILE, configItems.matrix_file)
                 .apply();
     }
 
@@ -79,5 +80,10 @@ public class Configuration {
     public static String getMenuType(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getString(ConfigurationItems.MENU_TYPE, "CD1");
+    }
+
+    public static String getMatrixFile(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getString(ConfigurationItems.MATRIX_FILE, "dev_data.open.json");
     }
 }

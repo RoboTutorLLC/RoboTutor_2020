@@ -25,6 +25,7 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String USE_PLACEMENT = "USE_PLACEMENT";
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
+    public static final String MATRIX_FILE = "MATRIX_FILE";
 
     public String config_version;
     public boolean language_override;
@@ -37,6 +38,8 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean use_placement;
     public boolean record_audio;
     public String menu_type;
+
+    public String matrix_file;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -56,7 +59,7 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-                              String menu_type) {
+                              String menu_type, String matrix_file) {
 
         this.config_version = config_version;
         this.language_override = language_override;
@@ -69,6 +72,7 @@ public class ConfigurationItems implements ILoadableObject {
         this.use_placement = use_placement;
         this.record_audio = record_audio;
         this.menu_type = menu_type;
+        this.matrix_file = matrix_file;
     }
 
     public void setDefaults() {

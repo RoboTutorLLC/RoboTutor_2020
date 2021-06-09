@@ -116,7 +116,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     private static final boolean QUICK_DEBUG_CONFIG = false;
     private static final ConfigurationItems QUICK_DEBUG_CONFIG_OPTION = ConfigurationQuickOptions.DEBUG_EN;
 
-    public static final String MATRIX_FILE = "dev_data.open.json";
+
+    public static String MATRIX_FILE = "dev_data.open.json";
 
     private static final String LOG_SEQUENCE_ID = "LOG_SEQUENCE_ID";
 
@@ -183,6 +184,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        MATRIX_FILE = Configuration.getMatrixFile(getApplicationContext());
         // Note = we don't want the system to try and recreate any of our views- always pass null
         //
         super.onCreate(null);
