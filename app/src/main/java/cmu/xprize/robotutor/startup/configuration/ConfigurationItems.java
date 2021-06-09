@@ -42,10 +42,7 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean use_placement;
     public boolean record_audio;
     public String menu_type;
-<<<<<<< HEAD
     public boolean content_creation_mode;
-=======
->>>>>>> development
     public boolean record_screen_video;
     public boolean show_helper_button;
     public String baseDirectory;
@@ -76,10 +73,7 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-<<<<<<< HEAD
                               String menu_type, boolean content_creation_mode,
-=======
->>>>>>> development
                               String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
                               boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
 
@@ -95,10 +89,7 @@ public class ConfigurationItems implements ILoadableObject {
         this.use_placement = use_placement;
         this.record_audio = record_audio;
         this.menu_type = menu_type;
-<<<<<<< HEAD
         this.content_creation_mode = content_creation_mode;
-=======
->>>>>>> development
         this.record_screen_video = record_screen_video;
         this.include_audio_output_in_screen_video = include_audio_output_in_screen_video;
         this.show_helper_button = show_helper_button;
@@ -120,10 +111,7 @@ public class ConfigurationItems implements ILoadableObject {
         use_placement = true;
         record_audio = false;
         menu_type = "CD1";
-<<<<<<< HEAD
         content_creation_mode = false;
-=======
->>>>>>> development
         show_helper_button = false;
         baseDirectory = "roboscreen";
         record_screen_video = true;
