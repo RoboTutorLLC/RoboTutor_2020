@@ -309,7 +309,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        screenRecorder.onActivityResult(requestCode, resultCode, data);
+        if (data != null)
+            screenRecorder.onActivityResult(requestCode, resultCode, data);
         setFullScreen();
     }
 
