@@ -11,7 +11,6 @@
     <!-- in Relative layout - views have to be defined before being referenced -->
 
     <cmu.xprize.robotutor.tutorengine.widgets.core.TTextView
-        android:visibility="gone"
         android:id="@+id/StutorVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
