@@ -44,14 +44,16 @@ RoboTutor uses a large volume of external assets at runtime.  To successfully ru
 
 1. Clone RoboTutor to your computer using Git/GitHub
 
-2. **Import** the RoboTutor project into Android Studio.
+2. Run the setup script `./setup.sh`
 
-3. You may need to install different versions of the build tools and android SDKs.
+3. **Import** the RoboTutor project into Android Studio.
 
-4. There are a number of build variants you can select to generate versions that support static language selections and also vesions that permit dynamic language selection at runtime. In order to generate any flavor that depends on the key signature, you must generate your own keystore (see next steps). Note that the version used in the XPrize code drop 1 submission usees flavor *release_sw*, which depends on a signed APK.
+4. You may need to install different versions of the build tools and android SDKs.
+
+5. There are a number of build variants you can select to generate versions that support static language selections and also vesions that permit dynamic language selection at runtime. In order to generate any flavor that depends on the key signature, you must generate your own keystore (see next steps). Note that the version used in the XPrize code drop 1 submission usees flavor *release_sw*, which depends on a signed APK.
 
 
-5. If you do not already have one, follow the steps for Android Studio (https://stackoverflow.com/a/30254012) (for
+6. If you do not already have one, follow the steps for Android Studio (https://stackoverflow.com/a/30254012) (for
 (https://stackoverflow.com/questions/3997748/how-can-i-create-a-keystore)) to generate a keystore.
 Sample command:
 
