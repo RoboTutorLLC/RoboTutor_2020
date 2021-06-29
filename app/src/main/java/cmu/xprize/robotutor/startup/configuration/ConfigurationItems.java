@@ -74,7 +74,7 @@ public class ConfigurationItems implements ILoadableObject {
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
                               String menu_type, boolean content_creation_mode,
-                              String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
+                              boolean record_screen_video, boolean include_audio_output_in_screen_video,
                               boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
 
 //        this.config_version = config_version;
