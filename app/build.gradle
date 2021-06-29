@@ -126,3 +126,10 @@ dependencies {
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
 }
 
+subprojects {
+    apply from: "checkstyle.gradle"
+    afterEvaluate{
+        preBuild.dependsOn('checkstyle')
+        check.dependsOn 'checkstyle'
+    }
+}
