@@ -30,6 +30,12 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    configurations {
+        all {
+            exclude group: 'com.gitub.adrielcafe', module: 'ffmpeg-android-java'
+        }
+    }
 }
 
 dependencies {
