@@ -2,7 +2,7 @@ apply plugin: 'checkstyle'
 //https://inderpalaulakh.com/posts/android-checkstyle/
 
 checkstyle {
-    description: 'code style check'
+    description = 'code style check'
     group 'verification'
     configFile file('checkstyle/checkstyle.xml')
 }
