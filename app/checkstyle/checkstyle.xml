@@ -107,7 +107,7 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="LineLength"/>
+        <!-- <module name="LineLength"/> -->
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -137,7 +137,7 @@
         <module name="NeedBraces"/>
         <module name="RightCurly"/>
         <module name="AvoidInlineConditionals"/>
-        <module name="DoubleCheckedLocking"/>    <!-- MY FAVOURITE -->
+        <!-- <module name="DoubleCheckedLocking"/>   --> <!-- MY FAVOURITE -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
@@ -145,7 +145,7 @@
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
-        <module name="RedundantThrows"/>
+        <!-- <module name="RedundantThrows"/>  -->
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
         <module name="DesignForExtension"/>
