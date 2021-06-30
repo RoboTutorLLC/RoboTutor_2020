@@ -631,6 +631,11 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
     public void skipSentence() {
 
     }
+
+    @Override
+    public void endOfUtteranceCapture() {
+
+    }
 }
 
 

@@ -498,11 +498,34 @@
             "edge": "LISTEN"
           }
         ]
+      },
+      "NARRATION_END_NODE": {
+        "type": "NODE",
+        "COMMENT": "Begins the saving of audio data",
+        "maptype": "moduleMap",
+        "mapname": "END_UTTERANCE_CAPTURE_MOD",
+        "preenter": [],
+        "preexit": [],
+        "edges": [
+          {
+            "constraint": "",
+            "edge": "ECHO_LINE_NODE"
+          }
+        ]
       }
     },
 
       "moduleMap": {
         "COMMENT": "@@@@@  CModules  @@@@@",
+
+        "END_UTTERANCE_CAPTURE_MOD": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "",
+          "tracks": [
+            {"type": "COMMAND","id": "SstoryReading","method": "endOfUtteranceCapture","parms": "none","features": ""}
+          ]
+        },
 
         "SAVEAUDIO": {
           "type": "MODULE",
@@ -755,7 +778,9 @@
         "CANCEL_FEEDBACK": {"type": "COMMAND", "cmd": "CANCEL_NODE"},
         "NEXT_NODE":       {"type": "COMMAND", "cmd": "NEXT"  },
         "WAIT":            {"type": "COMMAND", "cmd": "WAIT"  },
-        "PAUSE":           {"type": "COMMAND", "cmd": "WAIT"}
+        "PAUSE":           {"type": "COMMAND", "cmd": "WAIT"},
+
+        "END_UTTERANCE_CAPTURE": {"type": "COMMAND", "id":  "SstoryReading", "method": "endOfUtteranceCapture", "features": ""}
       },
 
       "constraintMap": {
@@ -838,6 +863,13 @@
         "NARRATION_CAPTURE_MODE": {
           "type": "CONDITION",
           "test": "NARRATION_CAPTURE_MODE"
+        },
+
+        "UPDATE_NARRATION_CAPTURE": {
+          "type": "CONDITION",
+          "test": "{{SstoryReading.narrationCompleteState}}=='TRUE'",
+          "Then": "true",
+          "Else": "false"
         }
       }
     }

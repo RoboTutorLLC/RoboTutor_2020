@@ -1089,6 +1089,11 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     }
 
     @Override
+    public void endOfUtteranceCapture() {
+        mViewManager.endOfUtteranceCapture();
+    }
+
+    @Override
     public void parrotLine() {
         mViewManager.parrotLine();
     }

@@ -842,6 +842,7 @@ public class TCONST {
     public static final String RTC_VAR_ECHOSTATE   = ".echoState";
     public static final String RTC_VAR_PARROTSTATE = ".parrotState";
     public static final String RTC_VAR_NARRATESTATE = ".narrateState";
+    public static final String RTC_VAR_NARRATECOMPLETESTATE = ".narrationCompleteState";
 
     // Generic question state flag
     public static final String RTC_VAR_QUESTIONSTATE = ".questionState";

@@ -87,4 +87,6 @@ public interface ICRt_ViewManager extends ILoadableObject {
     public void enableNarrationCaptureMode(boolean isNarrationCaptureMode, boolean keepExtraAudio);
 
     public void skipSentence();
+
+    public void endOfUtteranceCapture();
 }

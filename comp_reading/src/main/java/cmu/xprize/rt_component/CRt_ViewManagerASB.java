@@ -329,6 +329,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         if (hearRead.equals(TCONST.FTR_USER_HEAR)) {
 
+            if(isNarrationCaptureMode) {
+                isUserNarrating = true;
+                endOfUtteranceCapture();
+            }
+
             mParent.applyBehavior(TCONST.NARRATE_STORY);
         }
         if (hearRead.equals(FTR_USER_READ)) {
@@ -1036,6 +1041,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         mParent.publishValue(TCONST.RTC_VAR_ECHOSTATE, TCONST.FALSE);
         mParent.publishValue(TCONST.RTC_VAR_PARROTSTATE, TCONST.FALSE);
         mParent.publishValue(TCONST.RTC_VAR_NARRATESTATE, TCONST.FALSE);
+        mParent.publishValue(TCONST.RTC_VAR_NARRATECOMPLETESTATE, TCONST.FALSE);
 
         if (prompt != null) {
             mParent.publishValue(TCONST.RTC_VAR_PROMPT, prompt);
@@ -1061,31 +1067,36 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         //
                         if (hearRead.equals(FTR_USER_READ)) {
 
-                    if (!mParent.testFeature(TCONST.FTR_USER_PARROT)) mParent.publishValue(TCONST.RTC_VAR_ECHOSTATE, TCONST.TRUE);
+                            if(mParent.testFeature(TCONST.FTR_NARRATION_CAPTURE)) {
+                                mParent.publishValue(TCONST.RTC_VAR_NARRATECOMPLETESTATE, TCONST.TRUE);
+                            }
 
-                    hearRead = TCONST.FTR_USER_HEAR;
-                    mParent.retractFeature(FTR_USER_READING);
+                            if (!mParent.testFeature(TCONST.FTR_USER_PARROT))
+                                mParent.publishValue(TCONST.RTC_VAR_ECHOSTATE, TCONST.TRUE);
 
-                    Log.d("ISREADING", "NO");
+                            hearRead = TCONST.FTR_USER_HEAR;
+                            mParent.retractFeature(FTR_USER_READING);
 
-                    cummulativeState = TCONST.RTC_LINECOMPLETE;
-                    mParent.publishValue(TCONST.RTC_VAR_WORDSTATE, TCONST.LAST);
+                            Log.d("ISREADING", "NO");
 
-                    mListener.setPauseListener(true);
-                }
-                // Narrate mode - swithc back to READ and set line complete flags
-                //
-                else {
-                    hearRead = FTR_USER_READ;
-                    mParent.publishFeature(FTR_USER_READING);
+                            cummulativeState = TCONST.RTC_LINECOMPLETE;
+                            mParent.publishValue(TCONST.RTC_VAR_WORDSTATE, TCONST.LAST);
 
-                    if (mParent.testFeature(TCONST.FTR_USER_PARROT)) mParent.publishValue(TCONST.RTC_VAR_PARROTSTATE, TCONST.TRUE);
+                            mListener.setPauseListener(true);
+                        }
+                        // Narrate mode - swithc back to READ and set line complete flags
+                        //
+                        else {
+                            hearRead = FTR_USER_READ;
+                            mParent.publishFeature(FTR_USER_READING);
 
-                    Log.d("ISREADING", "YES");
+                            if (mParent.testFeature(TCONST.FTR_USER_PARROT)) mParent.publishValue(TCONST.RTC_VAR_PARROTSTATE, TCONST.TRUE);
 
-                    cummulativeState = TCONST.RTC_LINECOMPLETE;
-                    mParent.publishValue(TCONST.RTC_VAR_WORDSTATE, TCONST.LAST);
-                }
+                            Log.d("ISREADING", "YES");
+
+                            cummulativeState = TCONST.RTC_LINECOMPLETE;
+                            mParent.publishValue(TCONST.RTC_VAR_WORDSTATE, TCONST.LAST);
+                        }
             } else {
                 cummulativeState = TCONST.RTC_LINECOMPLETE;
                 mParent.publishValue(TCONST.RTC_VAR_WORDSTATE, TCONST.LAST);
@@ -1333,9 +1344,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         isUserNarrating = true;
 
         if (isNarrationCaptureMode) {
-            capturedUtt = AudioDataStorage.segmentation;
-            endOfUtteranceCapture();
-            constructAudioStoryData(); // sets data narration
+
+            // endOfUtteranceCapture();
+             // sets data narration
         }
         // reset the echo flag
         //
@@ -2179,7 +2190,10 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     }
 
+
     public void endOfUtteranceCapture() {
+
+        capturedUtt = AudioDataStorage.segmentation;
 
         // creates a 2d HeardWord list of all continuous utterances spoken
         // todo (chirag): write segmentation data to file also
@@ -2250,6 +2264,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                             endSegment = seams.get(seams.size() - 1) - 1;
                         } else  {
                             Log.d(TAG, "Sentence end reached however narration was not complete.");
+                            hearRead = TCONST.FTR_USER_READ;
                             seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
                             return;
                         }
@@ -2258,13 +2273,16 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     }
                 }
             }
+            Log.d(TAG, "End Of Utterance Capture. Successfully captured narration of sentence");
             UpdateDisplay();
             acceptedList.clear();
             seamIndices.clear();
-            // constructAudioStoryData();
+            mParent.publishValue(TCONST.RTC_VAR_NARRATECOMPLETESTATE,TCONST.FALSE);
+            constructAudioStoryData();
         } else {
             Log.wtf(TAG, "Unable to save final part of narration");
         }
+
 
     }
 

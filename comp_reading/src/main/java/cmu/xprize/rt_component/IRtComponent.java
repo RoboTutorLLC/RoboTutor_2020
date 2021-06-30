@@ -60,4 +60,5 @@ public interface IRtComponent {
     public void prevSentence();
     public void restartUtterance();
     public void skipSentence();
+    public void endOfUtteranceCapture();
 }
