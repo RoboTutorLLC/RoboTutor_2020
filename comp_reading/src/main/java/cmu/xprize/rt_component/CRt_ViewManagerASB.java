@@ -277,14 +277,15 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
             String date = formatter.format(new Date(System.currentTimeMillis()));
             String hyplogFile = TCONST.HYP_LOG_FILE_LOCATION + date + ".log";
-            try {
+            // Not working code below
+            /* try {
                 FileOutputStream fos = new FileOutputStream(hyplogFile);
                 fos.close();
                 AudioWriter.current_log_location = hyplogFile;
             } catch (IOException e) {
                 isNarrationCaptureMode = false;
                 Log.getStackTraceString(e);
-            }
+            } */
         } else {
             isNarrationCaptureMode = false;
         }

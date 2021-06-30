@@ -727,7 +727,7 @@ public class SpeechRecognizer {
 
         Log.d("STABLE", "HYP LIST: " + hypString);
 
-        try {
+        /* try {
 
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
             String date = formatter.format(new Date(System.currentTimeMillis()));
@@ -743,6 +743,8 @@ public class SpeechRecognizer {
         } catch (Exception e) {
             Log.d("SpeechRecognizer", "No log file");
         }
+
+         */
 
         String[] asrWords = hypString.split("\\s+");
 

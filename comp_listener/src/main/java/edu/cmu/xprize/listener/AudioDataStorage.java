@@ -18,7 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * audioData stores the metadata associated with audio (stordata.json stuff)
+ * audioData stores the metadata associated with audio (storydata.json stuff)
  * if you are looking for actual audio output, see AudioWriter
  */
 public class AudioDataStorage {
