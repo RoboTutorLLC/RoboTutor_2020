@@ -90,11 +90,11 @@ repositories {
 dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
-    implementation 'com.google.guava:guava:22.0-android'
+    implementation 'com.google.guava:guava:25.0-android'
     implementation 'com.android.support:appcompat-v7:25.2.0'
     implementation 'com.android.support:percent:25.2.0'
-    implementation 'com.google.code.gson:gson:2.8.0'
-    implementation 'org.mp4parser:isoparser:1.9.27'
+    implementation 'com.google.code.gson:gson:2.8.7'
+    implementation 'org.mp4parser:isoparser:1.9.41'
     implementation project(':comp_banner')
     implementation project(':comp_ltkplus')
     implementation project(':util')
