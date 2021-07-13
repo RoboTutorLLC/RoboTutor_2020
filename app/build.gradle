@@ -75,12 +75,19 @@ android {
 
     lintOptions {
         // set to true to turn off analysis progress reporting by lint
-        quiet true
+        quiet false
         // if true, stop the gradle build if errors are found
         abortOnError false
         // if true, only report errors
         ignoreWarnings true
     }
+
+    apply from: "checkstyle.gradle"
+    afterEvaluate{
+        preBuild.dependsOn('checkstyle')
+        check.dependsOn 'checkstyle'
+    }
+
 }
 
 repositories {
@@ -125,4 +132,3 @@ dependencies {
     implementation project(path: ':comp_intervention')
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
 }
-
