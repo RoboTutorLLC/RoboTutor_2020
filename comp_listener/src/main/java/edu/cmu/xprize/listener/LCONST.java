@@ -53,7 +53,7 @@ public class LCONST {
     /**
      * pocketsphinx threshold signal-to-noise ratio for voice activity detection, default 2.0
      */
-    public static final float VAD_THRESHOLD = 2.0f;
+    public static final float VAD_THRESHOLD = 1.0f; // 2021-07-14 previously 2.0f;
 
     /**
      * pocketsphinx filler probability: higher than default
