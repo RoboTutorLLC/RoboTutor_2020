@@ -532,6 +532,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
         mViewManager.setPageFlipButton(command);
     }
 
+
     // Tutor methods  End
     //************************************************************************
     //************************************************************************
@@ -887,5 +888,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     public void updateJSONData(String dataSource, String assetLocation) {
 
     }
+
+    public void stopAudio() {}
 
 }

@@ -834,6 +834,10 @@ public class TCONST {
     public static final String PAGEFLIP_BUTTON = "PAGE_FLIP_CLICK";
     public static final String SPEAK_BUTTON    = "SPEAK_CLICK";
 
+    public static final String SKIP_SENTENCE = "SENTENCE_SKIP_CLICK";
+    public static final String SKIP_PARA = "PARAGRAPH_SKIP_CLICK";
+    public static final String SKIP_PAGE = "PAGE_SKIP_CLICK";
+
     public static final String EMPTY = "";
 
     public static final int INCR = 1;
@@ -880,6 +884,7 @@ public class TCONST {
     public static final String RTC_VAR_REMAINING   = ".remainingWords";
     public static final String RTC_VAR_SENTENCE    = ".sentence";
     public static final String RTC_VAR_UTTERANCE   = ".utterance";
+    public static final String RTC_VAR_UTTERANCE_DURATION = ".duration";
 
     //Akira Game Prompt Situation
     public static final String PROMPT_1LEFT = "PROMPT_1LEFT";

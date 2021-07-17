@@ -1,9 +1,14 @@
 package edu.cmu.xprize.listener;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.AudioRecord;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,6 +52,8 @@ public class AudioWriter {
     public static String current_log_location;
 
     public static Activity activity;
+
+    public static Context context;
 
     public static void closeStreams() throws IOException, NullPointerException {
 
@@ -230,6 +237,12 @@ public class AudioWriter {
     }
 
     private static void convertToMp3() {
+        try {
+            Thread.sleep(10);
+        }catch (InterruptedException e) {
+            Log.wtf("AudioWriter", Log.getStackTraceString(e));
+        }
+
         File wavFile = new File(completeFilePath);
 
         Log.d("AudioWriter1", "AndroidAudioConverter loaded: " + AndroidAudioConverter.isLoaded());
@@ -243,12 +256,12 @@ public class AudioWriter {
             @Override
             public void onFailure(Exception error) {
 
-                Log.d("AudioWriter", "Failed to write mp3 " + Log.getStackTraceString(error));
+                Log.d("AudioWriter", "Failed to write mp3 \n" + Log.getStackTraceString(error));
                 // Log.getStackTraceString(error);
             }
         };
 
-        Log.d("AudioWriter2", "AndroidAudioConverter loaded: " + AndroidAudioConverter.isLoaded());
+
         AndroidAudioConverter.with(activity)
                 .setFile(wavFile)
                 .setFormat(AudioFormat.MP3)
@@ -333,5 +346,32 @@ public class AudioWriter {
             Log.getStackTraceString(e);
         }
         renameFile(prevName, newName, assetLocation);
+    }
+
+    public static void truncateNarration(String name, long length) {
+        FFmpeg ffmpeg = FFmpeg.getInstance(context);
+        String[] cmd = new String[]{"-t", Long.toString(length), "-i", name, "-acodec", "copy", name};
+        try {
+            // to execute "ffmpeg -version" command you just need to pass "-version"
+            ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onProgress(String message) {}
+
+                @Override
+                public void onFailure(String message) {}
+
+                @Override
+                public void onSuccess(String message) {}
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            Log.wtf("AudioWriter", e);
+        }
     }
 }

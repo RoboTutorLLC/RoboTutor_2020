@@ -333,8 +333,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 isUserNarrating = true;
                 endOfUtteranceCapture();
             }
-
-            mParent.applyBehavior(TCONST.NARRATE_STORY);
+            if(!hearRead.equals(FTR_USER_READ)) {
+                mParent.applyBehavior(TCONST.NARRATE_STORY);
+            }
         }
         if (hearRead.equals(FTR_USER_READ)) {
 
@@ -828,6 +829,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         utterancePrev = utteranceNdx == 0 ? 0 : rawNarration[utteranceNdx - 1].until;
         segmentPrev   = utterancePrev;
 
+        mParent.post(TCONST.STOP_AUDIO, new Long(currUtterance.until * 10));
+
+
         // Clean the extension off the end - could be either wav/mp3
         //
         String filename = currUtterance.audio.toLowerCase();
@@ -839,6 +843,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         // Publish the current utterance within sentence
         //
         mParent.publishValue(TCONST.RTC_VAR_UTTERANCE,  filename);
+
 
         // NOTE: Due to inconsistencies in the segmentation data, you cannot depend on it
         // having precise timing information.  As a result the segment may timeout before the
@@ -915,7 +920,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 // Note the last segment is not timed.  It is driven by the TRACK_COMPLETE event
                 // from the audio mp3 playing.  This is required as the segmentation data is not
                 // sufficiently accurate to ensure we don't interrupt a playing utterance.
-                //
+                //track
                 segmentNdx++;
                 if (segmentNdx >= numSegments) {
 
@@ -1014,6 +1019,10 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             case TCONST.NEXT_NODE:
 
                 mParent.nextNode();
+                break;
+
+            case TCONST.STOP_AUDIO:
+                mParent.stopAudio();
                 break;
 
             case TCONST.SPEAK_EVENT:
@@ -1201,19 +1210,70 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         }
 
         if (isNarrationCaptureMode) {
-            Log.d("CRT_Chirag", "isNarrateMode is true");
             try {
                 backButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        prevSentence();
+                        Log.d(TAG, "Back Button Pressed");
+                        if (hearRead != null) {
+                            if (hearRead.equals(TCONST.FTR_USER_READ)) {
+                                AudioWriter.abortOperation();
+                                acceptedList.clear();
+                        /*
+                        } else if (hearRead.equals(TCONST.FTR_USER_HEAR)) {
+                            mParent.post(TCONST.STOP_AUDIO, new Long(currUtterance.until * 10));
+                            hearRead = TCONST.FTR_USER_HEAR;
+                        }
+
+                         */
+
+                                if (mCurrLine > 0) {
+                                    seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine - 1, 0);
+                                } else if (mCurrPara > 0) {
+                                    seekToStoryPosition(mCurrPage, mCurrPara - 1, 0, 0);
+                                } else if (mCurrPage > 0) {
+                                    Log.d(TAG, "mCurrPage: " + mCurrPage + " mCurrPara: " + mCurrPara + " mCurrLine: " + mCurrLine);
+                                    seekToStoryPosition(mCurrPage - 1, 0, 0, 0);
+                                }
+                            }
+                        }
+
+
                     }
                 });
 
                 forwardButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        skipSentence();
+                        Log.d(TAG, "Skip Button Pressed");
+
+                        Log.d(TAG, "hearRead: " + hearRead);
+                        if (hearRead != null) {
+                            if (hearRead.equals(TCONST.FTR_USER_READ)) {
+                                AudioWriter.abortOperation();
+                                acceptedList.clear();
+                        /*
+                        } else if (hearRead.equals(TCONST.FTR_USER_HEAR)) {
+                            mParent.post(TCONST.STOP_AUDIO, new Long(currUtterance.until * 10));
+
+                        }
+
+                         */
+                                if (mCurrLine < mLineCount - 1) {
+                                    seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine + 1, 0);
+                                } else if (mCurrPara < mParaCount - 1) {
+                                    seekToStoryPosition(mCurrPage, mCurrPara + 1, 0, 0);
+
+                                } else if (mCurrPage < mPageCount - 1) {
+                                    seekToStoryPosition(mCurrPage + 1, 0, 0, 0);
+
+                                }
+                            }
+                        }
+
+                        UpdateDisplay();
+
+
                     }
                 });
 
@@ -1558,6 +1618,13 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
             if (isNarrationCaptureMode) {
+
+                int progress = 0;
+                for(CASB_Narration narration : data[mCurrPage].text[mCurrPara][mCurrLine].narration) {
+                    acceptedList.add(new int[]{progress, progress + narration.segmentation.length - 1});
+                    progress = narration.segmentation.length;
+                }
+
                 boolean cyan = true;
                 SpannableStringBuilder preHighlight = new SpannableStringBuilder(Html.fromHtml(fmtSentence));
                 Log.d("Highlighting", "Updating narration highlighting");
@@ -1575,11 +1642,14 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         if (segment[0] != 0)
                             textBuilder.append(" ");
                         for (int i = segment[0]; i <= segment[1]; i++) {
-
+                            try {
                             if(wordsToDisplay.length > i)
                                 textBuilder.append(wordsToDisplay[i]);
-                            if(!wordsToDisplay[i].endsWith("-") || !wordsToDisplay[i].endsWith("'")  )
-                                textBuilder.append(" ");
+
+
+                                if(!(wordsToDisplay[i].endsWith("-") || wordsToDisplay[i].endsWith("'")))
+                                    textBuilder.append(" ");
+                            } catch (ArrayIndexOutOfBoundsException ignored) {}
                         }
                         textBuilder.deleteCharAt(textBuilder.length() -1);
 
@@ -1600,6 +1670,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         Log.d(TAG, "Highlight text: " + text + ". index: " + index + ". text length: " + text.length());
 
                         preHighlight.setSpan(new BackgroundColorSpan((cyan ? Color.parseColor("#00FFFF") : Color.parseColor("#96e3ff"))), index, index + text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        if(segment[1] == wordsToDisplay.length - 1)
+                            break;
 
                         cyan = !cyan;
                     }
@@ -1713,10 +1786,11 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 match = true;
             }
 
-            if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) { // VMC_QA these are not equal. one of these is out of bounds (probably wordsToSpeak)
+
+            //if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) { // VMC_QA these are not equal. one of these is out of bounds (probably wordsToSpeak)
                 // wordsToSpeak is in fact out of bounds here. It is 1 shorter than heardWords */
-            // the above was commented out by Chirag in order to ensure that if heardwords is too long (because it often accidentally contains an extra word)
-            //if (match) {
+                // the above was commented out by Chirag in order to ensure that if heardwords is too long (because it often accidentally contains an extra word)
+            if(match) {
                 nextWord();
                 mHeardWord++;
 
@@ -1732,6 +1806,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 attemptNum = 0;
                 result = true;
             }
+
 
             mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1], attemptNum, false, result);
         }
@@ -1793,7 +1868,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     result = true;
                     mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord - 1, heardWords[mHeardWord - 1].hypWord, attemptNum, heardWords[mHeardWord - 1].utteranceId == "", result);
 
-                 // In narration capture mode, it is acceptable if the narrator says the wrong word because they may be starting from a different point than acceptable
+                 // In narration capture mode, it is acceptable if the narrator says the wrong word because they may be starting from a different point than predicted
                 } else if (isNarrationCaptureMode && wordIndex <= mCurrWord) {
 
                     boolean isAtSeam = false;
@@ -1972,6 +2047,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         narration.segmentation = segList.toArray(new CASB_Seg[segList.size()]);
 
                         narrationList.add(narration);
+
                     } catch (FileNotFoundException e) {
                         Log.wtf(TAG, "Unable to construct narration for " + fileString + " because " + fileName.toString() + ".seg does not exist");
                         return;
@@ -2012,6 +2088,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
             // todo (chirag): Updated internal representation. now update storydata.json
 
+
+
             isUserNarrating = false;
 
             resetNarration();
@@ -2021,6 +2099,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     /**
      * for an incorrect utterance in NARRATION CAPTURE MODE
+     * Obsolete
      */
     @Override
     public void clearAudioData() {
@@ -2044,7 +2123,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     private ArrayList<ListenerBase.HeardWord> determineUtterance(boolean lastUtteranceOfSentence) {
         // creates a 2d HeardWord list of all continuous utterances spoken
-
+        if(allHeardWords == null) {
+            return new ArrayList<ListenerBase.HeardWord>();
+        }
         AudioDataStorage.updateHypothesis(allHeardWords);
         for(ListenerBase.HeardWord word : allHeardWords) {
             Log.d("HeardWords", word.hypWord);
@@ -2208,6 +2289,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 if(latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 2])) {
 
                     Log.d(TAG, "Sentence end reached, however last word omitted.");
+                    hearRead = TCONST.FTR_USER_READ;
                     seekToStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
                     return;
 
@@ -2242,6 +2324,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             int endSegment = wordsToSpeak.length - 1;
             ArrayList<Integer> seams = new ArrayList();
             seams.add(-1);
+            /*
             while(!narrationCovered) {
                 boolean segmentCovered = false;
                 for(int[] segment : acceptedList) {
@@ -2273,6 +2356,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                     }
                 }
             }
+
+             */
             Log.d(TAG, "End Of Utterance Capture. Successfully captured narration of sentence");
             UpdateDisplay();
             acceptedList.clear();
@@ -2367,13 +2452,17 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mCurrWord = mWordCount; // go to the end of the sentence
             publishStateValues();
             hearRead = TCONST.FTR_USER_HEAR;
+            // mParent.applyBehavior(TCONST.UTTERANCE_COMPLETE_EVENT);
+            /*
             if (buttonState.equals(TCONST.RTC_PAGECOMPLETE)) {
+
                 nextPage();
             } else if (buttonState.equals(TCONST.RTC_PARAGRAPHCOMPLETE)) {
                 nextPara();
             } else if (buttonState.equals(TCONST.RTC_LINECOMPLETE)) {
                 nextLine();
             }
+             */
         }
     }
 

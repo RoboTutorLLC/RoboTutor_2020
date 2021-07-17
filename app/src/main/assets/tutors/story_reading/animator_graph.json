@@ -256,7 +256,10 @@
             "SET_UTTERANCE_BEHAVIOR",
             "SET_HYPOTHESIS_BEHAVIOR",
             "SET_ONCLICK_SPEAK_WORD",
-            "TIMER_HINT_BUTTON"
+            "TIMER_HINT_BUTTON",
+            "SET_BUTTON_NEXTSENTENCE",
+            "SET_BUTTON_NEXTPARAGRAPH",
+            "SET_BUTTON_NEXTPAGE"
           ],
           "maptype": "moduleMap",
           "mapname": "LISTENING",
@@ -760,6 +763,11 @@
 
         "SET_FLIP_NEXTPAGE":   {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NEXT_PAGE:String" , "features": ""},
         "RESET_FLIP_ONCLICK":  {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NULL:String" , "features": ""},
+
+        "SET_BUTTON_NEXTSENTENCE":   {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior", "parms": "SENTENCE_SKIP_CLICK:String|NEXT_SENTENCE:String" , "features": "NARRATION_CAPTURE_MODE"},
+        "SET_BUTTON_NEXTPARAGRAPH":   {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior", "parms": "PARAGRAPH_SKIP_CLICK:String|NEXT_PARA:String" , "features": "NARRATION_CAPTURE_MODE"},
+        "SET_BUTTON_NEXTPAGE":   {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior", "parms": "PAGE_SKIP_CLICK:String|NEXT_PAGE:String" , "features": "NARRATION_CAPTURE_MODE"},
+
 
         "SET_SPEAK_EVENT":      {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior",   "parms": "SPEAK_EVENT:String|SPEAK_WORD_BEHAVIOR:String" , "features": ""},
         "CLR_SPEAK_EVENT":      {"type": "COMMAND", "id": "SstoryReading", "method": "setVolatileBehavior",   "parms": "SPEAK_EVENT:String|NULL:String" , "features": ""},

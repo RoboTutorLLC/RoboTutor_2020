@@ -76,6 +76,7 @@ public class AudioDataStorage {
             os.write(segBytes);
             os.close();
 
+            // AudioWriter.truncateNarration(completeFilePath, seg.get(seg.size() - 1).endFrame);
         } catch(IOException | NullPointerException e) {
             Log.wtf("AudioDataStorage", "Failed to write segmentation!");
             Log.d("SegmentationFail", Log.getStackTraceString(e));
@@ -107,20 +108,24 @@ public class AudioDataStorage {
 
             JSONArray segm = new JSONArray();
             long finalEndTime = 0;
-            int i = 0;
+            int i = fileName.split(" ").length;
             for(ListenerBase.HeardWord heardWord : seg) {
+                if (i >= 0) {
+                /*
                 if (i > 1) {
                     if (seg.get(i).iSentenceWord != heardWord.iSentenceWord - 1)
                         break;
                 }
-                JSONObject segObj = new JSONObject();
-                segObj.put("end", heardWord.endFrame);
-                segObj.put("start", heardWord.startFrame );
-                segObj.put("word", heardWord.hypWord.toLowerCase());
-                segObj.put("matchLevel", heardWord.matchLevel);
-                segm.put(segObj);
-                finalEndTime = heardWord.endFrame;
-                i++;
+                 */
+                    JSONObject segObj = new JSONObject();
+                    segObj.put("end", heardWord.endFrame);
+                    segObj.put("start", heardWord.startFrame);
+                    segObj.put("word", heardWord.hypWord.toLowerCase());
+                    segm.put(segObj);
+                    finalEndTime = heardWord.endFrame;
+                    i++;
+                }
+                i--;
             }
             rawNarration.put("segmentation", segm);
             rawNarration.put("from", seg.get(0).startFrame);
@@ -165,7 +170,10 @@ public class AudioDataStorage {
     public static void updateHypothesis(ListenerBase.HeardWord[] heardWords) {
         Log.d("AudioDataStorageHyp", "Hypothesis Updated");
         segmentation.clear();
-        segmentation.addAll(Arrays.asList(heardWords));
+        if (heardWords != null) {
+            segmentation.addAll(Arrays.asList(heardWords));
+        }
+
     }
 
     static void setSampleRate(int samplerate) {

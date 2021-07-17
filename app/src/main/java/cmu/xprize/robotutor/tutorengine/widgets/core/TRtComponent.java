@@ -1282,4 +1282,12 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
         }
 
     }
+
+
+    @Override
+    public void stopAudio() {
+        mMediaManager.dispMediaPlayers();
+        CMediaManager.PlayerManager p = mMediaManager.getPlaying();
+        p.stopEarly();
+    }
 }

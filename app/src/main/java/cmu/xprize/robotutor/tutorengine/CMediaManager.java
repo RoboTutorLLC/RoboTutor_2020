@@ -612,7 +612,7 @@ public class CMediaManager {
                     case TCONST.EXTERNAL:
                         FileInputStream soundFile = new FileInputStream(dataSource);
 
-                        mPlayer.setDataSource(soundFile.getFD()); // Chirag chirag this one is failing
+                        mPlayer.setDataSource(soundFile.getFD());
                         break;
 
                     default:
@@ -776,7 +776,7 @@ public class CMediaManager {
             // This stops the last audio recording file
             ScreenRecorder.stopLastAudioFile();
 
-            //#Mod issue #335 - give the tracka chance to shutdown.  The audio runs in
+            //#Mod issue #335 - give the track a chance to shutdown.  The audio runs in
             // JNI code so this seems to allow it to shutdown and not restart if we are
             // interrupting a clip with another clip.
             //
@@ -787,6 +787,13 @@ public class CMediaManager {
                 e.printStackTrace();
             }
 
+
+
+        }
+
+        // Narration capture mode, stopping audio file before it completes and moving onto the next
+        public void stopEarly() {
+            seekTo(mPlayer.getDuration()-1);
         }
 
 

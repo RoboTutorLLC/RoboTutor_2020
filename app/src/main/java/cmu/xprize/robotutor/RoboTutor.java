@@ -288,6 +288,12 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         catch (Exception e) {
             Log.wtf(TAG, e);
         }
+
+        try {
+            AudioWriter.context = getApplicationContext();
+        } catch (Exception e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     /**
