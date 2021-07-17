@@ -28,6 +28,7 @@ import java.util.TimerTask;
 
 import cmu.xprize.robotutor.RoboTutor;
 import cmu.xprize.robotutor.startup.configuration.Configuration;
+
 import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
@@ -247,10 +248,12 @@ public class type_audio extends type_action implements IMediaListener {
         mPathResolved = getScope().parseTemplate(mSourcePath);
 
 
+
         if(AudioDataStorage.contentCreationOn || Objects.equals(CDebugLauncher.getDebugVar("use_hash_name"), "false")) {
             mPathResolved = mPathResolved.replace("sdcard/Download/RoboTutor/assets/story_questions/audio/en//", "").replace("sdcard/Download/RoboTutor/assets/story_questions/audio/sw//", "");
             _useHashName = false;
         }
+
         RoboTutor.logManager.postEvent_D(_logType, "target:node.audio,action:preload,name:" + mPathResolved);
         RoboTutor.logManager.postEvent_D(TCONST.DEBUG_AUDIO_FILE, "target:node.audio,action:preload,name:" + mPathResolved);
 

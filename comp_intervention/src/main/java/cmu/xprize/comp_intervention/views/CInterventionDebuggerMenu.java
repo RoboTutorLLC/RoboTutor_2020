@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -124,8 +125,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) stuckTimeExpected = expectedTime;
 
-                        logEvent(BROADCAST_STUCK_UPDATE, expectedTime);
-
                         break;
 
                     case BROADCAST_HESITATION_UPDATE:
@@ -134,8 +133,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) hesitateTimeExpected = expectedTime;
 
-                        logEvent(BROADCAST_HESITATION_UPDATE, expectedTime);
-
                         break;
 
                     case BROADCAST_GESTURE_UPDATE:
@@ -143,8 +140,6 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         expectedTime = intent.getLongExtra(EXTRA_TIME_EXPECT, -1);
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) gestureTimeExpected = expectedTime;
-
-                        logEvent(BROADCAST_GESTURE_UPDATE, expectedTime);
 
                         break;
 
@@ -324,24 +319,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                 "%s:\t\t%s",
                 LABEL_FAILURE, LABEL_TRIGGERED));
     }
-
-
-    /**
-     *
-     * This function essentially logs the actions specified
-     *
-     * @param action The action to be logged eg. stuck, hesitation, gesture etc.
-     *
-     * @param expectedTime The time in millis when the action is expected to be triggered
-     *
-     */
-    private void logEvent(String action, long expectedTime){
-
-        CLogManager logManager = CLogManager.getInstance();
-
-        logManager.postEvent_T(action, LABEL_TRIGGERED + ":" + expectedTime);
-    }
-
+  
     class CyclicalUpdate implements Runnable {
 
         @Override

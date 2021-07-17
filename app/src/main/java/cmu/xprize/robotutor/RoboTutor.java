@@ -132,6 +132,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     // deprecated variable , see issue #427
     public static final boolean OLD_MENU = true;
+    public static final int REQUEST_CODE = 1;
 
 
     private CMediaController    mMediaController;
@@ -315,7 +316,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        screenRecorder.onActivityResult(requestCode, resultCode, data);
+        if (data != null && requestCode == REQUEST_CODE && resultCode == RESULT_OK)
+            screenRecorder.onActivityResult(requestCode, resultCode, data);
         setFullScreen();
     }
 

@@ -53,9 +53,7 @@ import cmu.xprize.comp_counting2.IGlyphController_Simple;
 import cmu.xprize.comp_counting2.IWritingComponent_Simple;
 import cmu.xprize.ltkplus.CRecResult;
 import cmu.xprize.ltkplus.CRecognizerPlus;
-import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.ltkplus.IGlyphSink;
-import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 
