@@ -42,7 +42,7 @@ echo `ls`
 find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.apk \;
 
 #APK Version extraction
-
+echo `ls`
 # finding the exact line in the gradle file
 ORIGINAL_STRING=$(cat ../../../../../../build.gradle | grep -E '\d\.\d\.\d\.\d')
 echo ORIGINAL_STRING
