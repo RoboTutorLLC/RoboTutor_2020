@@ -43,6 +43,15 @@ find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.ap
 
 #APK Version extraction
 
+# finding the exact line in the gradle file
+ORIGINAL_STRING=$(cat ../build.gradle | grep -E '\d\.\d\.\d\.\d')
+echo ORIGINAL_STRING
+# extracting the exact parts but with " around
+TEMP_STRING=$(echo $ORIGINAL_STRING | grep -Eo '"(.*)"')
+echo TEMP_STRING
+# the exact numbering scheme
+FINAL_VERSION=$(echo $TEMP_STRING | sed 's/"//g') # 3.5.0.1
+echo FINAL_VERSION
 
 major=0
 minor=0
