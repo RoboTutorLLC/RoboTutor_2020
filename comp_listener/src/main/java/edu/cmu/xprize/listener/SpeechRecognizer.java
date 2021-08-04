@@ -38,8 +38,10 @@ package edu.cmu.xprize.listener;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -53,10 +55,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import cmu.xprize.util.CmnVariable;
 import cmu.xprize.util.TCONST;
 import edu.cmu.pocketsphinx.Config;
 import edu.cmu.pocketsphinx.Decoder;
@@ -439,6 +444,7 @@ public class SpeechRecognizer {
             isPausedRecognizer = false;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void run() {
 
@@ -564,7 +570,7 @@ public class SpeechRecognizer {
                     //Log.i("ASR","ASR RAW-BYTES: " + nread);
 
 
-                    File logFile = new File(TCONST.LOGCAT_LOCATION, "logcat" + ".txt" );
+                    File logFile = new File(CmnVariable.LOGCAT_LOCATION, "logcat.txt" );
 
                     if (-1 == nread) {
                         Log.i("ASR","Read Error");
@@ -580,46 +586,168 @@ public class SpeechRecognizer {
                         //`if(RMS > 4)
                         {
                             //ASRTimer = System.currentTimeMillis();
-                            decoder.processRaw(buffer, nread, false, false);
+
                             //Log.d("ASR", "Time in processRaw: " + (System.currentTimeMillis() - ASRTimer));
 
-                            if(TCONST.START_WORD_CMN == 0 && TCONST.CURRENT_WORD >= 0)
+                            if(CmnVariable.CMN_WRITE_FLAG == 0 && CmnVariable.START_WORD_CMN  == 1)
                             {
 
-                                if(logFile.exists())
-                                {
-                                    logFile.delete();
-                                }
+                                if(logFile.exists()) {
 
-                                Process process = null;
+                                    if(CmnVariable.CMN_WRITE_FLAG == 0)
+                                    {
+                                        // LOG FILE PARSER for CMN values
+                                        BufferedReader br = null;
+                                        String[] arrOfStr = new String[0];
+                                        try {
+                                            br = new BufferedReader(new FileReader(logFile));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
+                                        String sq = "";
+                                        String sq1 = "";
+                                        String cmn_values = "";
 
-                                try {
-                                    process = Runtime.getRuntime().exec("logcat -c");
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                        while (true)
+                                        {
+                                            try {
+                                                if (!((sq = br.readLine()) != null)) break;
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                            if(sq.contains("cmn_prior_update: to"))
+                                            {
+                                                CmnVariable.CMN_WRITE_FLAG = 1;
+
+                                                for(int i = 0 ; i < 13 ; i++) {
+                                                    try {
+                                                        sq1 = br.readLine();
+
+                                                        if(i != 12) {
+                                                            cmn_values = cmn_values + sq1.split("cmusphinx: ")[1] + ",";
+                                                        }
+
+                                                        else
+                                                        {
+                                                            cmn_values = cmn_values + sq1.split("cmusphinx: ")[1];
+                                                        }
+
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                cmn_values = cmn_values.replaceAll("\\s", "");
+
+                                                try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(CmnVariable.LOGCAT_LOCATION + "cmn_values.txt"))) {
+                                                    writer.write(cmn_values);
+                                                }
+                                                catch(IOException e){
+                                                    e.printStackTrace(); // Handle the exception
+                                                }
+
+                                                cmn_values = "";
 
 
-                                TCONST.START_WORD_CMN = 1;
-                                decoder.processRaw(buffer, nread, false, false);
-
-                                try {
-                                    process = Runtime.getRuntime().exec("logcat -s cmusphinx:I *:S" + logFile);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-                                try {
-                                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:S  cmusphinx:I");
+                                            }
+                                        }
+                                    }
 
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
 
                             }
 
-                            else if(TCONST.LOG_CMN_FLAG == 0)
+                            if(CmnVariable.START_WORD_CMN == 0) {
+
+                                if (logFile.exists()) {
+                                    logFile.delete();
+                                }
+
+                                try {
+                                    Runtime.getRuntime().exec("logcat -c");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                decoder.processRaw(buffer, nread, false, false);
+
+                                if (decoder.getInSpeech()) {
+                                    String filePath = CmnVariable.LOGCAT_LOCATION + "logcat.txt";
+                                    try {
+                                        Runtime.getRuntime().exec(new String[]{"logcat", "-f", filePath, "cmusphinx:I", "*:S"});
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    CmnVariable.START_WORD_CMN = 1;
+                                }
+
+                            }
+
+                            else
+                            {
+                                decoder.processRaw(buffer, nread, false, false);
+                            }
+
+                                /**
+                                // LOG FILE PARSER for CMN values
+                                BufferedReader br = null;
+                                String[] arrOfStr = new String[0];
+                                try {
+                                    br = new BufferedReader(new FileReader(logFile));
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                                String sq = "";
+                                String sq1 = "";
+                                String cmn_values = "";
+
+                                while (CmnVariable.START_WORD_CMN == 0)
+                                {
+                                    try {
+                                        if (!((sq = br.readLine()) != null)) break;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if(sq.contains("cmn_prior_update: to"))
+                                    {
+                                        for(int i = 0 ; i < 13 ; i++) {
+                                 try {
+                                 sq1 = br.readLine();
+
+                                 if(i != 12) {
+                                 cmn_values = cmn_values + sq1.split("cmusphinx: ")[1] + ",";
+                                 }
+
+                                 else
+                                 {
+                                 cmn_values = cmn_values + sq1.split("cmusphinx: ")[1];
+                                 }
+
+                                 } catch (IOException e) {
+                                 e.printStackTrace();
+                                 }
+                                 }
+                                        cmn_values = cmn_values.replaceAll("\\s", "");
+                                        CmnVariable.CMNINIT_VALUE = cmn_values;
+                                        Log.wtf("Prasad" , cmn_values);
+
+                                        try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(CmnVariable.LOGCAT_LOCATION + "cmn_values.txt"))) {
+                                            writer.write(cmn_values);
+                                        }
+                                        catch(IOException e){
+                                            e.printStackTrace();
+                                        }
+
+                                        logFile.delete();
+                                        CmnVariable.START_WORD_CMN = 1;
+                                    }
+                                }
+**/
+
+
+                            /**
+                            else if(TCONST.LOG_CMN_FLAG == 0 && logFile.exists())
                             {
                                 // LOG FILE PARSER for CMN values
                                 BufferedReader br = null;
@@ -662,14 +790,6 @@ public class SpeechRecognizer {
                                         }
                                         cmn_values = cmn_values.replaceAll("\\s", "");
                                         TCONST.CMNINIT_VALUE = cmn_values;
-                                        Log.wtf("Prasad" , cmn_values);
-
-                                        try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(TCONST.LOGCAT_LOCATION + "cmn_values.txt"))) {
-                                            writer.write(cmn_values);
-                                        }
-                                        catch(IOException e){
-                                            e.printStackTrace(); // Handle the exception
-                                        }
 
                                         cmn_values = "";
 
@@ -677,7 +797,7 @@ public class SpeechRecognizer {
                                     }
                                 }
                             }
-
+                            **/
 
 
 

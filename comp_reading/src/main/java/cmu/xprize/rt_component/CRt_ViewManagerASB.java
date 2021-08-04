@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import cmu.xprize.util.CPersonaObservable;
+import cmu.xprize.util.CmnVariable;
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -1575,7 +1576,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             mParent.UpdateValue(result);
 
             mParent.onASREvent(TCONST.RECOGNITION_EVENT);
-            TCONST.CURRENT_WORD = mCurrWord;
+            CmnVariable.CURRENT_WORD = mCurrWord;
+
+
 
         } catch (Exception e) {
 

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CmnVariable;
 import cmu.xprize.util.IReadyListener;
 import cmu.xprize.util.TCONST;
 import edu.cmu.pocketsphinx.LogMath;
@@ -165,16 +166,18 @@ public class ListenerBase {
      */
     protected void setupRecognizer(File assetsDir, File configFile, String langDictionary) {
 
-        TCONST.LOG_CMN_FLAG = 0;
-        TCONST.START_WORD_CMN = 0;
-        TCONST.CURRENT_WORD = 0;
+        CmnVariable.LOG_CMN_FLAG = 0;
+        CmnVariable.START_WORD_CMN = 0;
+        CmnVariable.CURRENT_WORD = 0;
+        CmnVariable.CMN_WRITE_FLAG = 0;
 
-        File cmnFile = new File(TCONST.LOGCAT_LOCATION, "cmn_values" + ".txt" );
+
+        File cmnFile = new File(CmnVariable.LOGCAT_LOCATION, "cmn_values" + ".txt" );
 
         if(!cmnFile.exists())
         {
-            try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(TCONST.LOGCAT_LOCATION + "cmn_values.txt"))) {
-                writer.write("0,0,0,0,0,0,0,0,0,0,0,0,0");
+            try(java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(CmnVariable.LOGCAT_LOCATION + "cmn_values.txt"))) {
+                writer.write("12,0,0,0,0,0,0,0,0,0,0,0,0");
             }
             catch(IOException e){
                 // Handle the exception
@@ -182,7 +185,7 @@ public class ListenerBase {
         }
 
         //Loading the CMN values
-        File cmn_value = new File(TCONST.LOGCAT_LOCATION + "cmn_values.txt");
+        File cmn_value = new File(CmnVariable.LOGCAT_LOCATION + "cmn_values.txt");
         BufferedReader br = null;
         String[] arrOfStr = new String[0];
         try {
@@ -195,13 +198,12 @@ public class ListenerBase {
 
 
         try {
+
             cmninit_value = br.readLine();
-            TCONST.CMNINIT_VALUE = cmninit_value;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         try {
             // save path to modelsDir for use when finding fsgs
