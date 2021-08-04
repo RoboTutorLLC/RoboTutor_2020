@@ -48,7 +48,7 @@
         "CONFIG_SPEAK_BUTTON": {
           "type": "QUEUE",
           "reuse": true,
-          "COMMENT": "TBD",
+          "COMMENT": "NOTE: the button must be in a valid state before showing. TODO: put check in to catch invalid behaviors",
           "tracks": [
             {
               "name": "LOG_EVENT",
@@ -58,8 +58,7 @@
               "parms": "type#behavior,value#CONFIG_SPEAK_BUTTON:String",
               "features": ""
             },
-            // NOTE: the button must be in a valid state before showing
-            // TODO: put check in to catch invalid behaviors
+
 
             {
               "type": "QUEUEDCOMMAND",
@@ -515,7 +514,25 @@
             "edge": "ECHO_LINE_NODE"
           }
         ]
-      }
+      },
+        "NARRATE_HESITATION": {
+          "type": "NODE",
+          "COMMENT": "Used if there is hesitation in narration capture mode, because a silence that is too long is not useful for the recording",
+          "maptype": "moduleMap",
+          "mapname": "NULL_MODULE",
+          "preenter": [],
+          "preexit": [],
+          "edges": [
+            {
+              "constraint": "NARRATION_CAPTURE_MODE",
+              "edge": "WRONG"
+            },
+            {
+              "constraint": "",
+              "edge": "LISTEN"
+            }
+          ]
+        }
     },
 
       "moduleMap": {

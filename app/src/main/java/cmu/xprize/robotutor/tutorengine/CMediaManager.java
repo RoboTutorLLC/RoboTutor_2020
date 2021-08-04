@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cmu.xprize.robotutor.ScreenRecorder;
 import cmu.xprize.robotutor.tutorengine.graph.type_handler;
@@ -792,8 +794,15 @@ public class CMediaManager {
         }
 
         // Narration capture mode, stopping audio file before it completes and moving onto the next
-        public void stopEarly() {
-            seekTo(mPlayer.getDuration()-1);
+        public void stopEarly(long milliseconds) {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    seekTo(mPlayer.getDuration()-1);
+
+                }
+            }, milliseconds);
         }
 
 

@@ -58,6 +58,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -169,6 +171,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     ArrayList<ListenerBase.HeardWord>       capturedUtt = new ArrayList<>();
 
     boolean narrationTracking;
+    boolean silenceTimerRunning = false;
 
 
     // json loadable
@@ -1615,77 +1618,63 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             if (showFutureContent)
                 content += TCONST.SENTENCE_SPACE + futureSentencesFmtd;
 
+            try {
+                if (isNarrationCaptureMode && hearRead.equals(TCONST.FTR_USER_HEAR)) {
+                    try {
+                        int progress = 0;
+                        int segmentNum = 0;
+                        for (int i = 0; i <= mCurrWord; i++) {
+                            if (rawNarration[segmentNum].segmentation.length > progress) {
+                                progress++;
+                            } else {
+                                segmentNum++;
+                                progress = 1;
+                            }
+                            Log.d(TAG, "Highlighting Information -- Progress: " + progress + ", SegmentNum: " + segmentNum);
 
-
-            if (isNarrationCaptureMode) {
-
-                int progress = 0;
-                for(CASB_Narration narration : data[mCurrPage].text[mCurrPara][mCurrLine].narration) {
-                    acceptedList.add(new int[]{progress, progress + narration.segmentation.length - 1});
-                    progress = narration.segmentation.length;
-                }
-
-                boolean cyan = true;
-                SpannableStringBuilder preHighlight = new SpannableStringBuilder(Html.fromHtml(fmtSentence));
-                Log.d("Highlighting", "Updating narration highlighting");
-
-                // check for bugs with segments
-                StringBuilder s = new StringBuilder();
-                for(int[] segment : acceptedList) {
-                    s.append(segment[0] + " " + segment[1] + ", ");
-                }
-                Log.d("Highlighting", "Segments start and end as follows: " + s.toString());
-
-                for(int[] segment : acceptedList) {
-                    if (segment[1] >= segment[0]) {
-                        StringBuilder textBuilder = new StringBuilder();
-                        if (segment[0] != 0)
-                            textBuilder.append(" ");
-                        for (int i = segment[0]; i <= segment[1]; i++) {
-                            try {
-                            if(wordsToDisplay.length > i)
-                                textBuilder.append(wordsToDisplay[i]);
-
-
-                                if(!(wordsToDisplay[i].endsWith("-") || wordsToDisplay[i].endsWith("'")))
-                                    textBuilder.append(" ");
-                            } catch (ArrayIndexOutOfBoundsException ignored) {}
                         }
-                        textBuilder.deleteCharAt(textBuilder.length() -1);
 
-                        StringBuilder precedingTextBuilder = new StringBuilder();
-                        for (int i = 0; i < segment[0]; i++) {
-                            precedingTextBuilder.append(wordsToDisplay[i]);
-                            if(!wordsToDisplay[i].endsWith("-") || !wordsToDisplay[i].endsWith("'")  )
-                                precedingTextBuilder.append(" ");
+                        SpannableStringBuilder preHighlight = new SpannableStringBuilder(Html.fromHtml(fmtSentence));
+
+                        int startIndex = 0;
+                        int endIndex = 0;
+                        int wordIndex = 0;
+                        for (String word : wordsToDisplay) {
+                            if (wordIndex < mCurrWord + 1 - progress) {
+                                if (0 < wordIndex)
+                                    startIndex++;
+                                startIndex += word.length();
+                            }
+
+                            if (wordIndex < mCurrWord + 1 - progress + rawNarration[segmentNum].segmentation.length) {
+                                if (0 < wordIndex)
+                                    endIndex++;
+                                endIndex += word.length();
+                            }
+                            wordIndex++;
                         }
-                        if (precedingTextBuilder.toString().endsWith(" ")) {
-                            precedingTextBuilder.deleteCharAt(precedingTextBuilder.length() - 1);
-                        }
-                        String text = textBuilder.toString();
 
-                        int index = precedingTextBuilder.toString().length();
+                        // Don't highlight the space between seams to emphasize the difference
+                        if (startIndex > 0) startIndex++;
 
-                        Log.d("Highlighting_TAG", "Segment[0]: " + segment[0] + "segment[1]" + segment[1]);
-                        Log.d(TAG, "Highlight text: " + text + ". index: " + index + ". text length: " + text.length());
+                        Log.d(TAG, "Highlighting Update -- StartIndex: " + startIndex + "EndIndex: " + endIndex);
 
-                        preHighlight.setSpan(new BackgroundColorSpan((cyan ? Color.parseColor("#00FFFF") : Color.parseColor("#96e3ff"))), index, index + text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        preHighlight.setSpan(new BackgroundColorSpan(Color.parseColor("#00FFFF")), startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                        if(segment[1] == wordsToDisplay.length - 1)
-                            break;
+                        fmtSentence = preHighlight.toString();
 
-                        cyan = !cyan;
+                        preHighlight.insert(0, Html.fromHtml(completedSentencesFmtd));
+                        preHighlight.append(TCONST.SENTENCE_SPACE + Html.fromHtml(futureSentencesFmtd));
+                        mPageText.setText(preHighlight);
+                    } catch (Exception e) {
+                        Log.d(TAG, "Highlighting Fault: " + Log.getStackTraceString(e));
+                        mPageText.setText(Html.fromHtml(content));
                     }
+                } else {
+
+                    mPageText.setText(Html.fromHtml(content));
                 }
-
-                fmtSentence = preHighlight.toString();
-
-                preHighlight.insert(0, Html.fromHtml(completedSentencesFmtd));
-                preHighlight.append(TCONST.SENTENCE_SPACE + Html.fromHtml(futureSentencesFmtd));
-                mPageText.setText(preHighlight);
-
-            } else {
-
+            } catch (NullPointerException e) {
                 mPageText.setText(Html.fromHtml(content));
             }
 
@@ -1816,6 +1805,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         mParent.UpdateValue(result);
     }
 
+    // Timer silenceTimer = new Timer(true);
 
     /**
      * This is where the incoming PLRT ASR data is processed.
@@ -1831,6 +1821,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      */
     @Override
     public void onUpdate(ListenerBase.HeardWord[] heardWords, boolean finalResult) {
+        // silenceTimer.cancel();
+
         allHeardWords = heardWords;
         AudioDataStorage.updateHypothesis(heardWords);
         boolean result    = true;
@@ -1923,8 +1915,34 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         } catch (Exception e) {
 
-            Log.e("ASR", "onUpdate Fault: " + e);
+            Log.e("ASR", "onUpdate Fault: " + Log.getStackTraceString(e));
         }
+
+
+        /* if (isNarrationCaptureMode) {
+            final ListenerBase.HeardWord[] finalHeardWords = heardWords;
+            TimerTask onSilence = new TimerTask() {
+                @Override
+                public void run() {
+                    mListener.setPauseListener(true);
+
+                    Log.i("ASR", "WRONG");
+                    attemptNum++;
+                    mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord, finalHeardWords[mHeardWord-1].hypWord, attemptNum, finalHeardWords[mHeardWord-1].utteranceId == "", false);
+
+                    // Publish the outcome
+                    mParent.publishValue(TCONST.RTC_VAR_ATTEMPT, attemptNum);
+                    mParent.UpdateValue(false);
+
+                    mParent.onASREvent(TCONST.RECOGNITION_EVENT);
+
+                }
+            };
+            silenceTimer = new Timer(true);
+            silenceTimer.schedule(onSilence, 2000L);
+        }
+
+         */
     }
 
 
@@ -1987,7 +2005,12 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     }
 
     /**
-     * In Narration capture mode, the audio recording data is saved to the storydata file and updated by RoboTutor in order to then echo the file
+     * In Narration capture mode, the audio recording data is saved to the storydata file and updated
+     * by RoboTutor in order to then echo the file. Currently, RoboTutor uses a greedy tiling algorithm
+     * to load narrations and tile them. This means that the longest segment that starts with
+     * the first word is prioritized. After that, the longest segment that starts with one word after
+     * the last word of the previous segment is prioritized. This occurs until the end of the sentence
+     * is reached.
      */
     @Override
     public void constructAudioStoryData() {
@@ -2018,8 +2041,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
                 File audioFile = new File(fileString);
 
-                Log.d(TAG, "Greedy algorithm " + "endsegment: " + endSegment + " startsegment: " + startSegment);
-                Log.d(TAG, "Greedy algorithm searching for narration " + fileString);
+                Log.d(TAG, "NARRATION CAPTURE MODE Greedy algorithm " + "endsegment: " + endSegment + " startsegment: " + startSegment);
+                Log.d(TAG, "NARRATION CAPTURE Searching for narration " + fileString);
 
                 if(audioFile.exists()) {
                     Log.d(TAG, "Narration Construction: found file: " + fileString);
@@ -2085,10 +2108,6 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             } while(!narrationCovered);
 
             data[mCurrPage].text[mCurrPara][mCurrLine].narration = narrationList.toArray(new CASB_Narration[narrationList.size()]);
-
-            // todo (chirag): Updated internal representation. now update storydata.json
-
-
 
             isUserNarrating = false;
 
@@ -2470,6 +2489,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         rawNarration = data[mCurrPage].text[mCurrPara][mCurrLine].narration;
         rawSentence  = data[mCurrPage].text[mCurrPara][mCurrLine].sentence;
         if (data[mCurrPage].prompt != null) page_prompt = data[mCurrPage].prompt;
+        UpdateDisplay();
     }
 
 }
