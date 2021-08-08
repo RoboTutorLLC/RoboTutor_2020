@@ -1,30 +1,34 @@
 #!/bin/bash
 
-#APK Version extraction
-echo `ls`
-echo `pwd`
-# finding the exact line in the gradle file
-ORIGINAL_STRING=$(cat build.gradle | grep -E '\d\.\d\.\d\.\d')
-echo "$ORIGINAL_STRING"
-# extracting the exact parts but with " around
-TEMP_STRING=$(echo $ORIGINAL_STRING | grep -Eo '"(.*)"')
-echo "$TEMP_STRING"
-# the exact numbering scheme
-FINAL_VERSION=$(echo $TEMP_STRING | sed 's/"//g') # 3.5.0.1
-echo "$FINAL_VERSION"
+v=$(cat build.gradle  | grep rtVersionName | awk '{print $3}')
+echo MY_VERSION_NAME=${v}
 
-major=0
-minor=0
-build=0
-assets=0
+##APK Version extraction
+#echo `ls`
+#echo `pwd`
+## finding the exact line in the gradle file
+#ORIGINAL_STRING=$(cat build.gradle | grep -E '\d\.\d\.\d\.\d')
+#echo "$ORIGINAL_STRING"
+## extracting the exact parts but with " around
+#TEMP_STRING=$(echo $ORIGINAL_STRING | grep -Eo '"(.*)"')
+#echo "$TEMP_STRING"
+## the exact numbering scheme
+#FINAL_VERSION=$(echo $TEMP_STRING | sed 's/"//g') # 3.5.0.1
+#echo "$FINAL_VERSION"
+#
+#major=0
+#minor=0
+#build=0
+#assets=0
+#
+#regex="([0-9]+).([0-9]+).([0-9]+).([0-9]+)"
+#if [[ $FINAL_VERSION =~ $regex ]]; then
+#  major="${BASH_REMATCH[1]}"
+#  minor="${BASH_REMATCH[2]}"
+#  build="${BASH_REMATCH[3]}"
+#  assets="${BASH_REMATCH[4]}"
+#fi
 
-regex="([0-9]+).([0-9]+).([0-9]+).([0-9]+)"
-if [[ $FINAL_VERSION =~ $regex ]]; then
-  major="${BASH_REMATCH[1]}"
-  minor="${BASH_REMATCH[2]}"
-  build="${BASH_REMATCH[3]}"
-  assets="${BASH_REMATCH[4]}"
-fi
 
 set -e
 
@@ -69,7 +73,7 @@ find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.ap
 
 
 
-mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}-v${major}.${minor}.${build}.${assets}.apk
+mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}-v${MY_VERSION_NAME}.apk
 
 ls
 echo `ls -al`
