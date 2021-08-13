@@ -12,6 +12,7 @@ import cmu.xprize.comp_intervention.views.CInterventionHelpButton;
 import cmu.xprize.comp_logging.CInterventionLogManager;
 import cmu.xprize.comp_logging.InterventionLogItem;
 import cmu.xprize.util.GlobalStaticsEngine;
+import cmu.xprize.util.LogTriggerHelper;
 
 import static cmu.xprize.util.TCONST.EXIT_FROM_INTERVENTION;
 import static cmu.xprize.util.TCONST.I_CANCEL_GESTURE;
@@ -32,6 +33,7 @@ import static cmu.xprize.util.consts.INTERVENTION_CONST.CONFIG_INTERVENTION;
 public class InterventionButtonMessageReceiver extends BroadcastReceiver {
 
     private static InterventionButtonMessageReceiver singleton;
+    private CInterventionHelpButton helpButton;
 
     private InterventionButtonMessageReceiver() {
 
@@ -45,10 +47,6 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
         return singleton;
     }
 
-
-
-    private CInterventionHelpButton helpButton;
-
     public void setHelpButton(CInterventionHelpButton helpButton) {
         this.helpButton = helpButton;
     }
@@ -60,7 +58,7 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.wtf("trigger", "REceived trigger: " + intent.getAction());
+        Log.wtf("trigger", "Received trigger: " + intent.getAction());
 
         String action = intent.getAction();
         boolean modal = intent.getBooleanExtra(I_MODAL_EXTRA, false);
@@ -68,13 +66,46 @@ public class InterventionButtonMessageReceiver extends BroadcastReceiver {
         if (action == null) return;
 
         // DO THIS THING where it's looking for the thing
-        switch(action) {
+        switch (action) {
 
             // all these are legit
-            case I_TRIGGER_GESTURE:
             case I_TRIGGER_HESITATE:
             case I_TRIGGER_STUCK:
             case I_TRIGGER_FAILURE:
+
+                LogTriggerHelper.logActionEvent(
+                        action,
+                        GlobalStaticsEngine.getCurrentTutorId(),
+                        CInterventionStudentData.getCurrentStudentId() //@JackMostow: Is this needed? Will this be of any help for us? Just added because I found it handy ;)
+                );
+
+                /*
+
+                @JackMostow: I changed this entirely.
+
+                Consequences:
+
+                -: I can't find a way to get how long the kid hesitated (as mentioned in the comment)
+
+                */
+
+            case I_TRIGGER_GESTURE:
+
+
+                /*
+
+                @JackMostow: I'm logging gesture from here. Or the previous method would suffice? Or both?!
+
+                By doing it this way:
+
+                +: We can have Current Tutor Id & Current Student Id
+                -: We'll not have the other details from MotionEvent
+                -: I can't find a way to get how long the kid hesitated (as @JackMostow mentioned in the comment)
+
+                What do you think? Thanks! - Vishnu
+
+                */
+
                 // don't start flashing if the popup is already showing // NEXT test this...
                 helpButton.triggerIntervention(action);
                 CInterventionLogManager.getInstance().postInterventionLog(new InterventionLogItem(

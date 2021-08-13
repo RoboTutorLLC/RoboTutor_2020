@@ -297,6 +297,7 @@ public class CTutor implements ILoadableObject2, IEventSource {
         mSceneGraph.onDestroy();
 
         mTutorGraph.onDestroy();
+
     }
 
     /**
@@ -378,7 +379,7 @@ public class CTutor implements ILoadableObject2, IEventSource {
                     // This is how you kill a running tutor externally -
                     // When the engine wants to kill a tutor and start another.
                     // killDeadTutor just cleans up the now unused tutor.  What happens
-                    // after is the responsability of the poster of the event
+                    // after is the responsibility of the poster of the event
                     //
                     case TCONST.KILLTUTOR:
 
@@ -402,11 +403,15 @@ public class CTutor implements ILoadableObject2, IEventSource {
                             Log.wtf("STUDENT_MODEL:AFTER_ASSESSMENT", studentModel.toString());
                         }
 
+                        // Please be mindful when changing the order of execution of functional calls bellow.
+                        // The calls should be done in the following order:
+                        // 1. cleanUpTutor(); this allows the media player to exit gracefully
+                        // 2. CTutorEngine.destroyCurrentTutor(); // after the media player has ended, the view is nullified
+                        // 3. updateStudentInterventionProgress(mTutorName); // updates the tutor
                         cleanUpTutor();
-
+                        CTutorEngine.destroyCurrentTutor();
                         updateStudentInterventionProgress(mTutorName);
 
-                        CTutorEngine.destroyCurrentTutor();
                         break;
 
 
@@ -526,7 +531,6 @@ public class CTutor implements ILoadableObject2, IEventSource {
      * @param command
      */
     public void post(String command) {
-
         enQueue(new Queue(command));
     }
 

@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import java.util.Date;
 import java.util.Locale;
 
+import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.util.consts.INTERVENTION_CONST;
 
 import static cmu.xprize.util.consts.INTERVENTION_CONST.BROADCAST_FAILURE_UPDATE;
@@ -122,6 +124,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         expectedTime = intent.getLongExtra(EXTRA_TIME_EXPECT, -1);
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) stuckTimeExpected = expectedTime;
+
                         break;
 
                     case BROADCAST_HESITATION_UPDATE:
@@ -129,6 +132,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         expectedTime = intent.getLongExtra(EXTRA_TIME_EXPECT, -1);
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) hesitateTimeExpected = expectedTime;
+
                         break;
 
                     case BROADCAST_GESTURE_UPDATE:
@@ -136,6 +140,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         expectedTime = intent.getLongExtra(EXTRA_TIME_EXPECT, -1);
                         Log.wtf("SNEEZY", String.valueOf(expectedTime));
                         if (expectedTime != -1) gestureTimeExpected = expectedTime;
+
                         break;
 
                     case BROADCAST_FAILURE_UPDATE:
@@ -149,7 +154,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         break;
 
 
-/*   ------         // BEGIN TRIGGERS **/
+                    /*   ------         // BEGIN TRIGGERS **/
                     case I_TRIGGER_HESITATE:
                         triggerHesitateText();
                         triggeredHesitate = true;
@@ -168,7 +173,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                         gestureTimeExpected = -1;
                         break;
 
-/*   -------        // BEGIN CANCELS **/
+                    /*   -------        // BEGIN CANCELS **/
                     case I_CANCEL_HESITATE:
                         triggeredHesitate = false;
                         break;
@@ -314,7 +319,7 @@ public class CInterventionDebuggerMenu extends LinearLayout {
                 "%s:\t\t%s",
                 LABEL_FAILURE, LABEL_TRIGGERED));
     }
-
+  
     class CyclicalUpdate implements Runnable {
 
         @Override

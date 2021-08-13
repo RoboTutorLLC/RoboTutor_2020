@@ -1,6 +1,6 @@
 //*********************************************************************************
 //
-//    Copyright(c) 2016-2017  Kevin Willows All Rights Reserved
+//    Copyright(c) 2016-2021  RoboTutorLLC All Rights Reserved
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -78,6 +78,75 @@ public class JSON_Helper {
         return cacheData(fileName, TCONST.DEFINED);
     }
 
+    static public String createValueAcronym(String jsonData) {
+        /*
+            @params: jsonData - A serialised jsonString, e.g.
+            {
+                "config_version": "ftttfNULLfCD2", → compute instead
+                "language_override": false,
+                "show_tutorversion": true,
+                "show_debug_launcher": true,
+                "language_switcher": true,
+                "no_asr_apps": false,
+                "language_feature_id": "LANG_NULL", → NULL | EN | SW
+                "show_demo_vids": false,
+                "menu_type": "CD2" → 1 or 2 in acronym
+
+            }
+
+            The config_version will be replaced with a custom acronym, which is generated below.
+
+         */
+        String outputAcronym = new String();
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("language_feature_id")) {
+                    /*
+                        This is checking for the key: "language_feature_id".
+                        Replacing the values with the corresponding acronyms:
+                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
+                     */
+                    String value = jsonObject.getString(key);
+                    if (value.equals("LANG_NULL")) {
+                        outputAcronym += "NULL";
+                    }
+                    else if (value.equals("EN")) {
+                        outputAcronym += "EN";
+                    }
+                    else if  (value.equals("SW")) {
+                        outputAcronym +="SW";
+                    }
+                }
+                else if (key.equals("menu_type")) {
+                    /*
+                        This is checking for the key: "menu_type".
+                        Replacing the values with the corresponding acronyms:
+                        Menu Type can have the following values: CD2 and CD1
+                        We are only using the last digit in the acronym.
+                     */
+                    String value = jsonObject.getString(key);
+                    outputAcronym += value.charAt(value.length()-1);
+                }
+                else if( key.equals("record_screen_video") == false ) {
+                    /*
+                        For every boolean value, we are only using their first character.
+                     */
+                    Object value = jsonObject.get(key);
+                    if (value != null)
+                        outputAcronym += value.toString().charAt(0);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return outputAcronym;
+    }
 
     static public String cacheData(String fileName, String localcacheSource) {
 
@@ -139,6 +208,71 @@ public class JSON_Helper {
         }
 
         return buffer.toString();
+    }
+
+    static public Boolean shouldRecord(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("record_screen_video")) {
+                    Boolean value = jsonObject.getBoolean(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    static public Boolean shouldIncludeAudio(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key.equals("include_audio_output_in_screen_video")) {
+                    Boolean value = jsonObject.getBoolean(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    static public String baseDirectory(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            JSONArray keys = jsonObject.names();
+
+            for (int i=0; i<keys.length(); i++) {
+                String key = keys.getString(i);
+                if (key == "baseDirectory") {
+                    /*
+                        This is checking for the key: "language_feature_id".
+                        Replacing the values with the corresponding acronyms:
+                         { "LANG_NULL" with "NULL", "EN" with "EN", "SW" with "SW".
+                     */
+                    String value = jsonObject.getString(key);
+                    return value;
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "roboscreen";
     }
 
 

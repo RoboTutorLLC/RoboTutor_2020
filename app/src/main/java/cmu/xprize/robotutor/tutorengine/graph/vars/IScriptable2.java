@@ -17,8 +17,6 @@
 //*********************************************************************************
 
 package cmu.xprize.robotutor.tutorengine.graph.vars;
-
-import cmu.xprize.robotutor.tutorengine.graph.vars.TBoolean;
 import cmu.xprize.util.IScriptable;
 
 public interface IScriptable2 extends IScriptable {
