@@ -22,11 +22,8 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.provider.MediaStore;
 import android.text.Html;
 import android.text.Layout;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -40,26 +37,19 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -204,8 +194,12 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
     boolean isUserNarrating;
     ListenerBase.HeardWord[] allHeardWords;
-    final int segmentGapLength = 100; // length of silence used to separate segments in narration capture mode
+    final int SEGMENT_GAP_LENGTH = 100; // length of silence used to separate segments in narration capture mode
     ArrayList<Integer> seamIndices = new ArrayList<>(); // list of indices of seams for narration capture mode
+
+
+    static final long END_UTTERANCE_DELAY = 200; // The time to wait after the last word at the end of the utterance during playback (milliseconds)
+    final int SEAM_GAP_SIL_LEN = 100;
 
     /**
      *
@@ -830,12 +824,14 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         segmentNdx    = _segNdx;
         numSegments   = segmentArray.length;
         utterancePrev = utteranceNdx == 0 ? 0 : rawNarration[utteranceNdx - 1].until;
-        segmentPrev   = utterancePrev;
+        segmentPrev   = rawNarration[utteranceNdx].from; // utterancePrev;
 
-        mParent.post(TCONST.STOP_AUDIO, new Long(currUtterance.until * 10));
+        mParent.firstWordTime = currUtterance.from;
 
 
-        // Clean the extension off the end - could be either wav/mp3
+        mParent.post(TCONST.STOP_AUDIO, (currUtterance.until * 10) + END_UTTERANCE_DELAY); // absolute position in file (in ms) to stop playing
+        
+        // Clean the extension off the end - could be either wav/mp3 +
         //
         String filename = currUtterance.audio.toLowerCase();
 
@@ -876,10 +872,12 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 // when its not in narrate mode, that
                 //
                 mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
-
+                mParent.post(TCONST.START_LATER, 0L);
 
             postDelayedTracker();
         } else {
+
+
 
             // NOTE: The narration mode uses the AS R logic to simplify operation.  In doing this
             /// it uses the wordsToSpeak array to progressively highlight the on screen text based
@@ -962,9 +960,17 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
 
     private void postDelayedTracker() {
+
         narrationSegment = rawNarration[utteranceNdx].segmentation[segmentNdx];
 
-        segmentCurr = utterancePrev + narrationSegment.end;
+        segmentCurr = narrationSegment.end; //utterancePrev + narrationSegment.end;
+
+        // If last word of the utterance, add a small amount of delay due to ASR inaccuracy
+        if (segmentNdx == rawNarration[utteranceNdx].segmentation.length - 1) {
+            segmentCurr += END_UTTERANCE_DELAY / 10;
+        }
+
+        Log.d(TAG, "Posting delayed tracker: SegmentCurr: " + segmentCurr + " segmentPrev: " + segmentPrev + " Delay: " + (segmentCurr - segmentPrev));
 
         mParent.post(TCONST.TRACK_NARRATION, new Long((segmentCurr - segmentPrev) * 10));
 
@@ -1028,6 +1034,9 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                 mParent.stopAudio();
                 break;
 
+                case TCONST.START_LATER:
+                mParent.startLate();
+                break;
             case TCONST.SPEAK_EVENT:
             case TCONST.UTTERANCE_COMPLETE_EVENT:
 
@@ -1805,7 +1814,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         mParent.UpdateValue(result);
     }
 
-    // Timer silenceTimer = new Timer(true);
+    //Timer silenceTimer = new Timer();
 
     /**
      * This is where the incoming PLRT ASR data is processed.
@@ -1821,7 +1830,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
      */
     @Override
     public void onUpdate(ListenerBase.HeardWord[] heardWords, boolean finalResult) {
-        // silenceTimer.cancel();
+        //silenceTimer.cancel();
 
         allHeardWords = heardWords;
         AudioDataStorage.updateHypothesis(heardWords);
@@ -1918,33 +1927,36 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             Log.e("ASR", "onUpdate Fault: " + Log.getStackTraceString(e));
         }
 
-
-        /* if (isNarrationCaptureMode) {
-            final ListenerBase.HeardWord[] finalHeardWords = heardWords;
-            TimerTask onSilence = new TimerTask() {
-                @Override
-                public void run() {
-                    mListener.setPauseListener(true);
-
-                    Log.i("ASR", "WRONG");
-                    attemptNum++;
-                    mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord, finalHeardWords[mHeardWord-1].hypWord, attemptNum, finalHeardWords[mHeardWord-1].utteranceId == "", false);
-
-                    // Publish the outcome
-                    mParent.publishValue(TCONST.RTC_VAR_ATTEMPT, attemptNum);
-                    mParent.UpdateValue(false);
-
-                    mParent.onASREvent(TCONST.RECOGNITION_EVENT);
-
-                }
-            };
-            silenceTimer = new Timer(true);
-            silenceTimer.schedule(onSilence, 2000L);
-        }
-
-         */
     }
 
+    @Override
+    public void wrongWordBehavior() {
+        /*
+        if (isNarrationCaptureMode && hearRead.equals(FTR_USER_READ)) {
+
+            Log.d("NARRATE HESITATION", "wrong word behavior. ");
+
+            mListener.setPauseListener(true);
+
+            Log.i("NARRATE HESITATION", "WRONG");
+            attemptNum++;
+            if (allHeardWords != null) {
+                mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord, allHeardWords[mHeardWord-1].hypWord, attemptNum, allHeardWords[mHeardWord-1].utteranceId == "", false);
+                Log.d("ASR", "Wrong Word Behavior: word" + allHeardWords[mHeardWord-1]);
+            } else {
+                mParent.updateContext(rawSentence, mCurrLine, wordsToSpeak, mCurrWord, wordsToSpeak[0], attemptNum, false, false);
+                Log.d("ASR", "Wrong Word Behavior: word" + wordsToSpeak[0]);
+
+            }
+
+            // Publish the outcome
+            mParent.publishValue(TCONST.RTC_VAR_ATTEMPT, attemptNum);
+            mParent.UpdateValue(false);
+
+            mParent.onASREvent(TCONST.RECOGNITION_EVENT);
+        }
+        */
+    }
 
     public void generateVirtualASRWord() {
 
@@ -2209,7 +2221,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
                         for (int i = seq.size() - 1; i > 0; i--) {
 
                             if (seq.size() < 2) break; // no use trying to test a 1 word utterance
-                            if (seq.get(i).startFrame - seq.get(i - 1).endFrame < segmentGapLength) { // 100 centiseconds gap is treated as a silence
+                            if (seq.get(i).startFrame - seq.get(i - 1).endFrame < SEGMENT_GAP_LENGTH) { // 100 centiseconds gap is treated as a silence
                                 seq.remove(i);
                             } else if (seq.get(i).hypWord.contains("START_")) {
                                 seq.remove(i);

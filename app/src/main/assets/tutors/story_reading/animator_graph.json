@@ -169,6 +169,31 @@
           ],
           "preexit": [],
           "edges": []
+        },
+        "WRONG_WORD_BEHAVIOR": {
+          "type": "QUEUE",
+          "COMMENT": "Stop recording in the event of long silence",
+          "preenter": [],
+          "reuse": "true",
+          "tracks": [
+            {
+              "name": "LOG_EVENT",
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "logState",
+              "parms": "type#behavior,value#WRONG_WORD_BEHAVIOR:String",
+              "features": ""
+            },
+            {
+              "type": "QUEUEDCOMMAND",
+              "id": "SstoryReading",
+              "method": "wrongWordBehavior",
+              "parms": "",
+              "features": ""
+            }
+          ],
+          "peexit": [],
+          "edges": []
         }
       },
       "nodeMap": {
@@ -258,14 +283,16 @@
             "TIMER_HINT_BUTTON",
             "SET_BUTTON_NEXTSENTENCE",
             "SET_BUTTON_NEXTPARAGRAPH",
-            "SET_BUTTON_NEXTPAGE"
+            "SET_BUTTON_NEXTPAGE",
+            "TIMER_STOP_LISTENING"
           ],
           "maptype": "moduleMap",
           "mapname": "LISTENING",
           "preexit": [
             "CLR_HYPOTHESIS_BEHAVIOR",
             "CLR_ONCLICK",
-            "TIMER_CANCEL_HINT_BUTTON"
+            "TIMER_CANCEL_HINT_BUTTON",
+            "TIMER_CANCEL_STOP_LISTENING"
           ],
           "edges": [
             {
@@ -767,6 +794,9 @@
 
         "TIMER_HINT_BUTTON":        {"type": "TIMER", "id": "HintWordTimer", "startdelay": "0", "period": "3500", "repeat": "false", "action": "CREATEANDSTART", "ontimer": "CONFIG_SPEAK_BUTTON", "features": "FTR_USER_READ|FTR_USER_READING"},
         "TIMER_CANCEL_HINT_BUTTON": {"type": "TIMER", "id": "HintWordTimer", "action": "CANCEL", "features": ""},
+
+        "TIMER_STOP_LISTENING": {"type": "TIMER", "id": "HesitationTimer", "startDelay":  "0", "period": "2000", "repeat":  "false", "action": "CREATEANDSTART","ontimer": "WRONG_WORD_BEHAVIOR", "features": "FTR_USER_READ|FTR_USER_READING|NARRATION_CAPTURE_MODE"},
+        "TIMER_CANCEL_STOP_LISTENING": {"type": "TIMER","id": "HesitationTimer", "action": "CANCEL", "features": ""},
 
         "FLIP_BUTTON_ENABLE":  {"type": "COMMAND", "id": "SstoryReading", "method": "setPageFlipButton",     "parms": "ENABLE:String", "features": ""},
         "FLIP_BUTTON_DISABLE": {"type": "COMMAND", "id": "SstoryReading", "method": "setPageFlipButton",     "parms": "DISABLE:String", "features": ""},

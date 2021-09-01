@@ -636,6 +636,11 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
     public void endOfUtteranceCapture() {
 
     }
+
+    @Override
+    public void wrongWordBehavior() {
+
+    }
 }
 
 

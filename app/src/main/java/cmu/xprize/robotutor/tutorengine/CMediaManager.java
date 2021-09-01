@@ -80,6 +80,11 @@ public class CMediaManager {
 
     final static public String TAG = "CMediaManager";
 
+    int startTime = 0;
+
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
 
     /**
      *
@@ -725,14 +730,20 @@ public class CMediaManager {
             if(!mPlaying && mIsAlive) {
 
                 if(mIsReady) {
+
                     // TODO: this will need a tweak for background music etc.
                     mMediaController.startSpeaking();
 
                     Log.v(GRAPH_MSG, "CMediaManager.playermanager.play: " + mDataSource);
                     mPlayer.start();
 
+
                     mPlaying       = true;
                     mDeferredStart = false;
+
+                    mPlayer.seekTo(startTime);
+
+                    Log.d(TAG, "Player seeked to " + startTime);
                 }
                 else
                     mDeferredStart = true;

@@ -234,6 +234,7 @@ public class TCONST {
     public static final String STOP_AUDIO          = "STOP_AUDIO";
     public static final String RTC_VAR_CLOZEWORD   = ".clozeWord";
     public static final String REMOVE_CLOZE_FROM_BLANK = "REMOVE_CLOZE_FROM_BLANK";
+    public static final String START_LATER = "START_LATER";
 
 
     public static final String NARRATE_STORY       = "NARRATE_STORY";

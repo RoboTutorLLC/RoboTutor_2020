@@ -86,6 +86,8 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     private HashMap<String,Integer> _IntegerVar = new HashMap<>();
     private HashMap<String,Boolean> _FeatureMap = new HashMap<>();
 
+    public boolean startLater = false;
+
     static private String TAG = "TRtComponent";
 
     public TRtComponent(Context context) {
@@ -338,7 +340,7 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
                         // which is done internally.
                         //
                         case TCONST.QUEUE:
-
+                            // CHIRAG - - AFTER THIS, FFW THE AUDIO TO THE CORRECT SPOT
                             if (obj.testFeatures()) {
                                 obj.applyNode();
                             }
@@ -1030,6 +1032,16 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     }
 
 
+    /**
+     * @param sentence Current sentence in a string
+     * @param index Line number of sentence
+     * @param wordList Array of words in the sentence
+     * @param wordIndex Index of current word in Sentence
+     * @param word Current word in sentence as String
+     * @param attempts number of attempts
+     * @param virtual
+     * @param correct
+     */
     @Override
     public void updateContext(String sentence, int index, String[] wordList, int wordIndex, String word, int attempts, boolean virtual, boolean correct) {
 
@@ -1308,5 +1320,18 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
         mMediaManager.dispMediaPlayers();
         CMediaManager.PlayerManager p = mMediaManager.getPlaying();
         p.stopEarly(60L);
+    }
+
+    @Override
+    public void wrongWordBehavior() {
+        mViewManager.wrongWordBehavior();
+    }
+
+    @Override
+    public void startLate() {
+        Log.d(TAG, "Forwarding Media to stated starting point: " + firstWordTime);
+        mMediaManager.dispMediaPlayers();
+
+        mMediaManager.setStartTime((int) firstWordTime * 10);
     }
 }

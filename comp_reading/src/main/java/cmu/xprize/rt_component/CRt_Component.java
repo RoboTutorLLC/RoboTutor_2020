@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
@@ -48,6 +49,7 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TTSsynthesizer;
 import cmu.xprize.util.TCONST;
+import edu.cmu.pocketsphinx.Segment;
 import edu.cmu.xprize.listener.AudioDataStorage;
 import edu.cmu.xprize.listener.IAsrEventListener;
 import edu.cmu.xprize.listener.ListenerBase;
@@ -890,5 +892,15 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     }
 
     public void stopAudio() {}
+
+    public void wrongWordBehavior() {
+
+    }
+
+    public long firstWordTime;
+
+    public void startLate() {
+
+    }
 
 }

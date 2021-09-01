@@ -18,7 +18,10 @@
 
 package cmu.xprize.rt_component;
 
+import java.util.List;
+
 import cmu.xprize.util.ILoadableObject;
+import edu.cmu.pocketsphinx.Segment;
 import edu.cmu.xprize.listener.ListenerBase;
 
 public interface ICRt_ViewManager extends ILoadableObject {
@@ -89,4 +92,7 @@ public interface ICRt_ViewManager extends ILoadableObject {
     public void skipSentence();
 
     public void endOfUtteranceCapture();
+
+    public void wrongWordBehavior();
+
 }
