@@ -85,6 +85,7 @@ public class ListenerBase {
     //
     static private HashMap<String, String> dictMap = new HashMap<String, String>();
     public ArrayList<Segment> allSegments;
+    public long offsetTime;
 
 
     static {
@@ -614,6 +615,7 @@ public class ListenerBase {
             Log.e("logHyp", "Error writing hypothesis log file " + e.getMessage());
         }
     }
+
 
 
 }

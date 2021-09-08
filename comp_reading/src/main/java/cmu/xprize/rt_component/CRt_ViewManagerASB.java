@@ -197,9 +197,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     final int SEGMENT_GAP_LENGTH = 100; // length of silence used to separate segments in narration capture mode
     ArrayList<Integer> seamIndices = new ArrayList<>(); // list of indices of seams for narration capture mode
 
-
-    static final long END_UTTERANCE_DELAY = 200; // The time to wait after the last word at the end of the utterance during playback (milliseconds)
-    final int SEAM_GAP_SIL_LEN = 100;
+    // Amount to pad the end time of the last word to avoid truncating it during playback
+    static final long END_UTTERANCE_DELAY_MS = 200;
 
     /**
      *
@@ -829,7 +828,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         mParent.firstWordTime = currUtterance.from;
 
 
-        mParent.post(TCONST.STOP_AUDIO, (currUtterance.until * 10) + END_UTTERANCE_DELAY); // absolute position in file (in ms) to stop playing
+        mParent.post(TCONST.STOP_AUDIO, (currUtterance.until * 10) + END_UTTERANCE_DELAY_MS); // absolute position in file (in ms) to stop playing
         
         // Clean the extension off the end - could be either wav/mp3 +
         //
@@ -967,7 +966,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         // If last word of the utterance, add a small amount of delay due to ASR inaccuracy
         if (segmentNdx == rawNarration[utteranceNdx].segmentation.length - 1) {
-            segmentCurr += END_UTTERANCE_DELAY / 10;
+            segmentCurr += END_UTTERANCE_DELAY_MS / 10;
         }
 
         Log.d(TAG, "Posting delayed tracker: SegmentCurr: " + segmentCurr + " segmentPrev: " + segmentPrev + " Delay: " + (segmentCurr - segmentPrev));
@@ -2152,7 +2151,17 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
     ArrayList<String> acceptedUtterances = new ArrayList<>();
     ArrayList<int[]> acceptedList = new ArrayList<>();
 
+
+    /**
+     *
+     * Determines the point at which the current utterance should be end (at a silence)
+     * @param lastUtteranceOfSentence
+     * @return
+     */
     private ArrayList<ListenerBase.HeardWord> determineUtterance(boolean lastUtteranceOfSentence) {
+
+        int offsetTime = (int) mParent.getoffsetTime() / 10;
+        List<Segment> segments = mParent.getSegments();
         // creates a 2d HeardWord list of all continuous utterances spoken
         if(allHeardWords == null) {
             return new ArrayList<ListenerBase.HeardWord>();
@@ -2168,7 +2177,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         int start = 1;
         for(int i = 0; i < AudioDataStorage.segmentation.size(); i++) {
-            if(AudioDataStorage.segmentation.get(i).matchLevel == ListenerBase.HeardWord.MATCH_EXACT) {
+            if (AudioDataStorage.segmentation.get(i).matchLevel == ListenerBase.HeardWord.MATCH_EXACT) {
                 uttMap.get(0).add(AudioDataStorage.segmentation.get(i));
                 start = i + 1;
                 break;
@@ -2204,6 +2213,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         int maxSeqLength = wordsToSpeak.length - prevStartFrom;
 
+        int seqIndex = 0;
         for (ArrayList<ListenerBase.HeardWord> seq : uttMap) {
             uttMapDiagram.append("\n");
             for (ListenerBase.HeardWord hd : seq) {
@@ -2211,25 +2221,50 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
             }
 
             if (seq.size() > 0) {
+
+                // firstindex is the index of the word in the sentence where the narrator began speaking
                 int firstindex = seq.get(0).iSentenceWord;
                 // The sequence must pick up where the narrator left off
-                if (firstindex == TCONST.ZERO || firstindex > (wordsToSpeak.length - prevStartFrom - 1)/* ||  firstindex == prevStartFrom || startPoints.contains(firstindex) */ ) {
+                if (firstindex == TCONST.ZERO || firstindex > (wordsToSpeak.length - prevStartFrom - 1)) {
 
+                    // Unless the narrator reached the end, it is necessary to find the point at which
+                    // to end the current utterance
                     if(!lastUtteranceOfSentence) {
                         // Truncate this subsequence so that it ends in a silence
                         // Start at the end of the subsequence and travel backwards to find the *last silence*
                         for (int i = seq.size() - 1; i > 0; i--) {
 
-                            if (seq.size() < 2) break; // no use trying to test a 1 word utterance
-                            if (seq.get(i).startFrame - seq.get(i - 1).endFrame < SEGMENT_GAP_LENGTH) { // 100 centiseconds gap is treated as a silence
+                            // find the corresponding RAW SEGMENT for this particular heardWord
+                            // this way you can find out whether it is preceded/followed by a silence
+                            int correspondingSegmentIndex = 0;
+                            for(Segment s: segments) {
+                                if(s.getStartFrame() - offsetTime == seq.get(i).startFrame) {
+                                    break;
+                                }
+                                correspondingSegmentIndex++;
+                            }
+                            try {
+                                // if (seq.size() < 2) break; // no use trying to test a 1 word utterance
+                                if (seq.get(i).hypWord.contains("START_")) {
+                                    seq.remove(i);
+                                } else if (i + 1 == seq.size() && segments.get(correspondingSegmentIndex + 1).getWord().equals("<sil>")) {
+                                    // word is the last word of subsequence and ends with a silence, so the whole
+                                    // subsequence is a usable utterance
+                                    break;
+                                } else if (seq.get(i).startFrame - seq.get(i-1).endFrame >= SEGMENT_GAP_LENGTH && segments.get(correspondingSegmentIndex - 1).getWord().equals("<sil>")) {
+                                    // word is preceded by a silence (AND A 100 CENTISECOND GAP), so remove the current word
+                                    // and cut off the utterance here
+                                    seq.remove(i);
+                                    break;
+                                } else if (seq.size() > maxSeqLength) {
+                                    seq.remove(i);
+                                } else {
+                                    // none of the conditions are met for this to be an end of the utterance,
+                                    // so simply remove this unusable word and try the one behind it
+                                    seq.remove(i);
+                                }
+                            } catch (IndexOutOfBoundsException e) {
                                 seq.remove(i);
-                            } else if (seq.get(i).hypWord.contains("START_")) {
-                                seq.remove(i);
-                            } else if (seq.size() > maxSeqLength) {
-                                seq.remove(i);
-                            } else {
-                                seq.remove(i);
-                                break; // break if silence found
                             }
                         }
                     }
@@ -2246,6 +2281,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
                 }
             }
+            seqIndex++;
         }
         Log.d("Utterance_Map", uttMapDiagram.toString());
         Log.d(TAG, Integer.toString(latestUtterance.size()));
@@ -2316,7 +2352,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
 
         if (latestUtterance.size() > 0) {
 
-            while (!latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 1])) {
+            while (!(latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 1]))) {
                 if(latestUtterance.get(latestUtterance.size() - 1).hypWord.equals(wordsToSpeak[wordsToSpeak.length - 2])) {
 
                     Log.d(TAG, "Sentence end reached, however last word omitted.");
@@ -2504,4 +2540,7 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         UpdateDisplay();
     }
 
+    public void checkForGarbage(List<Segment> s) {
+
+    }
 }

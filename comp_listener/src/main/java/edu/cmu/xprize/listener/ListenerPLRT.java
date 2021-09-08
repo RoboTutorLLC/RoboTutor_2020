@@ -478,9 +478,8 @@ public class ListenerPLRT extends ListenerBase {
             //
             if (eventListener != null) {
                 eventListener.onUpdate(heardWords, finalResult);
-                if(AudioDataStorage.contentCreationOn) { // if in NARRATION CAPTURE MODE
-                    allSegments = segments; // todo: unsafe, ensure that the objects in allSegments must stay unchanged
-                }
+                allSegments = segments;
+                offsetTime = sentenceStartSamples / SAMPLES_PER_FRAME;
             }
 
             // log the partial hypothesis

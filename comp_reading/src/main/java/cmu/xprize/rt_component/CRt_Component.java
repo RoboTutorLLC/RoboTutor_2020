@@ -903,4 +903,12 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
     }
 
+    List<Segment> getSegments() {
+        return mListener.allSegments;
+    }
+
+    long getoffsetTime() {
+        return mListener.offsetTime;
+    }
+
 }

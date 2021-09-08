@@ -1334,4 +1334,5 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
 
         mMediaManager.setStartTime((int) firstWordTime * 10);
     }
+
 }
