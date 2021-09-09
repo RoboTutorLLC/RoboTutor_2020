@@ -6,7 +6,27 @@ Narration capture mode exists to create narrations of existing stories and store
 
 Narration capture mode requires 3 files to be modified: debug.json, config.json, and storydata.json.
 
-To see how to set it up, visit [this pull request](https://github.com/RoboTutorLLC/RoboTutor_2020/pull/48).
+Directions for Use
+STEP 1: Create storydata.json for a particular story, but leave out segmentation and narration data in the storydata.json file
+
+STEP 2: In the downloads folder of the android device, create a folder with the story title, and in it create another folder with the story title + an underscore + a level number (e.g. if the story was titled, say, "butterflies" and the level was "1", you should have the file structure "Downloads/butterfly/butterflies_1"). Save the storydata.json in the subfolder.
+
+STEP 3: Configure debug.json to look like the following. Replace "storyName_level" with your story name and level identical to the subfolder created earlier.
+```
+  { 
+    "type": "TRANSITION", 
+    "skill": "stories", 
+    "tutor_id": "story.echo::storyName_level", 
+    "tutor_desc":"story.echo", 
+    "tutor_data": "[unpackaged_asset]storyName_level",
+    "use_hash_name": "false"
+  }
+```
+STEP 4: Configure config.json to include the following variable:
+```
+  "content_creation_mode": false
+```
+STEP 5: Launch RoboTutor.
 
 For more information on storydata.json and config.json, visit the [github authoring documentation](https://drive.google.com/drive/u/0/folders/0B7kzHmZs33scWjF3Qkw2MFo1Wm8?resourcekey=0-ZK-ICf9-mziZzT1Atavx0A). Information on debug.json can be found [here](https://docs.google.com/document/d/1qF4lGDrR7wzWOTY7lcwdhF6ttJegUvQxSEVUF-s8UoI/edit).
 
