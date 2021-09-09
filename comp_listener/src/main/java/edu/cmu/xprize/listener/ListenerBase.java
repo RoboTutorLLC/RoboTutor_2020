@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +56,7 @@ public class ListenerBase {
     static protected ListenerAssets  assets;     // created in init phase -
 
     protected String  captureLabel = "";          // label for capture, logging files
-    protected boolean IS_LOGGING   = false;
+    protected boolean IS_LOGGING   = true;
 
     protected File    configFile;                // config file to use, null => default
     protected File    modelsDir;                 // saved model directory
@@ -83,6 +84,9 @@ public class ListenerBase {
     // Note: on Android these are case sensitive filenames
     //
     static private HashMap<String, String> dictMap = new HashMap<String, String>();
+    public ArrayList<Segment> allSegments;
+    public long offsetTime;
+
 
     static {
         dictMap.put("LANG_EN", "CMU07A-CAPS.DIC");
@@ -139,6 +143,7 @@ public class ListenerBase {
 
         // initialize recognizer for our task
         //
+
         setupRecognizer(assets.getExternalDir(), configFile, dictMap.get(langFTR));
     }
 
@@ -231,8 +236,9 @@ public class ListenerBase {
 
                                 .setFloat("-pip", 1f)
 
-                                .setBoolean("-remove_noise", true)     // yes in default
-                                .setBoolean("-remove_silence", true)   // yes in default
+                                .setBoolean("-remove_noise", false)     // yes in default
+                                // I HAVE SET remove_noise AND remove_noise TO FALSE 
+                                .setBoolean("-remove_silence", false)   // yes in default
 
                                 .setFloat("-silprob", 1f)               // 0.005 in default
                                 .setInteger("-topn",  4)
@@ -563,8 +569,6 @@ public class ListenerBase {
 
     /***** Logging */
 
-
-
     /**
      * get the  path to the hypothesis log file for given utterance label
      */
@@ -611,6 +615,7 @@ public class ListenerBase {
             Log.e("logHyp", "Error writing hypothesis log file " + e.getMessage());
         }
     }
+
 
 
 }

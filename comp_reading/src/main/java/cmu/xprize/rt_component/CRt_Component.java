@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
@@ -48,6 +49,8 @@ import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TTSsynthesizer;
 import cmu.xprize.util.TCONST;
+import edu.cmu.pocketsphinx.Segment;
+import edu.cmu.xprize.listener.AudioDataStorage;
 import edu.cmu.xprize.listener.IAsrEventListener;
 import edu.cmu.xprize.listener.ListenerBase;
 import edu.cmu.xprize.listener.ListenerPLRT;
@@ -108,8 +111,6 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     // json loadable
     //
     public CData_Index[]      dataSource;
-
-
 
     // This is used to map "type" (class names) in the index to real classes
     //
@@ -533,6 +534,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
         mViewManager.setPageFlipButton(command);
     }
 
+
     // Tutor methods  End
     //************************************************************************
     //************************************************************************
@@ -581,6 +583,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
             // ZZZ it loads the story data JUST FINE
             String jsonData = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYDATA);
+            AudioDataStorage.initStoryData(jsonData);
             Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonData:");
 
             mViewManager.loadJSON(new JSONObject(jsonData), null);
@@ -603,6 +606,44 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
     }
 
+    public void loadStoryANDEnableContentCreation(String EXTERNPATH, String viewType, String assetLocation, Boolean narrationCaptureMode, boolean keepOnlyRelevantAudio) {
+
+        Log.d(TCONST.DEBUG_STORY_TAG, String.format("assetLocation=%s -- EXTERNPATH=%s", assetLocation, EXTERNPATH));
+
+        Class<?> storyClass = viewClassMap.get(viewType);
+
+        try {
+            // Generate the View manager for the storyName - specified in the data
+            //
+            // ooooh maybe check if it's math and make text closer to image
+            mViewManager = (ICRt_ViewManager)storyClass.getConstructor(new Class[]{CRt_Component.class, ListenerBase.class}).newInstance(this,mListener);
+
+            // ZZZ it loads the story data JUST FINE
+            String jsonData = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYDATA);
+            AudioDataStorage.initStoryData(jsonData);
+            Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonData:");
+
+            mViewManager.loadJSON(new JSONObject(jsonData), null);
+
+        } catch (Exception e) {
+            // TODO: Manage Exceptions
+            CErrorManager.logEvent(TAG, "Story Parse Error: ", e, false);
+        }
+
+        if (assetLocation.equals(TCONST.EXTERN_SHARED)) {
+            Log.d(TCONST.DEBUG_STORY_TAG, "SHARED!");
+            // we are done using sharedAssetLocation
+            EXTERNPATH = null;
+        }
+
+        mViewManager.enableNarrationCaptureMode(narrationCaptureMode, keepOnlyRelevantAudio);
+        //
+        // ZZZ what are these values?
+        // ZZZ EXTERNPATH = TCONST.EXTERN
+        // ZZZ assetLocation contains storydata.json and images
+        mViewManager.initStory(this, EXTERNPATH, assetLocation);
+
+    }
 
     /**
      * TODO: this currently only supports extern assets - need to allow for internal assets
@@ -779,6 +820,7 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
     }
     private void enQueue(Queue qCommand, Long delay) {
 
+
         if (!_qDisabled) {
             queueMap.put(qCommand, qCommand);
 
@@ -837,4 +879,36 @@ public class CRt_Component extends ViewAnimator implements IEventListener, IVMan
 
         JSON_Helper.parseSelf(jsonData, this, CClassMap.classMap, scope);
     }
+
+    /**
+     * Bypasses the normal json procedure to efficiently play narrations at runtime
+     * Overridden by TClass
+     *
+     * @param dataSource
+     * @param assetLocation
+     */
+    public void updateJSONData(String dataSource, String assetLocation) {
+
+    }
+
+    public void stopAudio() {}
+
+    public void wrongWordBehavior() {
+
+    }
+
+    public long firstWordTime;
+
+    public void startLate() {
+
+    }
+
+    List<Segment> getSegments() {
+        return mListener.allSegments;
+    }
+
+    long getoffsetTime() {
+        return mListener.offsetTime;
+    }
+
 }

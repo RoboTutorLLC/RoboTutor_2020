@@ -24,6 +24,7 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String USE_PLACEMENT = "USE_PLACEMENT";
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
+    public static final String CONTENT_CREATION_MODE = "CONTENT_CREATION_MODE";
     public static final String RECORD_SCREEN_VIDEO = "RECORD_SCREEN_VIDEO";
     public static final String INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO = "INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO";
     public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
@@ -41,6 +42,7 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean use_placement;
     public boolean record_audio;
     public String menu_type;
+    public boolean content_creation_mode;
     public boolean record_screen_video;
     public boolean show_helper_button;
     public String baseDirectory;
@@ -71,7 +73,8 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean language_switcher, boolean no_asr_apps,
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
-                              String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
+                              String menu_type, boolean content_creation_mode,
+                              boolean record_screen_video, boolean include_audio_output_in_screen_video,
                               boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
 
 //        this.config_version = config_version;
@@ -86,6 +89,7 @@ public class ConfigurationItems implements ILoadableObject {
         this.use_placement = use_placement;
         this.record_audio = record_audio;
         this.menu_type = menu_type;
+        this.content_creation_mode = content_creation_mode;
         this.record_screen_video = record_screen_video;
         this.include_audio_output_in_screen_video = include_audio_output_in_screen_video;
         this.show_helper_button = show_helper_button;
@@ -107,6 +111,7 @@ public class ConfigurationItems implements ILoadableObject {
         use_placement = true;
         record_audio = false;
         menu_type = "CD1";
+        content_creation_mode = false;
         show_helper_button = false;
         baseDirectory = "roboscreen";
         record_screen_video = true;

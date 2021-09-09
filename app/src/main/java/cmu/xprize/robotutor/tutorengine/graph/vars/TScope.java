@@ -219,9 +219,9 @@ public class TScope implements IScope2 {
                         }
 
                         // If the symbol references an array object we remember the symbol name and
-                        // continue parsing the input as a new symbol which may be either
-                        // another variable or a number representing the array index
-                        //
+                            // continue parsing the input as a new symbol which may be either
+                            // another variable or a number representing the array index
+                            //
                         else if (tChar == '[') {
 
                             isArray  = true;

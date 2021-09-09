@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cmu.xprize.robotutor.ScreenRecorder;
 import cmu.xprize.robotutor.tutorengine.graph.type_handler;
@@ -78,6 +80,11 @@ public class CMediaManager {
 
     final static public String TAG = "CMediaManager";
 
+    int startTime = 0;
+
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
 
     /**
      *
@@ -592,6 +599,8 @@ public class CMediaManager {
 
         protected void createPlayer(String dataSource, String location) {
 
+            Log.d("CMediaManager", "CHIRAG dataSource is: " + dataSource);
+
             try {
                 mIsReady = false;
 
@@ -623,6 +632,7 @@ public class CMediaManager {
                 mPlayer.setOnPreparedListener(this);
                 mPlayer.setOnCompletionListener(this);
                 mPlayer.setLooping(mOwner.isLooping());
+                Log.d("CMediaManager","Chirag - isLooping is: " + mOwner.isLooping());
 
                 float volume = mOwner.getVolume();
 
@@ -637,6 +647,7 @@ public class CMediaManager {
             } catch (Exception e) {
                 Log.e(GRAPH_MSG, "CMediaManager.mediaplayer.ERROR: " + mOwner.sourceName() + " => " + mOwner.resolvedName() + " => " + e);
 
+                Log.getStackTraceString(e);
                 // Do the completion event to keep the tutor moving.
                 //
                 onCompletion(mPlayer);
@@ -719,14 +730,20 @@ public class CMediaManager {
             if(!mPlaying && mIsAlive) {
 
                 if(mIsReady) {
+
                     // TODO: this will need a tweak for background music etc.
                     mMediaController.startSpeaking();
 
                     Log.v(GRAPH_MSG, "CMediaManager.playermanager.play: " + mDataSource);
                     mPlayer.start();
 
+
                     mPlaying       = true;
                     mDeferredStart = false;
+
+                    mPlayer.seekTo(startTime);
+
+                    Log.d(TAG, "Player seeked to " + startTime);
                 }
                 else
                     mDeferredStart = true;
@@ -772,7 +789,7 @@ public class CMediaManager {
             // This stops the last audio recording file
             ScreenRecorder.stopLastAudioFile();
 
-            //#Mod issue #335 - give the tracka chance to shutdown.  The audio runs in
+            //#Mod issue #335 - give the track a chance to shutdown.  The audio runs in
             // JNI code so this seems to allow it to shutdown and not restart if we are
             // interrupting a clip with another clip.
             //
@@ -783,6 +800,20 @@ public class CMediaManager {
                 e.printStackTrace();
             }
 
+
+
+        }
+
+        // Narration capture mode, stopping audio file before it completes and moving onto the next
+        public void stopEarly(long milliseconds) {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    seekTo(mPlayer.getDuration()-1);
+
+                }
+            }, milliseconds);
         }
 
 

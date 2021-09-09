@@ -69,6 +69,7 @@ public class ListenerPLRT extends ListenerBase {
     private boolean     useTruncations = true;       // Flag whether or not to use truncations.
     private boolean     speaking = false;            // speaking state. [currently unused]
 
+
     /**
      * Attach event listener to receive notification callbacks
      */
@@ -83,6 +84,7 @@ public class ListenerPLRT extends ListenerBase {
      * @param wordsToHear -- array of upper-case ASR dictionary words
      * @param startWord   -- 0-based index of word to expect next
      */
+    @Override
     public void listenFor(String[] wordsToHear, int startWord) {
 
         Log.d("STABLE", "ListenFor: " + TextUtils.join(" ", wordsToHear));
@@ -117,6 +119,7 @@ public class ListenerPLRT extends ListenerBase {
             // save stream offset of start of utterance, for converting stream-based frame times
             // to utterance-based times.
             sentenceStartSamples = recognizer.nSamples;
+
             // record start time now
             sentenceStartTime = System.currentTimeMillis();
 
@@ -475,11 +478,15 @@ public class ListenerPLRT extends ListenerBase {
             //
             if (eventListener != null) {
                 eventListener.onUpdate(heardWords, finalResult);
+                allSegments = segments;
+                offsetTime = sentenceStartSamples / SAMPLES_PER_FRAME;
             }
 
             // log the partial hypothesis
-            if(IS_LOGGING)
+            if(IS_LOGGING) {
                 logHyp(timestamp, TextUtils.join(" ", asrWords), segments, heardWords);
+            }
+            AudioDataStorage.updateHypothesis(heardWords);
         }
     }
 

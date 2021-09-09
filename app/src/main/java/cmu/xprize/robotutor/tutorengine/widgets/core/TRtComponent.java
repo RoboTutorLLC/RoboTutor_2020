@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -35,6 +36,8 @@ import java.util.Map;
 import cmu.xprize.comp_logging.ITutorLogger;
 import cmu.xprize.comp_logging.PerformanceLogItem;
 import cmu.xprize.robotutor.RoboTutor;
+import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
 import cmu.xprize.robotutor.tutorengine.CMediaPackage;
@@ -82,6 +85,8 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     private HashMap<String,String>  _StringVar  = new HashMap<>();
     private HashMap<String,Integer> _IntegerVar = new HashMap<>();
     private HashMap<String,Boolean> _FeatureMap = new HashMap<>();
+
+    public boolean startLater = false;
 
     static private String TAG = "TRtComponent";
 
@@ -335,7 +340,7 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
                         // which is done internally.
                         //
                         case TCONST.QUEUE:
-
+                            // CHIRAG - - AFTER THIS, FFW THE AUDIO TO THE CORRECT SPOT
                             if (obj.testFeatures()) {
                                 obj.applyNode();
                             }
@@ -465,6 +470,7 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
         extractFeatureContents(builder, _FeatureMap);
 
         RoboTutor.logManager.postTutorState(TUTOR_STATE_MSG, "target#reading_tutor," + logData + builder.toString());
+        Log.d("TRt_Component", "Tutor is Listening");
     }
 
     // ITutorLogger - End
@@ -730,6 +736,32 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
             } else if (dataNameDescriptor.startsWith("{")) {
 
                 loadJSON(new JSONObject(dataNameDescriptor), null);
+            } else if (dataNameDescriptor.startsWith(TCONST.UNPACKAGED_ASSET)) {
+
+                // This is for assets that haven't yet been completed (e.g. stories that need narrations) and exists for content creation
+                String storyFolder = dataNameDescriptor.substring(TCONST.UNPACKAGED_ASSET.length()).toLowerCase();
+
+                String[] levelval   = storyFolder.split("_");
+
+                String levelFolder = levelval[0];
+
+                DATASOURCEPATH  = TCONST.DOWNLOAD_PATH + "/";
+                STORYSOURCEPATH = DATASOURCEPATH + levelFolder + "/" + storyFolder + "/";
+
+                AUDIOSOURCEPATH = TCONST.DOWNLOAD_PATH + "/" + levelFolder + "/" + storyFolder;
+                // Probably going to change this to put all the audio in one place
+
+                configListenerLanguage(mMediaManager.getLanguageFeature(mTutor));
+                mMediaManager.addSoundPackage(mTutor, MEDIA_STORY, new CMediaPackage(LANG_AUTO, AUDIOSOURCEPATH, LOCAL_STORY_AUDIO));
+
+                boolean keepOnlyRelevantAudio;
+                if (CDebugLauncher.getDebugVar("delete_extra_audio") == "true")
+                    keepOnlyRelevantAudio = true;
+                else
+                    keepOnlyRelevantAudio = false;
+
+                loadStoryANDEnableContentCreation(STORYSOURCEPATH, "ASB_Data", TCONST.EXTERN, Configuration.getContentCreationMode(getContext()), keepOnlyRelevantAudio);
+
 
             } else if (dataNameDescriptor.startsWith(TCONST.UNPACKAGED_ASSET)) {
 
@@ -753,6 +785,7 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
             } else {
                 throw (new Exception("BadDataSource"));
             }
+            //enableNarrateMode(Configuration.getContentCreationMode(getContext()));
         }
         catch (Exception e) {
             CErrorManager.logEvent(TAG, "Invalid Data Source for : " + mTutor.getTutorName(), e, true);
@@ -999,6 +1032,16 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     }
 
 
+    /**
+     * @param sentence Current sentence in a string
+     * @param index Line number of sentence
+     * @param wordList Array of words in the sentence
+     * @param wordIndex Index of current word in Sentence
+     * @param word Current word in sentence as String
+     * @param attempts number of attempts
+     * @param virtual
+     * @param correct
+     */
     @Override
     public void updateContext(String sentence, int index, String[] wordList, int wordIndex, String word, int attempts, boolean virtual, boolean correct) {
 
@@ -1074,6 +1117,11 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
     @Override
     public void echoLine() {
         mViewManager.echoLine();
+    }
+
+    @Override
+    public void endOfUtteranceCapture() {
+        mViewManager.endOfUtteranceCapture();
     }
 
     @Override
@@ -1215,4 +1263,76 @@ public class TRtComponent extends CRt_Component implements IBehaviorManager, ITu
 
         RoboTutor.perfLogManager.postPerformanceLog(event);
     }
+
+    @Override
+    public void constructAudioStoryData() {
+        mViewManager.constructAudioStoryData();
+    }
+
+    @Override
+    public void clearAudioData() {
+        mViewManager.clearAudioData();
+    }
+
+    @Override
+    public void startLine() {
+        mViewManager.startLine();
+    }
+
+    @Override
+    public void restartUtterance() {
+        mViewManager.restartUtterance();
+    }
+
+    @Override
+    public void prevSentence() {mViewManager.prevSentence();}
+
+    @Override
+    public void skipSentence() {mViewManager.skipSentence(); }
+
+    @Override
+    public void updateJSONData(String dataSource, String assetLocation) {
+        /*
+        type_audio audioObj = new type_audio(true);
+
+        // json loadable fields are being hijacked here
+        audioObj.command = "PLAY";
+        audioObj.lang = "";
+        audioObj.soundsource = dataSource;
+        audioObj.soundpackage = "";
+        audioObj.hijackScope(mTutor.getScope());
+        audioObj.applyNode();
+        */
+
+        String jsondata = JSON_Helper.cacheData(STORYSOURCEPATH + "storydata.json");
+
+        try {
+            mViewManager.loadJSON(new JSONObject(jsondata), null);
+        } catch (JSONException e) {
+            Log.getStackTraceString(e);
+        }
+
+    }
+
+
+    @Override
+    public void stopAudio() {
+        mMediaManager.dispMediaPlayers();
+        CMediaManager.PlayerManager p = mMediaManager.getPlaying();
+        p.stopEarly(60L);
+    }
+
+    @Override
+    public void wrongWordBehavior() {
+        mViewManager.wrongWordBehavior();
+    }
+
+    @Override
+    public void startLate() {
+        Log.d(TAG, "Forwarding Media to stated starting point: " + firstWordTime);
+        mMediaManager.dispMediaPlayers();
+
+        mMediaManager.setStartTime((int) firstWordTime * 10);
+    }
+
 }

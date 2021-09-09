@@ -43,15 +43,19 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
 import cmu.xprize.util.TCONST;
@@ -453,7 +457,7 @@ public class SpeechRecognizer {
 
                 try {
                     recorder = new AudioRecord(
-                            AudioSource.VOICE_RECOGNITION, sampleRate,
+                            AudioSource.MIC, sampleRate, // switched VOICE_RECOGNITION to MIC to possibly get better ASR results -- Chirag, 9-23-20
                             AudioFormat.CHANNEL_IN_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, 8192);
                 }
@@ -461,6 +465,7 @@ public class SpeechRecognizer {
                     Log.d("ASR", "AudioRecorder Create Failed: " + e);
                 }
                 isRunningRecognizer = true;
+                AudioDataStorage.setSampleRate(sampleRate);
 
                 // Collect audio samples continuously while not paused and until the
                 // Thread is killed.  This allow UI/UX activity while the listener is still
@@ -576,6 +581,8 @@ public class SpeechRecognizer {
                             //ASRTimer = System.currentTimeMillis();
                             decoder.processRaw(buffer, nread, false, false);
                             //Log.d("ASR", "Time in processRaw: " + (System.currentTimeMillis() - ASRTimer));
+
+                            AudioWriter.addAudio(nread, buffer);
 
                             nSamples += nread;
 
@@ -720,6 +727,25 @@ public class SpeechRecognizer {
 
         Log.d("STABLE", "HYP LIST: " + hypString);
 
+        /* try {
+
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+            String date = formatter.format(new Date(System.currentTimeMillis()));
+
+            FileWriter writer = new FileWriter(AudioWriter.current_log_location, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            //Log.d("Speechrecognizer", "Writing to log file: " + AudioWriter.current_log_location);
+            bufferedWriter.write(date + " HYP LIST: " + hypString);
+            writer.close();
+            bufferedWriter.close();
+        } catch (IOException e) {
+            Log.getStackTraceString(e);
+        } catch (Exception e) {
+            Log.d("SpeechRecognizer", "No log file");
+        }
+
+         */
+
         String[] asrWords = hypString.split("\\s+");
 
 
@@ -848,7 +874,7 @@ public class SpeechRecognizer {
             output = new FileOutputStream(wavFile);
             // first write appropriate wave file header
             ByteArrayOutputStream hdrBytes = new ByteArrayOutputStream();
-            new WaveHeader(WaveHeader.FORMAT_PCM, (short) 1, 16000, (short) 16, (int) rawFile.length()).write(hdrBytes);
+            new WaveHeader(WaveHeader.FORMAT_PCM, (short) 1,    16000, (short) 16, (int) rawFile.length()).write(hdrBytes);
             output.write(hdrBytes.toByteArray());
             // then copy raw bytes to output file
             byte[] buffer = new byte[4096];

@@ -51,7 +51,9 @@ public class CDebugLauncher {
             this.matrix = mResult.get("skill1");
 
             for (Map.Entry<String, String> element : mResult.entrySet()) {
+
                 debugVars.put(element.getKey(), element.getValue());
+
 
             }
 

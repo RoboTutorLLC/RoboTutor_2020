@@ -37,4 +37,13 @@ public class CASB_Seg implements ILoadableObject {
 
         JSON_Helper.parseSelf(jsonObj, this, CClassMap.classMap, scope);
     }
+    public CASB_Seg() {
+
+    }
+
+    CASB_Seg(int start, int end, String word) {
+        this.start = start;
+        this.end = end;
+        this.word = word;
+    }
 }

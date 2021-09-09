@@ -54,4 +54,11 @@ public interface IRtComponent {
 
     public void continueListening();
 
+    public void constructAudioStoryData();
+    public void clearAudioData();
+    public void startLine();
+    public void prevSentence();
+    public void restartUtterance();
+    public void skipSentence();
+    public void endOfUtteranceCapture();
 }

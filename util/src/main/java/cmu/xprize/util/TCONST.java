@@ -226,6 +226,7 @@ public class TCONST {
     public static final String FTR_USER_REVEAL     = "FTR_USER_REVEAL";
     public static final String FTR_USER_PARROT     = "FTR_USER_PARROT";
     public static final String FTR_USER_READING    = "FTR_USER_READING";
+    public static final String FTR_NARRATION_CAPTURE = "NARRATION_CAPTURE_MODE";
     // UHQ
     public static final String FTR_GEN             = "FTR_GEN";
     public static final String FTR_PIC             = "FTR_PIC";
@@ -233,6 +234,7 @@ public class TCONST {
     public static final String STOP_AUDIO          = "STOP_AUDIO";
     public static final String RTC_VAR_CLOZEWORD   = ".clozeWord";
     public static final String REMOVE_CLOZE_FROM_BLANK = "REMOVE_CLOZE_FROM_BLANK";
+    public static final String START_LATER = "START_LATER";
 
 
     public static final String NARRATE_STORY       = "NARRATE_STORY";
@@ -833,6 +835,10 @@ public class TCONST {
     public static final String PAGEFLIP_BUTTON = "PAGE_FLIP_CLICK";
     public static final String SPEAK_BUTTON    = "SPEAK_CLICK";
 
+    public static final String SKIP_SENTENCE = "SENTENCE_SKIP_CLICK";
+    public static final String SKIP_PARA = "PARAGRAPH_SKIP_CLICK";
+    public static final String SKIP_PAGE = "PAGE_SKIP_CLICK";
+
     public static final String EMPTY = "";
 
     public static final int INCR = 1;
@@ -840,6 +846,9 @@ public class TCONST {
 
     public static final String RTC_VAR_ECHOSTATE   = ".echoState";
     public static final String RTC_VAR_PARROTSTATE = ".parrotState";
+    public static final String RTC_VAR_NARRATESTATE = ".narrateState";
+    public static final String RTC_VAR_NARRATECOMPLETESTATE = ".narrationCompleteState";
+
     // Generic question state flag
     public static final String RTC_VAR_QUESTIONSTATE = ".questionState";
     public static final String RTC_VAR_CLOZESTATE = ".clozeState";
@@ -876,6 +885,7 @@ public class TCONST {
     public static final String RTC_VAR_REMAINING   = ".remainingWords";
     public static final String RTC_VAR_SENTENCE    = ".sentence";
     public static final String RTC_VAR_UTTERANCE   = ".utterance";
+    public static final String RTC_VAR_UTTERANCE_DURATION = ".duration";
 
     //Akira Game Prompt Situation
     public static final String PROMPT_1LEFT = "PROMPT_1LEFT";
@@ -931,4 +941,6 @@ public class TCONST {
     public static final String WRITING_PLACEMENT_INDEX = "WRITING_PLACEMENT_INDEX";
 
     public static final String DEBUG_CSV = "DEBUG_CSV";
+
+    public static final String HYP_LOG_FILE_LOCATION = "/sdcard/Download/RTNarrateHypLogs/";
 }

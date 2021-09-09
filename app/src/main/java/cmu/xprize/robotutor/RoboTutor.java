@@ -84,6 +84,7 @@ import cmu.xprize.util.IRoboTutor;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TTSsynthesizer;
+import edu.cmu.xprize.listener.AudioWriter;
 import edu.cmu.xprize.listener.ListenerBase;
 
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.LITERACY_MATRIX;
@@ -216,11 +217,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         //
 
         ACTIVITY     = this;
+        AudioWriter.activity = ACTIVITY;
         PACKAGE_NAME = getApplicationContext().getPackageName();
 
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(hotLogPath, ACTIVITY));
-
-
 
 
         // Prep the CPreferenceCache
@@ -287,6 +287,12 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
             this.screenRecorder = new ScreenRecorder(this, getApplicationContext());
         }
         catch (Exception e) {
+            Log.wtf(TAG, e);
+        }
+
+        try {
+            AudioWriter.context = getApplicationContext();
+        } catch (Exception e) {
             Log.wtf(TAG, e);
         }
     }

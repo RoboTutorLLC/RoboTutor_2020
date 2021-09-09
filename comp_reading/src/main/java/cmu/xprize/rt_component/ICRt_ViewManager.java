@@ -18,7 +18,10 @@
 
 package cmu.xprize.rt_component;
 
+import java.util.List;
+
 import cmu.xprize.util.ILoadableObject;
+import edu.cmu.pocketsphinx.Segment;
 import edu.cmu.xprize.listener.ListenerBase;
 
 public interface ICRt_ViewManager extends ILoadableObject {
@@ -75,4 +78,21 @@ public interface ICRt_ViewManager extends ILoadableObject {
     public void setPageFlipButton(String command);
 
     public void execCommand(String _command, Object _target);
+
+    public void constructAudioStoryData();
+    public void clearAudioData();
+    public void startLine();
+
+    public void restartUtterance();
+
+    public void prevSentence();
+
+    public void enableNarrationCaptureMode(boolean isNarrationCaptureMode, boolean keepExtraAudio);
+
+    public void skipSentence();
+
+    public void endOfUtteranceCapture();
+
+    public void wrongWordBehavior();
+
 }

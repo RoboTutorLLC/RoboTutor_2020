@@ -69,7 +69,41 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true">
+        <LinearLayout
+            android:id="@+id/NarrateControls"
+            android:layout_width="184dp"
+            android:layout_height="63dp"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="90dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:background="@null"
+                android:rotation="0"
+                android:scaleType="fitCenter"
+                android:src="@drawable/page_flip_button"
+                android:text="Back"
+                app:layout_heightPercent="100%"
+                app:layout_marginLeftPercent="41%" />
+
+            <ImageButton
+                android:id="@+id/forwardButton"
+                android:layout_width="98dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:text="Forward"
+                app:layout_heightPercent="100%"
+                app:layout_marginLeftPercent="51%"
+                app:layout_marginTopPercent="90%"
+                android:src="@drawable/page_flip_button"
+                android:scaleType="fitCenter"
+                android:rotation="180"/>
+        </LinearLayout>
+    </FrameLayout>
 
 
 </android.support.percent.PercentRelativeLayout>

@@ -82,6 +82,16 @@ android {
         ignoreWarnings true
     }
 
+
+    configurations {
+        all {
+            exclude group: 'com.gitub.adrielcafe', module: 'ffmpeg-android-java'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.getRuntimeConfiguration().exclude group: 'com.github.adrielcafe', module: 'ffmpeg-android-java'
+    }
     apply from: "checkstyle.gradle"
     afterEvaluate{
         preBuild.dependsOn('checkstyle')
@@ -96,8 +106,12 @@ repositories {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
-    implementation 'com.google.guava:guava:25.0-android'
+
+    implementation ('com.writingminds:FFmpegAndroid:0.3.2') {
+        exclude group: 'com.gitub.adrielcafe', module: 'ffmpeg-android-java'
+    }
+    implementation 'com.google.guava:guava:22.0-android'
+
     implementation 'com.android.support:appcompat-v7:25.2.0'
     implementation 'com.android.support:percent:25.2.0'
     implementation 'com.google.code.gson:gson:2.8.7'
@@ -106,7 +120,9 @@ dependencies {
     implementation project(':comp_ltkplus')
     implementation project(':util')
     implementation project(':mn_component')
-    implementation project(':comp_listener')
+    implementation (project(':comp_listener')) {
+        exclude group: 'com.gitub.adrielcafe', module: 'ffmpeg-android-java'
+    }
     implementation project(':comp_reading')
     implementation project(':comp_questions')
     implementation project(':sm_component')

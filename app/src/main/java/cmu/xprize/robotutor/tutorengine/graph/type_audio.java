@@ -27,6 +27,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cmu.xprize.robotutor.RoboTutor;
+import cmu.xprize.robotutor.startup.configuration.Configuration;
+
 import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
@@ -34,7 +36,9 @@ import cmu.xprize.robotutor.tutorengine.IMediaListener;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.util.CEvent;
 import cmu.xprize.util.CFileNameHasher;
+import cmu.xprize.util.IScope;
 import cmu.xprize.util.TCONST;
+import edu.cmu.xprize.listener.AudioDataStorage;
 
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.TYPE_AUDIO;
@@ -84,6 +88,16 @@ public class type_audio extends type_action implements IMediaListener {
 
     final static public String TAG = "type_audio";
 
+    public boolean isNewNarration;
+
+    public static long playDuration = 0;
+
+    // used for manually hijacking this to play audio
+    public type_audio(boolean isNewNarration) {
+        this();
+
+        this.isNewNarration = isNewNarration;
+    }
 
     public type_audio() {
         Timer tempTimer = new Timer();
@@ -229,9 +243,13 @@ public class type_audio extends type_action implements IMediaListener {
         //
         initSoundPackage();
 
+        Log.d("msourcepath", "Chirag, it's " + mSourcePath);
+
         mPathResolved = getScope().parseTemplate(mSourcePath);
 
-        if(Objects.equals(CDebugLauncher.getDebugVar("use_hash_name"), "false")) {
+
+
+        if(AudioDataStorage.contentCreationOn || Objects.equals(CDebugLauncher.getDebugVar("use_hash_name"), "false")) {
             mPathResolved = mPathResolved.replace("sdcard/Download/RoboTutor/assets/story_questions/audio/en//", "").replace("sdcard/Download/RoboTutor/assets/story_questions/audio/sw//", "");
             _useHashName = false;
         }
@@ -251,7 +269,7 @@ public class type_audio extends type_action implements IMediaListener {
 
         // Note we keep this decomposition to provide the resolved name for debug messages
         //
-        if (_useHashName) {
+        if (_useHashName || mRawName.equals("Please read aloud")) {
 
             // Permit actual hash's in the script using the # prefix
             //
@@ -270,6 +288,7 @@ public class type_audio extends type_action implements IMediaListener {
         //
         mPathResolved = pathPart + mResolvedName + ".mp3";
 
+        Log.d("type_Audio", "The resolved name is: " + mResolvedName + ". The resolved path is " + mPathResolved);
         // This allocates a MediaPController for use by this audio_node. The media controller
         // is a managed global resource of CMediaManager
         //
@@ -468,14 +487,15 @@ public class type_audio extends type_action implements IMediaListener {
             // GRAY_SCREEN_BUG X
             langPath = mMediaManager.mapSoundPackage(_scope.tutor(), soundpackage, lang);
 
-            // Update the path to the sound source file
-            // #Mod Dec 13/16 - Moved audio/storyName assets to external storage
-            //
-            mSoundSource = TCONST.AUDIOPATH + "/" + langPath + "/" + soundsource;
+             // Update the path to the sound source file
+             // #Mod Dec 13/16 - Moved audio/storyName assets to external storage
+             //
+             mSoundSource = TCONST.AUDIOPATH + "/" + langPath + "/" + soundsource;
 
-            assetPath = mMediaManager.mapPackagePath(_scope.tutor(), soundpackage);
+             assetPath = mMediaManager.mapPackagePath(_scope.tutor(), soundpackage);
 
-            mSourcePath = assetPath + "/" + mSoundSource;
+             mSourcePath = assetPath + "/" + mSoundSource;
+
 
             mLocation = mMediaManager.mapPackageLocation(_scope.tutor(), soundpackage);
         }
@@ -491,6 +511,10 @@ public class type_audio extends type_action implements IMediaListener {
     public void loadJSON(JSONObject jsonObj, IScope2 scope) {
 
         super.loadJSON(jsonObj, scope);
+    }
+
+    public void hijackScope(IScope2 scope) {
+        _scope = scope;
     }
 
 }

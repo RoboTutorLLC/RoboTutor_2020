@@ -1,6 +1,10 @@
 package edu.cmu.xprize.listener;
 
 
+import java.util.List;
+
+import edu.cmu.pocketsphinx.Segment;
+
 public interface IAsrEventListener {
 
     /**
@@ -25,6 +29,7 @@ public interface IAsrEventListener {
 
 
     void onASREvent(int eventType);
+
 
 }
 

@@ -203,6 +203,26 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
         }
     }
 
+    @Override
+    public void constructAudioStoryData() {
+
+    }
+
+    @Override
+    public void clearAudioData() {
+
+    }
+
+    @Override
+    public void startLine() {
+
+    }
+
+    @Override
+    public void restartUtterance() {
+
+    }
+
 
     @Override
     public void onUpdate(ListenerBase.HeardWord[] heardWords, boolean finalResult) {
@@ -593,6 +613,33 @@ public class CRt_ViewManagerMari implements ICRt_ViewManager, ILoadableObject {
         matcher.appendTail(sb);
         System.out.println(sb.toString());
         sentences = new ArrayList<String>(Arrays.asList(sb.toString().split("\\.")));
+    }
+
+    public void prevSentence() {
+
+    }
+
+    @Override
+    public void enableNarrationCaptureMode(boolean isNarrateMode, boolean keepExtraAudio) {
+
+    }
+
+    public void enableNarrateMode(boolean isNarrateMode) {
+
+    }
+
+    public void skipSentence() {
+
+    }
+
+    @Override
+    public void endOfUtteranceCapture() {
+
+    }
+
+    @Override
+    public void wrongWordBehavior() {
+
     }
 }
 
