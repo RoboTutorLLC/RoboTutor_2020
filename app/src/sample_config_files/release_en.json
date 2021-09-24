@@ -1,11 +1,13 @@
 {
   "config_version": "release_en",
-  "language_override": true,
+  "language_override": false,
   "show_tutorversion": true,
-  "show_debug_launcher": true,
+  "show_debug_launcher": false,
   "language_switcher": false,
   "no_asr_apps": false,
   "language_feature_id": "LANG_EN",
   "show_demo_vids": false,
-  "show_helper_button": false
+  "show_helper_button": false,
+  "record_screen_video": true,
+  "include_audio_output_in_screen_video": false
 }

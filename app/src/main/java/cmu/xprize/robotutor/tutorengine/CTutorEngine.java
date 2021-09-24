@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -302,7 +303,6 @@ public class CTutorEngine implements ILoadableObject2 {
 
         startSessionManager();
 
-        Log.d(TAG, "destroyCurrentTutor: " + deadTutor.getTutorName());
 
         // Get the tutor being killed and do a depth first destruction to allow
         // components to release resources etc.
@@ -530,7 +530,25 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param tutorVariant
      * @param intentType
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static public void launch(String intentType, String tutorVariant, String dataSource, String tutorId, String matrix) {
+
+        // start recording when launching a menu screen
+        // end recording when entering the menu
+        Activity temp_act = getActivity();
+        RoboTutor act = (RoboTutor)temp_act;
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+        Log.i(TAG, "launch: the screen recording launcher will begin now");
+        if (JSON_Helper.shouldRecord(jsonData)) {
+            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
+            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
+            if (JSON_Helper.shouldIncludeAudio(jsonData))
+                act.startRecording(baseDirectory, true, tutorId);
+            else
+                act.startRecording(baseDirectory, false, tutorId);
+        }
+
 
         Log.d(TAG, "launch: tutorId=" + tutorId);
 

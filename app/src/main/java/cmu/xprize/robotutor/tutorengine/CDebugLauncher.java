@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+
 // if /sdcard/Download/debug.json exists
 // bypass the activity selector and directly launch the tutor
 public class CDebugLauncher {
@@ -21,6 +22,8 @@ public class CDebugLauncher {
     String dataSource;
     String tutorId;
     String matrix;
+
+    public static HashMap<String, String> debugVars = new HashMap<String, String>();
 
     public Boolean launchIfDebug() {
         try {
@@ -47,9 +50,14 @@ public class CDebugLauncher {
             this.tutorId = mResult.get("tutor_id");
             this.matrix = mResult.get("skill1");
 
+            for (Map.Entry<String, String> element : mResult.entrySet()) {
+                debugVars.put(element.getKey(), element.getValue());
+
+            }
+
             return true;
         } catch (Exception e) {
-            Log.wtf("CDebugLauncher", "/sdcard/Download/debug.json does not exist");
+            Log.d("CDebugLauncher", "/sdcard/Download/debug.json does not exist");
 
             return false;
         }
@@ -73,5 +81,12 @@ public class CDebugLauncher {
 
     public String getMatrix() {
         return this.matrix;
+    }
+
+    public static String getDebugVar(String key) {
+        if (debugVars.containsKey(key))
+            return debugVars.get(key);
+        else
+            return null;
     }
 }

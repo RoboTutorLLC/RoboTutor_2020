@@ -3,6 +3,8 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -197,6 +199,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate() {
 
@@ -229,6 +232,12 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
                     debugLauncher.getMatrix());
 
         }
+
+        // start recording when launching a tutor
+        // end recording when entering the menu
+        RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
+        Log.d(TAG, roboTutor_act.getClass().getSimpleName());
+        roboTutor_act.endRecording();
     }
 
     @Override

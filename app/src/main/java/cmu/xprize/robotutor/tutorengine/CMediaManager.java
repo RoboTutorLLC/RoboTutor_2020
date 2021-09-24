@@ -25,12 +25,16 @@ import android.os.Handler;
 import android.support.annotation.IntegerRes;
 import android.util.Log;
 
+import com.nanchen.screenrecordhelper.ScreenRecordHelper;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import cmu.xprize.robotutor.ScreenRecorder;
 import cmu.xprize.robotutor.tutorengine.graph.type_handler;
 import cmu.xprize.robotutor.tutorengine.graph.type_timelineFL;
 import cmu.xprize.robotutor.tutorengine.graph.type_timer;
@@ -453,14 +457,15 @@ public class CMediaManager {
 
 
     public PlayerManager attachMediaPlayer(String dataSource, String location, IMediaListener owner) {
-        System.out.println("ATTACHMEDIAPLAYER");
-        System.out.println("DATASOURCE: "+dataSource);
-        System.out.println("LOCATION: "+location);
-        System.out.println("OWNER: "+owner.sourceName()+ " => "+owner.resolvedName());
+        Log.d( TAG, "ATTACHMEDIAPLAYER");
+        Log.d(TAG, "DATASOURCE: "+dataSource);
+        Log.d(TAG, "LOCATION: "+location);
+        Log.d(TAG, "OWNER: "+owner.sourceName()+ " => "+owner.resolvedName());
         PlayerManager manager = null;
 
         // First look for an unattached (cached) controller that uses this datasource and reuse it.
         //
+
         for(PlayerManager playerInstance : mPlayerCache) {
 
             if(!playerInstance.isAttached() && playerInstance.compareSource(dataSource)) {
@@ -517,6 +522,9 @@ public class CMediaManager {
             mPlayerCache.add(manager);
         }
 
+        // This pushes all the audio in the main screen recorders
+        ScreenRecorder.addNewAudioFile(dataSource);
+
         return manager;
     }
 
@@ -528,7 +536,7 @@ public class CMediaManager {
      * @param owner
      */
     public void  detachMediaPlayer(Object owner) {
-        Log.d("ULANI", "detachMediaPlayer: ");
+        Log.d(TAG, "detachMediaPlayer: ");
         // First look for an unattached (cached) controller that uses this datasource and reuse it.
         //
         for(PlayerManager managerInstance : mPlayerCache) {
@@ -538,6 +546,8 @@ public class CMediaManager {
                 managerInstance.detach();
             }
         }
+        // This stops the last audio recording file
+        ScreenRecorder.stopLastAudioFile();
     }
 
     public void dispMediaPlayers(){
@@ -759,6 +769,8 @@ public class CMediaManager {
 
             pause();
             seek(0L);
+            // This stops the last audio recording file
+            ScreenRecorder.stopLastAudioFile();
 
             //#Mod issue #335 - give the tracka chance to shutdown.  The audio runs in
             // JNI code so this seems to allow it to shutdown and not restart if we are
@@ -770,6 +782,7 @@ public class CMediaManager {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
 
 

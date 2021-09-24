@@ -534,6 +534,10 @@ public class CLogManagerBase implements ILogManager {
     public void postEvent_A(String Tag, String Msg) {
         Log.wtf(Tag, postEvent_BASE("ASSERT", Tag, Msg));
     }
+    @Override
+    public void postEvent_T(String Tag, String Msg) {
+        Log.wtf(Tag, postEvent_BASE("TRIGGER", Tag, Msg));
+    }
 
     // Note that we leave the Msg JSON encoding to the Log thread where it can be processed off the
     // UI thread.

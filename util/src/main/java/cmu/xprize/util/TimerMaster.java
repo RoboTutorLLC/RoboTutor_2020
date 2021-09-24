@@ -82,8 +82,10 @@ public class TimerMaster {
                 STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay));
         _queue.postNamed(STUCK_TIMER_RUNNABLE, I_TRIGGER_STUCK, _stuckDelay);
 
-        Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _stuckDelay;
+
+        Intent stuckIntent = new Intent(BROADCAST_STUCK_UPDATE);
+
         stuckIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
         _manager.sendBroadcast(stuckIntent);
     }
@@ -107,8 +109,10 @@ public class TimerMaster {
                 HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay));
         _queue.postNamed(HESITATION_TIMER_RUNNABLE, I_TRIGGER_HESITATE, _hesitateDelay);
 
-        Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
         long expectedTrigger = (new Date()).getTime() + _hesitateDelay;
+
+        Intent hesitateIntent = new Intent(BROADCAST_HESITATION_UPDATE);
+
         hesitateIntent.putExtra(EXTRA_TIME_EXPECT, expectedTrigger);
         _manager.sendBroadcast(hesitateIntent);
     }
@@ -129,7 +133,7 @@ public class TimerMaster {
      * trigger gesture timer
      */
     public void triggerGestureTimer() {
-       if (gestureTriggered) return; // only trigger once
+        if (gestureTriggered) return; // only trigger once
 
         _queue.postNamed(GESTURE_TIMER_RUNNABLE, I_TRIGGER_GESTURE, _gestureDelay);
         gestureTriggered = true;
@@ -150,6 +154,4 @@ public class TimerMaster {
         _intervention.triggerIntervention(I_CANCEL_GESTURE);
         gestureTriggered = false;
     }
-
-
 }
