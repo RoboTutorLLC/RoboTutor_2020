@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# finding the exact line in the gradle file
+ORIGINAL_STRING=$(cat ../../build.gradle | grep -E '\d\.\d\.\d\.\d')
+# extracting the exact parts but with " around
+TEMP_STRING=$(echo $ORIGINAL_STRING | grep -Eo '"(.*)"')
+# the exact numbering scheme
+FINAL_VERSION=$(echo $TEMP_STRING | sed 's/"//g') # 3.5.0.1
+
+major=0
+minor=0
+build=0
+assets=0
+
+regex="([0-9]+).([0-9]+).([0-9]+).([0-9]+)"
+if [[ $FINAL_VERSION =~ $regex ]]; then
+  major="${BASH_REMATCH[1]}"
+  minor="${BASH_REMATCH[2]}"
+  build="${BASH_REMATCH[3]}"
+  assets="${BASH_REMATCH[4]}"
+fi
+
+# increment the build number
+build=$(echo $build + 1 | bc)
+NEW_VERSION="${major}.${minor}.${build}.${assets}"
+
+
+SED_ARGUMENT=$(echo "s/${FINAL_VERSION}/${NEW_VERSION}/g")
+echo $SED_ARGUMENT
+
+sed -i '' -e `printf $SED_ARGUMENT` ../../build.gradle
