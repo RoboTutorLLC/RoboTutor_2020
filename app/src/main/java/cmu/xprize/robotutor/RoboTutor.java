@@ -131,7 +131,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     // deprecated variable , see issue #427
     public static final boolean OLD_MENU = true;
-    public static final int REQUEST_CODE = 1;
+    public static final int REQUEST_CODE = 1024;
 
 
     private CMediaController    mMediaController;
@@ -303,7 +303,14 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void endRecording(){
-        screenRecorder.endRecording();
+        Log.e(TAG, "endRecording was called");
+        if (screenRecorder.getRecorderInstance() != null) {
+            screenRecorder.endRecording();
+            Log.e(TAG, "Recording ended successfully");
+        }
+        else{
+            Log.e(TAG, "Tried to end null recording");
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
