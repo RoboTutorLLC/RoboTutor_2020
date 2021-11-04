@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #Extract APK version
 v=$(cat build.gradle  | grep rtVersionName | awk '{print $1}')
 VERSION=$(echo ${v} | cut -d"\"" -f2)
