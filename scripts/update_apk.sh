@@ -1,5 +1,12 @@
 #!/bin/bash
 
+
+#Extract APK version
+v=$(cat build.gradle  | grep rtVersionName | awk '{print $1}')
+VERSION=$(echo ${v} | cut -d"\"" -f2)
+echo MY_VERSION_NAME=${VERSION}
+
+
 set -e
 
 if [ "${TRAVIS_PULL_REQUEST_BRANCH}" == "" ]; then
@@ -41,20 +48,9 @@ cd apk
 echo `ls`
 find ../app/build/outputs/apk/debug -type f -name '*.apk' -exec mv -v {} temp.apk \;
 
-major=0
-minor=0
-build=0
-assets=0
 
- regex="([0-9]+).([0-9]+).([0-9]+).([0-9]+)"
- if [[ $FINAL_VERSION =~ $regex ]]; then
-   major="${BASH_REMATCH[1]}"
-   minor="${BASH_REMATCH[2]}"
-   build="${BASH_REMATCH[3]}"
-   assets="${BASH_REMATCH[4]}"
- fi
 
-mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}-v${major}.${minor}.${build}.${assets}.apk
+mv temp.apk RoboTutor-${TRAVIS_PULL_REQUEST_BRANCH}-${DATE_TODAY}-v${VERSION}.apk
 
 ls
 echo `ls -al`
