@@ -113,10 +113,18 @@ public class ScreenRecorder {
         this.videoTimeStamp = new Date();
     }
 
+
+    //This is a method to return the instance of screenRecordHelper
+    public ScreenRecordHelper getRecorderInstance(){
+        return this.recorderInstance;
+    }
+
     /**
      * Start Recording
      * store it in the folder of /sdcard/roboscreen
      */
+
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void startRecording(String baseDirectory, Boolean includeAudio, String tutorId){
         this.videoTimeStamp = new Date();
@@ -134,6 +142,7 @@ public class ScreenRecorder {
                     "/sdcard/"+this.baseDirectory+"/videos/",this.saveName);
         }
         this.recorderInstance.startRecord();
+        //this.recorderInstance.onActivityResult(1024,-1, new Intent(this.));
         this.includeAudio = includeAudio;
 
     }
