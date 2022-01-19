@@ -163,6 +163,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     static public String        STUDENT_ID; // received from FaceLogin
     static public Student       STUDENT_INTERVENTION_PROFILE;
     static public String        SESSION_ID; // received from FaceLogin
+    static public String        SEQUENCE_ID_STRING;
 
     final static public  String CacheSource = TCONST.ASSETS;                // assets or extern
 
@@ -341,10 +342,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         Calendar calendar = Calendar.getInstance(Locale.US);
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
-        String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
+        SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
         String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
-                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + sequenceIdString +
+                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + SEQUENCE_ID_STRING +
                 "_" + initTime + "_" + Build.SERIAL;
 
         Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
