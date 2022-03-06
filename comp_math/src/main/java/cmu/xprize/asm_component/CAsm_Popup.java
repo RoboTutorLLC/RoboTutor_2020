@@ -1,7 +1,7 @@
 package cmu.xprize.asm_component;
 
 import android.content.Context;
-import android.support.percent.PercentLayoutHelper;
+import androidx.percentlayout.widget.PercentLayoutHelper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;

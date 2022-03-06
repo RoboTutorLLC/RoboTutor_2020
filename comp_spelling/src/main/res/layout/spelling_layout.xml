@@ -11,7 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -20,28 +20,28 @@
     android:id="@+id/SSpelling"
     android:background="@android:color/white">
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/imageTop"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.02"/>
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/imageBottom"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.6"/>
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/keyboardBottom"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.98" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/blankBottom"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -189,4 +189,4 @@
 
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

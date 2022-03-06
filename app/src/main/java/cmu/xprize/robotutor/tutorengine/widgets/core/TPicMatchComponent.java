@@ -1,9 +1,8 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import org.json.JSONObject;
 

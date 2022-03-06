@@ -241,9 +241,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         mParent = parent;
         mContext = mParent.getContext();
 
-        mOddPage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.qn_odd, null);
-        mEvenPage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.qn_even, null);
-        mQuestionPage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.qn_generic, null);
+        mOddPage = (ViewGroup) androidx.percentlayout.widget.PercentRelativeLayout.inflate(mContext, R.layout.qn_odd, null);
+        mEvenPage = (ViewGroup) androidx.percentlayout.widget.PercentRelativeLayout.inflate(mContext, R.layout.qn_even, null);
+        mQuestionPage = (ViewGroup) androidx.percentlayout.widget.PercentRelativeLayout.inflate(mContext, R.layout.qn_generic, null);
 //        mPicturePage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.qn_picture, null);
 
         mOddPage.setVisibility(View.GONE);

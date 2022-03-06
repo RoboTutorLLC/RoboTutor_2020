@@ -3,7 +3,7 @@ package cmu.xprize.comp_intervention.views;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -30,7 +30,7 @@ import static cmu.xprize.util.TCONST.I_TRIGGER_STUCK;
  * Created by kevindeland on 8/5/19.
  */
 
-public class CInterventionHelpButton extends android.support.v7.widget.AppCompatImageButton
+public class CInterventionHelpButton extends androidx.appcompat.widget.AppCompatImageButton
         implements IMessageQueueRunner {
 
 

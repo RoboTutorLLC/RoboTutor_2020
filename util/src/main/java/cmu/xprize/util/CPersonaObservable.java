@@ -2,7 +2,7 @@ package cmu.xprize.util;
 
 import android.content.Intent;
 import android.graphics.PointF;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.View;
 
 public class CPersonaObservable {

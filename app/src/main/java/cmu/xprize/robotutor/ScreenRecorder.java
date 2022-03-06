@@ -2,12 +2,10 @@ package cmu.xprize.robotutor;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.os.Build;
-import android.os.Environment;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
@@ -23,15 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
-import java.nio.ByteBuffer;
-import java.sql.Time;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Vector;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.TimeUnit;
-
-import cmu.xprize.robotutor.tutorengine.CMediaManager;
 
 class AudioObject {
     String path = "";

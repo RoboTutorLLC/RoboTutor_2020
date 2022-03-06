@@ -19,17 +19,12 @@
 package cmu.xprize.banner;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.AttributeSet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import cmu.xprize.banner.persona.Persona;
 import cmu.xprize.util.IEvent;

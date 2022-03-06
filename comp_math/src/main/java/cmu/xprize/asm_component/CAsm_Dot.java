@@ -3,11 +3,10 @@ package cmu.xprize.asm_component;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MotionEventCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 
 /**
