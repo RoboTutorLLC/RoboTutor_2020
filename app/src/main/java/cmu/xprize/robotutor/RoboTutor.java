@@ -20,24 +20,35 @@ package cmu.xprize.robotutor;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.media.MediaScannerConnection;
+import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import androidx.annotation.RequiresApi;
+
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //import com.nanchen.screenrecordhelper.ScreenRecordHelper;
 //import com.RoboTutorLLC.ScreenRecordHelper.ScreenrecordHelper;
+import com.hbisoft.hbrecorder.HBRecorder;
+import com.hbisoft.hbrecorder.HBRecorderListener;
 import com.nanchen.screenrecordhelper.ScreenRecordHelper;
 //com.github.RoboTutorLLC:ScreenRecordHelper
 
@@ -46,6 +57,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
@@ -99,6 +111,8 @@ import static cmu.xprize.util.TCONST.MATH_PLACEMENT;
 import static cmu.xprize.util.TCONST.SWAHILI_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.UPDATE_INTERVENTION_FILE;
 import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
+import static com.hbisoft.hbrecorder.Constants.MAX_FILE_SIZE_REACHED_ERROR;
+import static com.hbisoft.hbrecorder.Constants.SETTINGS_ERROR;
 
 
 /**
@@ -112,13 +126,13 @@ import static cmu.xprize.util.TCONST.WRITING_PLACEMENT;
  *
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
+public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, HBRecorderListener {
 
 
     // DEVELOPER VARIABLES FOR QUICK DEBUG LAUNCH
     private static final boolean QUICK_DEBUG_TUTOR = false;
     private static final String QUICK_DEBUG_TUTOR_KEY = INTERVENTION_BPOP;
-
+    public HBRecorder hbRecorder;
     // for devs, this is faster than changing the config file
     private static final boolean QUICK_DEBUG_CONFIG = false;
     private static final ConfigurationItems QUICK_DEBUG_CONFIG_OPTION = ConfigurationQuickOptions.DEBUG_EN;
@@ -247,11 +261,11 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         //
         setContentView(R.layout.robo_tutor);
         masterContainer = (ITutorManager)findViewById(R.id.master_container);
-
+        hbRecorder = new HBRecorder(this, this);
         // Set fullscreen and then get the screen metrics
         //
         setFullScreen();
-
+        startRecordingScreen();
         // get the multiplier used for drawables at the current screen density and calc the
         // correction rescale factor for design scale
         // This initializes the static object
@@ -287,37 +301,32 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
         catch (Exception e) {
             Log.wtf(TAG, e);
         }
+
+    }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void startRecordingScreen() {
+
+        quickSettings();
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        Intent permissionIntent = mediaProjectionManager != null ? mediaProjectionManager.createScreenCaptureIntent() : null;
+        startActivityForResult(permissionIntent, 777);
+
     }
 
-    /**
-     * Start Recording
-     * store it in the folder of /sdcard/roboscreen
-     */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void startRecording(String baseDirectory, Boolean includeAudio, String tutorId){
-
-        screenRecorder.startRecording(baseDirectory, includeAudio, tutorId);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void endRecording(){
-        Log.e(TAG, "endRecording was called");
-        if (screenRecorder.getRecorderInstance() != null) {
-            screenRecorder.endRecording();
-            Log.e(TAG, "Recording ended successfully");
-        }
-        else{
-            Log.e(TAG, "Tried to end null recording");
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null && requestCode == REQUEST_CODE && resultCode == RESULT_OK)
-            screenRecorder.onActivityResult(requestCode, resultCode, data);
-        setFullScreen();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode == 777) {
+                if (resultCode == RESULT_OK) {
+                    //Set file path or Uri depending on SDK version
+                    setOutputPath();
+                    //Start screen recording
+                    hbRecorder.startScreenRecording(data, resultCode, this);
+
+                }
+            }
+        }
     }
 
     /**
@@ -475,12 +484,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
     }
 
 
-    /**
-     *
-     *
-     * @param event
-     * @return
-     */
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
@@ -505,8 +509,121 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
         return result;
     }
+    ContentResolver resolver;
+    ContentValues contentValues;
+    Uri mUri;
+    @Override
+    public void HBRecorderOnStart() {
+        Log.d("HBRecorder","HBRecorder Recording Started");
+    }
+
+    @Override
+    public void HBRecorderOnComplete() {
+        Toast.makeText(getApplicationContext(),"Recording Saved Successfully", Toast.LENGTH_LONG).show();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //Update gallery depending on SDK Level
+            if (hbRecorder.wasUriSet()) {
+                if (Build.VERSION.SDK_INT >= 29 ) {
+                    updateGalleryUri();
+                } else {
+                    refreshGalleryFile();
+                }
+            }else{
+                refreshGalleryFile();
+            }
+        }
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void refreshGalleryFile() {
+        MediaScannerConnection.scanFile(this,
+                new String[]{hbRecorder.getFilePath()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+    }
+
+    @RequiresApi(api = 29)
+    private void updateGalleryUri(){
+        contentValues.clear();
+        //contentValues.put(MediaStore.Video.Media.IS_PRIVATE, 0);
+        getContentResolver().update(mUri, contentValues, null, null);
+    }
+
+    @Override
+    public void HBRecorderOnError(int errorCode, String reason) {
+        // Error 38 happens when
+        // - the selected video encoder is not supported
+        // - the output format is not supported
+        // - if another app is using the microphone
+
+        //It is best to use device default
+
+        if (errorCode == SETTINGS_ERROR) {
+            Toast.makeText(getApplicationContext(),"Settings not Supported", Toast.LENGTH_LONG).show();
+        } else if ( errorCode == MAX_FILE_SIZE_REACHED_ERROR) {
+            Toast.makeText(getApplicationContext(),"Max file size reached", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(),"General Recording Error", Toast.LENGTH_LONG).show();
+            Log.e("HBRecorderOnError", reason);
+        }
 
 
+    }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void quickSettings() {
+        hbRecorder.setAudioBitrate(128000);
+        hbRecorder.setAudioSamplingRate(44100);
+        hbRecorder.recordHDVideo(true);
+        hbRecorder.isAudioEnabled(true);
+        //Customise Notification
+        hbRecorder.setNotificationSmallIcon(R.drawable.icon);
+        hbRecorder.setNotificationTitle(getString(R.string.stop_recording_notification_title));
+        hbRecorder.setNotificationDescription(getString(R.string.stop_recording_notification_message));
+    }
+    private void createFolder() {
+        File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "HBRecorder");
+        if (!f1.exists()) {
+            if (f1.mkdirs()) {
+                Log.i("Folder ", "created");
+            }
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setOutputPath() {
+        String filename = generateFileName();
+        if (Build.VERSION.SDK_INT >= 29) {
+            resolver = getContentResolver();
+            contentValues = new ContentValues();
+            // contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "HBRecorder");
+            contentValues.put(MediaStore.Video.Media.TITLE, filename);
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
+            mUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
+            //FILE NAME SHOULD BE THE SAME
+            hbRecorder.setFileName(filename);
+            hbRecorder.setOutputUri(mUri);
+        }else{
+            createFolder();
+            hbRecorder.setOutputPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) +"/HBRecorder");
+        }
+    }
+
+    //Generate a timestamp to be used as a file name
+    private String generateFileName() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault());
+        Date curDate = new Date(System.currentTimeMillis());
+        return formatter.format(curDate).replace(" ", "");
+    }
     /**
      * Moves new assets to an external storyFolder so the Sphinx code can access it.
      *
@@ -524,9 +641,9 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
             try {
                 // TODO: Don't do this in production
-                // At the moment we always reinstall the tutor spec data - for 
-              
-              
+                // At the moment we always reinstall the tutor spec data - for
+
+
                 if(CacheSource.equals(TCONST.EXTERN)) {
                     tutorAssetManager.installAssets(TCONST.TUTORROOT);
                     logManager.postEvent_V(TAG, "INFO:Tutor Assets installed");
@@ -574,7 +691,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
             return result;
         }
 
-                @Override
+        @Override
         protected void onPostExecute(Boolean result) {
             isReady = result;
 
@@ -814,7 +931,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
      */
     @Override
     protected void onStop() {
-
+        hbRecorder.stopScreenRecording();
         super.onStop();
         // Off-Screen
         logManager.postEvent_V(TAG, "Robotutor:onStop");
@@ -831,6 +948,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
             TTS.shutDown();
             TTS = null;
         }
+
     }
 
 
@@ -908,6 +1026,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor {
 
     @Override
     protected void onDestroy() {
+        hbRecorder.stopScreenRecording();
         logManager.postEvent_V(TAG, "RoboTutor:onDestroy");
 
         Log.v(TAG, "isfinishing:" + isFinishing());

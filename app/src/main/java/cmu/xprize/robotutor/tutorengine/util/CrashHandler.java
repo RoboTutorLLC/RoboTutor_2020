@@ -30,7 +30,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void uncaughtException(Thread t, Throwable e) {
-        activity.endRecording();
+        //activity.endRecording();
+        activity.hbRecorder.stopScreenRecording();
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString()+"\n\n";
         report += "--------- Stack trace ---------\n\n";

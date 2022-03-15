@@ -546,10 +546,10 @@ public class CTutorEngine implements ILoadableObject2 {
         if (JSON_Helper.shouldRecord(jsonData)) {
             String baseDirectory = JSON_Helper.baseDirectory(jsonData);
             Log.d(TAG, "launching the activity: "+act.getLocalClassName());
-            if (JSON_Helper.shouldIncludeAudio(jsonData))
-                act.startRecording(baseDirectory, true, tutorId);
-            else
-                act.startRecording(baseDirectory, false, tutorId);
+//            if (JSON_Helper.shouldIncludeAudio(jsonData))
+//                act.startRecording(baseDirectory, true, tutorId);
+//            else
+//                act.startRecording(baseDirectory, false, tutorId);
         }
 
 
