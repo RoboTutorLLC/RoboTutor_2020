@@ -294,19 +294,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
         // testCrashHandler();
 
-        // creating a recorder instance
-        try{
-            this.screenRecorder = new ScreenRecorder(this, getApplicationContext());
-        }
-        catch (Exception e) {
-            Log.wtf(TAG, e);
-        }
+
 
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void startRecordingScreen() {
-
-        quickSettings();
+        hbRecorder.enableCustomSettings();
+        customSettings();
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         Intent permissionIntent = mediaProjectionManager != null ? mediaProjectionManager.createScreenCaptureIntent() : null;
         startActivityForResult(permissionIntent, 777);
@@ -580,15 +574,18 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void quickSettings() {
-        hbRecorder.setAudioBitrate(128000);
-        hbRecorder.setAudioSamplingRate(44100);
-        hbRecorder.recordHDVideo(true);
+    private void customSettings() {
+        hbRecorder.setAudioBitrate(16000);
+        hbRecorder.setAudioSamplingRate(16000);
+        hbRecorder.recordHDVideo(false);
         hbRecorder.isAudioEnabled(true);
+        hbRecorder.setScreenDimensions(854,480);
+        hbRecorder.setVideoFrameRate(30);
+
         //Customise Notification
-        hbRecorder.setNotificationSmallIcon(R.drawable.icon);
-        hbRecorder.setNotificationTitle(getString(R.string.stop_recording_notification_title));
-        hbRecorder.setNotificationDescription(getString(R.string.stop_recording_notification_message));
+//        hbRecorder.setNotificationSmallIcon(R.drawable.icon);
+//        hbRecorder.setNotificationTitle(getString(R.string.stop_recording_notification_title));
+//        hbRecorder.setNotificationDescription(getString(R.string.stop_recording_notification_message));
     }
     private void createFolder() {
         File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "HBRecorder");
