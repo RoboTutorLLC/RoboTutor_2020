@@ -81,7 +81,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
     private CMediaManager                   mMediaManager;
 
-    public static IStudentDataModel studentModel;
+    public static IStudentDataModel         studentModel;
     public static TransitionMatrixModel     matrix;
     public static PromotionMechanism        promotionMechanism;
     public enum MenuType {STUDENT_CHOICE, CYCLE_CONTENT};
@@ -543,14 +543,26 @@ public class CTutorEngine implements ILoadableObject2 {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
         Log.i(TAG, "launch: the screen recording launcher will begin now");
-        if (JSON_Helper.shouldRecord(jsonData)) {
-            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
-            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
+        // if activity wise recording is selected start recording
+        if(Configuration.getRecordingActivityWise(act.getApplicationContext())){
+            act.startRecordingScreen();
+        }
+        // if whole session recording is selected, resume recording
+        else {
+//        if (JSON_Helper.shouldRecord(jsonData)) {
+//            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
+//            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
+            if (Activity.hbRecorder.isRecordingPaused()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Activity.hbRecorder.resumeScreenRecording();
+                }
+            }
+        }
 //            if (JSON_Helper.shouldIncludeAudio(jsonData))
 //                act.startRecording(baseDirectory, true, tutorId);
 //            else
 //                act.startRecording(baseDirectory, false, tutorId);
-        }
+
 
 
         Log.d(TAG, "launch: tutorId=" + tutorId);

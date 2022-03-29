@@ -265,7 +265,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         // Set fullscreen and then get the screen metrics
         //
         setFullScreen();
-        startRecordingScreen();
+        // if we are recording whole session start recording here
+        if(!Configuration.getRecordingActivityWise(getApplicationContext())) {
+            startRecordingScreen();
+        }
         // get the multiplier used for drawables at the current screen density and calc the
         // correction rescale factor for design scale
         // This initializes the static object
@@ -298,7 +301,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void startRecordingScreen() {
+    public void startRecordingScreen() {
         hbRecorder.enableCustomSettings();
         customSettings();
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
@@ -575,12 +578,38 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void customSettings() {
-        hbRecorder.setAudioBitrate(16000);
+        int audio_bitrate = Configuration.getRecordingAudioBitrate(getApplicationContext());
+        int audio_sampling_rate = Configuration.getRecordingAudioSamplingRate(getApplicationContext());
+        int fps = Configuration.getRecordingFPS(getApplicationContext());
+        int width = 0;
+        int height = 0;
+        if(Configuration.getRecordingScreenResolution(getApplicationContext()) == 480){
+            width = 480;
+            height = 854;
+        }
+        else if(Configuration.getRecordingScreenResolution(getApplicationContext()) == 360){
+            width = 360;
+            height = 640;
+        }
+        if(Configuration.getRecordingScreenResolution(getApplicationContext()) == 720){
+            width = 720;
+            height = 1280;
+        }
+        if(Configuration.getRecordingScreenResolution(getApplicationContext()) == 1080){
+            width = 1080;
+            height = 1920;
+        }
+        Log.d("hbrecorder","audio bitrate is "+audio_bitrate);
+        Log.d("hbrecorder","audio sampling rate is "+audio_sampling_rate);
+        Log.d("hbrecorder","FPS is "+fps);
+        Log.d("hbrecorder","Screen Dimensions are "+width +" * "+ height);
+
+        hbRecorder.setAudioBitrate(audio_bitrate);
         hbRecorder.setAudioSamplingRate(16000);
         hbRecorder.recordHDVideo(false);
         hbRecorder.isAudioEnabled(true);
-        hbRecorder.setScreenDimensions(854,480);
-        hbRecorder.setVideoFrameRate(30);
+        hbRecorder.setScreenDimensions(height,width);
+        hbRecorder.setVideoFrameRate(fps);
 
         //Customise Notification
 //        hbRecorder.setNotificationSmallIcon(R.drawable.icon);

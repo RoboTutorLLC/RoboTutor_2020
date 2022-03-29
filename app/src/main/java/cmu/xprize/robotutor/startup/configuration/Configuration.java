@@ -33,6 +33,11 @@ public class Configuration {
                 .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
                 .putBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, configItems.include_audio_output_in_screen_video)
                 .putBoolean(ConfigurationItems.PINNING_MODE, configItems.pinning_mode)
+                .putInt(ConfigurationItems.RECORD_FPS, configItems.record_fps)
+                .putInt(ConfigurationItems.RECORD_SCREEN_RESOLUTION, configItems.record_screen_resolution)
+                .putInt(ConfigurationItems.RECORD_AUDIO_BITRATE, configItems.record_audio_bitrate)
+                .putInt(ConfigurationItems.RECORD_AUDIO_SAMPLING_RATE, configItems.record_audio_sampling_rate)
+                .putBoolean(ConfigurationItems.RECORD_ACTIVITY_WISE, configItems.record_activity_wise)
                 .apply();
     }
 
@@ -116,6 +121,30 @@ public class Configuration {
                 .getBoolean(ConfigurationItems.PINNING_MODE, false);
     }
 
+    public static int getRecordingFPS(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getInt(ConfigurationItems.RECORD_FPS,30);
+    }
+
+    public static int getRecordingScreenResolution(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getInt(ConfigurationItems.RECORD_SCREEN_RESOLUTION,480);
+    }
+
+    public static int getRecordingAudioBitrate(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getInt(ConfigurationItems.RECORD_AUDIO_BITRATE,16000);
+    }
+
+    public static int getRecordingAudioSamplingRate(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getInt(ConfigurationItems.RECORD_AUDIO_SAMPLING_RATE,16000);
+    }
+
+    public static boolean getRecordingActivityWise(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getBoolean(ConfigurationItems.RECORD_ACTIVITY_WISE,false);
+    }
     /**
      * logs all the config items.
      */

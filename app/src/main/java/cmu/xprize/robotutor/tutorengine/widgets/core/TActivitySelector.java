@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
+
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -233,8 +235,26 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
         // start recording when launching a tutor
         // end recording when entering the menu
-        RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
+        final RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
         Log.d(TAG, roboTutor_act.getClass().getSimpleName());
+        // if recording activity wise stop recording
+        if(Configuration.getRecordingActivityWise(roboTutor_act.getApplicationContext())){
+            roboTutor_act.hbRecorder.stopScreenRecording();
+        }
+        // if recording session wise pause recording after 5 seconds on menu to save space
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+
+                        roboTutor_act.hbRecorder.pauseScreenRecording();
+                    }
+
+                }, 5000);
+            }
+        }
+
         //roboTutor_act.endRecording();
     }
 

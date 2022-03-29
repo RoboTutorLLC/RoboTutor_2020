@@ -27,7 +27,12 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "roboscreen",
-            false
+            false,
+            480,
+            30,
+            true,
+            16000,
+            16100
     );
 
     // EN version, and they both have the debugger menu.
@@ -47,6 +52,11 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "roboscreen",
-            false
+            false,
+            480,
+            30,
+            true,
+            16000,
+            16100
     );
 }

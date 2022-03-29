@@ -25,6 +25,11 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String RECORD_AUDIO = "RECORD_AUDIO";
     public static final String MENU_TYPE = "MENU_TYPE";
     public static final String RECORD_SCREEN_VIDEO = "RECORD_SCREEN_VIDEO";
+    public static final String RECORD_SCREEN_RESOLUTION = "RECORD_SCREEN_RESOLUTION";
+    public static final String RECORD_FPS = "RECORD_FPS";
+    public static final String RECORD_AUDIO_BITRATE = "RECORD_AUDIO_BITRATE";
+    public static final String RECORD_AUDIO_SAMPLING_RATE = "RECORD_AUDIO_SAMPLING_RATE";
+    public static final String RECORD_ACTIVITY_WISE = "RECORD_ACTIVITY_WISE";
     public static final String INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO = "INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO";
     public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
     public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
@@ -42,6 +47,11 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean record_audio;
     public String menu_type;
     public boolean record_screen_video;
+    public Integer record_screen_resolution;
+    public Integer record_fps;
+    public boolean record_activity_wise;
+    public Integer record_audio_bitrate;
+    public Integer record_audio_sampling_rate;
     public boolean show_helper_button;
     public String baseDirectory;
     public boolean include_audio_output_in_screen_video;
@@ -72,7 +82,9 @@ public class ConfigurationItems implements ILoadableObject {
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
                               String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
-                              boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
+                              boolean show_helper_button, String baseDirectory, boolean pinning_mode, Integer record_screen_resolution,
+                              Integer record_fps, boolean record_activity_wise, Integer record_audio_bitrate,
+                              Integer record_audio_sampling_rate) {
 
 //        this.config_version = config_version;
         this.setConfigVersion();
@@ -85,6 +97,11 @@ public class ConfigurationItems implements ILoadableObject {
         this.show_demo_vids = show_demo_vids;
         this.use_placement = use_placement;
         this.record_audio = record_audio;
+        this.record_activity_wise = record_activity_wise;
+        this.record_audio_bitrate = record_audio_bitrate;
+        this.record_audio_sampling_rate = record_audio_sampling_rate;
+        this.record_fps = record_fps;
+        this.record_screen_resolution = record_screen_resolution;
         this.menu_type = menu_type;
         this.record_screen_video = record_screen_video;
         this.include_audio_output_in_screen_video = include_audio_output_in_screen_video;
@@ -112,6 +129,11 @@ public class ConfigurationItems implements ILoadableObject {
         record_screen_video = true;
         include_audio_output_in_screen_video = false;
         pinning_mode = false;
+        record_fps = 30;
+        record_audio_sampling_rate = 16100;
+        record_audio_bitrate = 16000;
+        record_screen_resolution = 480;
+        record_activity_wise = true;
     }
 
     private void setConfigVersion() {
