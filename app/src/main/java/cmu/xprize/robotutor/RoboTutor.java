@@ -617,7 +617,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 //        hbRecorder.setNotificationDescription(getString(R.string.stop_recording_notification_message));
     }
     private void createFolder() {
-        File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "HBRecorder");
+        File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), Configuration.getBaseDirectory(getApplicationContext()));
         if (!f1.exists()) {
             if (f1.mkdirs()) {
                 Log.i("Folder ", "created");
@@ -626,11 +626,11 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setOutputPath() {
-        String filename = generateFileName();
+        String filename = "Robotutor Log Video "+STUDENT_ID+" "+generateFileName();
         if (Build.VERSION.SDK_INT >= 29) {
             resolver = getContentResolver();
             contentValues = new ContentValues();
-            // contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "HBRecorder");
+            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + Configuration.getBaseDirectory(getApplicationContext()));
             contentValues.put(MediaStore.Video.Media.TITLE, filename);
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
@@ -640,7 +640,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
             hbRecorder.setOutputUri(mUri);
         }else{
             createFolder();
-            hbRecorder.setOutputPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) +"/HBRecorder");
+            hbRecorder.setOutputPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) +"/"+Configuration.getBaseDirectory(getApplicationContext()));
         }
     }
 
