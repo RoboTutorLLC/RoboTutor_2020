@@ -17,10 +17,10 @@ import cmu.xprize.robotutor.RoboTutor;
  */
 
 public class CrashHandler implements Thread.UncaughtExceptionHandler {
-    private Thread.UncaughtExceptionHandler defaultUEH;
+    private final Thread.UncaughtExceptionHandler defaultUEH;
 
-    private String _directory;
-    private RoboTutor activity;
+    private final String _directory;
+    private final RoboTutor activity;
 
     public CrashHandler(String directory, RoboTutor activity) {
         this.defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
@@ -57,7 +57,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             if(!logFileDir.exists()){
                 logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
             }
-            File logFile = new File(_directory + "/CRASH_" + timestamp + "_" + deviceId + "_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + ".txt");
+            File logFile = new File(_directory + "CRASH_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + "_" + RoboTutor.SEQUENCE_ID_STRING + "_" + timestamp + deviceId + ".txt");
             logFile.createNewFile();
             FileOutputStream trace = new FileOutputStream(logFile, false);
             trace.write(report.getBytes());
