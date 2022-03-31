@@ -136,6 +136,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private int                     mEvenIndex;
     private int                     mCurrViewIndex;
 
+    // NSP
+    private TextView                curNSPTextView;
+
+
     // state for the current storyName - African Story Book
 
     private String                  mCurrHighlight = "";
@@ -229,6 +233,16 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private String curGenericQuestion = "";
 
     static final String TAG = "CQn_ViewManagerASB";
+
+
+    // NSP buttons
+    private ImageButton mSmiley;
+    private ImageButton mFrownie;
+
+    private ImageButton mSmiley1;
+    private ImageButton mSmiley2;
+    private int NSPWordsCounter;
+    private TextView mLastNSPWord;
 
 
     /**
@@ -3092,4 +3106,176 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public boolean isPicMode() {return picture_match_mode;}
+
+    @Override
+    public void setNSPPage() {
+
+    }
+
+    @Override
+    public void NSPQuestions() {
+
+    }
+
+    @Override
+    public void displayNSPWhichQuestion() {
+
+    }
+
+    @Override
+    public void setNSPWhichQuestion() {
+
+
+    }
+
+    @Override
+    public void displayNSPDoesQuestion() {
+
+    }
+
+    @Override
+    public void setNSPDoesQuestion() {
+
+    }
+
+
+    @Override
+    public void hasNSPDistractor() {
+
+    }
+
+    @Override
+    public void resetNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void showNSPDoesButtons() {
+        Log.d(TAG, "showNSPDoesButtons: ");
+        setButtonState(mSmiley, "SHOW");
+        setButtonState(mFrownie, "SHOW");
+        mSmiley.setVisibility(View.VISIBLE);
+        mFrownie.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNSPDoesButtons() {
+        Log.d(TAG, "hideNSPDoesButtons: ");
+        setButtonState(mSmiley, "DISABLE");
+        setButtonState(mFrownie, "DISABLE");
+        mSmiley.setVisibility(View.INVISIBLE);
+        mFrownie.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void enableNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void disableNSPDoesButtons() {
+        Log.d(TAG, "disableNSPDoesButtons: ");
+        setButtonState(mSmiley, "DISABLE");
+        setButtonState(mFrownie, "DISABLE");
+
+    }
+
+    @Override
+    public void resetNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void showNSPWhichButtons() {
+        Log.d(TAG, "showNSPWhichButtons: ");
+        setButtonState(mSmiley1, "SHOW");
+        setButtonState(mSmiley2, "SHOW");
+        mSmiley1.setVisibility(View.VISIBLE);
+        mSmiley2.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNSPWhichButtons() {
+        Log.d(TAG, "hideNSPWhichButtons: ");
+        setButtonState(mSmiley1, "DISABLE");
+        setButtonState(mSmiley2, "DISABLE");
+        mSmiley1.setVisibility(View.INVISIBLE);
+        mSmiley2.setVisibility(View.INVISIBLE);
+
+    }
+
+    @Override
+    public void enableNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void disableNSPWhichButtons() {
+
+    }
+
+
+    @Override
+    public void acknowledgeButtonTapSmiley() {
+        Log.d(TAG, "acknowledgeSmiley: ");
+        // Change to the other darker green version of the smiley
+
+    }
+
+    @Override
+    public void acknowledgeButtonTapFrownie() {
+
+    }
+
+    @Override
+    public void showNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void hideNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void playNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void showNSPWhichSentences() {
+
+    }
+
+    @Override
+    public void hideNSPWhichSentences() {
+
+    }
+
+    @Override
+    public void highlightNSPWord() {
+        Log.d(TAG, "highlightNSPWord: ");
+        mParent.updateTextColor(this.curNSPTextView, Color.GREEN);
+        mParent.updateTextSize(this.curNSPTextView, 30);
+    }
+
+    @Override
+    public void undoHighlightNSPWord() {
+        Log.d(TAG, "undoHighlightNSPWord: ");
+        mParent.updateTextColor(this.curNSPTextView, Color.BLACK);
+        mParent.updateTextSize(this.curNSPTextView, 30);
+        if (this.curNSPTextView == mLastNSPWord) {
+            // TODO: Set as "NSP_ANIM_INCOMPLETE" as constant in TCONST.java
+            mParent.retractFeature("NSP_ANIM_INCOMPLETE");
+            mParent.publishFeature("NSP_ANIM_COMPLETE");
+            enableNSPDoesButtons(); // Change to does/which
+            this.NSPWordsCounter = 0;
+        } else {
+            mParent.publishFeature("NSP_ANIM_INCOMPLETE");
+        }
+        mParent.post(TCONST.NEXT_NODE, 2000);
+    }
+
+
+
 }

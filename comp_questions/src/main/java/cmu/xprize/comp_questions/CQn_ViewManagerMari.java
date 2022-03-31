@@ -18,6 +18,7 @@
 
 package cmu.xprize.comp_questions;
 
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.text.Html;
@@ -706,6 +707,137 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     @Override
     public boolean isPicMode() {return false;}
+
+    @Override
+    public void setNSPPage() {
+
+    }
+
+    @Override
+    public void NSPQuestions() {
+
+    }
+
+    @Override
+    public void displayNSPWhichQuestion() {
+
+    }
+
+    @Override
+    public void setNSPWhichQuestion() {
+
+    }
+
+    @Override
+    public void displayNSPDoesQuestion() {
+
+    }
+
+    @Override
+    public void setNSPDoesQuestion() {
+
+    }
+
+    @Override
+    public void hasNSPDistractor() {
+
+    }
+
+    @Override
+    public void resetNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void showNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void hideNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void enableNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void disableNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void resetNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void showNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void hideNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void enableNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void disableNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void acknowledgeButtonTapSmiley() {
+
+    }
+
+    @Override
+    public void acknowledgeButtonTapFrownie() {
+
+    }
+
+    @Override
+    public void showNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void hideNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void playNSPDoesSentence() {
+
+    }
+
+    @Override
+    public void showNSPWhichSentences() {
+
+    }
+
+    @Override
+    public void hideNSPWhichSentences() {
+
+    }
+
+
+    @Override
+    public void highlightNSPWord() {
+
+    }
+
+    @Override
+    public void undoHighlightNSPWord() {
+
+    }
 
 }
 
