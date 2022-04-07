@@ -709,11 +709,6 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
     public boolean isPicMode() {return false;}
 
     @Override
-    public void setNSPPage() {
-
-    }
-
-    @Override
     public void NSPQuestions() {
 
     }
@@ -735,6 +730,16 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     @Override
     public void setNSPDoesQuestion() {
+
+    }
+
+    @Override
+    public void setNSPWhichPage() {
+
+    }
+
+    @Override
+    public void setNSPDoesPage() {
 
     }
 
@@ -828,16 +833,6 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     }
 
-
-    @Override
-    public void highlightNSPWord() {
-
-    }
-
-    @Override
-    public void undoHighlightNSPWord() {
-
-    }
 
 }
 

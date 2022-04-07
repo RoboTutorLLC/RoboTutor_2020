@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFF">
+
+<!--    <TextView-->
+<!--        android:id="@+id/SnspDoesText"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginLeft="30dp"-->
+<!--        android:layout_marginRight="30dp"-->
+<!--        android:layout_marginTop="100dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text=""-->
+<!--        android:textColor="#000"-->
+<!--        android:textSize="25sp" />-->
+
+<!--&lt;!&ndash;    Remove the margin values&ndash;&gt;-->
+<!--    <ImageView-->
+<!--        android:id="@+id/SnspDoesSmiley"-->
+<!--        android:layout_width="96dp"-->
+<!--        android:layout_height="113dp"-->
+<!--        android:layout_below="@id/SnspDoesText"-->
+<!--        android:layout_alignParentLeft="true"-->
+<!--        android:layout_marginStart="30dp"-->
+<!--        android:layout_marginLeft="71dp"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:layout_marginEnd="30dp"-->
+<!--        android:layout_marginBottom="30dp"-->
+<!--        android:src=""-->
+<!--        app:layout_widthPercent="30%"-->
+<!--        android:contentDescription="TODO" />-->
+
+<!--    <ImageView-->
+<!--        android:id="@+id/SnspDoesFrownie"-->
+<!--        android:layout_width="82dp"-->
+<!--        android:layout_height="160dp"-->
+<!--        android:layout_below="@id/SnspDoesText"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:layout_marginStart="30dp"-->
+<!--        android:layout_marginTop="30dp"-->
+<!--        android:layout_marginEnd="30dp"-->
+<!--        android:layout_marginRight="40dp"-->
+<!--        android:layout_marginBottom="30dp"-->
+<!--        android:background="#FFF"-->
+<!--        app:layout_widthPercent="30%"-->
+<!--        tools:ignore="ContentDescription" />-->
+
+</RelativeLayout>

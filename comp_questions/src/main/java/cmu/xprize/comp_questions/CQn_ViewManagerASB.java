@@ -138,6 +138,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     // NSP
     private TextView                curNSPTextView;
+    private boolean                 nsp_page_mode = false;
+    private boolean                 isNSPPage = false;
 
 
     // state for the current storyName - African Story Book
@@ -243,6 +245,17 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private ImageButton mSmiley2;
     private int NSPWordsCounter;
     private TextView mLastNSPWord;
+    private boolean nsp_does_answer; //correct answer (true for smiley, false for frownie)
+    private boolean isNSPDoesPage;
+    private NSPQuestion NspQuestion;
+    private NSPQuestion[] NspQuestions;
+    private String NSPWhichCorrectSentence;
+    private String NSPWhichIncorrectSentence;
+    private TextView                NSPWhichSentence1;
+    private TextView                NSPWhichSentence2;
+    private TextView                NSPDoesSentence;
+    private boolean isNSPWhichPage;
+    private String NSPDoesSentenceText;
 
 
     /**
@@ -3107,10 +3120,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public boolean isPicMode() {return picture_match_mode;}
 
-    @Override
-    public void setNSPPage() {
-
-    }
 
     @Override
     public void NSPQuestions() {
@@ -3119,22 +3128,70 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void displayNSPWhichQuestion() {
+        if(isNSPWhichPage) {
+            int numLinesCurPage = data[mCurrPage].text.length;
+            this.NspQuestion = NspQuestions[numLinesCurPage-1];
+            ArrayList<String> incorrectChoices = new ArrayList<>();
+            if (NspQuestions[numLinesCurPage-1].choices.type != null && NspQuestions[numLinesCurPage-1].choices.type.equals("correct") && NspQuestions[numLinesCurPage-1].choices.text.length() > 0) {
+                NSPWhichCorrectSentence = ""; // how to get text from json file :'((((
+            } else {
+                incorrectChoices.add("");
+            }
+            Collections.shuffle(incorrectChoices);
+            NSPWhichIncorrectSentence = incorrectChoices.get(0);
+            if (Math.random() == 1) {
+                NSPWhichSentence1.setText(NSPWhichCorrectSentence);
+                NSPWhichSentence1.bringToFront();
+                NSPWhichSentence2.setText(NSPWhichIncorrectSentence);
+                NSPWhichSentence2.bringToFront();
+            } else {
+                NSPWhichSentence1.setText(NSPWhichIncorrectSentence);
+                NSPWhichSentence1.bringToFront();
+                NSPWhichSentence2.setText(NSPWhichCorrectSentence);
+                NSPWhichSentence2.bringToFront();
+            }
+
+        }
 
     }
 
     @Override
     public void setNSPWhichQuestion() {
 
-
     }
 
     @Override
     public void displayNSPDoesQuestion() {
+        if(isNSPDoesPage) {
+            int numLinesCurPage = data[mCurrPage].text.length;
+            this.NspQuestion = NspQuestions[numLinesCurPage-1];
+            ArrayList<String> choices = new ArrayList<>();
+            if (NspQuestions[numLinesCurPage-1].choices.text != null && NspQuestions[numLinesCurPage-1].choices.text.length() > 0) {
+                choices.add("") ; // how to get text from json file :'((((
+            }
+            Collections.shuffle(choices);
+            NSPDoesSentenceText = choices.get(0);
+            NSPDoesSentence.setText(NSPDoesSentenceText);
+            NSPDoesSentence.bringToFront();
+
+        }
 
     }
 
     @Override
     public void setNSPDoesQuestion() {
+
+
+
+    }
+
+    @Override
+    public void setNSPWhichPage() {
+
+    }
+
+    @Override
+    public void setNSPDoesPage() {
 
     }
 
@@ -3230,6 +3287,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public void showNSPDoesSentence() {
 
+
     }
 
     @Override
@@ -3239,6 +3297,27 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void playNSPDoesSentence() {
+        //segmentNdx = 0;
+        //trackNarration(true);
+        String filename = currUtterance.audio.toLowerCase();
+        if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
+            filename = filename.substring(0,filename.length()-4);
+        }
+
+        // Publish the current utterance within sentence
+        //
+        mParent.publishValue(TCONST.RTC_VAR_UTTERANCE,  filename);
+        // NOTE: Due to inconsistencies in the segmentation data, you cannot depend on it
+        // having precise timing information.  As a result the segment may timeout before the
+        // audio has completed. To avoid this we use oncomplete in type_audio to push an
+        // TRACK_SEGMENT back to this components queue.
+        // Tell the script to speak the new uttereance
+        //
+        Log.d(TAG, "playNSPSentence: curutterance = "+currUtterance);
+        mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+
+        postDelayedTracker();
+
 
     }
 
@@ -3252,30 +3331,71 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
-    @Override
-    public void highlightNSPWord() {
-        Log.d(TAG, "highlightNSPWord: ");
-        mParent.updateTextColor(this.curNSPTextView, Color.GREEN);
-        mParent.updateTextSize(this.curNSPTextView, 30);
-    }
+//    @Override
+//    public void highlightNSPWord() {
+//        Log.d(TAG, "highlightNSPWord: ");
+//        mParent.updateTextColor(this.curNSPTextView, Color.GREEN);
+//        mParent.updateTextSize(this.curNSPTextView, 30);
+//    }
+//
+//    @Override
+//    public void undoHighlightNSPWord() {
+//        Log.d(TAG, "undoHighlightNSPWord: ");
+//        mParent.updateTextColor(this.curNSPTextView, Color.BLACK);
+//        mParent.updateTextSize(this.curNSPTextView, 30);
+//        if (this.curNSPTextView == mLastNSPWord) {
+//            // TODO: Set as "NSP_ANIM_INCOMPLETE" as constant in TCONST.java
+//            mParent.retractFeature("NSP_ANIM_INCOMPLETE");
+//            mParent.publishFeature("NSP_ANIM_COMPLETE");
+//            enableNSPDoesButtons(); // Change to does/which
+//            this.NSPWordsCounter = 0;
+//        } else {
+//            mParent.publishFeature("NSP_ANIM_INCOMPLETE");
+//        }
+//        mParent.post(TCONST.NEXT_NODE, 2000);
+//    }
+//
 
-    @Override
-    public void undoHighlightNSPWord() {
-        Log.d(TAG, "undoHighlightNSPWord: ");
-        mParent.updateTextColor(this.curNSPTextView, Color.BLACK);
-        mParent.updateTextSize(this.curNSPTextView, 30);
-        if (this.curNSPTextView == mLastNSPWord) {
-            // TODO: Set as "NSP_ANIM_INCOMPLETE" as constant in TCONST.java
-            mParent.retractFeature("NSP_ANIM_INCOMPLETE");
-            mParent.publishFeature("NSP_ANIM_COMPLETE");
-            enableNSPDoesButtons(); // Change to does/which
-            this.NSPWordsCounter = 0;
-        } else {
-            mParent.publishFeature("NSP_ANIM_INCOMPLETE");
+
+    private class NSPDoesTouchListener implements OnTouchListener {
+        ViewGroup _frame;
+        boolean _student_answer;
+
+        NSPDoesTouchListener(ViewGroup frame, boolean student_answer) {
+            this._frame = frame;
+            this._student_answer = student_answer;
         }
-        mParent.post(TCONST.NEXT_NODE, 2000);
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mParent.updateViewColor(_frame, Color.LTGRAY);
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mParent.updateViewColor(_frame, Color.WHITE);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    disableNSPDoesButtons();
+                    if(nsp_does_answer == _student_answer) {
+                        mParent.updateViewColor(_frame, Color.GREEN);
+                        mParent.publishFeature(TCONST.NSP_DOES_CORRECT);
+                        mParent.retractFeature(TCONST.NSP_DOES_WRONG);
+
+                        mParent.logNSPMatchPerformance(true, nsp_does_answer, _student_answer, mCurrPage);
+                        picture_match_mode = false;
+                        show_image_options = false;
+                        hasQuestion();
+                    } else{
+                        mParent.updateViewColor(_frame, Color.RED);
+                        mParent.retractFeature(TCONST.NSP_DOES_CORRECT);
+                        mParent.publishFeature(TCONST.NSP_DOES_WRONG);
+                        mParent.logNSPMatchPerformance(false, nsp_does_answer, _student_answer, mCurrPage);
+                    }
+                    mParent.nextNode();
+                    break;
+            }
+            return true;
+        }
     }
-
-
-
 }

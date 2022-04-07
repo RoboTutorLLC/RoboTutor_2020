@@ -154,7 +154,7 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
 
      // NSP
-     void setNSPPage();
+
 
     void NSPQuestions();
 
@@ -165,6 +165,10 @@ public interface ICQn_ViewManager extends ILoadableObject {
     void displayNSPDoesQuestion();
 
     void setNSPDoesQuestion();
+
+    void setNSPWhichPage();
+
+    void setNSPDoesPage();
 
     void hasNSPDistractor();
 
@@ -202,8 +206,5 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
     public void hideNSPWhichSentences();
 
-    public void highlightNSPWord();
-
-    public void undoHighlightNSPWord();
 
 }

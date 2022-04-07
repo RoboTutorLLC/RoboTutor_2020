@@ -85,6 +85,35 @@
           "edges": []
         },
 
+        "SPEAK_NSP_DOES_UTTERANCE_BEHAVIOR": {
+          "type": "QUEUE",
+          "COMMENT": "Speak the current word and continue to next.",
+          "preenter": [],
+          "reuse": true,
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#behavior,value#SPEAK_NSP_DOES_UTTERANCE_BEHAVIOR:String", "features": ""},
+
+            {"type": "QUEUEDAUDIO", "command": "PLAY_NSP_DOES", "soundsource": "{{SstoryQuestions.utterance}}.mp3", "listeners": "SstoryQuestions", "oncomplete": "TRACK_SEGMENT" , "soundpackage": "story", "mode": "", "features": ""}
+          ],
+          "preexit": [],
+          "edges": []
+        },
+
+        "SPEAK_NSP_WHICH_UTTERANCE_BEHAVIOR": {
+          "type": "QUEUE",
+          "COMMENT": "Speak the current word and continue to next.",
+          "preenter": [],
+          "reuse": true,
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#behavior,value#SPEAK_NSP_WHICH_UTTERANCE_BEHAVIOR:String", "features": ""},
+
+            {"type": "QUEUEDAUDIO", "command": "PLAY_NSP_WHICH", "soundsource": "{{SstoryQuestions.utterance}}.mp3", "listeners": "SstoryQuestions", "oncomplete": "TRACK_SEGMENT" , "soundpackage": "story", "mode": "", "features": ""}
+          ],
+          "preexit": [],
+          "edges": []
+        },
+
+
         "SPEAK_SENTENCE_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",

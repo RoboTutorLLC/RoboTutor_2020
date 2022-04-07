@@ -13,7 +13,7 @@ import cmu.xprize.util.JSON_Helper;
 public class NSPQuestion implements ILoadableObject {
     // json loadable
     //    public ContextSentence sentence;
-    public NSPChoice       choice;
+    public NSPChoice       choices;
 
     @Override
     public void loadJSON(JSONObject jsonObj, IScope scope) {

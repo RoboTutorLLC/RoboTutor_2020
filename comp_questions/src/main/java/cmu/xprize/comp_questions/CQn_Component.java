@@ -716,6 +716,11 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
             Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonMcq:");
             mViewManager.loadJSON(new JSONObject(jsonMcq), null);
 
+            // UHQ load the relevant nsp json data for NSP questions
+            String jsonNSP = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYNSP);
+            Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonNsp:");
+            mViewManager.loadJSON(new JSONObject(jsonNSP), null);
+
         } catch (Exception e) {
             // TODO: Manage Exceptions
             CErrorManager.logEvent(TAG, "Story Parse Error: ", e, false);
@@ -833,6 +838,9 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     public void triggerIntervention(String type) {
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
+    }
+
+    public void logNSPMatchPerformance(boolean correct, boolean expected, boolean studentChoice, int page) {
     }
 
     // IEventListener  -- End
