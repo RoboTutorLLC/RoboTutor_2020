@@ -34,10 +34,11 @@ public class Configuration {
                 .putBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, configItems.include_audio_output_in_screen_video)
                 .putBoolean(ConfigurationItems.PINNING_MODE, configItems.pinning_mode)
                 .putInt(ConfigurationItems.RECORD_FPS, configItems.record_fps)
-                .putInt(ConfigurationItems.RECORD_SCREEN_RESOLUTION, configItems.record_screen_resolution)
+                .putInt(ConfigurationItems.RECORD_PIXELS_WIDE, configItems.record_pixels_wide)
+                .putInt(ConfigurationItems.RECORD_PIXELS_HIGH, configItems.record_pixels_high)
                 .putInt(ConfigurationItems.RECORD_AUDIO_BITRATE, configItems.record_audio_bitrate)
                 .putInt(ConfigurationItems.RECORD_AUDIO_SAMPLING_RATE, configItems.record_audio_sampling_rate)
-                .putBoolean(ConfigurationItems.RECORD_ACTIVITY_WISE, configItems.record_activity_wise)
+                .putString(ConfigurationItems.RECORD_SESSION_OR_ACTIVITY, configItems.record_session_or_activity)
                 .apply();
     }
 
@@ -126,11 +127,14 @@ public class Configuration {
                 .getInt(ConfigurationItems.RECORD_FPS,30);
     }
 
-    public static int getRecordingScreenResolution(Context context) {
+    public static int getRecordingPixelsWide(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getInt(ConfigurationItems.RECORD_SCREEN_RESOLUTION,480);
+                .getInt(ConfigurationItems.RECORD_PIXELS_WIDE,480);
     }
-
+    public static int getRecordingPixelsHigh(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getInt(ConfigurationItems.RECORD_PIXELS_HIGH,854);
+    }
     public static int getRecordingAudioBitrate(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
                 .getInt(ConfigurationItems.RECORD_AUDIO_BITRATE,16000);
@@ -141,9 +145,9 @@ public class Configuration {
                 .getInt(ConfigurationItems.RECORD_AUDIO_SAMPLING_RATE,16000);
     }
 
-    public static boolean getRecordingActivityWise(Context context) {
+    public static String getRecordingSessionOrActivity(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getBoolean(ConfigurationItems.RECORD_ACTIVITY_WISE,false);
+                .getString(ConfigurationItems.RECORD_SESSION_OR_ACTIVITY,"activity");
     }
     /**
      * logs all the config items.

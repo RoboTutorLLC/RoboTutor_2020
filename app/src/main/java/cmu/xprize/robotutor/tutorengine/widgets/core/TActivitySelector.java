@@ -238,7 +238,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         final RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
         Log.d(TAG, roboTutor_act.getClass().getSimpleName());
         // if recording activity wise stop recording
-        if(Configuration.getRecordingActivityWise(roboTutor_act.getApplicationContext())){
+        if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
             roboTutor_act.hbRecorder.stopScreenRecording();
         }
         // if recording session wise pause recording after 5 seconds on menu to save space

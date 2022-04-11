@@ -544,7 +544,7 @@ public class CTutorEngine implements ILoadableObject2 {
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
         Log.i(TAG, "launch: the screen recording launcher will begin now");
         // if activity wise recording is selected start recording
-        if(Configuration.getRecordingActivityWise(act.getApplicationContext())){
+        if(Configuration.getRecordingSessionOrActivity(act.getApplicationContext())=="activity"){
             act.startRecordingScreen();
         }
         // if whole session recording is selected, resume recording
@@ -572,6 +572,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
         defvar_tutor  tutorDescriptor = tutorVariants.get(tutorVariant);
         defdata_tutor tutorBinding    = bindingPatterns.get(tutorDescriptor.tutorName);
+        Log.d(TAG,tutorDescriptor.tutorName);
 
         // Initialize the tutorBinding from the dataSource spec - this transfers the
         // datasource fields to the prototype tutorVariant bindingPattern which is then
