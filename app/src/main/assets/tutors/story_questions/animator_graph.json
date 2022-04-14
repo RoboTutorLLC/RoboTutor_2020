@@ -562,7 +562,7 @@
             {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Way to go.mp3", "mode": "flow", "features": ""}
           ]
         },
-        "SHOWRIGHT": {
+        "SHOWRIGHT":  {
           "type": "MODULE",
           "reuse": true,
           "COMMENT": "PLAY_WHOOSH,SLIDE_UP_CORRECT,NARRATE_SENTENCE_CORRECT",
