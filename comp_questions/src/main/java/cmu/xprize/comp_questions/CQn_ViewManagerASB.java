@@ -58,12 +58,14 @@ import static cmu.xprize.comp_questions.QN_CONST.FTR_PLAY_GEN;
 import static cmu.xprize.comp_questions.QN_CONST.GEN_QUESTION_CHANCE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_CLZSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_LINESTATE;
+import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PARASTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PMSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_QNSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_WORDSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_CLOZE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_PICMATCH;
+import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP;
 import static cmu.xprize.util.TCONST.FTR_USER_READ;
 import static cmu.xprize.util.TCONST.FTR_USER_READING;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
@@ -209,6 +211,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean                 hasUngrammatical       = false;
     private boolean                 hasPlausible           = false;
 
+    private boolean                 hasCorrect              = false;
+    private boolean                 hasNext                 = false;
+    private boolean                 hasRandom               = false;
+    private boolean                 hasEasiest              = false;
+    private boolean                 hasHardest              = false;
+
 
 
     // json loadable
@@ -231,6 +239,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public ClozeQuestion[] questions;
 
     public List<Integer>  clozeIndices;
+    public List<Integer>  NSPIndices;
 
     private String curGenericQuestion = "";
 
@@ -300,7 +309,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
      * @param assetPath
      */
     public void initStory(IVManListener owner, String assetPath, String location) {
-
         // FOR_HUI... these should not exist
         try {
             for (int i = 0; i < questions.length; i++) {
@@ -310,6 +318,16 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             }
         } catch (Exception e) {
             Log.e(TAG, "Missing mcq.json... please add.");
+        }
+
+        try {
+            for (int i = 0; i < NspQuestions.length; i++) {
+                if(NspQuestions[i].choices != null) {
+                    NSPIndices.add(i + 1);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Missing nsp.json... please add.");
         }
 
         mCurrLineInStory = 0;
@@ -328,14 +346,22 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
         }else if (mParent.testFeature(TCONST.FTR_GEN)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
         } else if (mParent.testFeature(TCONST.FTR_PIC)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
+            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+        } else if (mParent.testFeature(TCONST.FTR_NSP)) {
+            mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.TRUE);
         }
 
 
@@ -1073,6 +1099,19 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         Log.d(TAG, "setPicMatchView: mImageGrid = null:"+(mImageGrid == null));
     }
 
+    private void setNSPWhichView(ViewGroup vgroup){
+        Log.d(TAG, "setNSPWhich: aslkdjfalksdf");
+        NSPWhichSentence1 = vgroup.findViewById(R.id.SnspSentence1Text);
+        NSPWhichSentence2 = vgroup.findViewById(R.id.SnspSentence2Text);
+        NSPWhichSentence1.setVisibility(View.INVISIBLE);
+        NSPWhichSentence2.setVisibility(View.INVISIBLE);
+    }
+    private void setNSPDoesView(ViewGroup vgroup){
+        Log.d(TAG, "setNSPDoes: askfldhklasdf");
+        NSPDoesSentence = vgroup.findViewById(R.id.SnspDoesText);
+        NSPDoesSentence.setVisibility(View.INVISIBLE);
+    }
+
     private static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("max must be greater than min");
@@ -1084,7 +1123,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private void configurePageImage() {
         if (picture_match_mode){
             // Do nothing because updateImageButtons will handle it
-        } else {
+        } else if (cloze_page_mode){
             InputStream in;
             try {
                 if (assetLocation.equals(TCONST.EXTERN)) {
@@ -1111,6 +1150,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 mPageImage.setImageBitmap(null);
                 e.printStackTrace();
             }
+        } else {
+            // NSP PAGE MODE
+            InputStream in;
         }
 
     }
@@ -2758,9 +2800,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             if (isClozePage && mCurrPara >= mParaCount-1){
                 mParent.publishValue(SHOW_CLOZE, TCONST.TRUE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             } else {
                 mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             }
         }
     }
@@ -2770,12 +2814,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         //TODO: either call one or the other depending on ftr
         hasClozeDistractor();
         hasPictureMatch();
+        hasNSPDistractor();
     }
 
     public void hasPictureMatch(){
         if (picture_match_mode && mCurrPara >= mParaCount-1 && mCurrPage % 2 == 1) {
             mParent.publishValue(SHOW_PICMATCH, TCONST.TRUE);
             mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+            mParent.publishValue(SHOW_NSP, TCONST.FALSE);
         }
 //        } else {
 //            mParent.publishValue(TCONST.SHOW_PICMATCH, TCONST.FALSE);
@@ -3160,17 +3206,53 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+    public void setNSPQuestion() {
+
+        if (isNSPPage){
+            int numLinesCurPage = data[mCurrPage].text.length;
+            this.NspQuestion = NspQuestions[numLinesCurPage-1];
+            if (NspQuestions[numLinesCurPage-1].choices.type == "correct" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
+                hasCorrect = true;
+            }
+            if (NspQuestions[numLinesCurPage-1].choices.type == "next" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
+                hasNext = true;
+            }
+            if (NspQuestions[numLinesCurPage-1].choices.type == "random" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
+                hasRandom = true;
+            }
+            if (NspQuestions[numLinesCurPage-1].choices.type == "easiest" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
+                hasEasiest = true;
+            }
+            if (NspQuestions[numLinesCurPage-1].choices.type == "hardest" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
+                hasHardest = true;
+            }
+        }
+
+    }
+
     @Override
     public void displayNSPDoesQuestion() {
         if(isNSPDoesPage) {
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            ArrayList<String> choices = new ArrayList<>();
-            if (NspQuestions[numLinesCurPage-1].choices.text != null && NspQuestions[numLinesCurPage-1].choices.text.length() > 0) {
-                choices.add("") ; // how to get text from json file :'((((
+            String correct, next, easiest, random, hardest;
+            if (NSPQuestion.choices.type == "correct") {
+                correct = NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type == "next") {
+                next = NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type == "easiest") {
+                easiest = NSPQuestion.choices.text;
+            }if (NSPQuestion.choices.type == "random") {
+                random = NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type == "hardest") {
+                hardest = NSPQuestion.choices.text;
             }
-            Collections.shuffle(choices);
-            NSPDoesSentenceText = choices.get(0);
+
+
+
+
+//            Collections.shuffle(choices);
+//            NSPDoesSentenceText = choices.get(0);
             NSPDoesSentence.setText(NSPDoesSentenceText);
             NSPDoesSentence.bringToFront();
 
@@ -3198,6 +3280,17 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void hasNSPDistractor() {
+        if (mCurrPage <= mPageCount-1) {
+            if ((isNSPDoesPage || isNSPWhichPage) && mCurrPara >= mParaCount-1){
+                mParent.publishValue(SHOW_CLOZE, TCONST.TRUE);
+                mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+                mParent.publishValue(SHOW_NSP, TCONST.TRUE);
+            } else {
+                mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+                mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+            }
+        }
 
     }
 
