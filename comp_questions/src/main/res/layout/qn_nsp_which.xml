@@ -7,18 +7,62 @@
 
     <TextView
         android:id="@+id/SnspSentence1Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="30sp"
+        app:layout_widthPercent="100%"
          />
 
     <TextView
         android:id="@+id/SnspSentence2Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="30sp"
+        app:layout_widthPercent="100%"
         />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/SnspSmiley1"
+        android:src="@drawable/like"
+        android:layout_below="@id/SnspSentence2Text"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="#FFF"
+        android:scaleType="fitCenter"
+        app:layout_widthPercent="30%"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
          />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/SnspSmiley2"
+        android:src="@drawable/like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/SnspSentence2Text"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="#FFF"
+        android:scaleType="fitCenter"
+        app:layout_widthPercent="30%"
         />
 
 </android.support.percent.PercentRelativeLayout>

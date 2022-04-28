@@ -151,6 +151,8 @@ public interface ICQn_ViewManager extends ILoadableObject {
      boolean isClozeMode();
      boolean isGenMode();
      boolean isPicMode();
+    boolean isNSPWhichMode();
+    boolean isNSPDoesMode();
 
 
      // NSP

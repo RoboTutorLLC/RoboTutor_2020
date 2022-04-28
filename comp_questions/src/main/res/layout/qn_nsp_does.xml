@@ -7,17 +7,51 @@
     android:layout_height="match_parent"
     android:background="#FFF">
 
+
     <TextView
         android:id="@+id/SnspDoesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="30sp"
+        app:layout_widthPercent="100%"
         />
 
-<!--&lt;!&ndash;    Remove the margin values&ndash;&gt;-->
-    <ImageView
+    <ImageButton
         android:id="@+id/SnspDoesSmiley"
+        android:src="@drawable/like"
+        android:layout_below="@id/SnspDoesText"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="#FFF"
+        android:scaleType="fitCenter"
+        app:layout_widthPercent="30%"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
          />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/SnspDoesFrownie"
+        android:src="@drawable/dislike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/SnspDoesText"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="#FFF"
+        android:scaleType="fitCenter"
+        app:layout_widthPercent="30%"
          />
 
 </android.support.percent.PercentRelativeLayout>

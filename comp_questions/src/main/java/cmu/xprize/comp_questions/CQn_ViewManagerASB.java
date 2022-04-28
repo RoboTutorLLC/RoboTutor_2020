@@ -106,6 +106,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private int                     picmatch_answer;
     private boolean                 picture_match_mode = false;
     private boolean                 cloze_page_mode = false;
+    private boolean                 nsp_does_mode = false;
+    private boolean                 nsp_which_mode = false;
     private boolean                 isClozePage = false;
     private ViewGroup               mPicturePage;
     private int                     numPicMatch; // OPEN_SOURCE how does this get set???
@@ -140,7 +142,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     // NSP
     private TextView                curNSPTextView;
-    private boolean                 nsp_page_mode = false;
     private boolean                 isNSPPage = false;
 
 
@@ -1048,6 +1049,18 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         } else {
             hideImageButtons();
             disableImageButtons();
+        }
+        if(nsp_which_mode) {
+            showNSPWhichButtons();
+        } else {
+            hideNSPWhichButtons();
+            disableNSPWhichButtons();
+        }
+        if(nsp_does_mode) {
+            showNSPDoesButtons();
+        } else {
+            hideNSPDoesButtons();
+            disableNSPDoesButtons();
         }
 
     }
@@ -3166,6 +3179,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public boolean isPicMode() {return picture_match_mode;}
 
+    @Override
+    public boolean isNSPDoesMode() { return nsp_does_mode;}
+
+    @Override
+    public boolean isNSPWhichMode() { return nsp_which_mode;}
+
 
     @Override
     public void NSPQuestions() {
@@ -3266,9 +3285,37 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
     }
-
+//int paracount = data[mCurrPage+1].text.length;
+//        int numLines = 0;
+//        numWordsCurPage = 0;
+//        for(int i = 0; i < paracount; i++){
+//            int linecount = data[mCurrPage+1].text[i].length;
+//            numLines+=linecount;
+//            for (int j = 0; j < linecount;j++){
+//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+//                for(int k = 0; k < utteranceLen; k++){
+//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+//                }
+//
+//            }
+//        }
+//        int sum=mCurrLineInStory+numLines;
+//        // TRACE_CLOZE where cloze_page_mode is set to true
+//        if(this.clozeIndices.contains(mCurrLineInStory+numLines)){
+//            clozeQuestion = questions[sum-1];
+//            clozeTarget = clozeQuestion.target;
+//            cloze_page_mode = true;
+//            updateClozeButtons();
+//        } else {
+//            cloze_page_mode = false;
+//        }
     @Override
     public void setNSPWhichPage() {
+        int paracount = data[mCurrPage+1].text.length;
+        if (paracount == NSPQuestion.choices.index) {
+
+        }
+
 
     }
 

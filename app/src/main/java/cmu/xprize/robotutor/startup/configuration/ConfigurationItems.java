@@ -29,6 +29,8 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String SHOW_HELPER_BUTTON = "SHOW_HELPER_BUTTON";
     public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
     public static final String PINNING_MODE = "PINNING_MODE";
+    public static final String STORY_NSP_MODE = "STORY_NSP_MODE";
+    public static final String NSP_CHOICE_PROBABILITIES = "NSP_CHOICE_PROBABILITIES";
 
     public String config_version;
     public boolean language_override;
@@ -46,6 +48,8 @@ public class ConfigurationItems implements ILoadableObject {
     public String baseDirectory;
     public boolean include_audio_output_in_screen_video;
     public boolean pinning_mode;
+//    public String story_nsp_mode;
+//    public String[] nsp_choice_probabilities;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -73,7 +77,7 @@ public class ConfigurationItems implements ILoadableObject {
                               boolean use_placement, boolean record_audio,
                               String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
                               boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
-
+//, String story_nsp_mode, String[] nsp_choice_probabilities
 //        this.config_version = config_version;
         this.setConfigVersion();
         this.language_override = language_override;
@@ -91,6 +95,8 @@ public class ConfigurationItems implements ILoadableObject {
         this.show_helper_button = show_helper_button;
         this.baseDirectory = baseDirectory;
         this.pinning_mode = pinning_mode;
+//        this.story_nsp_mode = story_nsp_mode;
+//        this.nsp_choice_probabilities = nsp_choice_probabilities;
     }
 
     public void setDefaults() {
@@ -112,6 +118,8 @@ public class ConfigurationItems implements ILoadableObject {
         record_screen_video = true;
         include_audio_output_in_screen_video = false;
         pinning_mode = false;
+//        story_nsp_mode = "TF";
+//        nsp_choice_probabilities = new String[] {"correct", "easy", "random"};
     }
 
     private void setConfigVersion() {
