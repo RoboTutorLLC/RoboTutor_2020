@@ -116,6 +116,16 @@ public class Configuration {
                 .getBoolean(ConfigurationItems.PINNING_MODE, false);
     }
 
+//    public static String getStoryNSPMode(Context context) {
+//        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+//                .getBoolean(ConfigurationItems.story_nsp_mode, false);
+//    }
+//
+//    public static Double[] getStoryNSPProbabilities(Context context) {
+//        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+//                .getBoolean(ConfigurationItems.nsp_choice_probabilities, false);
+//    }
+
     /**
      * logs all the config items.
      */

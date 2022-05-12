@@ -44,7 +44,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -217,6 +219,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean                 hasRandom               = false;
     private boolean                 hasEasiest              = false;
     private boolean                 hasHardest              = false;
+
+    private String                  nsp_question_type;
+    private String[]                NSPDoesTrulyNext;
+    private String NSPDoesDistractor;
 
 
 
@@ -1134,7 +1140,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
     private void configurePageImage() {
-        if (picture_match_mode){
+        if (picture_match_mode) {
             // Do nothing because updateImageButtons will handle it
         } else if (cloze_page_mode){
             InputStream in;
@@ -1165,7 +1171,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             }
         } else {
             // NSP PAGE MODE
-            InputStream in;
+            // Do nothing since no images are loaded in both NSP modes, the buttons are in the assets folder
         }
 
     }
@@ -3191,6 +3197,33 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+    public String loadConfig(){
+        Configuration c = new Configuration();
+        String nsp_mode = c.getStoryNSPMode();
+        if(nsp_mode.equals("TF")) {
+            nsp_does_mode = true;
+            nsp_which_mode = false;
+        } else {
+            nsp_does_mode = false;
+            nsp_which_mode = true;
+        }
+        double [] probabilities = c.getStoryNSPProbabilities();
+        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
+        NavigableMap<Double, String> map = new TreeMap<Double, String>();
+        double totalWeight = 0;
+        for (int i = 0; i < 5; i++){
+            totalWeight += probabilities[i];
+            map.put(totalWeight, choices[i]);
+        }
+
+        Random r = new Random();
+        double value = r.nextDouble() * totalWeight;
+        nsp_question_type = map.higherEntry(value).getValue();
+
+    }
+
+
+
     @Override
     public void displayNSPWhichQuestion() {
         if(isNSPWhichPage) {
@@ -3251,23 +3284,43 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void displayNSPDoesQuestion() {
-        if(isNSPDoesPage) {
+
+
+    }
+
+    @Override
+    public void setNSPDoesQuestion() {
+        if(isNSPDoesPage && nsp_does_mode) {
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
             String correct, next, easiest, random, hardest;
-            if (NSPQuestion.choices.type == "correct") {
+            if (NSPQuestion.choices.type.equals("correct") && nsp_question_type.equals("correct")) {
                 correct = NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type == "next") {
+                NSPDoesDistractor =  NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type.equals("next") && nsp_question_type.equals("next")) {
                 next = NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type == "easiest") {
+                NSPDoesDistractor =  NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type.equals("easiest") && nsp_question_type.equals("easiest")) {
                 easiest = NSPQuestion.choices.text;
-            }if (NSPQuestion.choices.type == "random") {
+                NSPDoesDistractor =  NSPQuestion.choices.text;
+            }if (NSPQuestion.choices.type.equals("random") && nsp_question_type.equals("random")) {
                 random = NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type == "hardest") {
+                NSPDoesDistractor =  NSPQuestion.choices.text;
+            } if (NSPQuestion.choices.type.equals("hardest") && nsp_question_type.equals("hardest")) {
                 hardest = NSPQuestion.choices.text;
+                NSPDoesDistractor =  NSPQuestion.choices.text;
             }
 
-
+            int rand = (int) Math.random();
+            if (rand == 0) {
+                // distractor
+                NSPDoesSentenceText = NSPDoesDistractor;
+            } else {
+                // truly next
+                if (NSPQuestion.choices.type.equals("correct")) {
+                    NSPDoesSentenceText = NSPQuestion.choices.text;
+                }
+            }
 
 
 //            Collections.shuffle(choices);
@@ -3276,11 +3329,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             NSPDoesSentence.bringToFront();
 
         }
-
-    }
-
-    @Override
-    public void setNSPDoesQuestion() {
 
 
 
@@ -3311,10 +3359,15 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        }
     @Override
     public void setNSPWhichPage() {
-        int paracount = data[mCurrPage+1].text.length;
-        if (paracount == NSPQuestion.choices.index) {
+        if (nsp_which_mode){
+            int paracount = data[mCurrPage+1].text.length;
+            if (paracount == NSPQuestion.choices.index) {
+
+            }
 
         }
+
+
 
 
     }

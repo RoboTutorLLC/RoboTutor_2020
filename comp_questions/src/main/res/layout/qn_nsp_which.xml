@@ -35,7 +35,8 @@
 
     <ImageButton
         android:id="@+id/SnspSmiley1"
-        android:src="@drawable/like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/SnspSentence2Text"
         android:layout_alignParentLeft="true"
         android:layout_marginStart="30dp"
@@ -44,10 +45,8 @@
         android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
-        app:layout_widthPercent="30%"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         />
+        android:src="@drawable/like"
+        app:layout_widthPercent="30%" />
 
     <ImageButton
         android:id="@+id/SnspSmiley2"

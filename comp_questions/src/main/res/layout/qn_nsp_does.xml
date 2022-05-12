@@ -24,7 +24,8 @@
 
     <ImageButton
         android:id="@+id/SnspDoesSmiley"
-        android:src="@drawable/like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/SnspDoesText"
         android:layout_alignParentLeft="true"
         android:layout_marginStart="30dp"
@@ -33,14 +34,11 @@
         android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
-        app:layout_widthPercent="30%"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-         />
+        android:src="@drawable/like"
+        app:layout_widthPercent="30%" />
 
     <ImageButton
         android:id="@+id/SnspDoesFrownie"
-        android:src="@drawable/dislike"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/SnspDoesText"
@@ -51,7 +49,7 @@
         android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
-        app:layout_widthPercent="30%"
-         />
+        android:src="@drawable/dislike"
+        app:layout_widthPercent="30%" />
 
 </android.support.percent.PercentRelativeLayout>

@@ -118,8 +118,10 @@ public class ConfigurationItems implements ILoadableObject {
         record_screen_video = true;
         include_audio_output_in_screen_video = false;
         pinning_mode = false;
+        // story_nsp_mode can be "TF" or "MC"
 //        story_nsp_mode = "TF";
-//        nsp_choice_probabilities = new String[] {"correct", "easy", "random"};
+        // nsp_choice_probabilities is an array of probabilities of {"correct", "next", "random", "easiest", "hardest"}
+//        nsp_choice_probabilities = new Double[] {};
     }
 
     private void setConfigVersion() {

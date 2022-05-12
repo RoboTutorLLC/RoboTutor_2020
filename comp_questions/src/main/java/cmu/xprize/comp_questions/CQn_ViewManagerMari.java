@@ -709,6 +709,16 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
     public boolean isPicMode() {return false;}
 
     @Override
+    public boolean isNSPWhichMode() {
+        return false;
+    }
+
+    @Override
+    public boolean isNSPDoesMode() {
+        return false;
+    }
+
+    @Override
     public void NSPQuestions() {
 
     }
