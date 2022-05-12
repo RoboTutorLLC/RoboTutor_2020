@@ -12,15 +12,14 @@
         android:id="@+id/SnspDoesText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginRight="60dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginRight="60dp"
         android:text=""
         android:textColor="#000"
         android:textSize="30sp"
-        app:layout_widthPercent="100%"
-        />
+        app:layout_widthPercent="100%" />
 
     <ImageButton
         android:id="@+id/SnspDoesSmiley"

@@ -9,29 +9,27 @@
         android:id="@+id/SnspSentence1Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginRight="60dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginRight="60dp"
         android:text=""
         android:textColor="#000"
         android:textSize="30sp"
-        app:layout_widthPercent="100%"
-         />
+        app:layout_widthPercent="100%" />
 
     <TextView
         android:id="@+id/SnspSentence2Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginRight="60dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginRight="60dp"
         android:text=""
         android:textColor="#000"
         android:textSize="30sp"
-        app:layout_widthPercent="100%"
-        />
+        app:layout_widthPercent="100%" />
 
     <ImageButton
         android:id="@+id/SnspSmiley1"
@@ -50,7 +48,6 @@
 
     <ImageButton
         android:id="@+id/SnspSmiley2"
-        android:src="@drawable/like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/SnspSentence2Text"
@@ -61,7 +58,7 @@
         android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
-        app:layout_widthPercent="30%"
-        />
+        android:src="@drawable/like"
+        app:layout_widthPercent="30%" />
 
 </android.support.percent.PercentRelativeLayout>

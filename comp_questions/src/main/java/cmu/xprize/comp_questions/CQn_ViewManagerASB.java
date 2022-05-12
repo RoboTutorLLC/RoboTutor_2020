@@ -3198,27 +3198,27 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
     public String loadConfig(){
-        Configuration c = new Configuration();
-        String nsp_mode = c.getStoryNSPMode();
-        if(nsp_mode.equals("TF")) {
-            nsp_does_mode = true;
-            nsp_which_mode = false;
-        } else {
-            nsp_does_mode = false;
-            nsp_which_mode = true;
-        }
-        double [] probabilities = c.getStoryNSPProbabilities();
-        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
-        NavigableMap<Double, String> map = new TreeMap<Double, String>();
-        double totalWeight = 0;
-        for (int i = 0; i < 5; i++){
-            totalWeight += probabilities[i];
-            map.put(totalWeight, choices[i]);
-        }
-
-        Random r = new Random();
-        double value = r.nextDouble() * totalWeight;
-        nsp_question_type = map.higherEntry(value).getValue();
+//        Configuration c = new Configuration();
+//        String nsp_mode = c.getStoryNSPMode();
+//        if(nsp_mode.equals("TF")) {
+//            nsp_does_mode = true;
+//            nsp_which_mode = false;
+//        } else {
+//            nsp_does_mode = false;
+//            nsp_which_mode = true;
+//        }
+//        double [] probabilities = c.getStoryNSPProbabilities();
+//        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
+//        NavigableMap<Double, String> map = new TreeMap<Double, String>();
+//        double totalWeight = 0;
+//        for (int i = 0; i < 5; i++){
+//            totalWeight += probabilities[i];
+//            map.put(totalWeight, choices[i]);
+//        }
+//
+//        Random r = new Random();
+//        double value = r.nextDouble() * totalWeight;
+//        nsp_question_type = map.higherEntry(value).getValue();
         return "";
     }
 
@@ -3338,6 +3338,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPDoesPage() {
+        if (NSPDoesDistractor.length() > 0) {
+            nsp_does_mode = true; // might not work
+            showNSPDoesButtons();
+        } else {
+            nsp_does_mode = false;
+        }
 
     }
 
