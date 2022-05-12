@@ -2,6 +2,8 @@ package cmu.xprize.comp_questions;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
@@ -13,7 +15,7 @@ import cmu.xprize.util.JSON_Helper;
 public class NSPQuestion implements ILoadableObject {
     // json loadable
     //    public ContextSentence sentence;
-    public static NSPChoice       choices;
+    public static List<NSPChoice> choices;
 
     @Override
     public void loadJSON(JSONObject jsonObj, IScope scope) {

@@ -3219,24 +3219,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         Random r = new Random();
         double value = r.nextDouble() * totalWeight;
         nsp_question_type = map.higherEntry(value).getValue();
-
+        return "";
     }
 
 
 
     @Override
     public void displayNSPWhichQuestion() {
-        if(isNSPWhichPage) {
-            int numLinesCurPage = data[mCurrPage].text.length;
-            this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            ArrayList<String> incorrectChoices = new ArrayList<>();
-            if (NspQuestions[numLinesCurPage-1].choices.type != null && NspQuestions[numLinesCurPage-1].choices.type.equals("correct") && NspQuestions[numLinesCurPage-1].choices.text.length() > 0) {
-                NSPWhichCorrectSentence = ""; // how to get text from json file :'((((
-            } else {
-                incorrectChoices.add("");
-            }
-            Collections.shuffle(incorrectChoices);
-            NSPWhichIncorrectSentence = incorrectChoices.get(0);
+        if(isNSPWhichPage && nsp_which_mode) {
             if (Math.random() == 1) {
                 NSPWhichSentence1.setText(NSPWhichCorrectSentence);
                 NSPWhichSentence1.bringToFront();
@@ -3255,35 +3245,38 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPWhichQuestion() {
-
-    }
-
-    public void setNSPQuestion() {
-
-        if (isNSPPage){
+        if(isNSPWhichPage && nsp_which_mode) {
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            if (NspQuestions[numLinesCurPage-1].choices.type == "correct" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
-                hasCorrect = true;
-            }
-            if (NspQuestions[numLinesCurPage-1].choices.type == "next" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
-                hasNext = true;
-            }
-            if (NspQuestions[numLinesCurPage-1].choices.type == "random" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
-                hasRandom = true;
-            }
-            if (NspQuestions[numLinesCurPage-1].choices.type == "easiest" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
-                hasEasiest = true;
-            }
-            if (NspQuestions[numLinesCurPage-1].choices.type == "hardest" && NspQuestions[numLinesCurPage-1].choices.text.length() > 0){
-                hasHardest = true;
+            String correct = "", next, easiest, random, hardest ;
+            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
+                if (NSPQuestion.choices.get(i).type.equals("correct") && nsp_question_type.equals("correct")) {
+                    correct = NSPQuestion.choices.get(i).text;
+                    NSPWhichCorrectSentence =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
+                    next = NSPQuestion.choices.get(i).text;
+                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
+                    easiest = NSPQuestion.choices.get(i).text;
+                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
+                }if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
+                    random = NSPQuestion.choices.get(i).text;
+                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
+                    hardest = NSPQuestion.choices.get(i).text;
+                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
+                }
             }
         }
 
     }
 
+
     @Override
     public void displayNSPDoesQuestion() {
+        NSPDoesSentence.setText(NSPDoesSentenceText);
+        NSPDoesSentence.bringToFront();
+        showNSPDoesButtons();
 
 
     }
@@ -3293,77 +3286,48 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         if(isNSPDoesPage && nsp_does_mode) {
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            String correct, next, easiest, random, hardest;
-            if (NSPQuestion.choices.type.equals("correct") && nsp_question_type.equals("correct")) {
-                correct = NSPQuestion.choices.text;
-                NSPDoesDistractor =  NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type.equals("next") && nsp_question_type.equals("next")) {
-                next = NSPQuestion.choices.text;
-                NSPDoesDistractor =  NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type.equals("easiest") && nsp_question_type.equals("easiest")) {
-                easiest = NSPQuestion.choices.text;
-                NSPDoesDistractor =  NSPQuestion.choices.text;
-            }if (NSPQuestion.choices.type.equals("random") && nsp_question_type.equals("random")) {
-                random = NSPQuestion.choices.text;
-                NSPDoesDistractor =  NSPQuestion.choices.text;
-            } if (NSPQuestion.choices.type.equals("hardest") && nsp_question_type.equals("hardest")) {
-                hardest = NSPQuestion.choices.text;
-                NSPDoesDistractor =  NSPQuestion.choices.text;
-            }
-
-            int rand = (int) Math.random();
-            if (rand == 0) {
-                // distractor
-                NSPDoesSentenceText = NSPDoesDistractor;
-            } else {
-                // truly next
-                if (NSPQuestion.choices.type.equals("correct")) {
-                    NSPDoesSentenceText = NSPQuestion.choices.text;
+            String correct = "", next, easiest, random, hardest ;
+            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
+                if (NSPQuestion.choices.get(i).type.equals("correct") && nsp_question_type.equals("correct")) {
+                    correct = NSPQuestion.choices.get(i).text;
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
+                    next = NSPQuestion.choices.get(i).text;
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
+                    easiest = NSPQuestion.choices.get(i).text;
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                }if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
+                    random = NSPQuestion.choices.get(i).text;
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
+                    hardest = NSPQuestion.choices.get(i).text;
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
                 }
             }
 
 
-//            Collections.shuffle(choices);
-//            NSPDoesSentenceText = choices.get(0);
-            NSPDoesSentence.setText(NSPDoesSentenceText);
-            NSPDoesSentence.bringToFront();
+            int rand = (int) Math.random();
+            if (rand == 0) {
+                // show distractor
+                NSPDoesSentenceText = NSPDoesDistractor;
+            } else {
+                // show truly next
+                NSPDoesSentenceText = correct;
+            }
+
 
         }
 
 
 
     }
-//int paracount = data[mCurrPage+1].text.length;
-//        int numLines = 0;
-//        numWordsCurPage = 0;
-//        for(int i = 0; i < paracount; i++){
-//            int linecount = data[mCurrPage+1].text[i].length;
-//            numLines+=linecount;
-//            for (int j = 0; j < linecount;j++){
-//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-//                for(int k = 0; k < utteranceLen; k++){
-//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-//                }
-//
-//            }
-//        }
-//        int sum=mCurrLineInStory+numLines;
-//        // TRACE_CLOZE where cloze_page_mode is set to true
-//        if(this.clozeIndices.contains(mCurrLineInStory+numLines)){
-//            clozeQuestion = questions[sum-1];
-//            clozeTarget = clozeQuestion.target;
-//            cloze_page_mode = true;
-//            updateClozeButtons();
-//        } else {
-//            cloze_page_mode = false;
-//        }
+
     @Override
     public void setNSPWhichPage() {
         if (nsp_which_mode){
             int paracount = data[mCurrPage+1].text.length;
-            if (paracount == NSPQuestion.choices.index) {
 
-            }
 
         }
 
