@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -303,6 +304,14 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         v.setAnimation(fade_out);
     }
 
+    public void fadeOutImageButton(ImageButton v){
+        v.setAnimation(fade_out);
+    }
+
+    public void fadeOutTextView(TextView v){
+        v.setAnimation(fade_out);
+    }
+
     public void updateViewColor(View v, int color){
         v.setBackgroundColor(color);
     }
@@ -325,6 +334,10 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     }
 
     public void updateViewAlpha(View v, float alpha){
+        v.setAlpha(alpha);
+    }
+
+    public void updateImageAlpha(ImageButton v, float alpha){
         v.setAlpha(alpha);
     }
 
@@ -840,7 +853,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         _bManager.sendBroadcast(msg);
     }
 
-    public void logNSPMatchPerformance(boolean correct, boolean expected, boolean studentChoice, int page) {
+    public void logNSPPerformance(boolean correct, String correctSentence, int index, String type) {
     }
 
     // IEventListener  -- End

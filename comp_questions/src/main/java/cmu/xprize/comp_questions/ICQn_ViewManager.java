@@ -180,8 +180,6 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
     public void hideNSPDoesButtons();
 
-    public void enableNSPDoesButtons();
-
     public void disableNSPDoesButtons();
 
     public void resetNSPWhichButtons();
@@ -194,19 +192,8 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
     public void disableNSPWhichButtons();
 
-    public void acknowledgeButtonTapSmiley();
-
-    public void acknowledgeButtonTapFrownie();
-
-    public void showNSPDoesSentence();
-
-    public void hideNSPDoesSentence();
-
     public void playNSPDoesSentence();
 
-    public void showNSPWhichSentences();
-
-    public void hideNSPWhichSentences();
 
 
 }

@@ -773,10 +773,6 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     }
 
-    @Override
-    public void enableNSPDoesButtons() {
-
-    }
 
     @Override
     public void disableNSPDoesButtons() {
@@ -809,37 +805,7 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
     }
 
     @Override
-    public void acknowledgeButtonTapSmiley() {
-
-    }
-
-    @Override
-    public void acknowledgeButtonTapFrownie() {
-
-    }
-
-    @Override
-    public void showNSPDoesSentence() {
-
-    }
-
-    @Override
-    public void hideNSPDoesSentence() {
-
-    }
-
-    @Override
     public void playNSPDoesSentence() {
-
-    }
-
-    @Override
-    public void showNSPWhichSentences() {
-
-    }
-
-    @Override
-    public void hideNSPWhichSentences() {
 
     }
 

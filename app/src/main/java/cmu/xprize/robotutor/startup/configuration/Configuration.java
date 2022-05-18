@@ -33,6 +33,7 @@ public class Configuration {
                 .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
                 .putBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, configItems.include_audio_output_in_screen_video)
                 .putBoolean(ConfigurationItems.PINNING_MODE, configItems.pinning_mode)
+                .putString(ConfigurationItems.STORY_NSP_MODE, configItems.story_nsp_mode)
                 .apply();
     }
 
@@ -116,15 +117,11 @@ public class Configuration {
                 .getBoolean(ConfigurationItems.PINNING_MODE, false);
     }
 
-//    public static String getStoryNSPMode(Context context) {
-//        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-//                .getBoolean(ConfigurationItems.story_nsp_mode, false);
-//    }
-//
-//    public static Double[] getStoryNSPProbabilities(Context context) {
-//        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-//                .getBoolean(ConfigurationItems.nsp_choice_probabilities, false);
-//    }
+    public static String getStoryNSPMode(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getString(ConfigurationItems.STORY_NSP_MODE, "TF");
+    }
+
 
     /**
      * logs all the config items.

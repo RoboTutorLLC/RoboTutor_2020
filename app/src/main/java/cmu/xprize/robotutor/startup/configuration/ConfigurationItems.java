@@ -48,8 +48,8 @@ public class ConfigurationItems implements ILoadableObject {
     public String baseDirectory;
     public boolean include_audio_output_in_screen_video;
     public boolean pinning_mode;
-//    public String story_nsp_mode;
-//    public String[] nsp_choice_probabilities;
+    public String story_nsp_mode;
+    public double[] nsp_choice_probabilities;
 
     public ConfigurationItems() {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
@@ -76,9 +76,8 @@ public class ConfigurationItems implements ILoadableObject {
                               String language_feature_id, boolean show_demo_vids,
                               boolean use_placement, boolean record_audio,
                               String menu_type, boolean record_screen_video, boolean include_audio_output_in_screen_video,
-                              boolean show_helper_button, String baseDirectory, boolean pinning_mode) {
-//, String story_nsp_mode, String[] nsp_choice_probabilities
-//        this.config_version = config_version;
+                              boolean show_helper_button, String baseDirectory, boolean pinning_mode, String story_nsp_mode, double[] nsp_choice_probabilities) {
+        this.config_version = config_version;
         this.setConfigVersion();
         this.language_override = language_override;
         this.show_tutorversion = show_tutorversion;
@@ -95,8 +94,8 @@ public class ConfigurationItems implements ILoadableObject {
         this.show_helper_button = show_helper_button;
         this.baseDirectory = baseDirectory;
         this.pinning_mode = pinning_mode;
-//        this.story_nsp_mode = story_nsp_mode;
-//        this.nsp_choice_probabilities = nsp_choice_probabilities;
+        this.story_nsp_mode = story_nsp_mode;
+        this.nsp_choice_probabilities = nsp_choice_probabilities;
     }
 
     public void setDefaults() {
@@ -119,9 +118,9 @@ public class ConfigurationItems implements ILoadableObject {
         include_audio_output_in_screen_video = false;
         pinning_mode = false;
         // story_nsp_mode can be "TF" or "MC"
-//        story_nsp_mode = "TF";
-        // nsp_choice_probabilities is an array of probabilities of {"correct", "next", "random", "easiest", "hardest"}
-//        nsp_choice_probabilities = new Double[] {};
+        story_nsp_mode = "TF";
+        // nsp_choice_probabilities is an array of attribute-value pairs ex: [“Correct”: .5, ”Easy”: .25, “Random”: .25]
+        nsp_choice_probabilities = new double[] {0.2, 0.2, 0.2, 0.2, 0.2};
     }
 
     private void setConfigVersion() {

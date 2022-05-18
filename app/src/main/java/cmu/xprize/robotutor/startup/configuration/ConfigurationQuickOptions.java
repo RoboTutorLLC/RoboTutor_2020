@@ -27,7 +27,9 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "roboscreen",
-            false
+            false,
+            "TF",
+            new double[]{0.2, 0.2, 0.2, 0.2, 0.2}
     );
 
     // EN version, and they both have the debugger menu.
@@ -47,6 +49,8 @@ public class ConfigurationQuickOptions {
             false,
             false,
             "roboscreen",
-            false
+            false,
+            "TF",
+            new double[]{0.2, 0.2, 0.2, 0.2, 0.2}
     );
 }
