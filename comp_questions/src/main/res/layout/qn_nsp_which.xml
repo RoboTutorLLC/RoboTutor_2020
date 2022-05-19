@@ -5,60 +5,68 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFF">
 
-    <TextView
-        android:id="@+id/SnspSentence1Text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginRight="60dp"
-        android:text=""
-        android:textColor="#000"
-        android:textSize="30sp"
-        app:layout_widthPercent="100%" />
-
-    <TextView
-        android:id="@+id/SnspSentence2Text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="60dp"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/nspwhich1"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="250dp"
-        android:layout_marginRight="60dp"
-        android:text=""
-        android:textColor="#000"
-        android:textSize="30sp"
-        app:layout_widthPercent="100%" />
+        android:layout_marginRight="30dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/SnspSmiley1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/SnspSentence2Text"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="30dp"
-        android:background="#FFF"
-        android:scaleType="fitCenter"
-        android:src="@drawable/like"
-        app:layout_widthPercent="30%" />
+        <TextView
+            android:id="@+id/SnspSentence1Text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Magezi Mataala Manene moved on, moved on, moved on!"
+            android:textColor="#000"
+            android:textSize="30sp" />
 
-    <ImageButton
-        android:id="@+id/SnspSmiley2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/SnspSentence2Text"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="30dp"
-        android:background="#FFF"
-        android:scaleType="fitCenter"
-        android:src="@drawable/like"
-        app:layout_widthPercent="30%" />
+        <ImageButton
+            android:id="@+id/SnspSmiley1"
+            android:layout_width="wrap_content"
+            android:layout_height="140dp"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:background="#FFF"
+            android:scaleType="fitCenter"
+            android:src="@drawable/like"
+            app:layout_widthPercent="30%" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginRight="30dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_below="@+id/nspwhich1"
+        >
+
+        <TextView
+            android:id="@+id/SnspSentence2Text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Magezi Mataala Manene moved on, moved on, moved on!"
+            android:textColor="#000"
+            android:textSize="30sp" />
+
+        <ImageButton
+            android:id="@+id/SnspSmiley2"
+            android:layout_width="wrap_content"
+            android:layout_height="140dp"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:background="#FFF"
+            android:scaleType="fitCenter"
+            android:src="@drawable/like"
+            app:layout_widthPercent="30%" />
+
+    </LinearLayout>
+
 
 </android.support.percent.PercentRelativeLayout>

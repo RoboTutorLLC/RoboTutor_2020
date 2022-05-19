@@ -228,6 +228,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private int                     NSPSentenceIndex;
 
 
+    private String                  NSPWhichSentence1Text;
+    private String                  NSPWhichSentence2Text;
+    private boolean                 isNSPWhichSentence1Correct;
+    private boolean                 isNSPWhichSentence2Correct;
 
     // json loadable
     // ZZZ where the money gets loaded
@@ -1133,18 +1137,18 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         Log.d(TAG, "setPicMatchView: mImageGrid = null:"+(mImageGrid == null));
     }
 
-    // TODO: ADD THE BUTTONS
     private void setNSPWhichView(ViewGroup vgroup){
         Log.d(TAG, "setNSPWhich: aslkdjfalksdf");
         NSPWhichSentence1 = vgroup.findViewById(R.id.SnspSentence1Text);
         NSPWhichSentence2 = vgroup.findViewById(R.id.SnspSentence2Text);
-        NSPWhichSentence1.setVisibility(View.INVISIBLE);
-        NSPWhichSentence2.setVisibility(View.INVISIBLE);
+        mSmiley1 = vgroup.findViewById(R.id.SnspSmiley1);
+        mSmiley2 = vgroup.findViewById(R.id.SnspSmiley2);
     }
     private void setNSPDoesView(ViewGroup vgroup){
         Log.d(TAG, "setNSPDoes: askfldhklasdf");
         NSPDoesSentence = vgroup.findViewById(R.id.SnspDoesText);
-        NSPDoesSentence.setVisibility(View.INVISIBLE);
+        mSmiley = vgroup.findViewById(R.id.SnspDoesSmiley);
+        mFrownie = vgroup.findViewById(R.id.SnspDoesFrownie);
     }
 
     private static int getRandomNumberInRange(int min, int max) {
@@ -3262,7 +3266,13 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        Random r = new Random();
 //        double value = r.nextDouble() * totalWeight;
 //        nsp_question_type = map.higherEntry(value).getValue();
-        return "correct";
+//        if(nsp_which_mode) {
+//            while (nsp_question_type.equals("correct")) {
+//                value = r.nextDouble() * totalWeight;
+//                nsp_question_type = map.higherEntry(value).getValue();.
+//            }
+//        }
+        return "easiest";
     }
 
 
@@ -3271,47 +3281,124 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void displayNSPWhichQuestion() {
         // Shows the sentences
         // TODO: ANIMATE (put the highlight thing, button with robofinger)
-        if (getRandomNumberInRange(0, 1) == 0) {
-            NSPWhichSentence1.setText(NSPWhichCorrectSentence);
-            NSPWhichSentence1.bringToFront();
-            NSPWhichSentence2.setText(NSPWhichIncorrectSentence);
-            NSPWhichSentence2.bringToFront();
-        } else {
-            NSPWhichSentence1.setText(NSPWhichIncorrectSentence);
-            NSPWhichSentence1.bringToFront();
-            NSPWhichSentence2.setText(NSPWhichCorrectSentence);
-            NSPWhichSentence2.bringToFront();
-        }
+        NSPWhichSentence1.setText(NSPWhichSentence1Text);
+        NSPWhichSentence1.bringToFront();
+        NSPWhichSentence2.setText(NSPWhichSentence2Text);
+        NSPWhichSentence2.bringToFront();
+        showNSPWhichButtons();
 
     }
 
     @Override
     public void setNSPWhichQuestion() {
 
-        if(isNSPWhichPage && nsp_which_mode) {
+        if(isNSPWhichPage) {
+            nsp_question_type = loadConfig();
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            String correct = "", next, easiest, random, hardest ;
 
-            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
-                if (NSPQuestion.choices.get(i).type.equals("correct") && nsp_question_type.equals("correct")) {
-                    correct = NSPQuestion.choices.get(i).text;
-                    NSPWhichCorrectSentence =  NSPQuestion.choices.get(i).text;
-                } if (NSPQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
-                    next = NSPQuestion.choices.get(i).text;
-                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
-                } if (NSPQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
-                    easiest = NSPQuestion.choices.get(i).text;
-                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
-                }if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
-                    random = NSPQuestion.choices.get(i).text;
-                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
-                } if (NSPQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
-                    hardest = NSPQuestion.choices.get(i).text;
-                    NSPWhichIncorrectSentence =  NSPQuestion.choices.get(i).text;
+            for(int i = 0; i < NspQuestion.choices.size(); i++) {
+                if (NspQuestion.choices.get(i).type.equals("correct")) {
+                    NSPWhichCorrectSentence =  NspQuestion.choices.get(i).text;
+                } if (NspQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
+                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+                } if (NspQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
+                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+                }if (NspQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
+                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+                } if (NspQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
+                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+                }
+            }
+
+
+            if (getRandomNumberInRange(0, 1) == 0) {
+                // sentence 1 correct
+                NSPWhichSentence1Text = NSPWhichCorrectSentence;
+                NSPWhichSentence2Text = NSPWhichIncorrectSentence;
+                isNSPWhichSentence1Correct = true;
+                isNSPWhichSentence2Correct = false;
+            } else {
+                // sentence 2 correct
+                NSPWhichSentence1Text = NSPWhichIncorrectSentence;
+                NSPWhichSentence2Text = NSPWhichCorrectSentence;
+                isNSPWhichSentence1Correct = false;
+                isNSPWhichSentence2Correct = true;
+            }
+
+        }
+
+
+    }
+
+    @Override
+    public void setNSPWhichPage() {
+        // intializes
+        int paracount = data[mCurrPage+1].text.length;
+        int numLines = 0;
+        numWordsCurPage = 0;
+        for(int i = 0; i < paracount; i++){
+            int linecount = data[mCurrPage+1].text[i].length;
+            numLines+=linecount;
+            for (int j = 0; j < linecount;j++){
+                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+                for(int k = 0; k < utteranceLen; k++){
+                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
                 }
             }
         }
+
+        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
+                nsp_which_mode = true;
+                updateNSPWhichButtons();
+                break;
+            } else {
+                nsp_which_mode = false;
+            }
+        }
+
+
+
+
+    }
+
+    public void updateNSPWhichButtons() {
+        Log.d(TAG, "updateNSPWhichButtons: ");
+        disableNSPWhichButtons();
+        if (isNSPDoesPage){
+            mSmiley1.setOnTouchListener(new NSPWhichTouchListener(mSmiley1, 0));
+            mSmiley2.setOnTouchListener(new NSPWhichTouchListener(mSmiley2, 1));
+        }
+    }
+
+
+    @Override
+    public void showNSPWhichButtons() {
+        Log.d(TAG, "showNSPWhichButtons: ");
+        setButtonState(mSmiley1, "SHOW");
+        setButtonState(mSmiley2, "SHOW");
+        mSmiley1.setVisibility(View.VISIBLE);
+        mSmiley2.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNSPWhichButtons() {
+        Log.d(TAG, "hideNSPWhichButtons: ");
+        setButtonState(mSmiley1, "DISABLE");
+        setButtonState(mSmiley2, "DISABLE");
+        mSmiley1.setVisibility(View.INVISIBLE);
+        mSmiley2.setVisibility(View.INVISIBLE);
+
+    }
+
+    @Override
+    public void enableNSPWhichButtons() {
+
+    }
+
+    @Override
+    public void disableNSPWhichButtons() {
 
     }
 
@@ -3321,8 +3408,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         NSPDoesSentence.setText(NSPDoesSentenceText);
         NSPDoesSentence.bringToFront();
         showNSPDoesButtons();
-
-
     }
 
     @Override
@@ -3332,17 +3417,19 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
             for(int i = 0; i < NSPQuestion.choices.size(); i++) {
-                if (NSPQuestion.choices.get(i).type.equals("correct") && nsp_question_type.equals("correct")) {
+                if (NSPQuestion.choices.get(i).type.equals("correct")) {
                     NSPDoesCorrect = NSPQuestion.choices.get(i).text;
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
+                    if (nsp_question_type.equals("correct")) {
+                        NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                        NSPSentenceIndex = NSPQuestion.choices.get(i).index;
+                    }
                 } if (NSPQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
                     NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
                     NSPSentenceIndex = NSPQuestion.choices.get(i).index;
                 } if (NSPQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
                     NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
                     NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                }if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
+                } if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
                     NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
                     NSPSentenceIndex = NSPQuestion.choices.get(i).index;
                 } if (NSPQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
@@ -3371,23 +3458,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
-    @Override
-    public void setNSPWhichPage() {
-        // intializes
-        if (nsp_which_mode){
-            int paracount = data[mCurrPage+1].text.length;
-
-
-        }
-
-
-
-
-    }
 
     @Override
     public void setNSPDoesPage() {
-
         int paracount = data[mCurrPage+1].text.length;
         int numLines = 0;
         numWordsCurPage = 0;
@@ -3481,34 +3554,33 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+    // TODO: Merge the playNSPSentence Methods
     @Override
-    public void showNSPWhichButtons() {
-        Log.d(TAG, "showNSPWhichButtons: ");
-        setButtonState(mSmiley1, "SHOW");
-        setButtonState(mSmiley2, "SHOW");
-        mSmiley1.setVisibility(View.VISIBLE);
-        mSmiley2.setVisibility(View.VISIBLE);
+    public void playNSPWhichSentence() {
+        //segmentNdx = 0;
+        //trackNarration(true);
+        String filename = currUtterance.audio.toLowerCase();
+        if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
+            filename = filename.substring(0,filename.length()-4);
+        }
+
+        // Publish the current utterance within sentence
+        //
+        mParent.publishValue(TCONST.RTC_VAR_UTTERANCE,  filename);
+        // NOTE: Due to inconsistencies in the segmentation data, you cannot depend on it
+        // having precise timing information.  As a result the segment may timeout before the
+        // audio has completed. To avoid this we use oncomplete in type_audio to push an
+        // TRACK_SEGMENT back to this components queue.
+        // Tell the script to speak the new uttereance
+        //
+        Log.d(TAG, "playNSPSentence: curutterance = "+currUtterance);
+        mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+
+        postDelayedTracker();
+
+
     }
 
-    @Override
-    public void hideNSPWhichButtons() {
-        Log.d(TAG, "hideNSPWhichButtons: ");
-        setButtonState(mSmiley1, "DISABLE");
-        setButtonState(mSmiley2, "DISABLE");
-        mSmiley1.setVisibility(View.INVISIBLE);
-        mSmiley2.setVisibility(View.INVISIBLE);
-
-    }
-
-    @Override
-    public void enableNSPWhichButtons() {
-
-    }
-
-    @Override
-    public void disableNSPWhichButtons() {
-
-    }
 
 
     @Override
@@ -3562,50 +3634,57 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     mParent.updateImageAlpha(_imageButton, (float) 0.5);
-                    _imageButton.setImageResource(R.drawable.like_clicked);
+                    if (mSmiley == _imageButton) {
+                        _imageButton.setImageResource(R.drawable.like_clicked);
+                    } else if (mFrownie == _imageButton){
+                        _imageButton.setImageResource(R.drawable.dislike_clicked);
+                    }
                     break;
                 case MotionEvent.ACTION_CANCEL:
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
                     break;
                 case MotionEvent.ACTION_UP:
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
-                    _imageButton.setImageResource(R.drawable.like);
+                    if (mSmiley == _imageButton) {
+                        _imageButton.setImageResource(R.drawable.like_clicked);
+                    } else if (mFrownie == _imageButton){
+                        _imageButton.setImageResource(R.drawable.dislike_clicked);
+                    }
                     disableNSPDoesButtons();
                     // truly next
-                    if(isNSPDoesTrulyNext && _index == 0) {
+                    if(isNSPDoesTrulyNext && (_imageButton == mSmiley)) {
                         // correct
                         mParent.publishFeature("NSP_DOES_TRULY_CORRECT");
                         mParent.retractFeature("NSP_DOES_TRULY_WRONG");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
-                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "TF"); // edit this
+                        mParent.logNSPPerformance(true, NSPDoesCorrect, NSPSentenceIndex, "TF"); // edit this
                         isNSPDoesPage = false;
                         hasQuestion();
-                    } else if (isNSPDoesTrulyNext && _index == 1) {
+                    } else if (isNSPDoesTrulyNext && (_imageButton == mFrownie)) {
                         // incorrect
                         mParent.publishFeature("NSP_DOES_TRULY_WRONG");
                         mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
-                        mParent.logNSPPerformance(false,  NSPWhichCorrectSentence,NSPSentenceIndex, "TF");
+                        mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
                     }
                     // distractor
-                    else if(isNSPDoesDistractor && _index == 1) {
+                    else if((isNSPDoesDistractor && (_imageButton == mFrownie)) || (isNSPDoesDistractor && NSPDoesCorrect.equals(NSPDoesDistractor) && (_imageButton == mSmiley))) {
                         // correct
                         mParent.publishFeature("NSP_DOES_DISTRACTOR_CORRECT");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
                         mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
                         mParent.retractFeature("NSP_DOES_TRULY_WRONG");
-                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "TF");
+                        mParent.logNSPPerformance(true, NSPDoesCorrect, NSPSentenceIndex, "TF");
                         isNSPDoesPage = false;
                         hasQuestion();
-                    } else if (isNSPDoesDistractor && _index == 0) {
+                    } else if (isNSPDoesDistractor && (_imageButton == mSmiley)) {
                         mParent.publishFeature("NSP_DOES_DISTRACTOR_WRONG");
                         mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
                         mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
                         mParent.retractFeature("NSP_DOES_TRULY_WRONG");
-                        mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "TF");
-
+                        mParent.logNSPPerformance(false, NSPDoesCorrect, NSPSentenceIndex, "TF");
                     }
 
                     mParent.nextNode();
@@ -3658,5 +3737,106 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         NSPDoesSentence.setTextColor(Color.GREEN);
         NSPDoesSentence.setText(NSPDoesCorrect);
 
+    }
+
+    private class NSPWhichTouchListener implements OnTouchListener {
+        ImageButton _imageButton;
+        int _index;
+
+        NSPWhichTouchListener(ImageButton imageButton, int index) {
+            this._imageButton = imageButton;
+            this._index = index;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mParent.updateImageAlpha(_imageButton, (float) 0.5);
+                    _imageButton.setImageResource(R.drawable.like_clicked);
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    _imageButton.setImageResource(R.drawable.like);
+                    disableNSPWhichButtons();
+                    if(isNSPWhichSentence1Correct && (_imageButton == mSmiley1)) {
+                        mParent.publishFeature("NSP_WHICH_SENTENCE1_CORRECT"); // calls NSPWhichSentence1Corrrect()
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
+                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        isNSPWhichPage = false;
+//                        NSPWhichSentence1Correct();
+                        hasQuestion();
+                    } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley2)) {
+                        mParent.publishFeature("NSP_WHICH_SENTENCE2_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
+                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC"); // edit this
+                        isNSPWhichPage = false;
+                        hasQuestion();
+                    } else if (isNSPWhichSentence1Correct && (_imageButton == mSmiley2)) {
+                        mParent.publishFeature("NSP_WHICH_SENTENCE2_WRONG");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
+                        mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+
+                    } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley1)) {
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
+                        mParent.publishFeature("NSP_WHICH_SENTENCE1_WRONG");
+                        mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                    }
+
+
+                    mParent.nextNode();
+                    break;
+            }
+            return true;
+        }
+    }
+
+    private void NSPWhichSentence1Correct() {
+        NSPWhichSentence1.setTextColor(Color.GREEN);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        mParent.fadeOutTextView(NSPWhichSentence2);
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPWhichSentence2Correct() {
+        NSPWhichSentence2.setTextColor(Color.GREEN);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        mParent.fadeOutTextView(NSPWhichSentence1);
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPWhichSentence1Incorrect() {
+        mSmiley1.setImageResource(R.drawable.like_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mSmiley1.startAnimation(anim);
+
+        mParent.fadeOutTextView(NSPWhichSentence1);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        // TODO: Add sliding up animation on NSPWhichSentence2
+    }
+
+    private void NSPWhichSentence2Incorrect() {
+        mSmiley2.setImageResource(R.drawable.like_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mSmiley2.startAnimation(anim);
+
+        mParent.fadeOutTextView(NSPWhichSentence2);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        // TODO: Add sliding up animation on NSPWhichSentence1
     }
 }

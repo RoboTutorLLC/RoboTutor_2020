@@ -194,6 +194,8 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
     public void playNSPDoesSentence();
 
+    public void playNSPWhichSentence();
+
 
 
 }

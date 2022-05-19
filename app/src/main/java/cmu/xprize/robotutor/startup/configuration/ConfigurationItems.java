@@ -119,7 +119,8 @@ public class ConfigurationItems implements ILoadableObject {
         pinning_mode = false;
         // story_nsp_mode can be "TF" or "MC"
         story_nsp_mode = "TF";
-        // nsp_choice_probabilities is an array of attribute-value pairs ex: [“Correct”: .5, ”Easy”: .25, “Random”: .25]
+        // nsp_choice_probabilities is an array of attribute-value pairs ex:
+        // If story_nsp_mode is MC, "Correct" is set to 0
         nsp_choice_probabilities = new double[] {0.2, 0.2, 0.2, 0.2, 0.2};
     }
 
