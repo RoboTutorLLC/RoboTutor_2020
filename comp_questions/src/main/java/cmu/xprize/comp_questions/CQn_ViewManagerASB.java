@@ -443,6 +443,72 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         }
     }
 
+    @Override
+    public void setNSPWhichPage() {
+        // intializes
+        int paracount = data[mCurrPage+1].text.length;
+        int numLines = 0;
+        numWordsCurPage = 0;
+        for(int i = 0; i < paracount; i++){
+            int linecount = data[mCurrPage+1].text[i].length;
+            numLines+=linecount;
+            for (int j = 0; j < linecount;j++){
+                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+                for(int k = 0; k < utteranceLen; k++){
+                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+                }
+            }
+        }
+
+        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
+                nsp_which_mode = true;
+                updateNSPWhichButtons();
+                break;
+            } else {
+                nsp_which_mode = false;
+            }
+        }
+
+
+
+
+    }
+
+    @Override
+    public void setNSPDoesPage() {
+        int paracount = data[mCurrPage+1].text.length;
+        int numLines = 0;
+        numWordsCurPage = 0;
+        for(int i = 0; i < paracount; i++){
+            int linecount = data[mCurrPage+1].text[i].length;
+            numLines+=linecount;
+            for (int j = 0; j < linecount;j++){
+                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+                for(int k = 0; k < utteranceLen; k++){
+                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+                }
+
+            }
+        }
+
+
+
+        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
+                nsp_does_mode = true;
+                updateNSPDoesButtons();
+                break;
+            } else {
+                nsp_does_mode = false;
+            }
+        }
+
+
+    }
+
+
+
     /**
      *  NOTE: we reset mCurrWord - last parm in seekToStoryPosition
      *
@@ -1076,7 +1142,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             disableImageButtons();
         }
         if(nsp_which_mode) {
-            showNSPWhichButtons();
+            updateNSPWhichButtons();
         } else {
             hideNSPWhichButtons();
             disableNSPWhichButtons();
@@ -2268,12 +2334,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 } else {
                     incLine(TCONST.INCR);
                 }
-            } if(nsp_which_mode || nsp_does_mode) {
-                if(this.isNSPDoesPage || this.isNSPWhichPage) {
-                    incNSPLine(TCONST.INCR);
-                } else {
-                    incLine(TCONST.INCR);
-                }
+            } else if(nsp_which_mode || nsp_does_mode) {
+                incLine(TCONST.INCR);
             }
 
             else {
@@ -2328,22 +2390,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             // Update the state vars
             //
             seekToClozeStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
-        }
-    }
-
-    private void incNSPLine(int incr) {
-//        Log.d("ULANI", "incLine: ");
-        // reset boot flag to
-        //
-        if (storyBooting) {
-
-            storyBooting = false;
-            speakOrListen();
-        } else {
-            mCurrLine += incr;
-            // Update the state vars
-            //
-            seekToNSPStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
         }
     }
 
@@ -2609,6 +2655,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         }
     }
 
+
+    // MADEL HERE
     /**
      * Finds the last sentence of the current page, which will be used as a cloze question
      */
@@ -3331,37 +3379,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
-    @Override
-    public void setNSPWhichPage() {
-        // intializes
-        int paracount = data[mCurrPage+1].text.length;
-        int numLines = 0;
-        numWordsCurPage = 0;
-        for(int i = 0; i < paracount; i++){
-            int linecount = data[mCurrPage+1].text[i].length;
-            numLines+=linecount;
-            for (int j = 0; j < linecount;j++){
-                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-                for(int k = 0; k < utteranceLen; k++){
-                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-                }
-            }
-        }
 
-        for (int i = 0; i < NspQuestion.choices.size(); i++) {
-            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
-                nsp_which_mode = true;
-                updateNSPWhichButtons();
-                break;
-            } else {
-                nsp_which_mode = false;
-            }
-        }
-
-
-
-
-    }
 
     public void updateNSPWhichButtons() {
         Log.d(TAG, "updateNSPWhichButtons: ");
@@ -3457,40 +3475,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
     }
-
-
-    @Override
-    public void setNSPDoesPage() {
-        int paracount = data[mCurrPage+1].text.length;
-        int numLines = 0;
-        numWordsCurPage = 0;
-        for(int i = 0; i < paracount; i++){
-            int linecount = data[mCurrPage+1].text[i].length;
-            numLines+=linecount;
-            for (int j = 0; j < linecount;j++){
-                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-                for(int k = 0; k < utteranceLen; k++){
-                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-                }
-
-            }
-        }
-
-
-
-        for (int i = 0; i < NspQuestion.choices.size(); i++) {
-            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
-                nsp_does_mode = true;
-                updateNSPDoesButtons();
-                break;
-            } else {
-                nsp_does_mode = false;
-            }
-        }
-
-
-    }
-
 
     @Override
     public void hasNSPDistractor() {

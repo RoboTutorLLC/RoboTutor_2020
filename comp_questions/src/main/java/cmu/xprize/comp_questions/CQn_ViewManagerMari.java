@@ -809,6 +809,11 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     }
 
+    @Override
+    public void playNSPWhichSentence() {
+
+    }
+
 
 }
 
