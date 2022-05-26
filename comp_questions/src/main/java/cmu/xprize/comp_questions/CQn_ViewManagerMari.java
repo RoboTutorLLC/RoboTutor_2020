@@ -718,10 +718,6 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
         return false;
     }
 
-    @Override
-    public void NSPQuestions() {
-
-    }
 
     @Override
     public void displayNSPWhichQuestion() {
@@ -770,6 +766,11 @@ public class CQn_ViewManagerMari implements ICQn_ViewManager, ILoadableObject {
 
     @Override
     public void hideNSPDoesButtons() {
+
+    }
+
+    @Override
+    public void enableNSPDoesButtons() {
 
     }
 

@@ -207,6 +207,14 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         mViewManager.setClozeQuestion();
     }
 
+    public void setNSPDoesQuestion() {
+        mViewManager.setNSPDoesQuestion();
+    }
+
+    public void setNSPWhichQuestion() {
+        mViewManager.setNSPWhichQuestion();
+    }
+
     public void genericQuestions() {
         mViewManager.genericQuestions();
     }
@@ -225,6 +233,14 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
 
     public void setClozePage() {
         mViewManager.setClozePage();
+    }
+
+    public void setNSPWhichPage() {
+        mViewManager.setNSPWhichPage();
+    }
+
+    public void setNSPDoesPage() {
+        mViewManager.setNSPDoesPage();
     }
 
     public void displayPictureMatching() { mViewManager.displayPictureMatching(); }
@@ -641,9 +657,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         mViewManager.hideImageButtons();
     }
 
-    public void enableClozeButtons(){
-        mViewManager.enableClozeButtons();
-    }
+    public void enableClozeButtons(){ mViewManager.enableClozeButtons();    }
 
     public void disableClozeButtons(){
         mViewManager.disableClozeButtons();
@@ -661,6 +675,24 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         mViewManager.hideClozeButtons();
     }
 
+    public void resetNSPDoesButtons(){mViewManager.resetNSPDoesButtons();}
+
+    public void showNSPDoesButtons(){mViewManager.showNSPDoesButtons();}
+
+    public void enableNSPDoesButtons(){mViewManager.enableNSPDoesButtons();}
+
+    public void disableNSPDoesButtons(){mViewManager.disableNSPDoesButtons();}
+
+    public void resetNSPWhichButtons(){mViewManager.resetNSPWhichButtons();}
+
+    public void showNSPWhichButtons(){mViewManager.showNSPWhichButtons();}
+
+    public void hideNSPWhichButtons(){mViewManager.hideNSPWhichButtons();}
+
+    public void enableNSPWhichButtons(){mViewManager.enableNSPWhichButtons();}
+
+    public void disableNSPWhichButtons(){mViewManager.disableNSPWhichButtons();}
+
     public void showClozeWordInBlank() { mViewManager.showClozeWordInBlank(); }
 
     public void hideClozeWordInBlank() {mViewManager.hideClozeWordInBlank(); }
@@ -672,10 +704,20 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     public void undoHighlightClozeWord() { mViewManager.undoHighlightClozeWord(); }
 
     public void playClozeSentence() { mViewManager.playClozeSentence(); }
+
+    public void playNSPDoesSentence() {
+        mViewManager.playNSPDoesSentence();
+    }
+
+    public void playNSPWhichSentence() {
+        mViewManager.playNSPWhichSentence();
+    }
+
+
+    public void hideNSPDoesButtons(){mViewManager.hideClozeButtons();}
     // Tutor methods  End
     //************************************************************************
     //************************************************************************
-
 
 
     protected boolean isCorrect() {
@@ -847,14 +889,17 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
 
     }
 
+    // Override...
+    public void logNSPPerformance(boolean correct, String correctSentence, int index, String type) {
+    }
+
+
     @Override
     public void triggerIntervention(String type) {
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
     }
 
-    public void logNSPPerformance(boolean correct, String correctSentence, int index, String type) {
-    }
 
     // IEventListener  -- End
     //************************************************************************

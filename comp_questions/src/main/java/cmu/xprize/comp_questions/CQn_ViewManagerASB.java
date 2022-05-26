@@ -2655,8 +2655,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         }
     }
 
-
-    // MADEL HERE
     /**
      * Finds the last sentence of the current page, which will be used as a cloze question
      */
@@ -3287,10 +3285,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public boolean isNSPWhichMode() { return nsp_which_mode;}
 
 
-    @Override
-    public void NSPQuestions() {
-
-    }
 
     public String loadConfig(){
 //        Configuration c = new Configuration();
@@ -3412,12 +3406,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void enableNSPWhichButtons() {
-
+        setButtonState(mSmiley1, "ENABLE");
+        setButtonState(mSmiley2, "ENABLE");
     }
 
     @Override
     public void disableNSPWhichButtons() {
-
+        setButtonState(mSmiley1, "DISABLE");
+        setButtonState(mSmiley2, "DISABLE");
     }
 
 
@@ -3497,6 +3493,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void resetNSPDoesButtons() {
+        mSmiley.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley, (float) 1.0);
+        mFrownie.setImageResource(R.drawable.dislike);
+        mParent.updateImageAlpha(mSmiley, (float) 1.0);
 
     }
 
@@ -3529,14 +3529,25 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
     @Override
-    public void disableNSPDoesButtons() {
+    public void enableNSPDoesButtons() {
+        setButtonState(mSmiley, "ENABLE");
+        setButtonState(mFrownie, "ENABLE");
+    }
 
+    @Override
+    public void disableNSPDoesButtons() {
+        setButtonState(mSmiley, "DISABLE");
+        setButtonState(mFrownie, "DISABLE");
     }
 
     @Override
     public void resetNSPWhichButtons() {
-
+        mSmiley1.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley1, (float) 1.0);
+        mSmiley2.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley2, (float) 1.0);
     }
+
 
     // TODO: Merge the playNSPSentence Methods
     @Override
