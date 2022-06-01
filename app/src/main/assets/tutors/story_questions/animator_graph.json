@@ -428,66 +428,16 @@
           "mapname": "LISTENING",
           "preexit": [],
           "edges": [
-            {"constraint":"NSP_DOES_TRULY_CORRECT", "edge":"NSP_DOES_SMILEY_TRULY"},
-            {"constraint":"NSP_DOES_TRULY_INCORRECT", "edge":"NSP_DOES_FROWNIE_TRULY"},
-            {"constraint":"NSP_DOES_DISTRACTOR_CORRECT", "edge":"NSP_DOES_FROWNIE_DISTRACTOR"},
-            {"constraint":"NSP_DOES_DISTRACTOR_INCORRECT", "edge":"NSP_DOES_SMILEY_DISTRACTOR"}
-          ]
-        },
-        "NSP_DOES_SMILEY_TRULY": {
-          "COMMENT": "When user inputs a correct answer...",
-          "type": "NODE",
-          "maptype": "moduleMap",
-          "mapname": "PLAYDOESTRULYCORRECT",
-          "preenter": [],
-          "preexit": [], // reset and hide buttons implemented in java componenet
-          "edges": [
-            //{"constraint": "TEST_CLZ_MODE_SIMPLE", "edge": "NSP_DOES_PAGE_NODE"},
-            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+            {"constraint":"NSP_DOES_CORRECT", "edge":"NSP_DOES_GOOD"},
+            {"constraint":"NSP_DOES_WRONG", "edge":"NSP_DOES_BAD"},
+            {"constraint":" ", "edge":"AWAIT_NSP_DOES_RESPONSE"}
           ]
         },
 
 
-        "NSP_DOES_FROWNIE_TRULY": {
-          "COMMENT": "When user inputs a correct answer...",
-          "type": "NODE",
-          "maptype": "moduleMap",
-          "mapname": "PLAYDOESTRULYINCORRECT",
-          "preenter": [],
-          "preexit": [], // reset and hide buttons implemented in java componenet
-          "edges": [
-            //{"constraint": "TEST_CLZ_MODE_SIMPLE", "edge": "NSP_DOES_PAGE_NODE"},
-            {"constraint": "", "edge": "AWAIT_NSP_DOES_RESPONSE"}
-          ]
-        },
 
-        "NSP_DOES_SMILEY_DISTRACTOR": {
-          "COMMENT": "When user inputs a correct answer...",
-          "type": "NODE",
-          "maptype": "moduleMap",
-          "mapname": "PLAYDOESDISTRACTORINCORRECT",
-          "preenter": [],
-          "preexit": [], // reset and hide buttons implemented in java componenet
-          "edges": [
-            //{"constraint": "TEST_CLZ_MODE_SIMPLE", "edge": "NSP_DOES_PAGE_NODE"},
-            {"constraint": "", "edge": "AWAIT_NSP_DOES_RESPONSE"}
-          ]
 
-        },
 
-        "NSP_DOES_FROWNIE_DISTRACTOR": {
-          "COMMENT": "When user inputs a correct answer...",
-          "type": "NODE",
-          "maptype": "moduleMap",
-          "mapname": "PLAYDOESDISTRACTORCORRECT",
-          "preenter": [],
-          "preexit": [], // reset and hide buttons implemented in java componenet
-          "edges": [
-            //{"constraint": "TEST_CLZ_MODE_SIMPLE", "edge": "NSP_DOES_PAGE_NODE"},
-            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
-          ]
-
-        },
 
         "AWAIT_NSP_WHICH_RESPONSE": {
           "COMMENT": "Need to verify with Madelein",
@@ -550,7 +500,17 @@
           ]
         },
 
-
+        "NSP_DOES_GOOD": {
+          "COMMENT": "When user inputs a correct answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPDOESCORRECT",
+          "preenter": [],
+          "preexit": ["RESET_IMAGE_BUTTONS", "HIDE_PM_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+          ]
+        },
 
         "PICMATCH_GOOD": {
           "COMMENT": "When user inputs a correct answer...",
@@ -563,6 +523,7 @@
             {"constraint": "", "edge": "NEXT_PAGE_NODE"}
           ]
         },
+
         "PICMATCH_BAD": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "NODE",
@@ -574,6 +535,19 @@
             {"constraint": "", "edge": "AWAIT_PICMATCH_RESPONSE"}
           ]
         },
+
+        "NSP_DOES_BAD": {
+          "COMMENT": "When user inputs a correct answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPDOESWRONG",
+          "preenter": [],
+          "preexit": ["RESET_IMAGE_BUTTONS", "ENABLE_PM_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "AWAIT_NSP_DOES_RESPONSE"}
+          ]
+        },
+
         "CLOZE_GOOD": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "NODE",
@@ -706,7 +680,7 @@
         "DISPLAY_NSP_DOES_QUESTION": {
           "type": "MODULE",
           "reuse": true,
-          "COMMENT": "uhq",
+          "COMMENT": "TODO : HIGHLIGHTING AND SPEAKING SIMULTANEOUSLY",
           "tracks": [
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#DISPLAY_NSP_DOES_QUESTION:String", "features": ""},
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayNSPDoesQuestion", "parms": "" , "features": ""},
@@ -781,6 +755,15 @@
           ]
         },
 
+        "PLAYNSPDOESCORRECT": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TBD",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYCLOZECORRECT:String", "features": ""}
+          ]
+        },
+
         "PLAYNSP_WHICH_SMILEY1_SENTENCE1": {
           "type": "MODULE",
           "reuse": true,
@@ -826,41 +809,6 @@
           ]
         },
 
-        "PLAYDOESTRULYINCORRECT": {
-          "type": "MODULE",
-          "reuse": true,
-          "COMMENT": "TBD",
-          "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYDOESTRULYINCORRECT:String", "features": ""},
-            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/not quite.mp3", "mode": "flow", "features": ""},
-            {"type": "COMMAND", "id": "SstoryQuestions", "method": "NSPDoesTrulyIncorrect", "parms": "" , "features": ""}
-
-          ]
-        },
-
-        "PLAYDOESDISTRACTORINCORRECT": {
-          "type": "MODULE",
-          "reuse": true,
-          "COMMENT": "TBD",
-          "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYDOESDISTRACTORINCORRECT:String", "features": ""},
-            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/not quite.mp3", "mode": "flow", "features": ""},
-            {"type": "COMMAND", "id": "SstoryQuestions", "method": "NSPDoesDistractorIncorrect", "parms": "" , "features": ""}
-
-          ]
-        },
-        "PLAYDOESDISTRACTORCORRECT": {
-          "type": "MODULE",
-          "reuse": true,
-          "COMMENT": "TBD",
-          "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYDOESDISTRACTORCORRECT:String", "features": ""},
-            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/play whoosh.mp3", "mode": "flow", "features": ""},
-            {"type": "COMMAND", "id": "SstoryQuestions", "method": "NSPDoesDistractorCorrect", "parms": "" , "features": ""}
-
-          ]
-        },
-
         "SHOWCLOZEWORD": {
           "type": "MODULE",
           "reuse": true,
@@ -902,18 +850,6 @@
           ]
         },
 
-
-        "PLAYDOESTRULYCORRECT": {
-          "type": "MODULE",
-          "reuse": true,
-          "COMMENT": "TBD",
-          "tracks": [
-            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYDOESTRULYCORRECT:String", "features": ""},
-            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/play whoosh.mp3", "mode": "flow", "features": ""},
-            {"type": "COMMAND", "id": "SstoryQuestions", "method": "NSPDoesTrulyCorrect", "parms": "" , "features": ""}
-
-          ]
-        },
 
         "PLAYCLOZESENTENCE": {
           "type": "MODULE",
@@ -1174,6 +1110,9 @@
         "RESET_IMAGE_BUTTONS":{"type": "COMMAND", "id": "SstoryQuestions", "method": "resetImageButtons", "parms": "" , "features": ""},
         "SET_PICTURE_MATCH": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPictureMatch", "parms": "" , "features": ""},
         "SET_CLOZE_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setClozePage", "parms": "" , "features": ""},
+        "SET_NSP_DOES_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setNSPDoesPage", "parms": "" , "features": ""},
+        "SET_NSP_WHICH_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setNSPWhichPage", "parms": "" , "features": ""},
+
         "ENABLE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableImageButtons", "parms": "" , "features": ""},
         "DISABLE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableImageButtons", "parms": "" , "features": ""},
         "HIDE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hideImageButtons", "parms": "" , "features": ""},
@@ -1209,34 +1148,34 @@
         //        },
         "TEST_NSP_DOES_MODE": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showNSPDoesMode}}=='FALSE') ({{SstoryQuestions.showNSPWhichMode}}=='FALSE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.pmState}}=='FALSE') && ({{SstoryQuestions.qnState}}=='FALSE') && ({{SstoryQuestions.clzState}}=='FALSE') && ({{SstoryQuestions.whichState}}=='FALSE' && ({{SstoryQuestions.doesState}}=='TRUE'))" ,
+          "If": "{{SstoryQuestions.doesState}}=='TRUE'" ,
           "Then": "true",
           "Else": "false"
         },
 
         "TEST_NSP_WHICH_MODE": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showNSPDoesMode}}=='FALSE') ({{SstoryQuestions.showNSPWhichMode}}=='FALSE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.pmState}}=='FALSE') && ({{SstoryQuestions.qnState}}=='FALSE') && ({{SstoryQuestions.clzState}}=='FALSE') && ({{SstoryQuestions.whichState}}=='TRUE' && ({{SstoryQuestions.doesState}}=='FALSE'))" ,
+          "If": " {{SstoryQuestions.whichState}}=='TRUE'" ,
           "Then": "true",
           "Else": "false"
         },
 
         "TEST_SHOW_NSP_DOES_MODE": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showNSPDoesMode}}=='TRUE') ({{SstoryQuestions.showNSPWhichMode}}=='FALSE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST')" ,
+          "If": "({{SstoryQuestions.showNSPDoesMode}}=='TRUE')" ,
           "Then": "true",
           "Else": "false"
         },
         "TEST_SHOW_NSP_WHICH_MODE": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showNSPDoesMode}}=='FALSE') ({{SstoryQuestions.showNSPWhichMode}}=='TRUE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST')" ,
+          "If": "{{SstoryQuestions.showNSPWhichMode}}=='TRUE')" ,
           "Then": "true",
           "Else": "false"
         },
 
         "SECOND_ERROR": {
           "type": "CONDITION",
-          "If": "{{SstoryQuestions.attempt}}==2",
+          "If": "{{SstoryQuestions.attempts}}==2",
           "Then": "true",
           "Else": "false"
         },
@@ -1341,9 +1280,17 @@
           "type": "CONDITION",
           "test": "PICMATCH_CORRECT"
         },
+        "NSP_DOES_CORRECT": {
+          "type": "CONDITION",
+          "test": "NSP_DOES_CORRECT"
+        },
         "PICMATCH_WRONG": {
           "type": "CONDITION",
           "test": "PICMATCH_WRONG"
+        },
+        "NSP_DOES_WRONG": {
+          "type": "CONDITION",
+          "test": "NSP_DOES_WRONG"
         },
         "NSP_WHICH_S1_CORRECT": {
           "type": "CONDITION",
@@ -1371,33 +1318,6 @@
           "Else": "false"
         },
 
-        "NSP_DOES_TRULY_CORRECT": {
-          "type": "CONDITION",
-          "If": "({{SstoryQuestions.isNSPDoesTrulyNext }}=='TRUE') && ({{SstoryQuestions.SMILEY }}=='TRUE')",
-          "Then": "true",
-          "Else": "false"
-          //"test": "(isNSPDoesTrulyNext & SMILEY)"
-        },
-        "NSP_DOES_TRULY_INCORRECT": {
-          "type": "CONDITION",
-          "If": "({{SstoryQuestions.isNSPDoesTrulyNext }}=='False') && ({{SstoryQuestions.SMILEY }}=='FALSE')",
-          "Then": "true",
-          "Else": "false"
-        },
-
-        "NSP_DOES_DISTRACTOR_CORRECT": {
-          "type": "CONDITION",
-          "If": "({{SstoryQuestions.isNSPDoesDistractorNext }}=='TRUE') && ({{SstoryQuestions.SMILEY }}=='FALSE')",
-          "Then": "true",
-          "Else": "false"
-        },
-
-        "NSP_DOES_DISTRACTOR_INCORRECT": {
-          "type": "CONDITION",
-          "If": "({{SstoryQuestions.isNSPDoesDistractorNext }}=='False') && ({{SstoryQuestions.SMILEY }}=='TRUE')",
-          "Then": "true",
-          "Else": "false"
-        },
 
         "TEST_SHOW_CLZ": {
           "type": "CONDITION",
