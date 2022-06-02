@@ -62,14 +62,14 @@ import static cmu.xprize.comp_questions.QN_CONST.FTR_PLAY_GEN;
 import static cmu.xprize.comp_questions.QN_CONST.GEN_QUESTION_CHANCE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_CLZSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_LINESTATE;
-import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPSTATE;
+//import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PARASTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PMSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_QNSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_WORDSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_CLOZE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_PICMATCH;
-import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP;
+//import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP;
 import static cmu.xprize.util.TCONST.FTR_USER_READ;
 import static cmu.xprize.util.TCONST.FTR_USER_READING;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
@@ -284,6 +284,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean isNSPDoesTrulyNext;
 
 
+    protected int NSPAttemptCount = 0;
 
     /**
      *
@@ -368,22 +369,22 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
         }else if (mParent.testFeature(TCONST.FTR_GEN)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
         } else if (mParent.testFeature(TCONST.FTR_PIC)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
-            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
         } else if (mParent.testFeature(TCONST.FTR_NSP)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.TRUE);
+//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.TRUE);
         }
 
 
@@ -445,23 +446,23 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPWhichPage() {
-        // intializes
-        int paracount = data[mCurrPage+1].text.length;
-        int numLines = 0;
-        numWordsCurPage = 0;
-        for(int i = 0; i < paracount; i++){
-            int linecount = data[mCurrPage+1].text[i].length;
-            numLines+=linecount;
-            for (int j = 0; j < linecount;j++){
-                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-                for(int k = 0; k < utteranceLen; k++){
-                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-                }
-            }
-        }
+//        // intializes
+//        int paracount = data[mCurrPage+1].text.length;
+//        int numLines = 0;
+//        numWordsCurPage = 0;
+//        for(int i = 0; i < paracount; i++){
+//            int linecount = data[mCurrPage+1].text[i].length;
+//            numLines+=linecount;
+//            for (int j = 0; j < linecount;j++){
+//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+//                for(int k = 0; k < utteranceLen; k++){
+//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+//                }
+//            }
+//        }
 
         for (int i = 0; i < NspQuestion.choices.size(); i++) {
-            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
+            if (mPageCount == NspQuestion.choices.get(i).index) {
                 nsp_which_mode = true;
                 updateNSPWhichButtons();
                 break;
@@ -477,25 +478,26 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPDoesPage() {
-        int paracount = data[mCurrPage+1].text.length;
-        int numLines = 0;
-        numWordsCurPage = 0;
-        for(int i = 0; i < paracount; i++){
-            int linecount = data[mCurrPage+1].text[i].length;
-            numLines+=linecount;
-            for (int j = 0; j < linecount;j++){
-                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-                for(int k = 0; k < utteranceLen; k++){
-                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-                }
+//        int paracount = data[mCurrPage+1].text.length;
+//        int numLines = 0;
+//        numWordsCurPage = 0;
+//        for(int i = 0; i < paracount; i++){
+//            int linecount = data[mCurrPage+1].text[i].length;
+//            numLines+=linecount;
+//            for (int j = 0; j < linecount;j++){
+//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+//                for(int k = 0; k < utteranceLen; k++){
+//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+//                }
+//
+//            }
+//        }
 
-            }
-        }
 
-
+        // SHOW the sentence
 
         for (int i = 0; i < NspQuestion.choices.size(); i++) {
-            if (mCurrLineInStory == NspQuestion.choices.get(i).index) {
+            if (mPageCount == NspQuestion.choices.get(i).index) {
                 nsp_does_mode = true;
                 updateNSPDoesButtons();
                 break;
@@ -929,6 +931,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 case MotionEvent.ACTION_UP:
                     mParent.updateViewAlpha(_imageView, (float) 1.0);
                     disableImageButtons();
+
                     if (picmatch_answer == _index){
                         mParent.updateViewColor(_frame, Color.GREEN);
                         mParent.publishFeature(TCONST.PICMATCH_CORRECT);
@@ -2912,11 +2915,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             if (isClozePage && mCurrPara >= mParaCount-1){
                 mParent.publishValue(SHOW_CLOZE, TCONST.TRUE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             } else {
                 mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             }
         }
     }
@@ -2933,7 +2936,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         if (picture_match_mode && mCurrPara >= mParaCount-1 && mCurrPage % 2 == 1) {
             mParent.publishValue(SHOW_PICMATCH, TCONST.TRUE);
             mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
-            mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+//            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
         }
 //        } else {
 //            mParent.publishValue(TCONST.SHOW_PICMATCH, TCONST.FALSE);
@@ -2941,6 +2944,29 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        }
     }
 
+
+    @Override
+    public void hasNSPDistractor() {
+        // load config.json
+        // Do the probabilities - set whichNext or isNext
+        // check current page whether there is an nsp question
+        // publishValue SHOW_NSP_DOES, SHOW_NSP_WHICH
+        if (mCurrPage <= mPageCount-1) {
+            for (int i = 0; i < NspQuestion.choices.size(); i++) {
+                if(NspQuestion.choices.get(i).index == mCurrLine && (isNSPDoesPage || isNSPWhichPage)) {
+                    mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+                    mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+//                    mParent.publishValue(SHOW_NSP, TCONST.TRUE);
+                    break;
+                }
+                else {
+//                    mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+                }
+            }
+
+        }
+
+    }
 
 
     /**
@@ -3421,7 +3447,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void displayNSPDoesQuestion() {
         NSPDoesSentence.setText(NSPDoesSentenceText);
         NSPDoesSentence.bringToFront();
-        showNSPDoesButtons();
     }
 
     @Override
@@ -3472,26 +3497,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
-    @Override
-    public void hasNSPDistractor() {
-        if (mCurrPage <= mPageCount-1) {
-            for (int i = 0; i < NspQuestion.choices.size(); i++) {
-                if(NspQuestion.choices.get(i).index == mCurrLine && (isNSPDoesPage || isNSPWhichPage)) {
-                    mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
-                    mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-                    mParent.publishValue(SHOW_NSP, TCONST.TRUE);
-                    break;
-                }
-                else {
-                    mParent.publishValue(SHOW_NSP, TCONST.FALSE);
-                }
-            }
-
-        }
-
-    }
-
-    @Override
     public void resetNSPDoesButtons() {
         mSmiley.setImageResource(R.drawable.like);
         mParent.updateImageAlpha(mSmiley, (float) 1.0);
@@ -3628,9 +3633,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    mParent.updateImageAlpha(_imageButton, (float) 0.5);
+                    mParent.updateImageAlpha(_imageButton, (float) 0.5); // remove this
                     if (mSmiley == _imageButton) {
-                        _imageButton.setImageResource(R.drawable.like_clicked);
+                        _imageButton.setImageResource(R.drawable.like_clicked); // set the size to smaller
                     } else if (mFrownie == _imageButton){
                         _imageButton.setImageResource(R.drawable.dislike_clicked);
                     }
@@ -3639,6 +3644,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
                     break;
                 case MotionEvent.ACTION_UP:
+                    NSPAttemptCount = NSPAttemptCount + 1;
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
                     if (mSmiley == _imageButton) {
                         _imageButton.setImageResource(R.drawable.like_clicked);
@@ -3648,21 +3654,34 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                     disableNSPDoesButtons();
                     // truly next
                     if(isNSPDoesTrulyNext && (_imageButton == mSmiley)) {
-                        // correct
-                        mParent.publishFeature("NSP_DOES_TRULY_CORRECT");
-                        mParent.retractFeature("NSP_DOES_TRULY_WRONG");
-                        mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
-                        mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
+                        NSPDoesTrulyCorrect();
+                        mParent.publishFeature("NSP_DOES_CORRECT");
+                        mParent.retractFeature("NSP_DOES_WRONG1");
+                        mParent.retractFeature("NSP_DOES_WRONG2");
+                        mParent.retractFeature("NSP_DOES_HESITATE1");
+                        mParent.retractFeature("NSP_DOES_HESITATE2");
                         mParent.logNSPPerformance(true, NSPDoesCorrect, NSPSentenceIndex, "TF"); // edit this
                         isNSPDoesPage = false;
                         hasQuestion();
                     } else if (isNSPDoesTrulyNext && (_imageButton == mFrownie)) {
                         // incorrect
-                        mParent.publishFeature("NSP_DOES_TRULY_WRONG");
-                        mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
-                        mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
-                        mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
-                        mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
+                        if (NSPAttemptCount == 1) {
+                            // TODO: add animation
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.publishFeature("NSP_DOES_WRONG1");
+                            mParent.retractFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+
+                        } else {
+                            NSPDoesTrulyIncorrect();
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.retractFeature("NSP_DOES_WRONG1");
+                            mParent.publishFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+                            mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
+                        }
                     }
                     // distractor
                     else if((isNSPDoesDistractor && (_imageButton == mFrownie)) || (isNSPDoesDistractor && NSPDoesCorrect.equals(NSPDoesDistractor) && (_imageButton == mSmiley))) {
@@ -3675,11 +3694,23 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                         isNSPDoesPage = false;
                         hasQuestion();
                     } else if (isNSPDoesDistractor && (_imageButton == mSmiley)) {
-                        mParent.publishFeature("NSP_DOES_DISTRACTOR_WRONG");
-                        mParent.retractFeature("NSP_DOES_DISTRACTOR_CORRECT");
-                        mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
-                        mParent.retractFeature("NSP_DOES_TRULY_WRONG");
-                        mParent.logNSPPerformance(false, NSPDoesCorrect, NSPSentenceIndex, "TF");
+                        if (NSPAttemptCount == 1) {
+                            // TODO: add animation
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.publishFeature("NSP_DOES_WRONG1");
+                            mParent.retractFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+
+                        } else {
+                            NSPDoesDistractorIncorrect();
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.retractFeature("NSP_DOES_WRONG1");
+                            mParent.publishFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+                            mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
+                        }
                     }
 
                     mParent.nextNode();
@@ -3754,42 +3785,70 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
                     break;
                 case MotionEvent.ACTION_UP:
+                    NSPAttemptCount = NSPAttemptCount + 1;
                     mParent.updateImageAlpha(_imageButton, (float) 1.0);
                     _imageButton.setImageResource(R.drawable.like);
                     disableNSPWhichButtons();
-                    if(isNSPWhichSentence1Correct && (_imageButton == mSmiley1)) {
-                        mParent.publishFeature("NSP_WHICH_SENTENCE1_CORRECT"); // calls NSPWhichSentence1Corrrect()
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
+                    if (isNSPWhichSentence1Correct && (_imageButton == mSmiley1)) {
+                        // do the animation stuff
+                        NSPWhichSentence1Correct();
+                        mParent.publishFeature("NSP_WHICH_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_WRONG1");
+                        mParent.retractFeature("NSP_WHICH_WRONG2");
+                        mParent.retractFeature("NSP_WHICH_HESITATE1");
+                        mParent.retractFeature("NSP_WHICH_HESITATE2");
                         mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
                         isNSPWhichPage = false;
-//                        NSPWhichSentence1Correct();
                         hasQuestion();
                     } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley2)) {
-                        mParent.publishFeature("NSP_WHICH_SENTENCE2_CORRECT");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
+                        NSPWhichSentence2Correct();
+                        mParent.publishFeature("NSP_WHICH_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_WRONG1");
+                        mParent.retractFeature("NSP_WHICH_WRONG2");
+                        mParent.retractFeature("NSP_WHICH_HESITATE1");
+                        mParent.retractFeature("NSP_WHICH_HESITATE2");
                         mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC"); // edit this
                         isNSPWhichPage = false;
                         hasQuestion();
+
                     } else if (isNSPWhichSentence1Correct && (_imageButton == mSmiley2)) {
-                        mParent.publishFeature("NSP_WHICH_SENTENCE2_WRONG");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_WRONG");
-                        mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+
+                        if (NSPAttemptCount == 1) {
+                            // add incorrect first time function
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.publishFeature("NSP_WHICH_WRONG1");
+                            mParent.retractFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+
+                        } else {
+                            NSPWhichSentence2Incorrect();
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.retractFeature("NSP_WHICH_WRONG1");
+                            mParent.publishFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                            mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        }
 
                     } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley1)) {
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_WRONG");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE2_CORRECT");
-                        mParent.retractFeature("NSP_WHICH_SENTENCE1_CORRECT");
-                        mParent.publishFeature("NSP_WHICH_SENTENCE1_WRONG");
-                        mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        if (NSPAttemptCount == 1) {
+                            // add incorrect first time
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.publishFeature("NSP_WHICH_WRONG1");
+                            mParent.retractFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                        } else {
+                            NSPWhichSentence1Incorrect();
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.retractFeature("NSP_WHICH_WRONG1");
+                            mParent.publishFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                            mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        }
                     }
-
-
                     mParent.nextNode();
                     break;
             }
