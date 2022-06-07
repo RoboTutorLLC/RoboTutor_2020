@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
@@ -265,10 +266,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         // Set fullscreen and then get the screen metrics
         //
         setFullScreen();
-        // if we are recording whole session start recording here
-        if(Configuration.getRecordingSessionOrActivity(getApplicationContext())=="session") {
-            startRecordingScreen();
-        }
+
         // get the multiplier used for drawables at the current screen density and calc the
         // correction rescale factor for design scale
         // This initializes the static object
@@ -296,7 +294,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         masterContainer.addAndShow(progressView);
 
         // testCrashHandler();
-
+        // if we are recording whole session start recording here
+        String session_or_activity=Configuration.getRecordingSessionOrActivity(getApplicationContext());
+        Log.i("ConfigurationItems", "Inside App, session or activity flag is:"+session_or_activity);
+        if(Objects.equals(session_or_activity, "session")) {
+            startRecordingScreen();
+        }
+        //startRecordingScreen();
 
 
     }
@@ -590,7 +594,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         Log.d("hbrecorder","Screen Dimensions are "+width +" * "+ height);
 
         hbRecorder.setAudioBitrate(audio_bitrate);
-        hbRecorder.setAudioSamplingRate(16000);
+        hbRecorder.setAudioSamplingRate(audio_sampling_rate);
         hbRecorder.recordHDVideo(false);
         hbRecorder.isAudioEnabled(true);
         hbRecorder.setScreenDimensions(height,width);

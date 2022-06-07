@@ -147,7 +147,7 @@ public class Configuration {
 
     public static String getRecordingSessionOrActivity(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getString(ConfigurationItems.RECORD_SESSION_OR_ACTIVITY,"activity");
+                .getString(ConfigurationItems.RECORD_SESSION_OR_ACTIVITY, "activity");
     }
     /**
      * logs all the config items.

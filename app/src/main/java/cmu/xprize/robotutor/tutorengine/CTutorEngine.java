@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CLogManager;
@@ -535,7 +536,7 @@ public class CTutorEngine implements ILoadableObject2 {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static public void launch(String intentType, String tutorVariant, String dataSource, String tutorId, String matrix) {
-
+        Log.d(TAG, "launch: tutorId=" + tutorId);
         // start recording when launching a menu screen
         // end recording when entering the menu
         Activity temp_act = getActivity();
@@ -543,29 +544,40 @@ public class CTutorEngine implements ILoadableObject2 {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
         Log.i(TAG, "launch: the screen recording launcher will begin now");
+
+
+
         // if activity wise recording is selected start recording
-        if(Configuration.getRecordingSessionOrActivity(act.getApplicationContext())=="activity"){
+        String session_or_activity=Configuration.getRecordingSessionOrActivity(act.getApplicationContext());
+        Log.i("ConfigurationItems", "Inside CTutorEngine, session or activity flag is:"+session_or_activity);
+        if(session_or_activity.equals("activity")) {
             act.startRecordingScreen();
+            // If activity is of type .read, .echo, .parrot, .reveal we need to stop recording audio
+            if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                act.hbRecorder.isAudioEnabled(false);
+            }
         }
+
         // if whole session recording is selected, resume recording
         else {
-//        if (JSON_Helper.shouldRecord(jsonData)) {
-//            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
-//            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
+
             if (Activity.hbRecorder.isRecordingPaused()) {
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     Activity.hbRecorder.resumeScreenRecording();
+                    // If activity is of type .read, .echo, .parrot, .reveal we need to pause recording audio
+                    if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
+                        act.hbRecorder.isAudioEnabled(false);
+
+                    }
                 }
             }
         }
-//            if (JSON_Helper.shouldIncludeAudio(jsonData))
-//                act.startRecording(baseDirectory, true, tutorId);
-//            else
-//                act.startRecording(baseDirectory, false, tutorId);
 
 
 
-        Log.d(TAG, "launch: tutorId=" + tutorId);
+
 
         Intent extIntent = new Intent();
         String extPackage;

@@ -48,12 +48,12 @@ public class ConfigurationItems implements ILoadableObject {
     public boolean record_audio;
     public String menu_type;
     public boolean record_screen_video;
-    public Integer record_pixels_wide;
-    public Integer record_pixels_high;
-    public Integer record_fps;
+    public int record_pixels_wide;
+    public int record_pixels_high;
+    public int record_fps;
     public String record_session_or_activity;
-    public Integer record_audio_bitrate;
-    public Integer record_audio_sampling_rate;
+    public int record_audio_bitrate;
+    public int record_audio_sampling_rate;
     public boolean show_helper_button;
     public String baseDirectory;
     public boolean include_audio_output_in_screen_video;
@@ -71,6 +71,7 @@ public class ConfigurationItems implements ILoadableObject {
             */
             Log.i(TAG, new JSONObject(jsonData).toString(4));
             this.setConfigVersion();
+            Log.i(TAG, this.record_session_or_activity);
         } catch (Exception e) {
             Log.e(TAG, "Invalid Data Source for : " + dataPath, e);
             setDefaults();

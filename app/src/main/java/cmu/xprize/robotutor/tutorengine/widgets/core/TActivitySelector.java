@@ -241,8 +241,12 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
             roboTutor_act.hbRecorder.stopScreenRecording();
         }
-        // if recording session wise pause recording after 5 seconds on menu to save space
+        // goes in else if recording session wise
         else {
+            // restart audio if it was paused earlier
+            Log.d("CTutorEngine", "Restarted audio recording if it was paused");
+            roboTutor_act.hbRecorder.isAudioEnabled(true);
+             //pause recording after 1 second on menu to save space
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -251,7 +255,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
                         roboTutor_act.hbRecorder.pauseScreenRecording();
                     }
 
-                }, 5000);
+                }, 1000);
             }
         }
 
