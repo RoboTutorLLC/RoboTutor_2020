@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CLogManager;
@@ -81,7 +82,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
     private CMediaManager                   mMediaManager;
 
-    public static IStudentDataModel studentModel;
+    public static IStudentDataModel         studentModel;
     public static TransitionMatrixModel     matrix;
     public static PromotionMechanism        promotionMechanism;
     public enum MenuType {STUDENT_CHOICE, CYCLE_CONTENT};
@@ -535,7 +536,7 @@ public class CTutorEngine implements ILoadableObject2 {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static public void launch(String intentType, String tutorVariant, String dataSource, String tutorId, String matrix) {
-
+        Log.d(TAG, "launch: tutorId=" + tutorId);
         // start recording when launching a menu screen
         // end recording when entering the menu
         Activity temp_act = getActivity();
@@ -543,23 +544,47 @@ public class CTutorEngine implements ILoadableObject2 {
         String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
         Log.i(TAG, "launch: the screen recording launcher will begin now");
-        if (JSON_Helper.shouldRecord(jsonData)) {
-            String baseDirectory = JSON_Helper.baseDirectory(jsonData);
-            Log.d(TAG, "launching the activity: "+act.getLocalClassName());
-            if (JSON_Helper.shouldIncludeAudio(jsonData))
-                act.startRecording(baseDirectory, true, tutorId);
-            else
-                act.startRecording(baseDirectory, false, tutorId);
+
+
+
+        // if activity wise recording is selected start recording
+        String session_or_activity=Configuration.getRecordingSessionOrActivity(act.getApplicationContext());
+        Log.i("ConfigurationItems", "Inside CTutorEngine, session or activity flag is:"+session_or_activity);
+        if(session_or_activity.equals("activity")) {
+            act.startRecordingScreen();
+            // If activity is of type .read, .echo, .parrot, .reveal we need to stop recording audio
+            if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                act.hbRecorder.isAudioEnabled(false);
+            }
+        }
+
+        // if whole session recording is selected, resume recording
+        else {
+
+            if (Activity.hbRecorder.isRecordingPaused()) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Activity.hbRecorder.resumeScreenRecording();
+                    // If activity is of type .read, .echo, .parrot, .reveal we need to pause recording audio
+                    if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
+                        act.hbRecorder.isAudioEnabled(false);
+
+                    }
+                }
+            }
         }
 
 
-        Log.d(TAG, "launch: tutorId=" + tutorId);
+
+
 
         Intent extIntent = new Intent();
         String extPackage;
 
         defvar_tutor  tutorDescriptor = tutorVariants.get(tutorVariant);
         defdata_tutor tutorBinding    = bindingPatterns.get(tutorDescriptor.tutorName);
+        Log.d(TAG,tutorDescriptor.tutorName);
 
         // Initialize the tutorBinding from the dataSource spec - this transfers the
         // datasource fields to the prototype tutorVariant bindingPattern which is then

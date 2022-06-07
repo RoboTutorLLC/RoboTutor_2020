@@ -14,7 +14,6 @@
 package cmu.xprize.comp_clickmask;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,16 +22,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -42,7 +38,6 @@ import cmu.xprize.util.CAnimatorUtil;
 import cmu.xprize.util.CDisplayMetrics;
 import cmu.xprize.util.TCONST;
 
-import static android.view.View.GONE;
 import static cmu.xprize.comp_clickmask.CM_CONST.*;
 
 

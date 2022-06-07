@@ -19,16 +19,7 @@
 package cmu.xprize.nl_component;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import cmu.xprize.fw_component.CStimRespBase;
 import cmu.xprize.util.IEvent;

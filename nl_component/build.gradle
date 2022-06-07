@@ -31,7 +31,7 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     api project(':util')
     api project(':comp_listener')
     api project(':fw_component')

@@ -2,9 +2,8 @@ package cmu.xprize.comp_debug;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Build;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;

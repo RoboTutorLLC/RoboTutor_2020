@@ -1,7 +1,7 @@
 package cmu.xprize.comp_counting;
 
 import android.content.Context;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;

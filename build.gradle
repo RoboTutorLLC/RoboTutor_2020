@@ -20,13 +20,14 @@ allprojects {
         jcenter()
         maven { url 'https://jitpack.io' }
         mavenCentral()
+        google()
     }
 
     // Global variables common to all modules
     // see: http://tools.android.com/tech-docs/new-build-system/tips
     //
     ext {
-        rtCompileSdkVersion=26          //Integer
+        rtCompileSdkVersion=29          //Integer
         rtBuildToolsVersion="26.0.1"    //String
 
         rtMinSdkVersion=19

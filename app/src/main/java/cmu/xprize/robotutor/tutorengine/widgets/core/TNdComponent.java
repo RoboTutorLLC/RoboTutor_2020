@@ -1,7 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import cmu.xprize.comp_intervention.CInterventionTimes;

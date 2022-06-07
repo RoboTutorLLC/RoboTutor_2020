@@ -11,7 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="contentDescription"
@@ -23,7 +23,7 @@
 
 
     <!-- Guidelines -->
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_vertical_0"
@@ -31,7 +31,7 @@
         app:layout_constraintGuide_percent="0.0"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_vertical_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -47,7 +47,7 @@
         android:background="@android:color/darker_gray"
         android:visibility="gone"/>
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_vertical_2"
@@ -55,7 +55,7 @@
         app:layout_constraintGuide_percent="0.70"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_vertical_3"
@@ -63,7 +63,7 @@
         app:layout_constraintGuide_percent="0.9"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_vertical_4"
@@ -72,7 +72,7 @@
         />
 
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_top_of_carry"
@@ -80,7 +80,7 @@
         app:layout_constraintGuide_percent="0.05"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_bottom_of_carry"
@@ -88,7 +88,7 @@
         app:layout_constraintGuide_percent="0.16"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_top_of_top"
@@ -96,7 +96,7 @@
         app:layout_constraintGuide_percent="0.21"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_bottom_of_top"
@@ -104,7 +104,7 @@
         app:layout_constraintGuide_percent="0.37"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_top_of_mid"
@@ -112,21 +112,21 @@
         app:layout_constraintGuide_percent="0.42"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_bottom_of_mid"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.58" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_top_of_bottom"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.63" />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_bottom_of_bottom"
@@ -134,7 +134,7 @@
         app:layout_constraintGuide_percent="0.92"
         />
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/guideline_horizontal_4"
@@ -1085,4 +1085,4 @@
         />
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

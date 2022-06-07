@@ -1,7 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.util;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +30,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void uncaughtException(Thread t, Throwable e) {
-        activity.endRecording();
+        //activity.endRecording();
+        activity.hbRecorder.stopScreenRecording();
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString()+"\n\n";
         report += "--------- Stack trace ---------\n\n";

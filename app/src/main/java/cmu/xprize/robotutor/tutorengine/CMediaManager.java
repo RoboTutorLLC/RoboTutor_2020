@@ -21,13 +21,10 @@ package cmu.xprize.robotutor.tutorengine;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.MediaPlayer;
-import android.os.Handler;
-import android.support.annotation.IntegerRes;
+
+import androidx.annotation.IntegerRes;
 import android.util.Log;
 
-import com.nanchen.screenrecordhelper.ScreenRecordHelper;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;

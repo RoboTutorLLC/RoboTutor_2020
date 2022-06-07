@@ -2,7 +2,7 @@ package cmu.xprize.robotutor.tutorengine.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

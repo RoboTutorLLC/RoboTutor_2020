@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -38,7 +38,6 @@ import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TimerMaster;
 import cmu.xprize.util.gesture.ExpectTapGestureListener;
 
-import static cmu.xprize.util.FailureInterventionHelper.Tutor.SPELL;
 import static cmu.xprize.util.TCONST.AUDIO_EVENT;
 import static cmu.xprize.util.TCONST.FTR_EOD;
 import static cmu.xprize.util.TCONST.GESTURE_TIME_SPELL;

@@ -29,18 +29,16 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.CountDownTimer;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.RemoteViews;
 
 import java.util.Locale;
 
-import cmu.xprize.comp_counting2.R;
 import cmu.xprize.ltkplus.CGlyph;
 import cmu.xprize.ltkplus.CRecResult;
 import cmu.xprize.ltkplus.CRecognizerPlus;

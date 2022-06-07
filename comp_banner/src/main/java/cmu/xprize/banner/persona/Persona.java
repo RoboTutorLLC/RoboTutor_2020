@@ -27,7 +27,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;

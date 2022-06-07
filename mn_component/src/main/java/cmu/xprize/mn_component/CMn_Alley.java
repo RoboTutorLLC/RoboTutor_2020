@@ -21,12 +21,9 @@ package cmu.xprize.mn_component;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,7 +33,7 @@ import cmu.xprize.util.View_Helper;
 
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
 
-public class CMn_Alley extends android.support.percent.PercentRelativeLayout {
+public class CMn_Alley extends androidx.percentlayout.widget.PercentRelativeLayout {
 
     private IValueListener    _owner;
     private boolean           _isMissingNumber;
