@@ -36,6 +36,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -46,9 +48,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.NavigableMap;
 import java.util.Random;
-import java.util.TreeMap;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -68,6 +68,8 @@ import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PMSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_QNSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_WORDSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_CLOZE;
+import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP_DOES;
+import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP_WHICH;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_PICMATCH;
 //import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP;
 import static cmu.xprize.util.TCONST.FTR_USER_READ;
@@ -222,7 +224,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean                 hasEasiest              = false;
     private boolean                 hasHardest              = false;
 
-    private String                  nsp_question_type;
+    private String                  nsp_question_type; // question type from config.json (easiest, next, hardest)
+    private String                  nsp_question_mode; // mode type from config.json (MC or TF)
     private String                  NSPDoesDistractor;
     private String                  NSPDoesCorrect;
     private int                     NSPSentenceIndex;
@@ -476,8 +479,33 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+    // Creates an NSP Does page, called by SET_NSP_DOES_PAGE
+    // Assigns the sentence to be shown on the screen
     @Override
     public void setNSPDoesPage() {
+        if(nsp_does_mode && isNSPDoesPage) {
+            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
+                if (NSPQuestion.choices.get(i).type.equals("correct")) {
+                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals(nsp_question_type)) {
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
+                }
+            }
+
+            if (getRandomNumberInRange(0, 1) == 0) {
+                // show distractor
+                NSPDoesSentenceText = NSPDoesDistractor;
+                isNSPDoesDistractor = true;
+                isNSPDoesTrulyNext = false;
+            } else {
+                // show truly next
+                NSPDoesSentenceText = NSPDoesCorrect;
+                isNSPDoesDistractor = false;
+                isNSPDoesTrulyNext = true;
+            }
+        }
+
 //        int paracount = data[mCurrPage+1].text.length;
 //        int numLines = 0;
 //        numWordsCurPage = 0;
@@ -494,7 +522,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        }
 
 
-        // SHOW the sentence
+        // SHOW the buttons on the screen
 
         for (int i = 0; i < NspQuestion.choices.size(); i++) {
             if (mPageCount == NspQuestion.choices.get(i).index) {
@@ -1151,7 +1179,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             disableNSPWhichButtons();
         }
         if(nsp_does_mode) {
-            showNSPDoesButtons();
+            updateNSPDoesButtons();
         } else {
             hideNSPDoesButtons();
             disableNSPDoesButtons();
@@ -2951,20 +2979,35 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         // Do the probabilities - set whichNext or isNext
         // check current page whether there is an nsp question
         // publishValue SHOW_NSP_DOES, SHOW_NSP_WHICH
+        // TODO: WHERE IS isNSPDoesPage/isNSPWhichPage set??? temporarily not in the condition
+        loadConfig();
         if (mCurrPage <= mPageCount-1) {
-            for (int i = 0; i < NspQuestion.choices.size(); i++) {
-                if(NspQuestion.choices.get(i).index == mCurrLine && (isNSPDoesPage || isNSPWhichPage)) {
-                    mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
-                    mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-//                    mParent.publishValue(SHOW_NSP, TCONST.TRUE);
-                    break;
-                }
-                else {
-//                    mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+            for (int i = 0; i < NspQuestions.length; i++) {
+                NspQuestion = NspQuestions[i];
+                for (int j = 0; j < NspQuestion.choices.size(); j++) {
+                    NSPSentenceIndex = NspQuestion.choices.get(j).index;
+                    String type = NspQuestion.choices.get(j).type;
+                    if (type.equals(nsp_question_type) && mCurrPage == NSPSentenceIndex) {
+                        mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+                        mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+                        if (nsp_question_mode.equals("TF")) {
+                            isNSPDoesPage = true;
+                            mParent.publishValue(SHOW_NSP_DOES, TCONST.TRUE);
+                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.FALSE);
+                        } else if (nsp_question_mode.equals("MC")) {
+                            isNSPWhichPage = true;
+                            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
+                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.TRUE);
+                        } else {
+                            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
+                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.FALSE);
+                        }
+                    }
                 }
             }
 
         }
+
 
     }
 
@@ -3313,6 +3356,20 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
     public String loadConfig(){
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+        try {
+            JSONObject obj = new JSONObject(jsonData);
+            JSONArray nsp_choice_probabilities = obj.getJSONArray("NSP_choice_probabilities");
+
+            JSONArray nsp_mode_probabilities = obj.getJSONArray("NSP_question_type_probabilities");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+//        JSONParser jsonParser = new JSONParser();
+
 //        Configuration c = new Configuration();
 //        String nsp_mode = c.getStoryNSPMode();
 //        if(nsp_mode.equals("TF")) {
@@ -3447,51 +3504,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void displayNSPDoesQuestion() {
         NSPDoesSentence.setText(NSPDoesSentenceText);
         NSPDoesSentence.bringToFront();
+        // highlight and say aloud
+
     }
 
     @Override
     public void setNSPDoesQuestion() {
-        if(isNSPDoesPage) {
-            nsp_question_type = loadConfig();
-            int numLinesCurPage = data[mCurrPage].text.length;
-            this.NspQuestion = NspQuestions[numLinesCurPage-1];
-            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
-                if (NSPQuestion.choices.get(i).type.equals("correct")) {
-                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
-                    if (nsp_question_type.equals("correct")) {
-                        NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                        NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                    }
-                } if (NSPQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                } if (NSPQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                } if (NSPQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                } if (NSPQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-                }
-            }
-
-
-            if (getRandomNumberInRange(0, 1) == 0) {
-                // show distractor
-                NSPDoesSentenceText = NSPDoesDistractor;
-                isNSPDoesDistractor = true;
-                isNSPDoesTrulyNext = false;
-            } else {
-                // show truly next
-                NSPDoesSentenceText = NSPDoesCorrect;
-                isNSPDoesDistractor = false;
-                isNSPDoesTrulyNext = true;
-            }
-
-
-        }
 
 
 
@@ -3630,6 +3648,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
+
 
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
