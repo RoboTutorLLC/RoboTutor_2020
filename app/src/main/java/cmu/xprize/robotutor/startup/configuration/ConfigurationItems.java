@@ -134,7 +134,7 @@ public class ConfigurationItems implements ILoadableObject {
         include_audio_output_in_screen_video = false;
         pinning_mode = false;
         record_fps = 30;
-        record_audio_sampling_rate = 16100;
+        record_audio_sampling_rate = 16000;
         record_audio_bitrate = 16000;
         record_pixels_wide = 480;
         record_pixels_high = 854;
