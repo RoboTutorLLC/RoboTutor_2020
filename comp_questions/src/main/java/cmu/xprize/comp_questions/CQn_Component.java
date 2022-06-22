@@ -107,6 +107,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     private Animation slide_bottom_up;
     private Animation slide_top_down;
     private Animation fade_out;
+    private Animation slideQuestion;
 
 
     // json loadable
@@ -149,6 +150,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         slide_top_down       = AnimationUtils.loadAnimation(mContext, R.anim.slide_top_down);
         slide_bottom_up      = AnimationUtils.loadAnimation(mContext, R.anim.slide_bottom_up);
         fade_out              = AnimationUtils.loadAnimation(mContext, R.anim.fade_out);
+        slideQuestion = AnimationUtils.loadAnimation(mContext, R.anim.slide_question_bottom_to_top);
 
         _bManager = LocalBroadcastManager.getInstance(getContext());
     }
@@ -314,6 +316,13 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
                 setInAnimation(slide_left_to_right);
         }
         setDisplayedChild(index);
+    }
+
+    public void animateQuestionSlide(){
+        if(_scrollVertical)
+            setInAnimation(slideQuestion);
+        else
+            setInAnimation(slideQuestion);
     }
 
     public void fadeOutView(View v){
