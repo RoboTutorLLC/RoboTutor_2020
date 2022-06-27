@@ -665,7 +665,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
                     logManager.postEvent_V(TAG, "INFO:Tutor Assets installed");
                 }
 
-                if(!tutorAssetManager.fileCheck(TCONST.LTK_PROJECT_ASSETS)) {
+                if(!tutorAssetManager.fileCheck(TCONST.LTK_PROJECT_ASSETS) ||
+                        tutorAssetManager.fileIsStale(TCONST.LTK_PROJEXCTS, TCONST.LTK_PROJECT_ASSETS)) {
                     tutorAssetManager.installAssets(TCONST.LTK_PROJEXCTS);
                     logManager.postEvent_V(TAG, "INFO:LTK Projects installed");
 
@@ -676,7 +677,8 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
                     logManager.postEvent_V(TAG, "INFO:LTK Projects extracted");
                 }
 
-                if(!tutorAssetManager.fileCheck(TCONST.LTK_GLYPH_ASSETS)) {
+                if(!tutorAssetManager.fileCheck(TCONST.LTK_GLYPH_ASSETS) ||
+                tutorAssetManager.fileIsStale(TCONST.LTK_GLYPHS, TCONST.LTK_GLYPH_ASSETS)) {
                     tutorAssetManager.installAssets(TCONST.LTK_GLYPHS);
                     logManager.postEvent_V(TAG, "INFO:LTK Glyphs installed");
 

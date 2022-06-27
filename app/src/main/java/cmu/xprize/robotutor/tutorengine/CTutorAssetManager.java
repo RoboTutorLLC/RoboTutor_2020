@@ -30,6 +30,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -130,6 +134,35 @@ public class CTutorAssetManager {
         File projects = new File(RoboTutor.APP_PRIVATE_FILES + "/" + path);
 
         return projects.exists();
+    }
+
+    public boolean fileIsStale(String downloadedAsset, String unzippedAsset) {
+        try {
+            String path_downloaded = RoboTutor.APP_PRIVATE_FILES + "/" + downloadedAsset;
+            String path_unzipped = RoboTutor.APP_PRIVATE_FILES + "/" + unzippedAsset;
+
+            File file_downloaded = new File(path_downloaded);
+            File file_unzipped = new File(path_unzipped);
+
+            BasicFileAttributes attr_downloaded = Files.readAttributes(Paths.get(file_downloaded.getPath()), BasicFileAttributes.class);
+            BasicFileAttributes attr_unzipped = Files.readAttributes(Paths.get(file_unzipped.getPath()), BasicFileAttributes.class);
+
+            FileTime time_downloaded = attr_downloaded.creationTime();
+            FileTime time_unzipped = attr_unzipped.creationTime();
+
+            Log.d(TAG, "fileIsNotStale: downloadTime = " + time_downloaded + " unzip time = " + time_unzipped);
+
+            if (time_downloaded.compareTo(time_unzipped) > 0) {
+                // time_downloaded - time_unzipped > 0
+                // file is stale
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
     }
 
 
