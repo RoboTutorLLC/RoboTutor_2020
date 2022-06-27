@@ -238,26 +238,28 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         final RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
         Log.d(TAG, roboTutor_act.getClass().getSimpleName());
         // if recording activity wise stop recording
-        if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
-            roboTutor_act.hbRecorder.stopScreenRecording();
-        }
-        // goes in else if recording session wise
-        else {
-            // restart audio if it was paused earlier
-            Log.d("CTutorEngine", "Restarted audio recording if it was paused");
-            roboTutor_act.hbRecorder.isAudioEnabled(true);
-             //pause recording after 1 second on menu to save space
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
 
-                        roboTutor_act.hbRecorder.pauseScreenRecording();
-                    }
+//        if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
+//            roboTutor_act.hbRecorder.stopScreenRecording();
+//        }
+//        // goes in else if recording session wise
+//        else {
+//            // restart audio if it was paused earlier
+//            Log.d("CTutorEngine", "Restarted audio recording if it was paused");
+//            roboTutor_act.hbRecorder.isAudioEnabled(true);
+//             //pause recording after 20 seconds on menu to save space
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                Handler handler = new Handler();
+//                handler.postDelayed(new Runnable() {
+//                    public void run() {
+//                        Log.d("CTutorEngine","Pausing Screen Recording since inactivity on menu screen");
+//                        roboTutor_act.hbRecorder.pauseScreenRecording();
+//                    }
+//
+//                }, 20000);
+//            }
+//        }
 
-                }, 1000);
-            }
-        }
 
         //roboTutor_act.endRecording();
     }

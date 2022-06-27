@@ -23,6 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+
+import android.os.Handler;
+
 import android.os.PowerManager;
 import androidx.annotation.RequiresApi;
 import android.util.Log;
@@ -342,6 +345,14 @@ public class CTutorEngine implements ILoadableObject2 {
 
             Log.d(TAG, "Killing Tutor: " + deadTutor.getTutorName());
 
+            if(deadTutor.getTutorName()=="activity_selector" &&
+                    Configuration.getRecordingSessionOrActivity(Activity.getApplicationContext())=="session") {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Activity.hbRecorder.resumeScreenRecording();
+
+                }
+            }
+
             RoboTutor.masterContainer.removeView(deadTutor.getTutorContainer());
             deadTutor.post(TCONST.KILLTUTOR);
         }
@@ -354,8 +365,62 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param tutorName
      * @param features
      */
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static private void createAndLaunchTutor(String tutorName, String features, String tutorId, defdata_tutor dataSource, String matrix) {
         killActiveTutor();
+        if (tutorName!=null) {
+            if (Configuration.getRecordingSessionOrActivity(Activity.getApplicationContext()).equals("session")) {
+                Log.d("CTutorEngine", "CreateAndLaunchTutor: Session mode");
+                if (tutorName.equals("activity_selector")) {
+                    //Log.d("CTutorEngine", "CreateAndLaunchTutor: Activity Selector so pause here after 15 sec");
+                    Log.d("CTutorEngine", "Restarted audio recording if it was paused");
+                    Activity.hbRecorder.isAudioEnabled(true);
+
+                    //pause recording after 20 seconds on menu to save space
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                // if even after 20 seconds active tutor is activity_selector
+                                if (activeTutor!=null && activeTutor.getTutorName().equals("activity_selector")) {
+                                    Log.d("CTutorEngine", "Pausing Screen Recording since inactivity on menu screen");
+                                    Activity.hbRecorder.pauseScreenRecording();
+                                }
+                            }
+
+                        }, 20000);
+                    }
+                } else {
+                    Log.d("CTutorEngine", "Resuming Screen Recording since a lesson is selected");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Activity.hbRecorder.resumeScreenRecording();
+                    }
+                    if (tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
+                        Activity.hbRecorder.isAudioEnabled(false);
+
+                    }
+                }
+
+            } else {
+                // recording activity wise
+                if (tutorName == "activity_selector") {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Activity.hbRecorder.stopScreenRecording();
+                    }
+                } else {
+                    if (tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
+                        Activity.hbRecorder.isAudioEnabled(false);
+
+                    }
+                    Activity.startRecordingScreen();
+                }
+
+            }
+        }
 
         // GRAY_SCREEN_BUG
         Log.d(TAG, "createAndLaunchTutor: " + tutorName + ", " + tutorId);
@@ -548,32 +613,34 @@ public class CTutorEngine implements ILoadableObject2 {
 
 
         // if activity wise recording is selected start recording
-        String session_or_activity=Configuration.getRecordingSessionOrActivity(act.getApplicationContext());
-        Log.i("ConfigurationItems", "Inside CTutorEngine, session or activity flag is:"+session_or_activity);
-        if(session_or_activity.equals("activity")) {
-            act.startRecordingScreen();
-            // If activity is of type .read, .echo, .parrot, .reveal we need to stop recording audio
-            if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
-                act.hbRecorder.isAudioEnabled(false);
-            }
-        }
 
-        // if whole session recording is selected, resume recording
-        else {
+//        String session_or_activity=Configuration.getRecordingSessionOrActivity(act.getApplicationContext());
+//        Log.i("ConfigurationItems", "Inside CTutorEngine, session or activity flag is:"+session_or_activity);
+//        if(session_or_activity.equals("activity")) {
+//            act.startRecordingScreen();
+//            // If activity is of type .read, .echo, .parrot, .reveal we need to stop recording audio
+//            if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+//                act.hbRecorder.isAudioEnabled(false);
+//            }
+//        }
+//
+//        // if whole session recording is selected, resume recording
+//        else {
+//
+//            if (Activity.hbRecorder.isRecordingPaused()) {
+//
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    Activity.hbRecorder.resumeScreenRecording();
+//                    // If activity is of type .read, .echo, .parrot, .reveal we need to pause recording audio
+//                    if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
+//                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
+//                        act.hbRecorder.isAudioEnabled(false);
+//
+//                    }
+//                }
+//            }
+//  }
 
-            if (Activity.hbRecorder.isRecordingPaused()) {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Activity.hbRecorder.resumeScreenRecording();
-                    // If activity is of type .read, .echo, .parrot, .reveal we need to pause recording audio
-                    if(tutorId.contains(".read") || tutorId.contains(".echo") || tutorId.contains(".parrot") || tutorId.contains(".reveal")) {
-                        Log.d(TAG, "One of the activities requiring mic, pausing audio recording");
-                        act.hbRecorder.isAudioEnabled(false);
-
-                    }
-                }
-            }
-        }
 
 
 
