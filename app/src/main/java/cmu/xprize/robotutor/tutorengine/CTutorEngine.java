@@ -23,7 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+
 import android.os.Handler;
+
 import android.os.PowerManager;
 import androidx.annotation.RequiresApi;
 import android.util.Log;
@@ -342,6 +344,7 @@ public class CTutorEngine implements ILoadableObject2 {
             activeTutor = null;
 
             Log.d(TAG, "Killing Tutor: " + deadTutor.getTutorName());
+
             if(deadTutor.getTutorName()=="activity_selector" &&
                     Configuration.getRecordingSessionOrActivity(Activity.getApplicationContext())=="session") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -349,6 +352,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
                 }
             }
+
             RoboTutor.masterContainer.removeView(deadTutor.getTutorContainer());
             deadTutor.post(TCONST.KILLTUTOR);
         }
@@ -361,6 +365,7 @@ public class CTutorEngine implements ILoadableObject2 {
      * @param tutorName
      * @param features
      */
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     static private void createAndLaunchTutor(String tutorName, String features, String tutorId, defdata_tutor dataSource, String matrix) {
         killActiveTutor();
@@ -416,6 +421,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
             }
         }
+
         // GRAY_SCREEN_BUG
         Log.d(TAG, "createAndLaunchTutor: " + tutorName + ", " + tutorId);
 
@@ -607,6 +613,7 @@ public class CTutorEngine implements ILoadableObject2 {
 
 
         // if activity wise recording is selected start recording
+
 //        String session_or_activity=Configuration.getRecordingSessionOrActivity(act.getApplicationContext());
 //        Log.i("ConfigurationItems", "Inside CTutorEngine, session or activity flag is:"+session_or_activity);
 //        if(session_or_activity.equals("activity")) {
@@ -633,6 +640,7 @@ public class CTutorEngine implements ILoadableObject2 {
 //                }
 //            }
 //  }
+
 
 
 

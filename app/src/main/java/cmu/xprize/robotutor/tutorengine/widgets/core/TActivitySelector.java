@@ -238,6 +238,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
         final RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
         Log.d(TAG, roboTutor_act.getClass().getSimpleName());
         // if recording activity wise stop recording
+
 //        if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
 //            roboTutor_act.hbRecorder.stopScreenRecording();
 //        }
@@ -258,6 +259,7 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 //                }, 20000);
 //            }
 //        }
+
 
         //roboTutor_act.endRecording();
     }
