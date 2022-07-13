@@ -33,7 +33,8 @@ public class Configuration {
                 .putString(ConfigurationItems.BASE_DIRECTORY, configItems.baseDirectory)
                 .putBoolean(ConfigurationItems.INCLUDE_AUDIO_OUTPUT_IN_SCREEN_VIDEO, configItems.include_audio_output_in_screen_video)
                 .putBoolean(ConfigurationItems.PINNING_MODE, configItems.pinning_mode)
-                .putString(ConfigurationItems.STORY_NSP_MODE, configItems.story_nsp_mode)
+                .putString(ConfigurationItems.STORY_NSP_CHOICE, configItems.NSP_choice_probabilities)
+                .putString(ConfigurationItems.STORY_NSP_QUESTION_TYPE, configItems.NSP_question_type_probabilities)
                 .apply();
     }
 
@@ -117,11 +118,15 @@ public class Configuration {
                 .getBoolean(ConfigurationItems.PINNING_MODE, false);
     }
 
-    public static String getStoryNSPMode(Context context) {
+    public static String getNSPChoice(Context context) {
         return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
-                .getString(ConfigurationItems.STORY_NSP_MODE, "TF");
+                .getString(ConfigurationItems.STORY_NSP_CHOICE, "[0.25, 0.25, 0.25, 0.15, 0.10]");
     }
 
+    public static String getNSPQuestionType(Context context) {
+        return context.getSharedPreferences(ROBOTUTOR_CONFIGURATION, MODE_PRIVATE)
+                .getString(ConfigurationItems.STORY_NSP_QUESTION_TYPE, "[0.5, 0.5]");
+    }
 
     /**
      * logs all the config items.

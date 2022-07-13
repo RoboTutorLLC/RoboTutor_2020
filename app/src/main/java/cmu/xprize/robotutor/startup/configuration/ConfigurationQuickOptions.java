@@ -28,8 +28,8 @@ public class ConfigurationQuickOptions {
             false,
             "roboscreen",
             false,
-            "TF",
-            new double[]{0.2, 0.2, 0.2, 0.2, 0.2}
+            "[0.25, 0.25, 0.25, 0.15, 0.10]",
+            "[0.5, 0.5]"
     );
 
     // EN version, and they both have the debugger menu.
@@ -50,7 +50,7 @@ public class ConfigurationQuickOptions {
             false,
             "roboscreen",
             false,
-            "TF",
-            new double[]{0.2, 0.2, 0.2, 0.2, 0.2}
+            "[0.25, 0.25, 0.25, 0.15, 0.10]",
+            "[0.5, 0.5]"
     );
 }

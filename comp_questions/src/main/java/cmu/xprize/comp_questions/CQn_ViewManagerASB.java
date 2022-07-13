@@ -3575,8 +3575,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     // TODO: Merge the playNSPSentence Methods
     @Override
     public void playNSPWhichSentence() {
-        //segmentNdx = 0;
-        //trackNarration(true);
+        segmentNdx = 0;
+        trackNarration(true);
         String filename = currUtterance.audio.toLowerCase();
         if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
             filename = filename.substring(0,filename.length()-4);
@@ -3603,8 +3603,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void playNSPDoesSentence() {
-        //segmentNdx = 0;
-        //trackNarration(true);
+        segmentNdx = 0;
+        trackNarration(true);
         String filename = currUtterance.audio.toLowerCase();
         if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
             filename = filename.substring(0,filename.length()-4);

@@ -42,15 +42,18 @@ import java.util.Iterator;
 import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
+import cmu.xprize.util.CMessageQueueFactory;
 import cmu.xprize.util.IEvent;
 import cmu.xprize.util.IEventListener;
 import cmu.xprize.util.IInterventionSource;
 import cmu.xprize.util.ILoadableObject;
+import cmu.xprize.util.IMessageQueueRunner;
 import cmu.xprize.util.IPublisher;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TTSsynthesizer;
+import cmu.xprize.util.TimerMaster;
 import edu.cmu.xprize.listener.IAsrEventListener;
 import edu.cmu.xprize.listener.ListenerBase;
 import edu.cmu.xprize.listener.ListenerPLRT;
@@ -63,7 +66,7 @@ import static cmu.xprize.util.TCONST.TYPE_AUDIO;
  *  The Reading Tutor Component
  */
 public class CQn_Component extends ViewAnimator implements IEventListener, IVManListener,
-        IAsrEventListener, ILoadableObject, IPublisher, IInterventionSource {
+        IAsrEventListener, ILoadableObject, IPublisher, IInterventionSource, IMessageQueueRunner {
 
     private Context                 mContext;
 
@@ -94,6 +97,7 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     protected String                AUDIOSOURCEPATH;
     protected String                SHAREDPATH;
 
+
     private final Handler           mainHandler = new Handler(Looper.getMainLooper());
     private HashMap                 queueMap    = new HashMap();
     private boolean                 _qDisabled  = false;
@@ -101,6 +105,8 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     protected boolean               _scrollVertical = false;
 
     private LocalBroadcastManager _bManager;
+    private CMessageQueueFactory _queue;
+    private TimerMaster _timer;
 
     private Animation slide_left_to_right;
     private Animation slide_right_to_left;
@@ -153,6 +159,11 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
         slideQuestion = AnimationUtils.loadAnimation(mContext, R.anim.slide_question_bottom_to_top);
 
         _bManager = LocalBroadcastManager.getInstance(getContext());
+        _queue = new CMessageQueueFactory(this, "CNSP");
+        long time = 3000000;
+        _timer = new TimerMaster(this, _queue, _bManager, "NSPTimer",
+                time, time, time);
+
     }
 
 
@@ -907,6 +918,22 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
     public void triggerIntervention(String type) {
         Intent msg = new Intent(type);
         _bManager.sendBroadcast(msg);
+    }
+
+    // TODO: DO THESE
+    @Override
+    public void runCommand(String command) {
+
+    }
+
+    @Override
+    public void runCommand(String command, Object target) {
+
+    }
+
+    @Override
+    public void runCommand(String command, String target) {
+
     }
 
 
