@@ -230,7 +230,8 @@ public class TCONST {
     public static final String FTR_GEN             = "FTR_GEN";
     public static final String FTR_PIC             = "FTR_PIC";
     public static final String FTR_CLO             = "FTR_CLO";
-    public static final String FTR_NSP             = "FTR_NSP";
+    public static final String FTR_NSP_DOES        = "FTR_NSP_DOES";
+    public static final String FTR_NSP_WHICH       = "FTR_NSP_WHICH";
     public static final String STOP_AUDIO          = "STOP_AUDIO";
     public static final String RTC_VAR_CLOZEWORD   = ".clozeWord";
     public static final String REMOVE_CLOZE_FROM_BLANK = "REMOVE_CLOZE_FROM_BLANK";

@@ -48,7 +48,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -63,6 +65,8 @@ import static cmu.xprize.comp_questions.QN_CONST.GEN_QUESTION_CHANCE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_CLZSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_LINESTATE;
 //import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPSTATE;
+import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPDOESSTATE;
+import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPWHICHSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PARASTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PMSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_QNSTATE;
@@ -224,8 +228,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean                 hasEasiest              = false;
     private boolean                 hasHardest              = false;
 
-    private String                  nsp_question_type; // question type from config.json (easiest, next, hardest)
-    private String                  nsp_question_mode; // mode type from config.json (MC or TF)
+    private String                  nsp_choice_type; // choice type from config.json (easiest, next, hardest)
+    private String                  nsp_question_type; // question mode type from config.json (MC or TF)
     private String                  NSPDoesDistractor;
     private String                  NSPDoesCorrect;
     private int                     NSPSentenceIndex;
@@ -342,15 +346,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             Log.e(TAG, "Missing mcq.json... please add.");
         }
 
+
+
+        // TODO: Fix
         try {
             for (int i = 0; i < NspQuestions.length; i++) {
                 NspQuestion = NspQuestions[i];
-                for (int j = 0; j < NspQuestion.choices.size(); j++) {
-                    if(NspQuestion.choices.get(j) != null) {
-                        NSPIndices.add(i + 1);
-                    }
-                }
-
             }
         } catch (Exception e) {
             Log.e(TAG, "Missing nsp.json... please add.");
@@ -372,22 +373,32 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         }else if (mParent.testFeature(TCONST.FTR_GEN)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         } else if (mParent.testFeature(TCONST.FTR_PIC)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
-//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.FALSE);
-        } else if (mParent.testFeature(TCONST.FTR_NSP)) {
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
+        } else if (mParent.testFeature(TCONST.FTR_NSP_DOES)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-//            mParent.publishValue(RTC_VAR_NSPSTATE, TCONST.TRUE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.TRUE);
+        } else if (mParent.testFeature(TCONST.FTR_NSP_WHICH)) {
+            mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.TRUE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         }
 
 
@@ -483,11 +494,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     // Assigns the sentence to be shown on the screen
     @Override
     public void setNSPDoesPage() {
+
         if(nsp_does_mode && isNSPDoesPage) {
             for(int i = 0; i < NSPQuestion.choices.size(); i++) {
                 if (NSPQuestion.choices.get(i).type.equals("correct")) {
                     NSPDoesCorrect = NSPQuestion.choices.get(i).text;
-                } if (NSPQuestion.choices.get(i).type.equals(nsp_question_type)) {
+                } if (NSPQuestion.choices.get(i).type.equals(nsp_choice_type)) {
                     NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
                     NSPSentenceIndex = NSPQuestion.choices.get(i).index;
                 }
@@ -2198,6 +2210,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             } else if (picture_match_mode){
                 incPage(TCONST.INCR);
             } else {
+
                 incPage(TCONST.INCR);
             }
         }
@@ -2208,6 +2221,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        } else {
         mParent.animatePageFlip(true, mCurrViewIndex);
         Log.d(TAG, "nextPage: cloze_page_mode = "+cloze_page_mode+" isClozePage = "+isClozePage);
+        Log.d(TAG, "nextPage: nsp_does_mode = "+nsp_does_mode+" nsp_which_mode = "+nsp_which_mode);
 //        }
     }
 
@@ -2973,6 +2987,61 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
 
+    public void loadConfig(){
+        ArrayList<Double> nspQuestion = new ArrayList<>(); // MC or TF
+        ArrayList<Double> nspChoice = new ArrayList<>(); // Easiest, next, etc
+
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+
+
+        try {
+            // get JSONObject from JSON file
+            JSONObject obj = new JSONObject(jsonData);
+
+            JSONObject nsp_qtype = obj.getJSONObject("nsp_question_type");
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("MC")));
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("TF")));
+
+            JSONObject nsp_ctype = obj.getJSONObject("nsp_choice_type");
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("correct")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("next")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("random")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("easiest")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("hardest")));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Random r = new Random();
+        double value = r.nextDouble();
+        if (value <= nspQuestion.get(0)) {
+            nsp_question_type = "MC";
+
+        } else {
+            nsp_question_type = "TF";
+        }
+
+
+        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
+        NavigableMap<Double, String> map = new TreeMap<Double, String>();
+        double totalWeight = 0;
+        for (int i = 0; i < 5; i++){
+            totalWeight += nspChoice.get(i);
+            map.put(totalWeight, choices[i]);
+        }
+
+        r = new Random();
+        value = r.nextDouble() * totalWeight;
+        nsp_choice_type = map.higherEntry(value).getValue();
+        if(nsp_which_mode || nsp_choice_type.equals("MC")) {
+            while (nsp_choice_type.equals("correct")) {
+                value = r.nextDouble() * totalWeight;
+                nsp_choice_type = map.higherEntry(value).getValue();
+            }
+        }
+    }
     @Override
     public void hasNSPDistractor() {
         // load config.json
@@ -2987,14 +3056,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 for (int j = 0; j < NspQuestion.choices.size(); j++) {
                     NSPSentenceIndex = NspQuestion.choices.get(j).index;
                     String type = NspQuestion.choices.get(j).type;
-                    if (type.equals(nsp_question_type) && mCurrPage == NSPSentenceIndex) {
+                    if (type.equals(nsp_choice_type) && mCurrPage == NSPSentenceIndex) {
                         mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
                         mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-                        if (nsp_question_mode.equals("TF")) {
+                        if (nsp_question_type.equals("TF")) {
                             isNSPDoesPage = true;
                             mParent.publishValue(SHOW_NSP_DOES, TCONST.TRUE);
                             mParent.publishValue(SHOW_NSP_WHICH, TCONST.FALSE);
-                        } else if (nsp_question_mode.equals("MC")) {
+                        } else if (nsp_question_type.equals("MC")) {
                             isNSPWhichPage = true;
                             mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
                             mParent.publishValue(SHOW_NSP_WHICH, TCONST.TRUE);
@@ -3355,50 +3424,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
 
-    public String loadConfig(){
-        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
-        String jsonData = JSON_Helper.cacheDataByName(dataPath);
-        try {
-            JSONObject obj = new JSONObject(jsonData);
-            JSONArray nsp_choice_probabilities = obj.getJSONArray("NSP_choice_probabilities");
 
-            JSONArray nsp_mode_probabilities = obj.getJSONArray("NSP_question_type_probabilities");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-//        JSONParser jsonParser = new JSONParser();
-
-//        Configuration c = new Configuration();
-//        String nsp_mode = c.getStoryNSPMode();
-//        if(nsp_mode.equals("TF")) {
-//            nsp_does_mode = true;
-//            nsp_which_mode = false;
-//        } else {
-//            nsp_does_mode = false;
-//            nsp_which_mode = true;
-//        }
-//        double [] probabilities = c.getStoryNSPProbabilities();
-//        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
-//        NavigableMap<Double, String> map = new TreeMap<Double, String>();
-//        double totalWeight = 0;
-//        for (int i = 0; i < 5; i++){
-//            totalWeight += probabilities[i];
-//            map.put(totalWeight, choices[i]);
-//        }
-//
-//        Random r = new Random();
-//        double value = r.nextDouble() * totalWeight;
-//        nsp_question_type = map.higherEntry(value).getValue();
-//        if(nsp_which_mode) {
-//            while (nsp_question_type.equals("correct")) {
-//                value = r.nextDouble() * totalWeight;
-//                nsp_question_type = map.higherEntry(value).getValue();.
-//            }
-//        }
-        return "easiest";
-    }
 
 
 
@@ -3414,11 +3440,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+
     @Override
     public void setNSPWhichQuestion() {
 
         if(isNSPWhichPage) {
-            nsp_question_type = loadConfig();
             int numLinesCurPage = data[mCurrPage].text.length;
             this.NspQuestion = NspQuestions[numLinesCurPage-1];
 
