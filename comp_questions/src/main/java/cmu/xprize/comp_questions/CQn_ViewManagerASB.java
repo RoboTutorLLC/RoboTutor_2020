@@ -3770,6 +3770,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         hideNSPDoesButtons();
         mParent.fadeOutImageButton(mFrownie);
         mParent.fadeOutImageButton(mSmiley);
+        //mParent.slideQuestion
         // TODO: Add sliding up animation
     }
 
