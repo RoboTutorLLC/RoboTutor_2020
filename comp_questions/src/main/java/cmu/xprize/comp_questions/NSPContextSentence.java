@@ -8,16 +8,9 @@ import cmu.xprize.util.ILoadableObject;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
 
-/**
- * uhq: Class used to parse data from nsp.json for a single NSP question choice
- */
-public class NSPChoice implements ILoadableObject{
-    // json loadable
-    public String type;
-    public int index;
+public class NSPContextSentence implements ILoadableObject {
     public String text;
-    public Double coherence;
-
+    public int index;
     @Override
     public void loadJSON(JSONObject jsonObj, IScope scope) {
         try{
@@ -25,6 +18,5 @@ public class NSPChoice implements ILoadableObject{
         } catch(Exception e){
             Log.d("SEND HELP", e.toString());
         }
-
     }
 }
