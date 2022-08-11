@@ -56,6 +56,7 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.util.CClassMap2;
 import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
+import cmu.xprize.robotutor.tutorengine.util.MABHandler;
 import cmu.xprize.robotutor.tutorengine.util.PromotionMechanism;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelCSV;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
@@ -818,6 +819,14 @@ public class CTutorEngine implements ILoadableObject2 {
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
         return matrix;
+    }
+
+    private static void getArm() {
+        String tutorName = "activity_selector";
+        String dataPath = TCONST.TUTORROOT + "/" + tutorName;
+        String dataFile = RoboTutor.ARM_WEIGHTS_FILE;
+
+        MABHandler.getArm(dataPath + "/" + dataFile, mRootScope);
     }
 
 
