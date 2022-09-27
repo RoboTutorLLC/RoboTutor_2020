@@ -4,14 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+
 import android.widget.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import cmu.xprize.util.JSON_Helper;

@@ -27,7 +27,7 @@ import cmu.xprize.util.CAnimatorUtil;
  * Created by jacky on 2016/6/22.
  */
 
-public class CSb_Scoreboard extends android.support.percent.PercentRelativeLayout {
+public class CSb_Scoreboard extends androidx.percentlayout.widget.PercentRelativeLayout {
     private CSb_Lollipop[] lollipops;
     private CSb_Coinbag[] coinbags;
     private int mScore;

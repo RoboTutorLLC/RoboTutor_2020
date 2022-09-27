@@ -173,8 +173,8 @@ public class CRt_ViewManagerASB implements ICRt_ViewManager, ILoadableObject {
         mParent = parent;
         mContext = mParent.getContext();
 
-        mOddPage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.asb_oddpage, null);
-        mEvenPage = (ViewGroup) android.support.percent.PercentRelativeLayout.inflate(mContext, R.layout.asb_evenpage, null);
+        mOddPage = (ViewGroup) androidx.percentlayout.widget.PercentRelativeLayout.inflate(mContext, R.layout.asb_oddpage, null);
+        mEvenPage = (ViewGroup) androidx.percentlayout.widget.PercentRelativeLayout.inflate(mContext, R.layout.asb_evenpage, null);
 
         mOddPage.setVisibility(View.GONE);
         mEvenPage.setVisibility(View.GONE);

@@ -20,8 +20,8 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 
 import android.content.Context;
-import android.support.percent.PercentLayoutHelper;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentLayoutHelper;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;

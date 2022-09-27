@@ -1,7 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.util;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +30,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void uncaughtException(Thread t, Throwable e) {
-        activity.endRecording();
+        //activity.endRecording();
+        activity.hbRecorder.stopScreenRecording();
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString()+"\n\n";
         report += "--------- Stack trace ---------\n\n";
@@ -57,7 +58,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             if(!logFileDir.exists()){
                 logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
             }
-            File logFile = new File(_directory + "CRASH_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + "_" + RoboTutor.SEQUENCE_ID_STRING + "_" + timestamp + deviceId + ".txt");
+            File logFile = new File(_directory + "CRASH_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + "_" +
+                    //RoboTutor.SEQUENCE_ID_STRING + "_" +
+                     timestamp + deviceId + ".txt");
             logFile.createNewFile();
             FileOutputStream trace = new FileOutputStream(logFile, false);
             trace.write(report.getBytes());

@@ -3,7 +3,9 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
+
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -233,9 +235,33 @@ public class TActivitySelector extends CActivitySelector implements ITutorSceneI
 
         // start recording when launching a tutor
         // end recording when entering the menu
-        RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
+        final RoboTutor roboTutor_act = (RoboTutor) CTutorEngine.getActivity();
         Log.d(TAG, roboTutor_act.getClass().getSimpleName());
-        roboTutor_act.endRecording();
+        // if recording activity wise stop recording
+
+//        if(Configuration.getRecordingSessionOrActivity(roboTutor_act.getApplicationContext())=="activity"){
+//            roboTutor_act.hbRecorder.stopScreenRecording();
+//        }
+//        // goes in else if recording session wise
+//        else {
+//            // restart audio if it was paused earlier
+//            Log.d("CTutorEngine", "Restarted audio recording if it was paused");
+//            roboTutor_act.hbRecorder.isAudioEnabled(true);
+//             //pause recording after 20 seconds on menu to save space
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                Handler handler = new Handler();
+//                handler.postDelayed(new Runnable() {
+//                    public void run() {
+//                        Log.d("CTutorEngine","Pausing Screen Recording since inactivity on menu screen");
+//                        roboTutor_act.hbRecorder.pauseScreenRecording();
+//                    }
+//
+//                }, 20000);
+//            }
+//        }
+
+
+        //roboTutor_act.endRecording();
     }
 
     @Override

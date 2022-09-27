@@ -22,8 +22,8 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.percent.PercentLayoutHelper;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentLayoutHelper;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -32,8 +32,6 @@ import android.widget.FrameLayout;
 import android.widget.RemoteViews;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import cmu.xprize.comp_logging.CErrorManager;
 

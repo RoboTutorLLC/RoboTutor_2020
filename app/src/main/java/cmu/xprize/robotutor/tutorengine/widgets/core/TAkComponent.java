@@ -9,7 +9,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;

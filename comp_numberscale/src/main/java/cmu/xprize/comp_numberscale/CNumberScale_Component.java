@@ -3,15 +3,12 @@ package cmu.xprize.comp_numberscale;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MotionEventCompat;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,7 +17,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 

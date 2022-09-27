@@ -21,7 +21,7 @@ package cmu.xprize.fw_component;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.support.percent.PercentRelativeLayout;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;

@@ -31,7 +31,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.CountDownTimer;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
