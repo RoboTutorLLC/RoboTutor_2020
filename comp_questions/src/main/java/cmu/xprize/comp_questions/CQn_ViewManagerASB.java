@@ -354,7 +354,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 NspQuestion = NspQuestions[i];
             }
         } catch (Exception e) {
-            Log.e(TAG, "Missing nsp.json... please add.");
+            Log.e(TAG, "nsp.json not properly parsed");
             Log.e(TAG, e.toString());
         }
 
@@ -3209,10 +3209,20 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
         while (mHeardWord < heardWords.length) {
 
-            if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) {
+            if(mCurrWord > heardWords.length){
+                break;
+            }
+
+            if (
+                    wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])
+            ) {
 
                 nextWord();
                 mHeardWord++;
+
+                if(mHeardWord > heardWords.length){
+                    break;
+                }
 
                 Log.i("ASR", "RIGHT");
                 attemptNum = 0;
