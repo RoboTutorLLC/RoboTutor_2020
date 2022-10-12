@@ -3000,6 +3000,13 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             // get JSONObject from JSON file
             JSONObject obj = new JSONObject(jsonData);
 
+            Log.d(TAG, "DATA PARSED: "+obj.toString());
+
+
+            //Missing nsp_question_type attribute
+            //Missing more attributes
+            //Get new log file
+
             JSONObject nsp_qtype = obj.getJSONObject("nsp_question_type");
             nspQuestion.add(Double.valueOf(nsp_qtype.getString("MC")));
             nspQuestion.add(Double.valueOf(nsp_qtype.getString("TF")));
@@ -3012,6 +3019,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             nspChoice.add(Double.valueOf(nsp_ctype.getString("hardest")));
 
         } catch (JSONException e) {
+            Log.d("Parsing Error", "Missing json attributes for NSP question");
+            
             e.printStackTrace();
         }
 
