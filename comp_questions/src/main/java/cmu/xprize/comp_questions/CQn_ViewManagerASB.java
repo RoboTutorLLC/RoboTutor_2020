@@ -3201,6 +3201,22 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
 
+    public void highlightWord(String[] heardWords){
+        //All code to highlight word
+        //ASk question how should the UI be changed? Through the asset files or through some text object?
+        //If so where is that text object located
+
+        StringBuilder sentence =  new StringBuilder();
+
+        for (int i = 0; i < heardWords.length; i++) {
+            sentence.append(heardWords[i].toLowerCase() + " ");
+        }
+
+
+
+    }
+
+
     /**
      * This is where we process words being narrated
      *
@@ -3225,7 +3241,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             if (
                     wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])
             ) {
-
+                //highlight word
+                highlightWord(heardWords);
                 nextWord();
                 mHeardWord++;
 
