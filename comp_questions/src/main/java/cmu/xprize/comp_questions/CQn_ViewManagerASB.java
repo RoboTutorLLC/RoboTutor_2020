@@ -388,18 +388,13 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
-        } else if (mParent.testFeature(TCONST.FTR_NSP_DOES)) {
+        } else if (mParent.testFeature(TCONST.FTR_NSP)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+//            Determine IsNext or WhichNext and publish accordingly
             mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.TRUE);
-        } else if (mParent.testFeature(TCONST.FTR_NSP_WHICH)) {
-            mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.TRUE);
-            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         }
 
 
@@ -3531,7 +3526,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void displayNSPDoesQuestion() {
         NSPDoesSentence.setText(NSPDoesSentenceText);
         NSPDoesSentence.bringToFront();
-        // highlight and say aloud
+        // highlight and say aloud, add buttons ata
 
     }
 
