@@ -792,9 +792,9 @@ public class CQn_Component extends ViewAnimator implements IEventListener, IVMan
             mViewManager.loadJSON(new JSONObject(jsonMcq), null);
 
             // UHQ load the relevant nsp json data for NSP questions
-            String jsonNSP = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYNSP);
-            Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonNsp:");
-            mViewManager.loadJSON(new JSONObject(jsonNSP), null);
+//            String jsonNSP = JSON_Helper.cacheDataByName(EXTERNPATH + TCONST.STORYNSP);
+//            Log.d(TCONST.DEBUG_STORY_TAG, "logging jsonNsp:");
+//            mViewManager.loadJSON(new JSONObject(jsonNSP), null);
 
         } catch (Exception e) {
             // TODO: Manage Exceptions

@@ -497,7 +497,7 @@
           "COMMENT": "When user hesitates, not sure with preexit yet",
           "type": "NODE",
           "maptype": "moduleMap",
-          "mapname": "PLAYNSPMCHESITATE",
+          "mapname": "PLAYNSPHESITATE",
           "preenter": [],
           "preexit": ["RESET_NSP_MC_BUTTONS", "UPDATE_NSP_MC_BUTTONS"],
           "edges": [
@@ -533,7 +533,7 @@
           "COMMENT": "When user hesitates, not sure with preexit yet",
           "type": "NODE",
           "maptype": "moduleMap",
-          "mapname": "PLAYNSPTFHESITATE",
+          "mapname": "PLAYNSPHESITATE",
           "preenter": [],
           "preexit": ["RESET_NSP_TF_BUTTONS", "UPDATE_NSP_TF_BUTTONS"],
           "edges": [
@@ -789,6 +789,16 @@
 //            Hopefully this doesn't cause any problems
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPDoesButtons", "parms": "" , "features": ""},
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPWhichButtons", "parms": "" , "features": ""}
+          ]
+        },
+
+        "PLAYNSPHESITATE": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TBD",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYNSPHESITATE:String", "features": ""},
+//            IDK HOW TO MAKE THIS WORK
           ]
         },
 
