@@ -349,14 +349,16 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
         // TODO: Fix
-        try {
-            for (int i = 0; i < NspQuestions.length - 1; i++) {
-                NspQuestion = NspQuestions[i];
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "nsp.json not properly parsed");
-            Log.e(TAG, e.toString());
-        }
+//        try {
+//            for (int i = 0; i < NspQuestions.length - 1; i++) {
+//                NspQuestion = NspQuestions[i];
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Missing nsp.json... please add.");
+//            Log.e(TAG, e.toString());
+//        }
+
+        loadConfig();
 
         mCurrLineInStory = 0;
         mOwner        = owner;
@@ -388,18 +390,13 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
-        } else if (mParent.testFeature(TCONST.FTR_NSP_DOES)) {
+        } else if (mParent.testFeature(TCONST.FTR_NSP)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+//            Determine IsNext or WhichNext and publish accordingly
             mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.TRUE);
-        } else if (mParent.testFeature(TCONST.FTR_NSP_WHICH)) {
-            mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
-            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.TRUE);
-            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         }
 
 
@@ -1152,8 +1149,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mSay      = mOddPage.findViewById(R.id.Sspeak);
             setPicMatchView(mOddPage);
             setClozeView(mOddPage);
-            setNSPDoesView(mOddPage);
-            setNSPWhichView(mOddPage);
+//            setNSPDoesView(mOddPage);
+//            setNSPWhichView(mOddPage);
         } else {
             mCurrViewIndex = mEvenIndex;
             Log.d(TAG, "flipPage: asdfad mevenpage");
@@ -1163,8 +1160,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mSay = mEvenPage.findViewById(R.id.Sspeak);
             setPicMatchView(mEvenPage);
             setClozeView(mEvenPage);
-            setNSPDoesView(mEvenPage);
-            setNSPWhichView(mEvenPage);
+//            setNSPDoesView(mEvenPage);
+//            setNSPWhichView(mEvenPage);
         }
         // Ensure the buttons reflect the current states
         updateButtons();
@@ -1185,18 +1182,18 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             hideImageButtons();
             disableImageButtons();
         }
-        if(nsp_which_mode) {
-            updateNSPWhichButtons();
-        } else {
-            hideNSPWhichButtons();
-            disableNSPWhichButtons();
-        }
-        if(nsp_does_mode) {
-            updateNSPDoesButtons();
-        } else {
-            hideNSPDoesButtons();
-            disableNSPDoesButtons();
-        }
+//        if(nsp_which_mode) {
+//            updateNSPWhichButtons();
+//        } else {
+//            hideNSPWhichButtons();
+//            disableNSPWhichButtons();
+//        }
+//        if(nsp_does_mode) {
+//            updateNSPDoesButtons();
+//        } else {
+//            hideNSPDoesButtons();
+//            disableNSPDoesButtons();
+//        }
 
     }
 
@@ -1270,9 +1267,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
     private void configurePageImage() {
-        if (picture_match_mode) {
+        if (picture_match_mode){
             // Do nothing because updateImageButtons will handle it
-        } else if (cloze_page_mode){
+        } else {
             InputStream in;
             try {
                 if (assetLocation.equals(TCONST.EXTERN)) {
@@ -1299,11 +1296,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 mPageImage.setImageBitmap(null);
                 e.printStackTrace();
             }
-        } else {
-            // NSP PAGE MODE
-            // Do nothing since no images are loaded in both NSP modes, the buttons are in the assets folder
         }
-
     }
 
 
@@ -3000,16 +2993,12 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             // get JSONObject from JSON file
             JSONObject obj = new JSONObject(jsonData);
 
-            Log.d(TAG, "DATA PARSED: "+obj.toString());
+            JSONObject nsp_qtype = obj.getJSONObject("nsp_question_probability");
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("which_sentence_is_next")));
+            Log.d(TAG, "WHICHNEXT: " + nsp_qtype.getString("which_sentence_is_next") );
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("is_this_sentence_next")));
+            Log.d(TAG, "ISNEXT: " + nsp_qtype.getString("is_this_sentence_next") );
 
-
-            //Missing nsp_question_type attribute
-            //Missing more attributes
-            //Get new log file
-
-            JSONObject nsp_qtype = obj.getJSONObject("nsp_question_type");
-            nspQuestion.add(Double.valueOf(nsp_qtype.getString("MC")));
-            nspQuestion.add(Double.valueOf(nsp_qtype.getString("TF")));
 
             JSONObject nsp_ctype = obj.getJSONObject("nsp_choice_type");
             nspChoice.add(Double.valueOf(nsp_ctype.getString("correct")));
@@ -3019,18 +3008,16 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             nspChoice.add(Double.valueOf(nsp_ctype.getString("hardest")));
 
         } catch (JSONException e) {
-            Log.d("Parsing Error", "Missing json attributes for NSP question");
-            
             e.printStackTrace();
         }
 
         Random r = new Random();
         double value = r.nextDouble();
         if (value <= nspQuestion.get(0)) {
-            nsp_question_type = "MC";
+            nsp_question_type = "WhichNext";
 
         } else {
-            nsp_question_type = "TF";
+            nsp_question_type = "IsNext";
         }
 
 
@@ -3045,7 +3032,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         r = new Random();
         value = r.nextDouble() * totalWeight;
         nsp_choice_type = map.higherEntry(value).getValue();
-        if(nsp_which_mode || nsp_choice_type.equals("MC")) {
+        if(nsp_choice_type.equals("WhichNext")) {
             while (nsp_choice_type.equals("correct")) {
                 value = r.nextDouble() * totalWeight;
                 nsp_choice_type = map.higherEntry(value).getValue();
@@ -3059,10 +3046,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         // check current page whether there is an nsp question
         // publishValue SHOW_NSP_DOES, SHOW_NSP_WHICH
         // TODO: WHERE IS isNSPDoesPage/isNSPWhichPage set??? temporarily not in the condition
-        loadConfig();
-        if (mCurrPage <= mPageCount-1) {
-            for (int i = 0; i < NspQuestions.length; i++) {
-                NspQuestion = NspQuestions[i];
+
+//        if (mCurrPage <= mPageCount-1) {
+//            for (int i = 0; i < NspQuestions.length; i++) {
+//                NspQuestion = NspQuestions[i];
 //                for (int j = 0; j < NspQuestion.choices.size(); j++) {
 ////                    NSPSentenceIndex = NspQuestion.choices.get(j).index;
 //                    String type = NspQuestion.choices.get(j).type;
@@ -3083,9 +3070,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //                        }
 //                    }
 //                }
-            }
-
-        }
+//            }
+//
+//        }
 
 
     }
@@ -3201,22 +3188,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     }
 
 
-    public void highlightWord(String[] heardWords){
-        //All code to highlight word
-        //ASk question how should the UI be changed? Through the asset files or through some text object?
-        //If so where is that text object located
-
-        StringBuilder sentence =  new StringBuilder();
-
-        for (int i = 0; i < heardWords.length; i++) {
-            sentence.append(heardWords[i].toLowerCase() + " ");
-        }
-
-
-
-    }
-
-
     /**
      * This is where we process words being narrated
      *
@@ -3234,21 +3205,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
         while (mHeardWord < heardWords.length) {
 
-            if(mCurrWord > heardWords.length){
-                break;
-            }
+            if (wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])) {
 
-            if (
-                    wordsToSpeak[mCurrWord].equals(heardWords[mHeardWord])
-            ) {
-                //highlight word
-                highlightWord(heardWords);
                 nextWord();
                 mHeardWord++;
-
-                if(mHeardWord > heardWords.length){
-                    break;
-                }
 
                 Log.i("ASR", "RIGHT");
                 attemptNum = 0;
@@ -3567,7 +3527,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void displayNSPDoesQuestion() {
         NSPDoesSentence.setText(NSPDoesSentenceText);
         NSPDoesSentence.bringToFront();
-        // highlight and say aloud
+        // highlight and say aloud, add buttons ata
 
     }
 
