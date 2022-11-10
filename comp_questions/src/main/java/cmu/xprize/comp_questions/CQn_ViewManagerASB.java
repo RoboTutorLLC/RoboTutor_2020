@@ -3534,6 +3534,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public void setNSPDoesQuestion() {
 
+        //mPageText.setText();
+
 
 
     }

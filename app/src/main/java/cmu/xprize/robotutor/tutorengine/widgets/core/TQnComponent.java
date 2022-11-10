@@ -1358,7 +1358,10 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
         event.setPromotionMode(RoboTutor.getPromotionMode(event.getMatrixName()));
         event.setLevelName(task);
         event.setTaskName("story");
-        String cleanedSentence = currentSentence.replaceAll(",", "").replaceAll("\"", ""); // logger handles commas and quotes weird
+        String cleanedSentence = "";
+                if(currentSentence != null){
+                 currentSentence.replaceAll(",", "").replaceAll("\"", ""); // logger handles commas and quotes weird
+                     }
         event.setProblemName(cleanedSentence);
         event.setProblemNumber(currentIndex);
         if (dataSource != null) {
