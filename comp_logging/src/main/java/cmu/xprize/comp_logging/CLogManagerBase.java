@@ -68,6 +68,7 @@ public class CLogManagerBase implements ILogManager {
 
     private boolean                    logWriterValid = false;
 
+    //this is a dummy commit
     // Datashop specific
 
     private boolean                    loggingDS = false;
