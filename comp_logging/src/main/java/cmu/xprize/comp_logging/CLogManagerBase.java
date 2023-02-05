@@ -30,7 +30,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -68,7 +70,7 @@ public class CLogManagerBase implements ILogManager {
 
     private boolean                    logWriterValid = false;
 
-    //this is a dummy commit
+
     // Datashop specific
 
     private boolean                    loggingDS = false;
@@ -619,6 +621,10 @@ public class CLogManagerBase implements ILogManager {
     public void postError(String Tag, String Msg, Exception e) {
 
         String packet;
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString().replace('\n',';');
 
         packet = "{" +
                 "\"class\":\"ERROR\"," +
@@ -626,7 +632,8 @@ public class CLogManagerBase implements ILogManager {
                 "\"type\":\"Exception\"," +
                 "\"time\":\"" + System.currentTimeMillis() + "\"," +
                 "\"msg\":\"" + Msg + "\"," +
-                "\"exception\":\"" + e.toString() + "\"" +
+                "\"exception\":\"" + e.toString() + "\"," +
+                "\"stack_trace\":\"" + stackTrace + "\"" +
                 "},\n";
 
         post(packet);
