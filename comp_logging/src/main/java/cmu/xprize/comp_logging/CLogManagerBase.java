@@ -18,6 +18,7 @@
 
 package cmu.xprize.comp_logging;
 
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -36,6 +37,7 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -218,17 +220,30 @@ public class CLogManagerBase implements ILogManager {
         protected String dataPacket;
         protected String unEncodedPacket;
         protected String statePacket;
+        protected String errorMsg;
+        protected Exception exception;
 
         public Queue(String packet) {
 
             dataPacket      = packet;
             unEncodedPacket = null;
+            exception = null;
+            errorMsg = null;
         }
 
         public Queue(String _packet, String _target, String _state) {
             dataPacket      = _packet;
             unEncodedPacket = _target;
             statePacket     = _state;
+            exception = null;
+            errorMsg = null;
+        }
+
+        public Queue(String _packet, String msg, Exception e) {
+            dataPacket      = _packet;
+            unEncodedPacket = null;
+            exception = e;
+            errorMsg = msg;
         }
 
         // we can accept data with various object/value encodings (i.e. different delimiters)
@@ -291,10 +306,64 @@ public class CLogManagerBase implements ILogManager {
                 }
 
                 writePacketToLog(dataPacket);
+                if(errorMsg != null){
+                    addToErrorLog(errorMsg,exception);
+                }
 
             } catch (Exception e) {
                 CErrorManager.logEvent(TAG, "Write Error:", e, false);
             }
+        }
+    }
+
+    private void addToErrorLog(String errorMsg, Exception e) {
+        if(e == null){
+            String report = errorMsg +"\n\n";
+            createErrorFile(report,errorMsg);
+            return;
+        }
+        StackTraceElement[] arr = e.getStackTrace();
+        String report = e.toString()+"\n\n";
+        report += "--------- Stack trace ---------\n\n";
+        for (int i=0; i<arr.length; i++) {
+            report += "    "+arr[i].toString()+"\n";
+        }
+        report += "-------------------------------\n\n";
+
+        report += "--------- Cause ---------\n\n";
+        Throwable cause = e.getCause();
+        if(cause != null) {
+            report += cause.toString() + "\n\n";
+            arr = cause.getStackTrace();
+            for (int i=0; i<arr.length; i++) {
+                report += "    "+arr[i].toString()+"\n";
+            }
+        }
+        report += "-------------------------------\n\n";
+        createErrorFile(report,errorMsg);
+    }
+
+    private void createErrorFile(String report,String msg) {
+        try {
+            String deviceId = Build.SERIAL;
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor_ERROR/";
+            File logFileDir = new File(_directory);
+            if(!logFileDir.exists()){
+                logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
+            }
+
+            //Add version how ?? BuildConfig.VERSION_NAME + "_" not working for this package need to get version from robotutor
+            File logFile = new File(_directory + "ERROR_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" +
+                    //RoboTutor.SEQUENCE_ID_STRING + "_" +
+                    timestamp + deviceId + ".txt");
+            logFile.createNewFile();
+            FileOutputStream trace = new FileOutputStream(logFile, false);
+            trace.write(report.getBytes());
+            trace.close();
+        } catch(IOException ioe) {
+            Log.d("CEF",ioe.getMessage());
+            ioe.printStackTrace();
         }
     }
 
@@ -497,6 +566,11 @@ public class CLogManagerBase implements ILogManager {
     }
 
 
+    private void post(String packet, String msg, Exception e) {
+        enQueue(new Queue(packet,msg,e));
+    }
+
+
     /**
      * Post a command to this scenegraph queue
      *
@@ -613,7 +687,7 @@ public class CLogManagerBase implements ILogManager {
                 "\"msg\":\"" + Msg + "\"" +
                 "},\n";
 
-        post(packet);
+        post(packet,Msg,null);
     }
 
 
@@ -636,8 +710,10 @@ public class CLogManagerBase implements ILogManager {
                 "\"stack_trace\":\"" + stackTrace + "\"" +
                 "},\n";
 
-        post(packet);
+        post(packet,Msg,e);
     }
+
+
 
     @Override
     public void postBattery(String Tag, String percent, String chargeType) {
