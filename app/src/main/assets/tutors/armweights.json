@@ -1,0 +1,12 @@
+[
+  {
+    "arm_name": "test1",
+    "arm_weight": 0.5,
+    "filepath": "app/src/main/assets/tutors/armweights.json"
+  },
+  {
+    "arm_name": "test2",
+    "arm_weight": 0.9,
+    "filepath": "app/src/main/assets/tutors/armweights.json"
+  }
+]
