@@ -347,12 +347,16 @@ public class CLogManagerBase implements ILogManager {
         try {
             String deviceId = Build.SERIAL;
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor_ERROR/";
+            String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor/";
             File logFileDir = new File(_directory);
             if(!logFileDir.exists()){
                 logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
             }
-
+            _directory = _directory + "/RoboTutor_ERROR/";
+            logFileDir = new File(_directory);
+            if(!logFileDir.exists()){
+                logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
+            }
             //Add version how ?? BuildConfig.VERSION_NAME + "_" not working for this package need to get version from robotutor
             File logFile = new File(_directory + "ERROR_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" +
                     //RoboTutor.SEQUENCE_ID_STRING + "_" +
