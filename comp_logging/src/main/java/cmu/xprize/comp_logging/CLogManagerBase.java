@@ -18,11 +18,14 @@
 
 package cmu.xprize.comp_logging;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -346,7 +349,7 @@ public class CLogManagerBase implements ILogManager {
     private void createErrorFile(String report,String msg) {
         try {
             String deviceId = Build.SERIAL;
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss.sss").format(new Date());
             String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor/";
             File logFileDir = new File(_directory);
             if(!logFileDir.exists()){
@@ -357,9 +360,10 @@ public class CLogManagerBase implements ILogManager {
             if(!logFileDir.exists()){
                 logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
             }
-            //Add version how ?? BuildConfig.VERSION_NAME + "_" not working for this package need to get version from robotutor
+
+
             File logFile = new File(_directory + "ERROR_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" +
-                    //RoboTutor.SEQUENCE_ID_STRING + "_" +
+                    getSequenceId() + "_" +
                     timestamp + deviceId + ".txt");
             logFile.createNewFile();
             FileOutputStream trace = new FileOutputStream(logFile, false);
@@ -369,6 +373,23 @@ public class CLogManagerBase implements ILogManager {
             Log.d("CEF",ioe.getMessage());
             ioe.printStackTrace();
         }
+
+    }
+
+    private String getSequenceId() {
+       int cnt = 0;
+       String sequenceId="";
+       for(int i=0;i<log_Filename.length();i++){
+           if(cnt == 2){
+               for(int j=i;j<log_Filename.length();j++){
+                   if(log_Filename.charAt(j) == '_') break;
+                   sequenceId += log_Filename.charAt(j);
+               }
+               break;
+           }
+           if(log_Filename.charAt(i) == '_') cnt++;
+       }
+       return sequenceId;
     }
 
 
