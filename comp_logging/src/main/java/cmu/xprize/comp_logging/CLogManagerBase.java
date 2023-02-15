@@ -84,6 +84,7 @@ public class CLogManagerBase implements ILogManager {
     private java.nio.channels.FileLock logDSLock;
     private FileWriter                 logDSWriter;
     private boolean                    logDSWriterValid = false;
+    protected static String sessionStartTime;
 
 
     protected String TAG = "CLogManagerBase";
@@ -96,6 +97,7 @@ public class CLogManagerBase implements ILogManager {
 
         log_Path = logPath;
         log_Filename = logFilename;
+        sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
 
         // Restart the log if necessary
         //
@@ -362,7 +364,7 @@ public class CLogManagerBase implements ILogManager {
             }
 
 
-            File logFile = new File(_directory + "ERROR_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" +
+            File logFile = new File(_directory + "ERROR_RoboTutor_" + sessionStartTime +"_" + BuildConfig.BUILD_TYPE + "_" +
                     getSequenceId() + "_" +
                     timestamp + deviceId + ".txt");
             logFile.createNewFile();
