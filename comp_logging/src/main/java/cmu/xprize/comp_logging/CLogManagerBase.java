@@ -97,7 +97,7 @@ public class CLogManagerBase implements ILogManager {
 
         log_Path = logPath;
         log_Filename = logFilename;
-        sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
+        sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
 
         // Restart the log if necessary
         //
@@ -351,7 +351,7 @@ public class CLogManagerBase implements ILogManager {
     private void createErrorFile(String report,String msg) {
         try {
             String deviceId = Build.SERIAL;
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss.sss").format(new Date());
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
             String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor/";
             File logFileDir = new File(_directory);
             if(!logFileDir.exists()){
