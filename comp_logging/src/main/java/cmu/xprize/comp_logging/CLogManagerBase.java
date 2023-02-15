@@ -379,6 +379,7 @@ public class CLogManagerBase implements ILogManager {
     }
 
     private String getSequenceId() {
+        //Example RoboTutor__3.5.0.1_000019_2023.02.15.22.05.05_unknown : in this example 000019 is being extracted which occurs between 3rd and 4th underscore.
        int cnt = 0;
        String sequenceId="";
        for(int i=0;i<log_Filename.length();i++){
