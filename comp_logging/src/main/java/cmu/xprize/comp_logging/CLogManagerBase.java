@@ -380,7 +380,7 @@ public class CLogManagerBase implements ILogManager {
        int cnt = 0;
        String sequenceId="";
        for(int i=0;i<log_Filename.length();i++){
-           if(cnt == 2){
+           if(cnt == 3){
                for(int j=i;j<log_Filename.length();j++){
                    if(log_Filename.charAt(j) == '_') break;
                    sequenceId += log_Filename.charAt(j);
