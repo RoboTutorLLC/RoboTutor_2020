@@ -764,7 +764,6 @@ public class CLogManagerBase implements ILogManager {
 
     @Override
     public void postPacket(String packet) {
-
         post(packet);
     }
 }
