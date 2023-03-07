@@ -187,6 +187,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     static public String            SELECTOR_MODE = TCONST.FTR_TUTOR_SELECT; // this is only used as a feature, when launching TActivitySelector...
     static public boolean           STUDENT_CHOSE_REPEAT = false;
 //    static public String        SELECTOR_MODE = TCONST.FTR_DEBUG_SELECT;
+static public String        SEQUENCE_ID_STRING;
 
     static private String[] videoNames = new String[]{"video1", "video2"};
     private int videoNamesIterator = 0;
@@ -352,9 +353,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         Calendar calendar = Calendar.getInstance(Locale.US);
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
         String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
+        SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
         String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
-                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + sequenceIdString +
+                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + SEQUENCE_ID_STRING +
                 "_" + initTime + "_" + Build.SERIAL;
 
         Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
