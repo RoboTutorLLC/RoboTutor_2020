@@ -1,0 +1,39 @@
+{
+  "arms": [
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    },
+    {
+      "name": "cd3-filtered",
+      "weight": 0.3,
+      "matrix": "cd3-filtered-dev_data.json"
+    }
+  ]
+}
