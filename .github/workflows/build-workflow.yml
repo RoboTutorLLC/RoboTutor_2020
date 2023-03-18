@@ -1,0 +1,50 @@
+# Name of workflow
+name: Pre Merge Checks
+
+# Triggering this workflow
+on:
+  push:
+    branches:
+      - '*'
+
+
+# Jobs to be run on this workflow
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Build project
+        run: ./gradlew assembleDebug
+
+      - name: Fetch current datetime
+        id: fetch_current_datetime
+        run: echo "DATE_TIME=$(date +%Y%m%d_%H%M%S.%N | cut -b1-19)" >> $GITHUB_OUTPUT
+      #       steps.fetch_current_datetime.outputs.DATE_TIME
+      # cut -b1-19 : example- 20230316_125512.123 - 19 characters
+
+      - name: Fetch current branch name
+        id: fetch_current_branch
+        run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
+      #       steps.fetch_current_branch.outputs.BRANCH_NAME
+
+      - name: Fetch app version name
+        id: fetch_version_name
+        run: echo "VERSION_NAME=$(./gradlew -q getVersionName --warning-mode=none)" >> $GITHUB_OUTPUT
+      #       steps.fetch_version_name.outputs.VERSION_NAME
+
+      - name: Fetch APK Name
+        id: fetch_apk_name
+        run: echo "APK_NAME=RoboTutor2020-${{ steps.fetch_current_branch.outputs.BRANCH_NAME }}-${{ steps.fetch_version_name.outputs.VERSION_NAME }}-${{ steps.fetch_current_datetime.outputs.DATE_TIME }}" >> $GITHUB_OUTPUT
+      #       steps.fetch_apk_name.outputs.APK_NAME
+
+      - name: Rename APK
+        run: mv build/robotutor.debug.${{ steps.fetch_version_name.outputs.VERSION_NAME }}.apk build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
+          path: build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
