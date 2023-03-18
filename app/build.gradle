@@ -134,3 +134,9 @@ dependencies {
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
 }
+
+task getVersionName() {
+    project.gradle.projectsEvaluated {
+        println "$project.android.defaultConfig.versionName"
+    }
+}
