@@ -69,7 +69,7 @@ android {
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
 //            new File(output.outputFile.parent, newApkName)
-            output.outputFileName = newApkName
+            output.outputFileName = new File("./../../../../../build/", newApkName)
         }
     }
 
