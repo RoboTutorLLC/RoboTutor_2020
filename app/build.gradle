@@ -21,7 +21,7 @@ android {
 
     // Create a variable called keystorePropertiesFile, and initialize it to your
     // keystore.properties file, in the rootProject folder.
-    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystorePropertiesFile = rootProject.file("/home/runner/work/RoboTutor_2020/RoboTutor_2020/app/src/sample_config_files/sample_keystore.properties")
 
     // Initialize a new Properties() object called keystoreProperties
     def keystoreProperties = new Properties()
