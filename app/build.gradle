@@ -21,7 +21,9 @@ android {
 
     // Create a variable called keystorePropertiesFile, and initialize it to your
     // keystore.properties file, in the rootProject folder.
-    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystorePropertiesFile = rootProject.file("app/src/sample_config_files/sample_keystore.properties")
+
+//    def keystorePropertiesFile = rootProject.file("/home/runner/work/RoboTutor_2020/RoboTutor_2020/app/src/sample_config_files/sample_keystore.properties")
 
     // Initialize a new Properties() object called keystoreProperties
     def keystoreProperties = new Properties()
@@ -69,7 +71,7 @@ android {
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
 //            new File(output.outputFile.parent, newApkName)
-            output.outputFileName = newApkName
+            output.outputFileName = new File("./../../../../../build/", newApkName)
         }
     }
 
@@ -133,4 +135,10 @@ dependencies {
     implementation project(path: ':comp_intervention')
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
+}
+
+task getVersionName() {
+    project.gradle.projectsEvaluated {
+        println "$project.android.defaultConfig.versionName"
+    }
 }

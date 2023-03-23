@@ -18,10 +18,14 @@
 
 package cmu.xprize.comp_logging;
 
+import android.app.Activity;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,10 +34,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -68,6 +75,7 @@ public class CLogManagerBase implements ILogManager {
 
     private boolean                    logWriterValid = false;
 
+
     // Datashop specific
 
     private boolean                    loggingDS = false;
@@ -76,6 +84,7 @@ public class CLogManagerBase implements ILogManager {
     private java.nio.channels.FileLock logDSLock;
     private FileWriter                 logDSWriter;
     private boolean                    logDSWriterValid = false;
+    protected static String sessionStartTime;
 
 
     protected String TAG = "CLogManagerBase";
@@ -88,6 +97,7 @@ public class CLogManagerBase implements ILogManager {
 
         log_Path = logPath;
         log_Filename = logFilename;
+        sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
 
         // Restart the log if necessary
         //
@@ -215,17 +225,30 @@ public class CLogManagerBase implements ILogManager {
         protected String dataPacket;
         protected String unEncodedPacket;
         protected String statePacket;
+        protected String errorMsg;
+        protected Exception exception;
 
         public Queue(String packet) {
 
             dataPacket      = packet;
             unEncodedPacket = null;
+            exception = null;
+            errorMsg = null;
         }
 
         public Queue(String _packet, String _target, String _state) {
             dataPacket      = _packet;
             unEncodedPacket = _target;
             statePacket     = _state;
+            exception = null;
+            errorMsg = null;
+        }
+
+        public Queue(String _packet, String msg, Exception e) {
+            dataPacket      = _packet;
+            unEncodedPacket = null;
+            exception = e;
+            errorMsg = msg;
         }
 
         // we can accept data with various object/value encodings (i.e. different delimiters)
@@ -288,11 +311,88 @@ public class CLogManagerBase implements ILogManager {
                 }
 
                 writePacketToLog(dataPacket);
+                if(errorMsg != null){
+                    addToErrorLog(errorMsg,exception);
+                }
 
             } catch (Exception e) {
                 CErrorManager.logEvent(TAG, "Write Error:", e, false);
             }
         }
+    }
+
+    private void addToErrorLog(String errorMsg, Exception e) {
+        if(e == null){
+            String report = errorMsg +"\n\n";
+            createErrorFile(report,errorMsg);
+            return;
+        }
+        StackTraceElement[] arr = e.getStackTrace();
+        String report = e.toString()+"\n\n";
+        report += "--------- Stack trace ---------\n\n";
+        for (int i=0; i<arr.length; i++) {
+            report += "    "+arr[i].toString()+"\n";
+        }
+        report += "-------------------------------\n\n";
+
+        report += "--------- Cause ---------\n\n";
+        Throwable cause = e.getCause();
+        if(cause != null) {
+            report += cause.toString() + "\n\n";
+            arr = cause.getStackTrace();
+            for (int i=0; i<arr.length; i++) {
+                report += "    "+arr[i].toString()+"\n";
+            }
+        }
+        report += "-------------------------------\n\n";
+        createErrorFile(report,errorMsg);
+    }
+
+    private void createErrorFile(String report,String msg) {
+        try {
+            String deviceId = Build.SERIAL;
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+            String _directory = Environment.getExternalStorageDirectory() + "/RoboTutor/";
+            File logFileDir = new File(_directory);
+            if(!logFileDir.exists()){
+                logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
+            }
+            _directory = _directory + "/RoboTutor_ERROR/";
+            logFileDir = new File(_directory);
+            if(!logFileDir.exists()){
+                logFileDir.mkdirs(); // incase RoboTutor folder is nonexistent
+            }
+
+
+            File logFile = new File(_directory + "ERROR_RoboTutor_" + sessionStartTime +"_" + BuildConfig.BUILD_TYPE + "_" +
+                    getSequenceId() + "_" +
+                    timestamp + deviceId + ".txt");
+            logFile.createNewFile();
+            FileOutputStream trace = new FileOutputStream(logFile, false);
+            trace.write(report.getBytes());
+            trace.close();
+        } catch(IOException ioe) {
+            Log.d("CEF",ioe.getMessage());
+            ioe.printStackTrace();
+        }
+
+    }
+
+    private String getSequenceId() {
+        //Example RoboTutor__3.5.0.1_000019_2023.02.15.22.05.05_unknown : in this example 000019 is being extracted which occurs between 3rd and 4th underscore.
+       int cnt = 0;
+       String sequenceId="";
+       for(int i=0;i<log_Filename.length();i++){
+           if(cnt == 3){
+               for(int j=i;j<log_Filename.length();j++){
+                   if(log_Filename.charAt(j) == '_') break;
+                   sequenceId += log_Filename.charAt(j);
+               }
+               break;
+           }
+           if(log_Filename.charAt(i) == '_') cnt++;
+       }
+       return sequenceId;
     }
 
 
@@ -494,6 +594,11 @@ public class CLogManagerBase implements ILogManager {
     }
 
 
+    private void post(String packet, String msg, Exception e) {
+        enQueue(new Queue(packet,msg,e));
+    }
+
+
     /**
      * Post a command to this scenegraph queue
      *
@@ -610,7 +715,7 @@ public class CLogManagerBase implements ILogManager {
                 "\"msg\":\"" + Msg + "\"" +
                 "},\n";
 
-        post(packet);
+        post(packet,Msg,null);
     }
 
 
@@ -618,6 +723,10 @@ public class CLogManagerBase implements ILogManager {
     public void postError(String Tag, String Msg, Exception e) {
 
         String packet;
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString().replace('\n',';');
 
         packet = "{" +
                 "\"class\":\"ERROR\"," +
@@ -625,11 +734,14 @@ public class CLogManagerBase implements ILogManager {
                 "\"type\":\"Exception\"," +
                 "\"time\":\"" + System.currentTimeMillis() + "\"," +
                 "\"msg\":\"" + Msg + "\"," +
-                "\"exception\":\"" + e.toString() + "\"" +
+                "\"exception\":\"" + e.toString() + "\"," +
+                "\"stack_trace\":\"" + stackTrace + "\"" +
                 "},\n";
 
-        post(packet);
+        post(packet,Msg,e);
     }
+
+
 
     @Override
     public void postBattery(String Tag, String percent, String chargeType) {
@@ -652,7 +764,6 @@ public class CLogManagerBase implements ILogManager {
 
     @Override
     public void postPacket(String packet) {
-
         post(packet);
     }
 }
