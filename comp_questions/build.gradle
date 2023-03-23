@@ -33,5 +33,4 @@ dependencies {
     api project(':util')
     api project(':comp_ask')
     api project(':comp_logging')
-    api project(':app')
 }
