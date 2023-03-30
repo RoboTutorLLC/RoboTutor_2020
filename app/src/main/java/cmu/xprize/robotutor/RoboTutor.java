@@ -36,6 +36,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import androidx.annotation.RequiresApi;
 
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,9 +77,9 @@ import cmu.xprize.ltkplus.CRecognizerPlus;
 import cmu.xprize.ltkplus.GCONST;
 import cmu.xprize.ltkplus.IGlyphSink;
 import cmu.xprize.robotutor.startup.CStartView;
-import cmu.xprize.util.configuration.Configuration;
-import cmu.xprize.util.configuration.ConfigurationItems;
-import cmu.xprize.util.configuration.ConfigurationQuickOptions;
+import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.robotutor.startup.configuration.ConfigurationItems;
+import cmu.xprize.robotutor.startup.configuration.ConfigurationQuickOptions;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CTutorAssetManager;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;
@@ -103,6 +104,7 @@ import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.SONGS_MATRI
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.STORIES_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.UNKNOWN_MATRIX;
 import static cmu.xprize.robotutor.tutorengine.QuickDebugTutorList.INTERVENTION_BPOP;
+import static cmu.xprize.robotutor.tutorengine.QuickDebugTutorList.INTERVENTION_NUMCOMPARE;
 import static cmu.xprize.util.TCONST.ENGLISH_ASSET_PATTERN;
 import static cmu.xprize.util.TCONST.GRAPH_MSG;
 import static cmu.xprize.util.TCONST.INTERVENTION_STUDENT_FILE;

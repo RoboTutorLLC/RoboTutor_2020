@@ -1,4 +1,4 @@
-package cmu.xprize.util.configuration;
+package cmu.xprize.robotutor.startup.configuration;
 
 import android.util.Log;
 

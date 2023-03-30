@@ -26,7 +26,7 @@ import android.widget.ToggleButton;
 
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.util.configuration.Configuration;
+import cmu.xprize.robotutor.startup.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;
 import cmu.xprize.robotutor.tutorengine.CObjectDelegate;
