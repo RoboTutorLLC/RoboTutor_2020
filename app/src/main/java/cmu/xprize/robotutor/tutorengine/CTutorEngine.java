@@ -40,14 +40,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.graph.databinding;
 import cmu.xprize.robotutor.tutorengine.graph.defdata_scenes;
 import cmu.xprize.robotutor.tutorengine.graph.defdata_tutor;
@@ -56,6 +55,7 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.util.CClassMap2;
 import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
+import cmu.xprize.robotutor.tutorengine.util.MABHandler;
 import cmu.xprize.robotutor.tutorengine.util.PromotionMechanism;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelCSV;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
@@ -67,8 +67,6 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.DEBUG_CSV;
-import static cmu.xprize.util.TCONST.LANG_EN;
-import static cmu.xprize.util.TCONST.NULL;
 
 /**
  * The tutor engine provides top-levelFolder control over the tutor lifecycle and can support multiple
@@ -823,6 +821,14 @@ public class CTutorEngine implements ILoadableObject2 {
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
         return matrix;
+    }
+
+    private static void getArm() {
+        String tutorName = "activity_selector";
+        String dataPath = TCONST.TUTORROOT + "/" + tutorName;
+        String dataFile = RoboTutor.ARM_WEIGHTS_FILE;
+
+        MABHandler.getArm(dataPath + "/" + dataFile, mRootScope);
     }
 
 
