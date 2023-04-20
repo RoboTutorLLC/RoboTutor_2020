@@ -1,4 +1,4 @@
-package cmu.xprize.robotutor.startup.configuration;
+package cmu.xprize.util.configuration;
 
 import java.util.HashMap;
 
