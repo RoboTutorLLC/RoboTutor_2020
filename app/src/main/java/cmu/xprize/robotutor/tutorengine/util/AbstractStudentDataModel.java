@@ -3,7 +3,7 @@ package cmu.xprize.robotutor.tutorengine.util;
 import android.util.Log;
 
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.util.CPlacementTest_Tutor;
 

@@ -20,23 +20,18 @@ package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
-import com.google.gson.JsonParser;
-
 import org.json.JSONObject;
-
-import java.io.FileReader;
 
 import cmu.xprize.banner.CBanner;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.comp_logging.PerformanceLogItem;
 import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CObjectDelegate;
 import cmu.xprize.robotutor.tutorengine.CTutor;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;

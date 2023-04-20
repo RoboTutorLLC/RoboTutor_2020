@@ -7,16 +7,12 @@ import android.util.Log;
 import java.util.Map;
 
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;
-import cmu.xprize.util.CPlacementTest_Tutor;
 
-import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_MATH;
-import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_STORIES;
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 import static cmu.xprize.util.TCONST.LANG_SW;
 import static cmu.xprize.util.TCONST.MENU_BUG_TAG;
-import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
 
 /**
  * RoboTutor
