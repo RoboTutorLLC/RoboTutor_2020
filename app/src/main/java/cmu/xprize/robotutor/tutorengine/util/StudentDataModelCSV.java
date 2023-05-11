@@ -30,8 +30,8 @@ import static cmu.xprize.util.TCONST.LANG_SW;
  */
 public class StudentDataModelCSV extends AbstractStudentDataModel implements IStudentDataModel {
 
-    private static final String ROOTFOLDER = Environment.DIRECTORY_DOWNLOADS;
-    private static final String SUBFOLDER = "robotutor";
+    private static final String ROOTFOLDER =  "/sdcard/RoboTutor/";
+    private static final String SUBFOLDER = "robotutor_studentModels";
     // first load ORIGINAL, then save to and load from UPDATED
     private static final String ORIGINAL_CSV = "students.csv";
     private static final String UPDATED_CSV = "update_students.csv";
