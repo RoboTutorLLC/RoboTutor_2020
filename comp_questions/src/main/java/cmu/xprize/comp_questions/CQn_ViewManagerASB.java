@@ -30,10 +30,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -44,7 +48,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.NavigableMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import cmu.xprize.util.CPersonaObservable;
 import cmu.xprize.util.ILoadableObject;
@@ -58,12 +64,18 @@ import static cmu.xprize.comp_questions.QN_CONST.FTR_PLAY_GEN;
 import static cmu.xprize.comp_questions.QN_CONST.GEN_QUESTION_CHANCE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_CLZSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_LINESTATE;
+//import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPSTATE;
+import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPDOESSTATE;
+import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_NSPWHICHSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PARASTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_PMSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_QNSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.RTC_VAR_WORDSTATE;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_CLOZE;
+import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP_DOES;
+import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP_WHICH;
 import static cmu.xprize.comp_questions.QN_CONST.SHOW_PICMATCH;
+//import static cmu.xprize.comp_questions.QN_CONST.SHOW_NSP;
 import static cmu.xprize.util.TCONST.FTR_USER_READ;
 import static cmu.xprize.util.TCONST.FTR_USER_READING;
 import static cmu.xprize.util.TCONST.QGRAPH_MSG;
@@ -104,6 +116,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private int                     picmatch_answer;
     private boolean                 picture_match_mode = false;
     private boolean                 cloze_page_mode = false;
+    private boolean                 nsp_does_mode = false;
+    private boolean                 nsp_which_mode = false;
     private boolean                 isClozePage = false;
     private ViewGroup               mPicturePage;
     private int                     numPicMatch; // OPEN_SOURCE how does this get set???
@@ -135,6 +149,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private int                     mOddIndex;
     private int                     mEvenIndex;
     private int                     mCurrViewIndex;
+
+    // NSP
+    private TextView                curNSPTextView;
+    private boolean                 isNSPPage = false;
+
 
     // state for the current storyName - African Story Book
 
@@ -203,7 +222,23 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     private boolean                 hasUngrammatical       = false;
     private boolean                 hasPlausible           = false;
 
+    private boolean                 hasCorrect              = false;
+    private boolean                 hasNext                 = false;
+    private boolean                 hasRandom               = false;
+    private boolean                 hasEasiest              = false;
+    private boolean                 hasHardest              = false;
 
+    private String                  nsp_choice_type; // choice type from config.json (easiest, next, hardest)
+    private String                  nsp_question_type; // question mode type from config.json (MC or TF)
+    private String                  NSPDoesDistractor;
+    private String                  NSPDoesCorrect;
+    private int                     NSPSentenceIndex;
+
+
+    private String                  NSPWhichSentence1Text;
+    private String                  NSPWhichSentence2Text;
+    private boolean                 isNSPWhichSentence1Correct;
+    private boolean                 isNSPWhichSentence2Correct;
 
     // json loadable
     // ZZZ where the money gets loaded
@@ -225,11 +260,38 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public ClozeQuestion[] questions;
 
     public List<Integer>  clozeIndices;
+    public List<Integer>  NSPIndices;
 
     private String curGenericQuestion = "";
 
     static final String TAG = "CQn_ViewManagerASB";
 
+
+    // NSP buttons
+    private ImageButton mSmiley;
+    private ImageButton mFrownie;
+
+    private ImageButton mSmiley1;
+    private ImageButton mSmiley2;
+    private int NSPWordsCounter;
+    private TextView mLastNSPWord;
+    private boolean nsp_does_answer; //correct answer (true for smiley, false for frownie)
+    private boolean isNSPDoesPage;
+    private NSPQuestion NspQuestion;
+    private NSPQuestion[] NspQuestions;
+    private String NSPWhichCorrectSentence;
+    private String NSPWhichIncorrectSentence;
+    private TextView                NSPWhichSentence1;
+    private TextView                NSPWhichSentence2;
+    private TextView                NSPDoesSentence;
+    private boolean isNSPWhichPage;
+    private String NSPDoesSentenceText;
+
+    private boolean isNSPDoesDistractor;
+    private boolean isNSPDoesTrulyNext;
+
+
+    protected int NSPAttemptCount = 0;
 
     /**
      *
@@ -273,7 +335,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
      * @param assetPath
      */
     public void initStory(IVManListener owner, String assetPath, String location) {
-
         // FOR_HUI... these should not exist
         try {
             for (int i = 0; i < questions.length; i++) {
@@ -284,6 +345,20 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         } catch (Exception e) {
             Log.e(TAG, "Missing mcq.json... please add.");
         }
+
+
+
+        // TODO: Fix
+//        try {
+//            for (int i = 0; i < NspQuestions.length - 1; i++) {
+//                NspQuestion = NspQuestions[i];
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Missing nsp.json... please add.");
+//            Log.e(TAG, e.toString());
+//        }
+
+        loadConfig();
 
         mCurrLineInStory = 0;
         mOwner        = owner;
@@ -301,14 +376,27 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         }else if (mParent.testFeature(TCONST.FTR_GEN)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.TRUE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
         } else if (mParent.testFeature(TCONST.FTR_PIC)) {
             mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
             mParent.publishValue(RTC_VAR_PMSTATE, TCONST.TRUE);
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.FALSE);
+        } else if (mParent.testFeature(TCONST.FTR_NSP)) {
+            mParent.publishValue(RTC_VAR_CLZSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_QNSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_PMSTATE, TCONST.FALSE);
+//            Determine IsNext or WhichNext and publish accordingly
+            mParent.publishValue(RTC_VAR_NSPWHICHSTATE, TCONST.FALSE);
+            mParent.publishValue(RTC_VAR_NSPDOESSTATE, TCONST.TRUE);
         }
 
 
@@ -367,6 +455,99 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             cloze_page_mode = false;
         }
     }
+
+    @Override
+    public void setNSPWhichPage() {
+//        // intializes
+//        int paracount = data[mCurrPage+1].text.length;
+//        int numLines = 0;
+//        numWordsCurPage = 0;
+//        for(int i = 0; i < paracount; i++){
+//            int linecount = data[mCurrPage+1].text[i].length;
+//            numLines+=linecount;
+//            for (int j = 0; j < linecount;j++){
+//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+//                for(int k = 0; k < utteranceLen; k++){
+//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+//                }
+//            }
+//        }
+
+//        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+//            if (mPageCount == NspQuestion.choices.get(i).index) {
+//                nsp_which_mode = true;
+//                updateNSPWhichButtons();
+//                break;
+//            } else {
+//                nsp_which_mode = false;
+//            }
+//        }
+
+
+
+
+    }
+
+    // Creates an NSP Does page, called by SET_NSP_DOES_PAGE
+    // Assigns the sentence to be shown on the screen
+    @Override
+    public void setNSPDoesPage() {
+
+        if(nsp_does_mode && isNSPDoesPage) {
+//            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
+//                if (NSPQuestion.choices.get(i).type.equals("correct")) {
+//                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
+//                } if (NSPQuestion.choices.get(i).type.equals(nsp_choice_type)) {
+//                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+////                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
+//                }
+//            }
+
+            if (getRandomNumberInRange(0, 1) == 0) {
+                // show distractor
+                NSPDoesSentenceText = NSPDoesDistractor;
+                isNSPDoesDistractor = true;
+                isNSPDoesTrulyNext = false;
+            } else {
+                // show truly next
+                NSPDoesSentenceText = NSPDoesCorrect;
+                isNSPDoesDistractor = false;
+                isNSPDoesTrulyNext = true;
+            }
+        }
+
+//        int paracount = data[mCurrPage+1].text.length;
+//        int numLines = 0;
+//        numWordsCurPage = 0;
+//        for(int i = 0; i < paracount; i++){
+//            int linecount = data[mCurrPage+1].text[i].length;
+//            numLines+=linecount;
+//            for (int j = 0; j < linecount;j++){
+//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+//                for(int k = 0; k < utteranceLen; k++){
+//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+//                }
+//
+//            }
+//        }
+
+
+        // SHOW the buttons on the screen
+
+//        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+//            if (mPageCount == NspQuestion.choices.get(i).index) {
+//                nsp_does_mode = true;
+//                updateNSPDoesButtons();
+//                break;
+//            } else {
+//                nsp_does_mode = false;
+//            }
+//        }
+
+
+    }
+
+
 
     /**
      *  NOTE: we reset mCurrWord - last parm in seekToStoryPosition
@@ -788,6 +969,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 case MotionEvent.ACTION_UP:
                     mParent.updateViewAlpha(_imageView, (float) 1.0);
                     disableImageButtons();
+
                     if (picmatch_answer == _index){
                         mParent.updateViewColor(_frame, Color.GREEN);
                         mParent.publishFeature(TCONST.PICMATCH_CORRECT);
@@ -967,6 +1149,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mSay      = mOddPage.findViewById(R.id.Sspeak);
             setPicMatchView(mOddPage);
             setClozeView(mOddPage);
+//            setNSPDoesView(mOddPage);
+//            setNSPWhichView(mOddPage);
         } else {
             mCurrViewIndex = mEvenIndex;
             Log.d(TAG, "flipPage: asdfad mevenpage");
@@ -976,6 +1160,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mSay = mEvenPage.findViewById(R.id.Sspeak);
             setPicMatchView(mEvenPage);
             setClozeView(mEvenPage);
+//            setNSPDoesView(mEvenPage);
+//            setNSPWhichView(mEvenPage);
         }
         // Ensure the buttons reflect the current states
         updateButtons();
@@ -996,6 +1182,18 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             hideImageButtons();
             disableImageButtons();
         }
+//        if(nsp_which_mode) {
+//            updateNSPWhichButtons();
+//        } else {
+//            hideNSPWhichButtons();
+//            disableNSPWhichButtons();
+//        }
+//        if(nsp_does_mode) {
+//            updateNSPDoesButtons();
+//        } else {
+//            hideNSPDoesButtons();
+//            disableNSPDoesButtons();
+//        }
 
     }
 
@@ -1046,6 +1244,20 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         Log.d(TAG, "setPicMatchView: mImageGrid = null:"+(mImageGrid == null));
     }
 
+    private void setNSPWhichView(ViewGroup vgroup){
+        Log.d(TAG, "setNSPWhich: aslkdjfalksdf");
+        NSPWhichSentence1 = vgroup.findViewById(R.id.SnspSentence1Text);
+        NSPWhichSentence2 = vgroup.findViewById(R.id.SnspSentence2Text);
+        mSmiley1 = vgroup.findViewById(R.id.SnspSmiley1);
+        mSmiley2 = vgroup.findViewById(R.id.SnspSmiley2);
+    }
+    private void setNSPDoesView(ViewGroup vgroup){
+        Log.d(TAG, "setNSPDoes: askfldhklasdf");
+        NSPDoesSentence = vgroup.findViewById(R.id.SnspDoesText);
+        mSmiley = vgroup.findViewById(R.id.SnspDoesSmiley);
+        mFrownie = vgroup.findViewById(R.id.SnspDoesFrownie);
+    }
+
     private static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("max must be greater than min");
@@ -1085,7 +1297,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 e.printStackTrace();
             }
         }
-
     }
 
 
@@ -1593,6 +1804,10 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     }
 
+    private void seekToNSPStoryPosition(int currPage, int currPara, int currLine, int currWord) {
+        // TODO
+    }
+
     /**
      * Replaces the last word in the raw sentence with a blank
      * @param rawSentence
@@ -1989,6 +2204,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             } else if (picture_match_mode){
                 incPage(TCONST.INCR);
             } else {
+
                 incPage(TCONST.INCR);
             }
         }
@@ -1999,6 +2215,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        } else {
         mParent.animatePageFlip(true, mCurrViewIndex);
         Log.d(TAG, "nextPage: cloze_page_mode = "+cloze_page_mode+" isClozePage = "+isClozePage);
+        Log.d(TAG, "nextPage: nsp_does_mode = "+nsp_does_mode+" nsp_which_mode = "+nsp_which_mode);
 //        }
     }
 
@@ -2156,7 +2373,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
                 } else {
                     incLine(TCONST.INCR);
                 }
-            } else {
+            } else if(nsp_which_mode || nsp_does_mode) {
+                incLine(TCONST.INCR);
+            }
+
+            else {
                 incLine(TCONST.INCR);
             }
         }
@@ -2210,7 +2431,6 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             seekToClozeStoryPosition(mCurrPage, mCurrPara, mCurrLine, TCONST.ZERO);
         }
     }
-
 
     /**
      *  NOTE: we reset mCurrWord - last parm in seekToStoryPosition
@@ -2731,9 +2951,11 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             if (isClozePage && mCurrPara >= mParaCount-1){
                 mParent.publishValue(SHOW_CLOZE, TCONST.TRUE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             } else {
                 mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
             }
         }
     }
@@ -2743,12 +2965,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         //TODO: either call one or the other depending on ftr
         hasClozeDistractor();
         hasPictureMatch();
+        hasNSPDistractor();
     }
 
     public void hasPictureMatch(){
         if (picture_match_mode && mCurrPara >= mParaCount-1 && mCurrPage % 2 == 1) {
             mParent.publishValue(SHOW_PICMATCH, TCONST.TRUE);
             mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+//            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
         }
 //        } else {
 //            mParent.publishValue(TCONST.SHOW_PICMATCH, TCONST.FALSE);
@@ -2756,6 +2980,102 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        }
     }
 
+
+    public void loadConfig(){
+        ArrayList<Double> nspQuestion = new ArrayList<>(); // MC or TF
+        ArrayList<Double> nspChoice = new ArrayList<>(); // Easiest, next, etc
+
+        String dataPath = TCONST.DOWNLOAD_PATH + "/config.json";
+        String jsonData = JSON_Helper.cacheDataByName(dataPath);
+
+
+        try {
+            // get JSONObject from JSON file
+            JSONObject obj = new JSONObject(jsonData);
+
+            JSONObject nsp_qtype = obj.getJSONObject("nsp_question_probability");
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("which_sentence_is_next")));
+            Log.d(TAG, "WHICHNEXT: " + nsp_qtype.getString("which_sentence_is_next") );
+            nspQuestion.add(Double.valueOf(nsp_qtype.getString("is_this_sentence_next")));
+            Log.d(TAG, "ISNEXT: " + nsp_qtype.getString("is_this_sentence_next") );
+
+
+            JSONObject nsp_ctype = obj.getJSONObject("nsp_choice_type");
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("correct")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("next")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("random")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("easiest")));
+            nspChoice.add(Double.valueOf(nsp_ctype.getString("hardest")));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Random r = new Random();
+        double value = r.nextDouble();
+        if (value <= nspQuestion.get(0)) {
+            nsp_question_type = "WhichNext";
+
+        } else {
+            nsp_question_type = "IsNext";
+        }
+
+
+        String [] choices = {"correct", "next", "random", "easiest", "hardest"};
+        NavigableMap<Double, String> map = new TreeMap<Double, String>();
+        double totalWeight = 0;
+        for (int i = 0; i < 5; i++){
+            totalWeight += nspChoice.get(i);
+            map.put(totalWeight, choices[i]);
+        }
+
+        r = new Random();
+        value = r.nextDouble() * totalWeight;
+        nsp_choice_type = map.higherEntry(value).getValue();
+        if(nsp_choice_type.equals("WhichNext")) {
+            while (nsp_choice_type.equals("correct")) {
+                value = r.nextDouble() * totalWeight;
+                nsp_choice_type = map.higherEntry(value).getValue();
+            }
+        }
+    }
+    @Override
+    public void hasNSPDistractor() {
+        // load config.json
+        // Do the probabilities - set whichNext or isNext
+        // check current page whether there is an nsp question
+        // publishValue SHOW_NSP_DOES, SHOW_NSP_WHICH
+        // TODO: WHERE IS isNSPDoesPage/isNSPWhichPage set??? temporarily not in the condition
+
+//        if (mCurrPage <= mPageCount-1) {
+//            for (int i = 0; i < NspQuestions.length; i++) {
+//                NspQuestion = NspQuestions[i];
+//                for (int j = 0; j < NspQuestion.choices.size(); j++) {
+////                    NSPSentenceIndex = NspQuestion.choices.get(j).index;
+//                    String type = NspQuestion.choices.get(j).type;
+//                    if (type.equals(nsp_choice_type) && mCurrPage == NSPSentenceIndex) {
+//                        mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
+//                        mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
+//                        if (nsp_question_type.equals("TF")) {
+//                            isNSPDoesPage = true;
+//                            mParent.publishValue(SHOW_NSP_DOES, TCONST.TRUE);
+//                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.FALSE);
+//                        } else if (nsp_question_type.equals("MC")) {
+//                            isNSPWhichPage = true;
+//                            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
+//                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.TRUE);
+//                        } else {
+//                            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
+//                            mParent.publishValue(SHOW_NSP_WHICH, TCONST.FALSE);
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
+
+
+    }
 
 
     /**
@@ -3092,4 +3412,528 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public boolean isPicMode() {return picture_match_mode;}
+
+    @Override
+    public boolean isNSPDoesMode() { return nsp_does_mode;}
+
+    @Override
+    public boolean isNSPWhichMode() { return nsp_which_mode;}
+
+
+
+
+
+
+
+    @Override
+    public void displayNSPWhichQuestion() {
+        // Shows the sentences
+        // TODO: ANIMATE (put the highlight thing, button with robofinger)
+        NSPWhichSentence1.setText(NSPWhichSentence1Text);
+        NSPWhichSentence1.bringToFront();
+        NSPWhichSentence2.setText(NSPWhichSentence2Text);
+        NSPWhichSentence2.bringToFront();
+        showNSPWhichButtons();
+
+    }
+
+
+    @Override
+    public void setNSPWhichQuestion() {
+
+        if(isNSPWhichPage) {
+            int numLinesCurPage = data[mCurrPage].text.length;
+            this.NspQuestion = NspQuestions[numLinesCurPage-1];
+
+//            for(int i = 0; i < NspQuestion.choices.size(); i++) {
+//                if (NspQuestion.choices.get(i).type.equals("correct")) {
+//                    NSPWhichCorrectSentence =  NspQuestion.choices.get(i).text;
+//                } if (NspQuestion.choices.get(i).type.equals("next") && nsp_question_type.equals("next")) {
+//                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+//                } if (NspQuestion.choices.get(i).type.equals("easiest") && nsp_question_type.equals("easiest")) {
+//                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+//                }if (NspQuestion.choices.get(i).type.equals("random") && nsp_question_type.equals("random")) {
+//                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+//                } if (NspQuestion.choices.get(i).type.equals("hardest") && nsp_question_type.equals("hardest")) {
+//                    NSPWhichIncorrectSentence =  NspQuestion.choices.get(i).text;
+//                }
+//            }
+
+
+            if (getRandomNumberInRange(0, 1) == 0) {
+                // sentence 1 correct
+                NSPWhichSentence1Text = NSPWhichCorrectSentence;
+                NSPWhichSentence2Text = NSPWhichIncorrectSentence;
+                isNSPWhichSentence1Correct = true;
+                isNSPWhichSentence2Correct = false;
+            } else {
+                // sentence 2 correct
+                NSPWhichSentence1Text = NSPWhichIncorrectSentence;
+                NSPWhichSentence2Text = NSPWhichCorrectSentence;
+                isNSPWhichSentence1Correct = false;
+                isNSPWhichSentence2Correct = true;
+            }
+
+        }
+
+
+    }
+
+
+
+    public void updateNSPWhichButtons() {
+        Log.d(TAG, "updateNSPWhichButtons: ");
+        disableNSPWhichButtons();
+        if (isNSPDoesPage){
+            mSmiley1.setOnTouchListener(new NSPWhichTouchListener(mSmiley1, 0));
+            mSmiley2.setOnTouchListener(new NSPWhichTouchListener(mSmiley2, 1));
+        }
+    }
+
+
+    @Override
+    public void showNSPWhichButtons() {
+        Log.d(TAG, "showNSPWhichButtons: ");
+        setButtonState(mSmiley1, "SHOW");
+        setButtonState(mSmiley2, "SHOW");
+        mSmiley1.setVisibility(View.VISIBLE);
+        mSmiley2.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideNSPWhichButtons() {
+        Log.d(TAG, "hideNSPWhichButtons: ");
+        setButtonState(mSmiley1, "DISABLE");
+        setButtonState(mSmiley2, "DISABLE");
+        mSmiley1.setVisibility(View.INVISIBLE);
+        mSmiley2.setVisibility(View.INVISIBLE);
+
+    }
+
+    @Override
+    public void enableNSPWhichButtons() {
+        setButtonState(mSmiley1, "ENABLE");
+        setButtonState(mSmiley2, "ENABLE");
+    }
+
+    @Override
+    public void disableNSPWhichButtons() {
+        setButtonState(mSmiley1, "DISABLE");
+        setButtonState(mSmiley2, "DISABLE");
+    }
+
+
+    @Override
+    public void displayNSPDoesQuestion() {
+        NSPDoesSentence.setText(NSPDoesSentenceText);
+        NSPDoesSentence.bringToFront();
+        // highlight and say aloud, add buttons ata
+
+    }
+
+    @Override
+    public void setNSPDoesQuestion() {
+
+
+
+    }
+
+    public void resetNSPDoesButtons() {
+        mSmiley.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley, (float) 1.0);
+        mFrownie.setImageResource(R.drawable.dislike);
+        mParent.updateImageAlpha(mSmiley, (float) 1.0);
+
+    }
+
+    @Override
+    public void showNSPDoesButtons() {
+        Log.d(TAG, "showNSPDoesButtons: ");
+        setButtonState(mSmiley, "SHOW");
+        setButtonState(mFrownie, "SHOW");
+        mSmiley.setVisibility(View.VISIBLE);
+        mFrownie.setVisibility(View.VISIBLE);
+    }
+
+    public void showNSPDoesButtonsWithRoboFinger() {
+        // TODO: Robofinger
+        setButtonState(mSmiley, "SHOW");
+        setButtonState(mFrownie, "SHOW");
+        mSmiley.setVisibility(View.VISIBLE);
+
+        mFrownie.setVisibility(View.VISIBLE);
+
+    }
+
+    @Override
+    public void hideNSPDoesButtons() {
+        Log.d(TAG, "hideNSPDoesButtons: ");
+        setButtonState(mSmiley, "DISABLE");
+        setButtonState(mFrownie, "DISABLE");
+        mSmiley.setVisibility(View.INVISIBLE);
+        mFrownie.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void enableNSPDoesButtons() {
+        setButtonState(mSmiley, "ENABLE");
+        setButtonState(mFrownie, "ENABLE");
+    }
+
+    @Override
+    public void disableNSPDoesButtons() {
+        setButtonState(mSmiley, "DISABLE");
+        setButtonState(mFrownie, "DISABLE");
+    }
+
+    @Override
+    public void resetNSPWhichButtons() {
+        mSmiley1.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley1, (float) 1.0);
+        mSmiley2.setImageResource(R.drawable.like);
+        mParent.updateImageAlpha(mSmiley2, (float) 1.0);
+    }
+
+
+    // TODO: Merge the playNSPSentence Methods
+    @Override
+    public void playNSPWhichSentence() {
+        segmentNdx = 0;
+        trackNarration(true);
+        String filename = currUtterance.audio.toLowerCase();
+        if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
+            filename = filename.substring(0,filename.length()-4);
+        }
+
+        // Publish the current utterance within sentence
+        //
+        mParent.publishValue(TCONST.RTC_VAR_UTTERANCE,  filename);
+        // NOTE: Due to inconsistencies in the segmentation data, you cannot depend on it
+        // having precise timing information.  As a result the segment may timeout before the
+        // audio has completed. To avoid this we use oncomplete in type_audio to push an
+        // TRACK_SEGMENT back to this components queue.
+        // Tell the script to speak the new uttereance
+        //
+        Log.d(TAG, "playNSPSentence: curutterance = "+currUtterance);
+        mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+
+        postDelayedTracker();
+
+
+    }
+
+
+
+    @Override
+    public void playNSPDoesSentence() {
+        segmentNdx = 0;
+        trackNarration(true);
+        String filename = currUtterance.audio.toLowerCase();
+        if (filename.endsWith(".wav") || filename.endsWith(".mp3")) {
+            filename = filename.substring(0,filename.length()-4);
+        }
+
+        // Publish the current utterance within sentence
+        //
+        mParent.publishValue(TCONST.RTC_VAR_UTTERANCE,  filename);
+        // NOTE: Due to inconsistencies in the segmentation data, you cannot depend on it
+        // having precise timing information.  As a result the segment may timeout before the
+        // audio has completed. To avoid this we use oncomplete in type_audio to push an
+        // TRACK_SEGMENT back to this components queue.
+        // Tell the script to speak the new uttereance
+        //
+        Log.d(TAG, "playNSPSentence: curutterance = "+currUtterance);
+        mParent.applyBehavior(TCONST.SPEAK_UTTERANCE);
+
+        postDelayedTracker();
+
+
+    }
+
+
+    private void updateNSPDoesButtons(){
+        Log.d(TAG, "updateNSPDoesButtons: ");
+        disableNSPDoesButtons();
+        if (isNSPDoesPage){
+            mSmiley.setOnTouchListener(new NSPDoesTouchListener(mSmiley, 0));
+            mFrownie.setOnTouchListener(new NSPDoesTouchListener(mFrownie, 1));
+        }
+    }
+
+    private class NSPDoesTouchListener implements OnTouchListener {
+        ImageButton _imageButton;
+        int _index;
+
+        NSPDoesTouchListener(ImageButton imageButton, int index) {
+            this._imageButton = imageButton;
+            this._index = index;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mParent.updateImageAlpha(_imageButton, (float) 0.5); // remove this
+                    if (mSmiley == _imageButton) {
+                        _imageButton.setImageResource(R.drawable.like_clicked); // set the size to smaller
+                    } else if (mFrownie == _imageButton){
+                        _imageButton.setImageResource(R.drawable.dislike_clicked);
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    NSPAttemptCount = NSPAttemptCount + 1;
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    if (mSmiley == _imageButton) {
+                        _imageButton.setImageResource(R.drawable.like_clicked);
+                    } else if (mFrownie == _imageButton){
+                        _imageButton.setImageResource(R.drawable.dislike_clicked);
+                    }
+                    disableNSPDoesButtons();
+                    // truly next
+                    if(isNSPDoesTrulyNext && (_imageButton == mSmiley)) {
+                        NSPDoesTrulyCorrect();
+                        mParent.publishFeature("NSP_DOES_CORRECT");
+                        mParent.retractFeature("NSP_DOES_WRONG1");
+                        mParent.retractFeature("NSP_DOES_WRONG2");
+                        mParent.retractFeature("NSP_DOES_HESITATE1");
+                        mParent.retractFeature("NSP_DOES_HESITATE2");
+                        mParent.logNSPPerformance(true, NSPDoesCorrect, NSPSentenceIndex, "TF"); // edit this
+                        isNSPDoesPage = false;
+                        hasQuestion();
+                    } else if (isNSPDoesTrulyNext && (_imageButton == mFrownie)) {
+                        // incorrect
+                        if (NSPAttemptCount == 1) {
+                            // TODO: add animation
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.publishFeature("NSP_DOES_WRONG1");
+                            mParent.retractFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+
+                        } else {
+                            NSPDoesTrulyIncorrect();
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.retractFeature("NSP_DOES_WRONG1");
+                            mParent.publishFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+                            mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
+                        }
+                    }
+                    // distractor
+                    else if((isNSPDoesDistractor && (_imageButton == mFrownie)) || (isNSPDoesDistractor && NSPDoesCorrect.equals(NSPDoesDistractor) && (_imageButton == mSmiley))) {
+                        // correct
+                        mParent.publishFeature("NSP_DOES_DISTRACTOR_CORRECT");
+                        mParent.retractFeature("NSP_DOES_DISTRACTOR_WRONG");
+                        mParent.retractFeature("NSP_DOES_TRULY_CORRECT");
+                        mParent.retractFeature("NSP_DOES_TRULY_WRONG");
+                        mParent.logNSPPerformance(true, NSPDoesCorrect, NSPSentenceIndex, "TF");
+                        isNSPDoesPage = false;
+                        hasQuestion();
+                    } else if (isNSPDoesDistractor && (_imageButton == mSmiley)) {
+                        if (NSPAttemptCount == 1) {
+                            // TODO: add animation
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.publishFeature("NSP_DOES_WRONG1");
+                            mParent.retractFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+
+                        } else {
+                            NSPDoesDistractorIncorrect();
+                            mParent.retractFeature("NSP_DOES_CORRECT");
+                            mParent.retractFeature("NSP_DOES_WRONG1");
+                            mParent.publishFeature("NSP_DOES_WRONG2");
+                            mParent.retractFeature("NSP_DOES_HESITATE1");
+                            mParent.retractFeature("NSP_DOES_HESITATE2");
+                            mParent.logNSPPerformance(false,  NSPDoesCorrect,NSPSentenceIndex, "TF");
+                        }
+                    }
+
+                    mParent.nextNode();
+                    break;
+            }
+            return true;
+        }
+    }
+
+    private void NSPDoesTrulyCorrect() {
+        NSPDoesSentence.setTextColor(Color.GREEN);
+        hideNSPDoesButtons();
+        mParent.fadeOutImageButton(mFrownie);
+        mParent.fadeOutImageButton(mSmiley);
+        //mParent.slideQuestion
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPDoesDistractorCorrect() {
+        NSPDoesSentence.setTextColor(Color.RED);
+        hideNSPDoesButtons();
+        mParent.fadeOutImageButton(mFrownie);
+        mParent.fadeOutImageButton(mSmiley);
+        mParent.fadeOutTextView(NSPDoesSentence);
+        NSPDoesSentence.setTextColor(Color.GREEN);
+        NSPDoesSentence.setText(NSPDoesCorrect);
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPDoesTrulyIncorrect() {
+        mFrownie.setImageResource(R.drawable.dislike_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mFrownie.startAnimation(anim);
+        mParent.fadeOutImageButton(mFrownie);
+        mParent.fadeOutImageButton(mSmiley);
+        mParent.fadeOutTextView(NSPDoesSentence);
+        NSPDoesSentence.setTextColor(Color.GREEN);
+        NSPDoesSentence.setText(NSPDoesCorrect);
+        // TODO: Add sliding up animation
+
+
+    }
+    private void NSPDoesDistractorIncorrect() {
+        mSmiley.setImageResource(R.drawable.like_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mSmiley.startAnimation(anim);
+        mParent.fadeOutImageButton(mFrownie);
+        mParent.fadeOutImageButton(mSmiley);
+        mParent.fadeOutTextView(NSPDoesSentence);
+        NSPDoesSentence.setY(80); // TODO: Change
+        NSPDoesSentence.setTextColor(Color.GREEN);
+        NSPDoesSentence.setText(NSPDoesCorrect);
+
+    }
+
+    private class NSPWhichTouchListener implements OnTouchListener {
+        ImageButton _imageButton;
+        int _index;
+
+        NSPWhichTouchListener(ImageButton imageButton, int index) {
+            this._imageButton = imageButton;
+            this._index = index;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mParent.updateImageAlpha(_imageButton, (float) 0.5);
+                    _imageButton.setImageResource(R.drawable.like_clicked);
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    NSPAttemptCount = NSPAttemptCount + 1;
+                    mParent.updateImageAlpha(_imageButton, (float) 1.0);
+                    _imageButton.setImageResource(R.drawable.like);
+                    disableNSPWhichButtons();
+                    if (isNSPWhichSentence1Correct && (_imageButton == mSmiley1)) {
+                        // do the animation stuff
+                        NSPWhichSentence1Correct();
+                        mParent.publishFeature("NSP_WHICH_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_WRONG1");
+                        mParent.retractFeature("NSP_WHICH_WRONG2");
+                        mParent.retractFeature("NSP_WHICH_HESITATE1");
+                        mParent.retractFeature("NSP_WHICH_HESITATE2");
+                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        isNSPWhichPage = false;
+                        hasQuestion();
+                    } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley2)) {
+                        NSPWhichSentence2Correct();
+                        mParent.publishFeature("NSP_WHICH_CORRECT");
+                        mParent.retractFeature("NSP_WHICH_WRONG1");
+                        mParent.retractFeature("NSP_WHICH_WRONG2");
+                        mParent.retractFeature("NSP_WHICH_HESITATE1");
+                        mParent.retractFeature("NSP_WHICH_HESITATE2");
+                        mParent.logNSPPerformance(true, NSPWhichCorrectSentence, NSPSentenceIndex, "MC"); // edit this
+                        isNSPWhichPage = false;
+                        hasQuestion();
+
+                    } else if (isNSPWhichSentence1Correct && (_imageButton == mSmiley2)) {
+
+                        if (NSPAttemptCount == 1) {
+                            // add incorrect first time function
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.publishFeature("NSP_WHICH_WRONG1");
+                            mParent.retractFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+
+                        } else {
+                            NSPWhichSentence2Incorrect();
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.retractFeature("NSP_WHICH_WRONG1");
+                            mParent.publishFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                            mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        }
+
+                    } else if (isNSPWhichSentence2Correct && (_imageButton == mSmiley1)) {
+                        if (NSPAttemptCount == 1) {
+                            // add incorrect first time
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.publishFeature("NSP_WHICH_WRONG1");
+                            mParent.retractFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                        } else {
+                            NSPWhichSentence1Incorrect();
+                            mParent.retractFeature("NSP_WHICH_CORRECT");
+                            mParent.retractFeature("NSP_WHICH_WRONG1");
+                            mParent.publishFeature("NSP_WHICH_WRONG2");
+                            mParent.retractFeature("NSP_WHICH_HESITATE1");
+                            mParent.retractFeature("NSP_WHICH_HESITATE2");
+                            mParent.logNSPPerformance(false, NSPWhichCorrectSentence, NSPSentenceIndex, "MC");
+                        }
+                    }
+                    mParent.nextNode();
+                    break;
+            }
+            return true;
+        }
+    }
+
+    private void NSPWhichSentence1Correct() {
+        NSPWhichSentence1.setTextColor(Color.GREEN);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        mParent.fadeOutTextView(NSPWhichSentence2);
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPWhichSentence2Correct() {
+        NSPWhichSentence2.setTextColor(Color.GREEN);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        mParent.fadeOutTextView(NSPWhichSentence1);
+        // TODO: Add sliding up animation
+    }
+
+    private void NSPWhichSentence1Incorrect() {
+        mSmiley1.setImageResource(R.drawable.like_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mSmiley1.startAnimation(anim);
+
+        mParent.fadeOutTextView(NSPWhichSentence1);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        // TODO: Add sliding up animation on NSPWhichSentence2
+    }
+
+    private void NSPWhichSentence2Incorrect() {
+        mSmiley2.setImageResource(R.drawable.like_clicked);
+        Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+        mSmiley2.startAnimation(anim);
+
+        mParent.fadeOutTextView(NSPWhichSentence2);
+        mParent.fadeOutImageButton(mSmiley1);
+        mParent.fadeOutImageButton(mSmiley2);
+        // TODO: Add sliding up animation on NSPWhichSentence1
+    }
 }

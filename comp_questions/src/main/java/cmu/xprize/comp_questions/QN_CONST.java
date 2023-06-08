@@ -12,11 +12,15 @@ public class QN_CONST {
     static final String FILLER_SPACE = "____________";
 
     public static final String SHOW_CLOZE          = ".showCloze";
-    public static final String SHOW_PICMATCH        = ".showPicMatch";
+    public static final String SHOW_PICMATCH       = ".showPicMatch";
+    public static final String SHOW_NSP_DOES       = ".showNSPDoesMode";
+    public static final String SHOW_NSP_WHICH      = ".showNSPWhichMode";
 
     public static final String RTC_VAR_QNSTATE = ".qnState";
     public static final String RTC_VAR_CLZSTATE = ".clzState";
     public static final String RTC_VAR_PMSTATE = ".pmState";
+    public static final String RTC_VAR_NSPWHICHSTATE = ".whichNextState";
+    public static final String RTC_VAR_NSPDOESSTATE = ".isNextState";
 
     public static final String RTC_VAR_PARASTATE   = ".paraState";
     public static final String RTC_VAR_LINESTATE   = ".lineState";

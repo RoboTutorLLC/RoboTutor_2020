@@ -1,4 +1,3 @@
-
 //*********************************************************************************
 //
 //    Copyright(c) 2016-2017  Kevin Willows All Rights Reserved
@@ -176,6 +175,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     static public String        STUDENT_ID; // received from FaceLogin
     static public Student       STUDENT_INTERVENTION_PROFILE;
     static public String        SESSION_ID; // received from FaceLogin
+    static public String        SEQUENCE_ID_STRING;
 
     final static public  String CacheSource = TCONST.ASSETS;                // assets or extern
 
@@ -185,7 +185,6 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     static public String            SELECTOR_MODE = TCONST.FTR_TUTOR_SELECT; // this is only used as a feature, when launching TActivitySelector...
     static public boolean           STUDENT_CHOSE_REPEAT = false;
 //    static public String        SELECTOR_MODE = TCONST.FTR_DEBUG_SELECT;
-static public String        SEQUENCE_ID_STRING;
 
     static private String[] videoNames = new String[]{"video1", "video2"};
     private int videoNamesIterator = 0;
@@ -350,7 +349,6 @@ static public String        SEQUENCE_ID_STRING;
 
         Calendar calendar = Calendar.getInstance(Locale.US);
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
-        String sequenceIdString = String.format(Locale.US, "%06d", getNextLogSequenceId());
         SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
         String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
@@ -967,7 +965,6 @@ static public String        SEQUENCE_ID_STRING;
             TTS.shutDown();
             TTS = null;
         }
-
     }
 
 

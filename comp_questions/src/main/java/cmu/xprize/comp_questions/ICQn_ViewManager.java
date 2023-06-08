@@ -151,4 +151,51 @@ public interface ICQn_ViewManager extends ILoadableObject {
      boolean isClozeMode();
      boolean isGenMode();
      boolean isPicMode();
+    boolean isNSPWhichMode();
+    boolean isNSPDoesMode();
+
+
+     // NSP
+
+
+    void displayNSPWhichQuestion();
+
+    void setNSPWhichQuestion();
+
+    void setNSPWhichPage();
+
+    void displayNSPDoesQuestion();
+
+    void setNSPDoesQuestion();
+
+    void setNSPDoesPage();
+
+    void hasNSPDistractor();
+
+    public void resetNSPDoesButtons();
+
+    public void showNSPDoesButtons();
+
+    public void hideNSPDoesButtons();
+
+    public void enableNSPDoesButtons();
+
+    public void disableNSPDoesButtons();
+
+    public void resetNSPWhichButtons();
+
+    public void showNSPWhichButtons();
+
+    public void hideNSPWhichButtons();
+
+    public void enableNSPWhichButtons();
+
+    public void disableNSPWhichButtons();
+
+    public void playNSPDoesSentence();
+
+    public void playNSPWhichSentence();
+
+
+
 }

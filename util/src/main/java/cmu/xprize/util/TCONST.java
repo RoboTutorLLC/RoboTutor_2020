@@ -230,6 +230,7 @@ public class TCONST {
     public static final String FTR_GEN             = "FTR_GEN";
     public static final String FTR_PIC             = "FTR_PIC";
     public static final String FTR_CLO             = "FTR_CLO";
+    public static final String FTR_NSP              = "FTR_NSP";
     public static final String STOP_AUDIO          = "STOP_AUDIO";
     public static final String RTC_VAR_CLOZEWORD   = ".clozeWord";
     public static final String REMOVE_CLOZE_FROM_BLANK = "REMOVE_CLOZE_FROM_BLANK";
@@ -273,6 +274,8 @@ public class TCONST {
     public static final String NEXT_SCENE                 = "NEXT_SCENE";
     public static final String NEXT_WORD                  = "NEXT_WORD";
 
+    public static final String NSP_DOES_CORRECT           = "NSP_DOES_CORRECT";
+    public static final String NSP_DOES_WRONG            = "NSP_DOES_WRONG";
 
     // Core log message types - anumation scenegraph and queued scenegraph
     //
@@ -299,6 +302,7 @@ public class TCONST {
     public static final String STUDENT_ID_VAR = "studentId";
     public static final String SESSION_ID_VAR = "sessionId";
     public static final String LAST_TUTOR = "LAST_TUTOR_PLAYED";
+    public static final String STORYNSP = "nsp.json";
 
 
     static public HashMap<String, Integer> colorMap = new HashMap<String,Integer>();

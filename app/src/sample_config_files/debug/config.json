@@ -8,5 +8,7 @@
   "language_feature_id": "LANG_SW",
   "show_demo_vids": false,
   "use_placement": false,
-  "record_audio": false
+  "record_audio": false,
+  "nsp_mode" : "TF",
+  "NSP_choice_probabilities":  {"Correct": 0.5, "Easy": 0.25, "Random": 0.25}
 }

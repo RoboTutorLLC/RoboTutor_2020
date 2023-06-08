@@ -25,7 +25,10 @@
         android:layout_height="match_parent"
         android:layout_below="@id/SstoryText"
         android:layout_alignParentLeft="true"
-        android:layout_margin="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
         app:layout_widthPercent="30%" />
@@ -47,7 +50,10 @@
         android:layout_height="match_parent"
         android:layout_below="@id/SstoryText"
         android:layout_alignParentRight="true"
-        android:layout_margin="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
         android:background="#FFF"
         android:scaleType="fitCenter"
         app:layout_widthPercent="30%" />

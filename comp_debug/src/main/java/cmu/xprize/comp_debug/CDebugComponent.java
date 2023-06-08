@@ -369,7 +369,10 @@ public class CDebugComponent extends PercentRelativeLayout implements IDebugLaun
         "story.clo.hear",
         "story.pic.hear",
         "story.gen.hear",
-        "story.pic.hide"};
+        "story.pic.hide",
+        "story.nsp.does.hear",
+        "story.nsp.which.hear"
+        };
 
         final String tutor_desc = "story.pic.hear";
         final String tutor_id = "story.pic.hear::story_30";
@@ -378,7 +381,9 @@ public class CDebugComponent extends PercentRelativeLayout implements IDebugLaun
         String[][] storyTutors = {
                 {"story.clo.hear", "story.clo.hear::story_30", "[encfolder]story_30"},
                 {"story.pic.hear", "story.pic.hear::story_30", "[encfolder]story_30"},
-                {"story.gen.hear", "story.gen.hear::story_30", "[encfolder]story_30"}
+                {"story.gen.hear", "story.gen.hear::story_30", "[encfolder]story_30"},
+                {"story.nsp.does.hear", "story.nsp.does.hear::story_30", "[encfolder]story_30"},
+                {"story.nsp.which.hear", "story.nsp.which.hear::story_30", "[encfolder]story_30"}
         };
 
 
