@@ -509,6 +509,8 @@ public class JSON_Helper {
 
                                         // First load the shared instance info in the map
                                         ((ILoadableObject) eObj).loadJSON(mapElem, scope);
+
+                                        Log.d(TAG, "MAPELM:  " + mapElem.toString());
                                     } else {
                                         try {
                                             // If not using a global type then determine the per instance type
@@ -653,6 +655,14 @@ public class JSON_Helper {
                     } else if (elemClass.equals(double.class)) {
                         eObj = nArr.getDouble(i);
                     } else {
+                        Log.d(TAG, "parseArray passed data: " + nArr.toString());
+                        try {
+                            Log.d(TAG, "parseArray passed data json object being inspected: " + nArr.getJSONArray(i).toString());
+                        }
+                        catch (Exception e){
+
+                        }
+
                         nJsonObj = nArr.getJSONObject(i);
 
                         // If the element has a type field then assume it is a subtype
@@ -697,4 +707,21 @@ public class JSON_Helper {
         return field_Array;
     }
 
+
+    /**
+     *
+     *   Support parsing NSP arrays specifically
+     *
+     * @param jsonObject
+     * @return
+     * @throws JSONException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    static Object parseStoryQuestionsArray(JSONObject jsonObject){
+
+
+        return null;
+
+    }
 }

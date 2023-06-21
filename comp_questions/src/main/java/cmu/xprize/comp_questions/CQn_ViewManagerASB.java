@@ -2989,6 +2989,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         String jsonData = JSON_Helper.cacheDataByName(dataPath);
 
 
+        Log.d(TAG, "DATA PATH:    " + dataPath);
+
+
         try {
             // get JSONObject from JSON file
             JSONObject obj = new JSONObject(jsonData);
