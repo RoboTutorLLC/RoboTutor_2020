@@ -13,21 +13,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CTutorEngine;
-import cmu.xprize.util.CPlacementTest_Tutor;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 import static cmu.xprize.util.TCONST.DEBUG_CSV;
 import static cmu.xprize.util.TCONST.LANG_SW;
-import static cmu.xprize.util.TCONST.PLACEMENT_TAG;
-import static cmu.xprize.util.TCONST.WRITING_PLACEMENT_INDEX;
 
 /**
  * RoboTutor
@@ -36,8 +30,8 @@ import static cmu.xprize.util.TCONST.WRITING_PLACEMENT_INDEX;
  */
 public class StudentDataModelCSV extends AbstractStudentDataModel implements IStudentDataModel {
 
-    private static final String ROOTFOLDER = Environment.DIRECTORY_DOWNLOADS;
-    private static final String SUBFOLDER = "robotutor";
+    private static final String ROOTFOLDER =  "/sdcard/RoboTutor/";
+    private static final String SUBFOLDER = "robotutor_studentModels";
     // first load ORIGINAL, then save to and load from UPDATED
     private static final String ORIGINAL_CSV = "students.csv";
     private static final String UPDATED_CSV = "update_students.csv";

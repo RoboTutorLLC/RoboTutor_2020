@@ -1245,7 +1245,7 @@
         },
         "TEST_NSP_MODE": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showNSP}}=='TRUE') &&{{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') &&  ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.paraState}}=='LAST')",
+          "If": "({{SstoryQuestions.showNSP}}=='TRUE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.paraState}}=='LAST')",
           "Then": "true",
           "Else": "false"
         },
