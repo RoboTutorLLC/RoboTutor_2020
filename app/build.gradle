@@ -91,6 +91,7 @@ android {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -139,3 +140,5 @@ task getVersionName() {
         println "$project.android.defaultConfig.versionName"
     }
 }
+
+
