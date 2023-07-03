@@ -34,3 +34,4 @@ SED_ARGUMENT=$(echo "s/${FINAL_VERSION}/${NEW_VERSION}/g")
 echo $SED_ARGUMENT
 
 sed -i '' -e `printf $SED_ARGUMENT` ../../build.gradle
+echo $PWD

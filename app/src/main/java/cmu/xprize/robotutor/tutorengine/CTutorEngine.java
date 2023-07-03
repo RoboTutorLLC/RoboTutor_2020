@@ -834,9 +834,10 @@ public class CTutorEngine implements ILoadableObject2 {
         // Load the datasource into a separate class...
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
-
+        System.out.println("dataPath: " + dataPath);
         System.out.println("eebfebbfweabfwb");
-        HashMap<String, String> h2 = exceldata();
+
+        HashMap<String, String> h2 = loadTranslationTable();
         System.out.println("h2 : " + h2);
         return matrix;
     }
@@ -858,12 +859,12 @@ public class CTutorEngine implements ILoadableObject2 {
         loadJSON(jsonObj, (IScope2) scope);
 
     }
-    public static HashMap<String, String> exceldata(){
+    public static HashMap<String, String> loadTranslationTable(){
         HashMap<String, String> hm = new HashMap<>();
 
         try {
             //csv file containing data
-            String strFile = "D:\\Robotutor\\app\\src\\main\\res\\raw\\filtered_translaion.csv";
+            String strFile = "tutors/activity_selector/filtered_translation.csv";
 
             //create BufferedReader to read csv file
             BufferedReader br = new BufferedReader(new FileReader(strFile));
