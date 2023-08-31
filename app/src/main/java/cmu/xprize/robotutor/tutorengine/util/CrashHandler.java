@@ -66,7 +66,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             }
             File logFile = new File(_directory + "CRASH_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + "_" +
                     //RoboTutor.SEQUENCE_ID_STRING + "_" +
-                     timestamp + "_" + RoboTutor.SESSION_ID + "_" + errorMessage + ".txt");
+                     timestamp + "_" + deviceId + "_" + RoboTutor.SESSION_ID + "_" + errorMessage + ".txt");
             logFile.createNewFile();
             FileOutputStream trace = new FileOutputStream(logFile, false);
             trace.write(report.getBytes());
