@@ -286,8 +286,8 @@ public class PromotionMechanism {
                         // student has made it to the end
                         CPlacementTest_Tutor lastPlacementTest = _matrix.mathPlacement[mathPlacementIndex]; // off-by-one??? they'll never reach it :)
                         // update our preferences to exit PLACEMENT mode
-                        _studentModel.updateMathPlacement(false, false);
-                        _studentModel.updateMathPlacementIndex(null, false);
+                        _studentModel.updateMathPlacement(true, true); //reached end -> jump to promotion
+                        _studentModel.updateMathPlacementIndex(null, true);
 
 
                         _studentModel.saveAll();
@@ -317,8 +317,8 @@ public class PromotionMechanism {
                         CPlacementTest_Tutor lastPlacementTest = _matrix.writePlacement[writingPlacementIndex]; // off-by-one??? they'll never reach it :)
                         // update our preferences to exit PLACEMENT mode
 
-                        _studentModel.updateWritingPlacement(false, false);
-                        _studentModel.updateWritingPlacementIndex(null, false); //editor.remove("WRITING_PLACEMENT_INDEX");
+                        _studentModel.updateWritingPlacement(true, true);  // once they reach index lenght, jump to promotion
+                        _studentModel.updateWritingPlacementIndex(null, true); //editor.remove("WRITING_PLACEMENT_INDEX");
 
                         _studentModel.saveAll();
                         return lastPlacementTest.fail; // go to beginning of last level
@@ -353,15 +353,15 @@ public class PromotionMechanism {
                 // set prefs.usesThingy to false
                 if(useMathPlacement) {
                     lastPlacementTest = _matrix.mathPlacement[placementIndex];
-                    _studentModel.updateMathPlacement(false, false); // editor.putBoolean(placementKey, false); // no more placement
-                    _studentModel.updateMathPlacementIndex(null, false);
+                    _studentModel.updateMathPlacement(true, true); // editor.putBoolean(placementKey, false); // no more placement
+                    _studentModel.updateMathPlacementIndex(null, true);
 
                 }
                 // useWritePlacement only other option
                 else {
                     lastPlacementTest = _matrix.writePlacement[placementIndex];
-                    _studentModel.updateWritingPlacement(false, false); // editor.putBoolean(placementKey, false); // no more placement
-                    _studentModel.updateWritingPlacementIndex(null, false); // editor.remove(placementIndexKey);
+                    _studentModel.updateWritingPlacement(true, true); //jump to promotion
+                    _studentModel.updateWritingPlacementIndex(null, true); // editor.remove(placementIndexKey);
                 }
 
                 _studentModel.saveAll();
