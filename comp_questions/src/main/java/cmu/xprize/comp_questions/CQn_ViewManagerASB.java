@@ -40,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -2662,9 +2663,9 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public void setRandomGenericQuestion(){
         try {
-            /*String DATASOURCEPATH = "sdcard/robotutor_assets/assets/audio/sw/cmu/xprize/story_reading/generic_questions/questions";
+           String DATASOURCEPATH = "sdcard/robotutor_assets/assets/audio/sw/cmu/xprize/story_reading/generic_questions/questions";
             File dir = new File(DATASOURCEPATH);
-            File[] allfiles = dir.listFiles();*/
+            File[] allfiles = dir.listFiles();
 
             String[] genericQuestions =
             {"Who is this story about",
@@ -2974,6 +2975,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
 //            mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
         }
+
+
 //        } else {
 //            mParent.publishValue(TCONST.SHOW_PICMATCH, TCONST.FALSE);
 //            mParent.publishValue(TCONST.SHOW_CLOZE, TCONST.FALSE);
@@ -3325,17 +3328,17 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     @Override
     public void onUpdate(String[] heardWords, boolean finalResult) {
 
-//        String logString = "";
-//
-//        for (String hypWord :  heardWords) {
-//            logString += hypWord.toLowerCase() + ":" ;
-//        }
-//        Log.i("ASR", "New JSGF HypSet: "  + logString);
-//
-//
-//        mParent.publishValue(TCONST.RTC_VAR_ATTEMPT, attemptNum++);
-//
-//        mParent.onASREvent(TCONST.RECOGNITION_EVENT);
+        StringBuilder logString = new StringBuilder();
+
+        for (String hypWord :  heardWords) {
+            logString.append(hypWord.toLowerCase()).append(":");
+        }
+        Log.i("ASR", "New JSGF HypSet: "  + logString);
+
+
+        mParent.publishValue(TCONST.RTC_VAR_ATTEMPT, attemptNum++);
+
+        mParent.onASREvent(TCONST.RECOGNITION_EVENT);
 
     }
 
