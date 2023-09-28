@@ -1182,18 +1182,18 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             hideImageButtons();
             disableImageButtons();
         }
-//        if(nsp_which_mode) {
-//            updateNSPWhichButtons();
-//        } else {
-//            hideNSPWhichButtons();
-//            disableNSPWhichButtons();
-//        }
-//        if(nsp_does_mode) {
-//            updateNSPDoesButtons();
-//        } else {
-//            hideNSPDoesButtons();
-//            disableNSPDoesButtons();
-//        }
+        if(nsp_which_mode) {
+            updateNSPWhichButtons();
+        } else {
+            hideNSPWhichButtons();
+            disableNSPWhichButtons();
+        }
+        if(nsp_does_mode) {
+            updateNSPDoesButtons();
+        } else {
+            hideNSPDoesButtons();
+            disableNSPDoesButtons();
+        }
 
     }
 
