@@ -835,7 +835,7 @@ public class CTutorEngine implements ILoadableObject2 {
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
         System.out.println("dataPath: " + dataPath);
-        System.out.println("eebfebbfweabfwb");
+        System.out.println("Log pointer");
 
         HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
         System.out.println("h2 : " + h2);
@@ -870,7 +870,7 @@ public class CTutorEngine implements ILoadableObject2 {
             BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String strLine;
             StringTokenizer st;
-            int lineNumber = 0;
+            int lineNumber = 0, tokenNumber = 0;
 
             //read comma-separated file line by line
             while ((strLine = br.readLine()) != null) {
@@ -880,7 +880,9 @@ public class CTutorEngine implements ILoadableObject2 {
                 st = new StringTokenizer(strLine, ",");
 
                 while (st.hasMoreTokens()) {
+                    tokenNumber++;
                     String a = st.nextToken();
+                    tokenNumber+=2;
                     String b = st.nextToken();
                     hm.put(a, b);
                 }
@@ -896,15 +898,6 @@ public class CTutorEngine implements ILoadableObject2 {
 
 
 }
-
-//package cmu.xprize.robotutor.tutorengine;
-//import java.io.BufferedReader;
-//import java.io.FileNotFoundException;
-//import java.io.FileReader;
-//
-//import java.io.IOException;
-//import java.util.HashMap;
-//import java.util.StringTokenizer;
 
 
 
