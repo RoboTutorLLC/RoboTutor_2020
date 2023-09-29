@@ -46,12 +46,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringTokenizer;
 
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
@@ -79,8 +81,6 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 
 import static cmu.xprize.util.TCONST.DEBUG_CSV;
-import static cmu.xprize.util.TCONST.LANG_EN;
-import static cmu.xprize.util.TCONST.NULL;
 
 /**
  * The tutor engine provides top-levelFolder control over the tutor lifecycle and can support multiple
@@ -837,7 +837,7 @@ public class CTutorEngine implements ILoadableObject2 {
         System.out.println("dataPath: " + dataPath);
         System.out.println("eebfebbfweabfwb");
 
-        HashMap<String, String> h2 = loadTranslationTable();
+        HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
         System.out.println("h2 : " + h2);
         return matrix;
     }
@@ -859,41 +859,32 @@ public class CTutorEngine implements ILoadableObject2 {
         loadJSON(jsonObj, (IScope2) scope);
 
     }
-    public static HashMap<String, String> loadTranslationTable(){
+    public static HashMap<String, String> loadTranslationTable(Context context) {
         HashMap<String, String> hm = new HashMap<>();
 
         try {
             //csv file containing data
-            String strFile = "tutors/activity_selector/filtered_translation.csv";
+            InputStream is = context.getResources().openRawResource(R.raw.filtered_translation);
 
             //create BufferedReader to read csv file
-            BufferedReader br = new BufferedReader(new FileReader(strFile));
-            String strLine = "";
-            StringTokenizer st = null;
-            int lineNumber = 0, tokenNumber = 0;
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String strLine;
+            StringTokenizer st;
+            int lineNumber = 0;
 
-            //read comma separated file line by line
+            //read comma-separated file line by line
             while ((strLine = br.readLine()) != null) {
                 lineNumber++;
 
-                //break comma separated line using ","
+                //break comma-separated line using ","
                 st = new StringTokenizer(strLine, ",");
 
                 while (st.hasMoreTokens()) {
-                    //display csv values
-                    tokenNumber++;
                     String a = st.nextToken();
-                    tokenNumber+=2;
                     String b = st.nextToken();
-                    hm.put(a,b);
+                    hm.put(a, b);
                 }
             }
-//
-//            // printing hashmap
-//            for (Map.Entry<String, String> entry : hm.entrySet()) {
-//                System.out.println(entry.getKey() + " => "
-//                        + ": " + entry.getValue());
-//            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
