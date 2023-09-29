@@ -85,6 +85,34 @@
           "edges": []
         },
 
+        "SPEAK_NSP_TF_UTTERANCE_BEHAVIOR": {
+          "type": "QUEUE",
+          "COMMENT": "Not sure where this is used",
+          "preenter": [],
+          "reuse": true,
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#behavior,value#SPEAK_NSP_TF_UTTERANCE_BEHAVIOR:String", "features": ""},
+            {"type": "QUEUEDAUDIO", "command": "PLAY_NSP_TF", "soundsource": "{{SstoryQuestions.utterance}}.mp3", "listeners": "SstoryQuestions", "oncomplete": "TRACK_SEGMENT" , "soundpackage": "story", "mode": "", "features": ""}
+          ],
+          "preexit": [],
+          "edges": []
+        },
+
+        "SPEAK_NSP_MC_UTTERANCE_BEHAVIOR": {
+          "type": "QUEUE",
+          "COMMENT": "Not sure where this is used in the Java component",
+          "preenter": [],
+          "reuse": true,
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#behavior,value#SPEAK_NSP_MC_UTTERANCE_BEHAVIOR:String", "features": ""},
+
+            {"type": "QUEUEDAUDIO", "command": "PLAY_NSP_MC", "soundsource": "{{SstoryQuestions.utterance}}.mp3", "listeners": "SstoryQuestions", "oncomplete": "TRACK_SEGMENT" , "soundpackage": "story", "mode": "", "features": ""}
+          ],
+          "preexit": [],
+          "edges": []
+        },
+
+
         "SPEAK_SENTENCE_BEHAVIOR": {
           "type": "QUEUE",
           "COMMENT": "Speak the current word and continue to next.",
@@ -132,10 +160,14 @@
             {"constraint": "STORY_COMPLETE", "edge": "NEXT_SCENE"},
             {"constraint": "TEST_GEN_MODE", "edge": "GENERIC_QUESTION_NODE"},
             {"constraint": "PAGE_COMPLETE", "edge": "NEXT_PAGE_NODE"},
+            {"constraint": "TEST_NSP_MODE", "edge": "NSP_PAGE_NODE"},
             {"constraint": "TEST_CLZ_MODE", "edge": "CLOZE_PAGE_NODE"},
             {"constraint": "TEST_PM_MODE", "edge": "PICTURE_MATCH_NODE"},
             {"constraint": "TEST_SHOW_CLZ", "edge": "PRESENT_CLOZE"},
             {"constraint": "TEST_SHOW_PM", "edge": "PRESENT_PICMATCH"},
+            {"constraint": "TEST_SHOW_NSP_MC_MODE", "edge": "PRESENT_NSP_MC"},
+            {"constraint": "TEST_SHOW_NSP_TF_MODE", "edge": "PRESENT_NSP_TF"},
+
             {"constraint": "PARAGRAPH_COMPLETE", "edge": "NEXT_PARA_NODE"},
             {"constraint": "LINE_COMPLETE", "edge": "NEXT_LINE_NODE"},
             {"constraint": "", "edge": "NEXT_WORD_NODE"}
@@ -164,7 +196,7 @@
           "edges": [
             {"constraint": "FTR_RIGHT", "edge": "CORRECT"},
             {"constraint": "SECOND_ERROR", "edge": "WRONG_2"},
-            {"constraint": "", "edge": "WRONG"}
+            {"constraint": "ERROR", "edge": "WRONG"}
           ]
         },
 
@@ -263,12 +295,24 @@
           ]
         },
 
-        "PICTURE_MATCH_NODE": {
+        "NEXT_PAGE_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
           "maptype": "moduleMap",
           "mapname": "PAGEFLIP",
-          "preenter": ["SET_PICTURE_MATCH"],
+          "preenter": [],
+          "preexit": [],
+          "edges": [
+            {"constraint": "", "edge": "LISTEN"}
+          ]
+        },
+
+        "NSP_PAGE_NODE": {
+          "type": "NODE",
+          "COMMENT": "Determines if the next page is an NSP page",
+          "maptype": "moduleMap",
+          "mapname": "PAGEFLIP",
+          "preenter": ["SET_NSP_PAGE"],
           "preexit": [],
           "edges": [
             {"constraint": "", "edge": "LISTEN"}
@@ -287,12 +331,12 @@
           ]
         },
 
-        "NEXT_PAGE_NODE": {
+        "PICTURE_MATCH_NODE": {
           "type": "NODE",
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
           "maptype": "moduleMap",
           "mapname": "PAGEFLIP",
-          "preenter": [],
+          "preenter": ["SET_PICTURE_MATCH"],
           "preexit": [],
           "edges": [
             {"constraint": "", "edge": "LISTEN"}
@@ -322,6 +366,61 @@
             {"constraint": "", "edge": "AWAIT_PICMATCH_RESPONSE"}
           ]
         },
+
+        "PRESENT_NSP_MC": {
+          "type": "NODE",
+          "COMMENT": "Presents an IsNext NSP Question",
+          "maptype": "moduleMap",
+          "mapname": "DISPLAY_NSP_MC_QUESTION",
+          "preenter": [],
+          "preexit": [],
+          "edges": [
+            {"constraint": "", "edge": "AWAIT_NSP_MC_RESPONSE"}
+          ]
+        },
+
+        "PRESENT_NSP_TF": {
+          "type": "NODE",
+          "COMMENT": "Presents a WhichNext NSP Question",
+          "maptype": "moduleMap",
+          "mapname": "DISPLAY_NSP_TF_QUESTION",
+          "preenter": [],
+          "preexit": [],
+          "edges": [
+            {"constraint": "", "edge": "AWAIT_NSP_TF_RESPONSE"}
+          ]
+        },
+
+        "AWAIT_NSP_MC_RESPONSE": {
+          "COMMENT": "Waits for IsNext response",
+          "type": "NODE",
+          "preenter": [],
+          "maptype": "moduleMap",
+          "mapname": "LISTENING",
+          "preexit": [],
+          "edges": [
+            {"constraint":"NSP_MC_CORRECT", "edge":"NSP_MC_GOOD"},
+            {"constraint":"NSP_DOES_WRONG", "edge":"NSP_MC_BAD"},
+            {"constraint":"NSP_MC_HESITATION", "edge":"NSP_MC_HESITATION"},
+            {"constraint":" ", "edge":"AWAIT_NSP_MC_RESPONSE"}
+          ]
+        },
+
+        "AWAIT_NSP_TF_RESPONSE": {
+          "COMMENT": "Wait for WhichNextResponse",
+          "type": "NODE",
+          "preenter": [],
+          "maptype": "moduleMap",
+          "mapname": "LISTENING",
+          "preexit": [],
+          "edges": [
+            {"constraint":"NSP_TF_CORRECT", "edge":"NSP_TF_GOOD"},
+            {"constraint":"NSP_TF_WRONG", "edge":"NSP_TF_BAD"},
+            {"constraint":"NSP_TF_HESITATION", "edge":"NSP_TF_HESITATION"},
+            {"constraint":" ", "edge":"AWAIT_NSP_MC_RESPONSE"}
+          ]
+        },
+
         "PICMATCH_GOOD": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "NODE",
@@ -333,6 +432,7 @@
             {"constraint": "", "edge": "NEXT_PAGE_NODE"}
           ]
         },
+
         "PICMATCH_BAD": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "NODE",
@@ -344,6 +444,7 @@
             {"constraint": "", "edge": "AWAIT_PICMATCH_RESPONSE"}
           ]
         },
+
         "CLOZE_GOOD": {
           "COMMENT": "When user inputs a correct answer...",
           "type": "NODE",
@@ -368,9 +469,81 @@
           ]
         },
 
+        "NSP_MC_GOOD": {
+          "COMMENT": "When user inputs a correct answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPCORRECT",
+          "preenter": [],
+          "preexit": ["RESET_NSP_MC_BUTTONS", "HIDE_NSP_MC_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+          ]
+        },
+
+        "NSP_MC_BAD": {
+          "COMMENT": "When user inputs an incorrect answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPWRONG",
+          "preenter": [],
+          "preexit": ["RESET_NSP_MC_BUTTONS", "ENABLE_NSP_MC_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "AWAIT_NSP_MC_RESPONSE"}
+          ]
+        },
+
+        "NSP_MC_HESITATION": {
+          "COMMENT": "When user hesitates, not sure with preexit yet",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPHESITATE",
+          "preenter": [],
+          "preexit": ["RESET_NSP_MC_BUTTONS", "UPDATE_NSP_MC_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+          ]
+        },
+
+        "NSP_TF_GOOD": {
+          "COMMENT": "When user inputs a correct answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPCORRECT",
+          "preenter": [],
+          "preexit": ["RESET_NSP_TF_BUTTONS", "HIDE_NSP_TF_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+          ]
+        },
+
+        "NSP_TF_BAD": {
+          "COMMENT": "When user inputs an incorrect answer...",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPWRONG",
+          "preenter": [],
+          "preexit": ["RESET_NSP_TF_BUTTONS", "ENABLE_NSP_TF_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "AWAIT_NSP_TF_RESPONSE"}
+          ]
+        },
+
+        "NSP_TF_HESITATION": {
+          "COMMENT": "When user hesitates, not sure with preexit yet",
+          "type": "NODE",
+          "maptype": "moduleMap",
+          "mapname": "PLAYNSPHESITATE",
+          "preenter": [],
+          "preexit": ["RESET_NSP_TF_BUTTONS", "UPDATE_NSP_TF_BUTTONS"],
+          "edges": [
+            {"constraint": "", "edge": "NEXT_PAGE_NODE"}
+          ]
+        },
+
         "NEXT_SCENE": {
           "type": "NODE",
-          "COMMENT": "When module is complete - move to next scene in the scenegraph",
+          "COMMENT": "Doesn't go anywhere in the animator graph",
           "maptype": "moduleMap",
           "mapname": "SCENEFLIP",
           "preenter": [],
@@ -416,6 +589,7 @@
             {"constraint":"", "edge":"CLOZE_GOOD"}
           ]
         },
+
         "ANIMATE_CLOZE_WORD": {
           "COMMENT": "",
           "type": "NODE",
@@ -428,6 +602,7 @@
             {"constraint":"CLZ_ANIM_COMPLETE", "edge":"AWAIT_CLOZE_RESPONSE"}
           ]
         },
+
         "AWAIT_PICMATCH_RESPONSE": {
           "COMMENT": "",
           "type": "NODE",
@@ -470,6 +645,30 @@
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#DISPLAY_CLOZE_QUESTION:String", "features": ""},
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayClozeQuestion", "parms": "" , "features": ""},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Which word belongs here.mp3", "mode": "flow", "features": ""}
+          ]
+        },
+
+        "DISPLAY_NSP_TF_QUESTION": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TODO : HIGHLIGHTING AND SPEAKING SIMULTANEOUSLY",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#DISPLAY_NSP_TF_QUESTION:String", "features": ""},
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayNSPDoesQuestion", "parms": "" , "features": ""},
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/Does this come next.mp3", "mode": "flow", "features": ""},
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "showNSPDoesButtons", "parms": "" , "features": ""}
+          ]
+        },
+
+        "DISPLAY_NSP_MC_QUESTION": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "uhq",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#DISPLAY_NSP_WHICH_QUESTION:String", "features": ""},
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayNSPWhichQuestion", "parms": "" , "features": ""},
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "story_questions/Which comes next.mp3", "mode": "flow", "features": ""},
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "showNSPWhichButtons", "parms": "" , "features": ""}
           ]
         },
 
@@ -518,6 +717,17 @@
           ]
         },
 
+        "PLAYNSPCORRECT": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TBD",
+          "tracks": [
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "nsp_questions/Ding correct.mp3", "mode": "flow", "features": ""},
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYNSPCORRECT:String", "features": ""},
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Way to go.mp3", "mode": "flow", "features": ""}
+          ]
+        },
+
         "SHOWCLOZEWORD": {
           "type": "MODULE",
           "reuse": true,
@@ -555,7 +765,6 @@
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYCLOZEWRONG:String", "features": ""},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Try again.mp3", "mode": "flow", "features": ""},
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableClozeButtons", "parms": "" , "features": ""}
-
           ]
         },
 
@@ -567,6 +776,29 @@
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYCLOZESENTENCE:String", "features": ""},
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "playClozeSentence", "parms": "" , "features": ""},
             {"type": "COMMAND", "cmd": "WAIT"}
+          ]
+        },
+
+        "PLAYNSPWRONG": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TBD",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYNSPWRONG:String", "features": ""},
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Try again.mp3", "mode": "flow", "features": ""},
+//            Hopefully this doesn't cause any problems
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPDoesButtons", "parms": "" , "features": ""},
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPWhichButtons", "parms": "" , "features": ""}
+          ]
+        },
+
+        "PLAYNSPHESITATE": {
+          "type": "MODULE",
+          "reuse": true,
+          "COMMENT": "TBD",
+          "tracks": [
+            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PLAYNSPHESITATE:String", "features": ""},
+//            IDK HOW TO MAKE THIS WORK
           ]
         },
 
@@ -602,8 +834,8 @@
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#CHECK_COMPLETE:String", "features": ""},
 
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",        "parms": "HIDE:String",    "features": ""}
-          //,
-//            {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "HIDE:String",    "features": ""}
+            //,
+            //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "HIDE:String",    "features": ""}
             //{"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",        "parms": "DISABLE:String",    "features": ""},
             //{"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "DISABLE:String",    "features": ""}
 
@@ -611,14 +843,14 @@
 
           ]
         },
-//        "NULL_MODULE": {
-//          "type": "MODULE",
-//          "reuse": true,
-//          "COMMENT": "TBD",
-//          "tracks": [
-//            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#NULL_MODULE:String", "features": ""}
-//          ]
-//        },
+        //        "NULL_MODULE": {
+        //          "type": "MODULE",
+        //          "reuse": true,
+        //          "COMMENT": "TBD",
+        //          "tracks": [
+        //            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#NULL_MODULE:String", "features": ""}
+        //          ]
+        //        },
 
         "PREP_NEXT_WORD": {
           "type": "MODULE",
@@ -651,17 +883,17 @@
           ]
         },
 
-//        "CLOZEPAGEFLIP": {
-//          "type": "MODULE",
-//          "reuse": true,
-//          "COMMENT": "TBD",
-//          "tracks": [
-//            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#CLOZEPAGEFLIP:String", "features": ""},
-//
-//            {"type": "COMMAND", "id": "SstoryQuestions", "method": "post", "parms": "NEXT_CLOZE_PAGE:String|500:long" , "features": "!FTR_MANUAL"},
-//            {"type": "COMMAND", "id": "SstoryQuestions", "method": "post", "parms": "NEXT_CLOZE_PAGE:String"          , "features": "FTR_MANUAL"}
-//          ]
-//        },
+        //        "CLOZEPAGEFLIP": {
+        //          "type": "MODULE",
+        //          "reuse": true,
+        //          "COMMENT": "TBD",
+        //          "tracks": [
+        //            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#CLOZEPAGEFLIP:String", "features": ""},
+        //
+        //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "post", "parms": "NEXT_CLOZE_PAGE:String|500:long" , "features": "!FTR_MANUAL"},
+        //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "post", "parms": "NEXT_CLOZE_PAGE:String"          , "features": "FTR_MANUAL"}
+        //          ]
+        //        },
 
         "SCENEFLIP": {
           "type": "MODULE",
@@ -713,36 +945,36 @@
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "genericQuestions" , "features": "FTR_PLAY_GEN"}
           ]
         }
-      //,
+        //,
 
-//        "PROMPT_CLOZE": {
-//          "type": "MODULE",
-//          "reuse": true,
-//          "COMMENT": "TBD",
-//          "tracks": [
-//            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PROMPT_CLOZE:String", "features": ""},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Which word belongs here.mp3", "mode": "flow", "features": ""}
-//          ]
-//        },
+        //        "PROMPT_CLOZE": {
+        //          "type": "MODULE",
+        //          "reuse": true,
+        //          "COMMENT": "TBD",
+        //          "tracks": [
+        //            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#PROMPT_CLOZE:String", "features": ""},
+        //            {"type": "AUDIO", "command": "PLAY", "soundsource": "cloze_questions/Which word belongs here.mp3", "mode": "flow", "features": ""}
+        //          ]
+        //        },
 
-//        "SHOW_CLOZE": {
-//          "type": "MODULE",
-//          "reuse": true,
-//          "COMMENT": "TBD",
-//          "tracks": [
-//            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#SHOW_CLOZE:String", "features": ""},
-//            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayClozeQuestion" , "features": ""}
-//          ]
-//        },
-//        "SHOW_PICMATCH": {
-//          "type": "MODULE",
-//          "reuse": true,
-//          "COMMENT": "TBD",
-//          "tracks": [
-//            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#SHOW_CLOZE:String", "features": ""},
-//            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayPictureMatching" , "features": ""}
-//          ]
-//        }
+        //        "SHOW_CLOZE": {
+        //          "type": "MODULE",
+        //          "reuse": true,
+        //          "COMMENT": "TBD",
+        //          "tracks": [
+        //            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#SHOW_CLOZE:String", "features": ""},
+        //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayClozeQuestion" , "features": ""}
+        //          ]
+        //        },
+        //        "SHOW_PICMATCH": {
+        //          "type": "MODULE",
+        //          "reuse": true,
+        //          "COMMENT": "TBD",
+        //          "tracks": [
+        //            {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SstoryQuestions", "method": "logState", "parms": "type#node,value#SHOW_CLOZE:String", "features": ""},
+        //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "displayPictureMatching" , "features": ""}
+        //          ]
+        //        }
       },
 
       "actionMap": {
@@ -752,21 +984,21 @@
         "SET_VERSION": {"type": "COMMAND", "id": "Sbanner", "method": "setVersionID", "parms": "v.0.0.1:String", "features": ""},
 
         "START_STORY":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "startStory", "features": ""},
-//        "INIT_LISTENER": {"type": "COMMAND", "id": "SstoryQuestions", "method": "initListener", "features": "FTR_USER_PARROT"},
+        //        "INIT_LISTENER": {"type": "COMMAND", "id": "SstoryQuestions", "method": "initListener", "features": "FTR_USER_PARROT"},
 
-//        "HESTITATION_TIMER":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|HESITATION_PROMPT:String|5000:Integer" , "features": ""},
-//        "HESTITATION_RESET":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|NULL:String|0:Integer" , "features": ""},
+        //        "HESTITATION_TIMER":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|HESITATION_PROMPT:String|5000:Integer" , "features": ""},
+        //        "HESTITATION_RESET":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|NULL:String|0:Integer" , "features": ""},
 
-//        "SET_WORD_EVENT":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|HESTITATION_RESET:String" , "features": ""},
-//        "RESET_WORD_EVENT": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|NULL:String" , "features": ""},
+        //        "SET_WORD_EVENT":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|HESTITATION_RESET:String" , "features": ""},
+        //        "RESET_WORD_EVENT": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|NULL:String" , "features": ""},
 
         "SET_UTTERANCE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "UTTERANCE_COMPLETE_EVENT:String|NEXT_NODE:String" , "features": ""},
-//        "SET_CLOZE_RESPONSE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "ON_CLICK:String|NEXT_NODE:String" , "features": ""},
+        //        "SET_CLOZE_RESPONSE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "ON_CLICK:String|NEXT_NODE:String" , "features": ""},
 
         "SET_HYPOTHESIS_BEHAVIOR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_RECOGNITION_EVENT:String|NEXT_NODE:String" , "features": ""},
         "CLR_HYPOTHESIS_BEHAVIOR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_RECOGNITION_EVENT:String|NULL:String" , "features": ""},
 
-//        "HIGHLIGHT_ERROR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setHighLight", "parms": "red:String"},
+        //        "HIGHLIGHT_ERROR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setHighLight", "parms": "red:String"},
         "CONTINUE":        {"type": "COMMAND", "id": "SstoryQuestions", "method": "continueListening"  , "features": ""},
 
         "NEXT_WORD": {"type": "COMMAND", "id": "SstoryQuestions", "method": "nextWord" , "features": ""},
@@ -782,79 +1014,98 @@
         "SET_ONCLICK_SPEAK_WORD": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ON_CLICK:String|SPEAK_WORD_BEHAVIOR:String" , "features": "FTR_USER_READ|FTR_USER_READING"},
         "CLR_ONCLICK":            {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ON_CLICK:String|NULL:String" , "features": ""},
 
-//        "TIMER_HINT_WORD":        {"type": "TIMER", "id": "HintWordTimer", "startdelay": "0", "period": "3000", "repeat": "false", "action": "CREATEANDSTART", "ontimer": "SPEAK_WORD_BEHAVIOR", "features": "FTR_USER_READ|FTR_USER_READING"},
-//        "TIMER_CANCEL_HINT_WORD": {"type": "TIMER", "id": "HintWordTimer", "action": "CANCEL", "features": ""},
+        //        "TIMER_HINT_WORD":        {"type": "TIMER", "id": "HintWordTimer", "startdelay": "0", "period": "3000", "repeat": "false", "action": "CREATEANDSTART", "ontimer": "SPEAK_WORD_BEHAVIOR", "features": "FTR_USER_READ|FTR_USER_READING"},
+        //        "TIMER_CANCEL_HINT_WORD": {"type": "TIMER", "id": "HintWordTimer", "action": "CANCEL", "features": ""},
 
         "TIMER_HINT_BUTTON":        {"type": "TIMER", "id": "HintWordTimer", "startdelay": "0", "period": "3500", "repeat": "false", "action": "CREATEANDSTART", "ontimer": "CONFIG_SPEAK_BUTTON", "features": "FTR_USER_READ|FTR_USER_READING"},
         "TIMER_CANCEL_HINT_BUTTON": {"type": "TIMER", "id": "HintWordTimer", "action": "CANCEL", "features": ""},
 
-//        "FLIP_BUTTON_ENABLE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "ENABLE:String", "features": ""},
-//        "FLIP_BUTTON_DISABLE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "DISABLE:String", "features": ""},
-//        "FLIP_BUTTON_SHOW":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "SHOW:String", "features": ""},
-//        "FLIP_BUTTON_HIDE":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "HIDE:String", "features": ""},
+        //        "FLIP_BUTTON_ENABLE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "ENABLE:String", "features": ""},
+        //        "FLIP_BUTTON_DISABLE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "DISABLE:String", "features": ""},
+        //        "FLIP_BUTTON_SHOW":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "SHOW:String", "features": ""},
+        //        "FLIP_BUTTON_HIDE":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",     "parms": "HIDE:String", "features": ""},
 
-//        "SPEAK_BUTTON_ENABLE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "ENABLE:String",  "features": ""},
-//        "SPEAK_BUTTON_DISABLE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "DISABLE:String", "features": ""},
-//        "SPEAK_BUTTON_SHOW":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "SHOW:String",    "features": ""},
-//        "SPEAK_BUTTON_HIDE":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "HIDE:String",    "features": ""},
+        //        "SPEAK_BUTTON_ENABLE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "ENABLE:String",  "features": ""},
+        //        "SPEAK_BUTTON_DISABLE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "DISABLE:String", "features": ""},
+        //        "SPEAK_BUTTON_SHOW":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "SHOW:String",    "features": ""},
+        //        "SPEAK_BUTTON_HIDE":    {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",     "parms": "HIDE:String",    "features": ""},
 
-//        "SET_FLIP_NEXTPAGE":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NEXT_PAGE:String" , "features": ""},
-//        "RESET_FLIP_ONCLICK":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NULL:String" , "features": ""},
+        //        "SET_FLIP_NEXTPAGE":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NEXT_PAGE:String" , "features": ""},
+        //        "RESET_FLIP_ONCLICK":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "PAGE_FLIP_CLICK:String|NULL:String" , "features": ""},
 
         "SET_SPEAK_EVENT":      {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior",   "parms": "SPEAK_EVENT:String|SPEAK_WORD_BEHAVIOR:String" , "features": ""},
-//        "CLR_SPEAK_EVENT":      {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior",   "parms": "SPEAK_EVENT:String|NULL:String" , "features": ""},
+        //        "CLR_SPEAK_EVENT":      {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior",   "parms": "SPEAK_EVENT:String|NULL:String" , "features": ""},
 
-//        "SET_SPEAK_WORD":      {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior",   "parms": "SPEAK_CLICK:String|SPEAK_WORD_BEHAVIOR:String" , "features": ""},
-//        "SET_SPEAK_SENTENCE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "SPEAK_CLICK:String|SPEAK_SENTENCE_BEHAVIOR:String" , "features": ""},
-//        "RESET_SPEAK_ONCLICK": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "SPEAK_CLICK:String|NULL:String" , "features": ""},
+        //        "SET_SPEAK_WORD":      {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior",   "parms": "SPEAK_CLICK:String|SPEAK_WORD_BEHAVIOR:String" , "features": ""},
+        //        "SET_SPEAK_SENTENCE":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "SPEAK_CLICK:String|SPEAK_SENTENCE_BEHAVIOR:String" , "features": ""},
+        //        "RESET_SPEAK_ONCLICK": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "SPEAK_CLICK:String|NULL:String" , "features": ""},
 
         "SET_NARRATOR":        {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "NARRATE_STORY:String|NARRATE_SENTENCE_BEHAVIOR:String" , "features": ""},
         "SET_UTTERANCE":       {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "SPEAK_UTTERANCE:String|SPEAK_UTTERANCE_BEHAVIOR:String" , "features": ""},
-//        "SET_CLOZE_UTTERANCE":       {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "SPEAK_CLOZE_UTTERANCE:String|SPEAK_CLOZE_UTTERANCE_BEHAVIOR:String" , "features": ""},
+        //        "SET_CLOZE_UTTERANCE":       {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "SPEAK_CLOZE_UTTERANCE:String|SPEAK_CLOZE_UTTERANCE_BEHAVIOR:String" , "features": ""},
 
-//        "SET_CLOZE_QUESTION": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setClozeQuestion", "parms": "" , "features": ""},
+        //        "SET_CLOZE_QUESTION": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setClozeQuestion", "parms": "" , "features": ""},
         "CHECK_CLOZE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hasClozeDistractor", "parms": "" , "features": ""},
         "CHECK_QUESTION": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hasQuestion", "parms": "" , "features": ""},
         "RESET_IMAGE_BUTTONS":{"type": "COMMAND", "id": "SstoryQuestions", "method": "resetImageButtons", "parms": "" , "features": ""},
         "SET_PICTURE_MATCH": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPictureMatch", "parms": "" , "features": ""},
         "SET_CLOZE_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setClozePage", "parms": "" , "features": ""},
+        "SET_NSP_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setNSPPage", "parms": "" , "features": ""},
+
+        // Delete these two once we figure out how and where to determind if a question is a WhichNext or IsNext
+        "SET_NSP_MC_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setNSPWhichPage", "parms": "" , "features": ""},
+        "SET_NSP_TF_PAGE": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setNSPDoesPage", "parms": "" , "features": ""},
+
         "ENABLE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableImageButtons", "parms": "" , "features": ""},
-        "DISABLE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableImageButtons", "parms": "" , "features": ""},
+//        "DISABLE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableImageButtons", "parms": "" , "features": ""},
         "HIDE_PM_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hideImageButtons", "parms": "" , "features": ""},
-        "RESET_CLOZE_BUTTONS":{"type": "COMMAND", "id": "SstoryQuestions", "method": "resetClozeButtons", "parms": "" , "features": ""},
+
+        "RESET_CLOZE_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "resetClozeButtons", "parms": "" , "features": ""},
         "ENABLE_CLZ_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableClozeButtons", "parms": "" , "features": ""},
-        "DISABLE_CLZ_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableClozeButtons", "parms": "" , "features": ""},
-
-
+//        "DISABLE_CLZ_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableClozeButtons", "parms": "" , "features": ""},
         "HIDE_CLZ_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hideClozeButtons", "parms": "" , "features": ""},
+
+        "RESET_NSP_TF_BUTTONS":{"type": "COMMAND", "id": "SstoryQuestions", "method": "resetNSPDoesButtons", "parms": "" , "features": ""},
+        "ENABLE_NSP_TF_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPDoesButtons", "parms": "" , "features": ""},
+//        "DISABLE_NSP_TF_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableClozeButtons", "parms": "" , "features": ""},
+        "HIDE_NSP_TF_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hideNSPDoesButtons", "parms": "" , "features": ""},
+        "UPDATE_NSP_TF_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "updateNSPDoesButtons", "parms": "" , "features": ""},
+
+        "RESET_NSP_MC_BUTTONS":{"type": "COMMAND", "id": "SstoryQuestions", "method": "resetNSPWhichButtons", "parms": "" , "features": ""},
+        "ENABLE_NSP_MC_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "enableNSPWhichButtons", "parms": "" , "features": ""},
+//        "DISABLE_NSP_TF_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "disableClozeButtons", "parms": "" , "features": ""},
+        "HIDE_NSP_MC_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "hideNSPWhichButtons", "parms": "" , "features": ""},
+        "UPDATE_NSP_MC_BUTTONS": {"type": "COMMAND", "id": "SstoryQuestions", "method": "updateNSPWhichButtons", "parms": "" , "features": ""},
+
+
         "GET_CLOZE_WORD" : {"type": "COMMAND", "id": "SstoryQuestions", "method": "publishClozeWord", "parms": "" , "features": ""},
         "SHOW_CLOZE_WORD" : {"type": "COMMAND", "id": "SstoryQuestions", "method": "showClozeWord", "parms": "" , "features": ""},
 
         //        "EMPTY_ACTION":    {"type": "COMMAND", "cmd": "NOOP"},
-//        "GOTONEXTSCENE":   {"type": "COMMAND", "cmd": "NEXTSCENE"},
-//        "RETURN_AND_GO":   {"type": "COMMAND", "cmd": "SUBGRAPH_RETURN_AND_GO"},
-//        "RETURN_AND_WAIT": {"type": "COMMAND", "cmd": "SUBGRAPH_RETURN_AND_WAIT"},
-//        "CANCEL_FEEDBACK": {"type": "COMMAND", "cmd": "CANCEL_NODE"},
+        //        "GOTONEXTSCENE":   {"type": "COMMAND", "cmd": "NEXTSCENE"},
+        //        "RETURN_AND_GO":   {"type": "COMMAND", "cmd": "SUBGRAPH_RETURN_AND_GO"},
+        //        "RETURN_AND_WAIT": {"type": "COMMAND", "cmd": "SUBGRAPH_RETURN_AND_WAIT"},
+        //        "CANCEL_FEEDBACK": {"type": "COMMAND", "cmd": "CANCEL_NODE"},
         "NEXT_NODE":       {"type": "COMMAND", "cmd": "NEXT"  },
         "WAIT":            {"type": "COMMAND", "cmd": "WAIT"  }
-      //,
-//        "PAUSE":           {"type": "COMMAND", "cmd": "WAIT"}
+        //,
+        //        "PAUSE":           {"type": "COMMAND", "cmd": "WAIT"}
       },
 
       "constraintMap": {
 
         "COMMENT": "@@@@@  CConstraints @@@@@ ",
 
-//        "FIRST_ERROR": {
-//          "type": "CONDITION",
-//          "If": "{{SstoryQuestions.attempt}}==1",
-//          "Then": "true",
-//          "Else": "false"
-//        },
+        //        "FIRST_ERROR": {
+        //          "type": "CONDITION",
+        //          "If": "{{SstoryQuestions.attempt}}==1",
+        //          "Then": "true",
+        //          "Else": "false"
+        //        },
 
         "SECOND_ERROR": {
           "type": "CONDITION",
-          "If": "{{SstoryQuestions.attempt}}==2",
+          "If": "{{SstoryQuestions.attempts}}==2",
           "Then": "true",
           "Else": "false"
         },
@@ -905,12 +1156,12 @@
           "test": "CLZ_ANIM_INCOMPLETE"
         },
 
-//        "SILENCE_COMPLETE": {
-//          "type": "CONDITION",
-//          "If": "{{SstoryQuestions.silenceState}}=='FTR_COMPLETE'",
-//          "Then": "true",
-//          "Else": "false"
-//        },
+        //        "SILENCE_COMPLETE": {
+        //          "type": "CONDITION",
+        //          "If": "{{SstoryQuestions.silenceState}}=='FTR_COMPLETE'",
+        //          "Then": "true",
+        //          "Else": "false"
+        //        },
 
         "ECHO_LINEMODE": {
           "type": "CONDITION",
@@ -941,12 +1192,12 @@
           "test": "FTR_WRONG"
         },
 
-//        "HAS_CLOZE_QUESTION": {
-//          "type": "CONDITION",
-//          "If": "{{SstoryQuestions.distractor}}=='TRUE'",
-//          "Then": "true",
-//          "Else": "false"
-//        },
+        //        "HAS_CLOZE_QUESTION": {
+        //          "type": "CONDITION",
+        //          "If": "{{SstoryQuestions.distractor}}=='TRUE'",
+        //          "Then": "true",
+        //          "Else": "false"
+        //        },
         "CLOZE_CORRECT": {
           "type": "CONDITION",
           "test": "CLOZE_CORRECT"
@@ -963,9 +1214,26 @@
           "type": "CONDITION",
           "test": "PICMATCH_WRONG"
         },
+        "NSP_MC_CORRECT": {
+          "type": "CONDITION",
+          "test": "NSP_MC_CORRECT"
+        },
+        "NSP_MC_WRONG": {
+          "type": "CONDITION",
+          "test": "NSP_MC_WRONG"
+        },
+        "NSP_TF_CORRECT": {
+          "type": "CONDITION",
+          "test": "NSP_TF_CORRECT"
+        },
+        "NSP_TF_WRONG": {
+          "type": "CONDITION",
+          "test": "NSP_TF_WRONG"
+        },
+
         "TEST_SHOW_CLZ": {
           "type": "CONDITION",
-          "If": "({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='TRUE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST')",
+          "If": "({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='TRUE') &&  ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.paraState}}=='LAST')",
           "Then": "true",
           "Else": "false"
         },
@@ -975,6 +1243,13 @@
           "Then": "true",
           "Else": "false"
         },
+        "TEST_NSP_MODE": {
+          "type": "CONDITION",
+          "If": "({{SstoryQuestions.showNSP}}=='TRUE') && ({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.paraState}}=='LAST')",
+          "Then": "true",
+          "Else": "false"
+        },
+
         "TEST_PM_MODE": {
           "type": "CONDITION",
           "If": "({{SstoryQuestions.showPicMatch}}=='FALSE') && ({{SstoryQuestions.showCloze}}=='FALSE') && ({{SstoryQuestions.paraState}}=='LAST') && ({{SstoryQuestions.lineState}}=='LAST') && ({{SstoryQuestions.wordState}}=='LAST') && ({{SstoryQuestions.pmState}}=='TRUE') && ({{SstoryQuestions.qnState}}=='FALSE') && ({{SstoryQuestions.clzState}}=='FALSE')",
@@ -996,6 +1271,18 @@
         "TEST_CLZ_MODE_SIMPLE": {
           "type": "CONDITION",
           "If": "({{SstoryQuestions.clzState}}=='TRUE')",
+          "Then": "true",
+          "Else": "false"
+        },
+        "TEST_SHOW_NSP_MC_MODE": {
+          "type": "CONDITION",
+          "If": "({{SstoryQuestions.whichNextState}}=='TRUE')",
+          "Then": "true",
+          "Else": "false"
+        },
+        "TEST_SHOW_NSP_TF_MODE": {
+          "type": "CONDITION",
+          "If": "({{SstoryQuestions.isNextState}}=='TRUE')",
           "Then": "true",
           "Else": "false"
         }

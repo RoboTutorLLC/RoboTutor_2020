@@ -17,14 +17,6 @@
 //*********************************************************************************
 
 package cmu.xprize.robotutor.tutorengine;
-//import java.io.BufferedReader;
-//import java.io.FileNotFoundException;
-//import java.io.FileReader;
-//
-//import java.io.IOException;
-//import java.util.HashMap;
-//import java.util.StringTokenizer;
-
 
 import android.app.Activity;
 import android.content.Context;
@@ -61,7 +53,7 @@ import cmu.xprize.comp_logging.CLogManager;
 import cmu.xprize.comp_logging.ILogManager;
 import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.graph.databinding;
 import cmu.xprize.robotutor.tutorengine.graph.defdata_scenes;
 import cmu.xprize.robotutor.tutorengine.graph.defdata_tutor;
@@ -70,6 +62,7 @@ import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.robotutor.tutorengine.graph.vars.TScope;
 import cmu.xprize.robotutor.tutorengine.util.CClassMap2;
 import cmu.xprize.robotutor.tutorengine.util.IStudentDataModel;
+import cmu.xprize.robotutor.tutorengine.util.MABHandler;
 import cmu.xprize.robotutor.tutorengine.util.PromotionMechanism;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelCSV;
 import cmu.xprize.robotutor.tutorengine.util.StudentDataModelSharedPrefs;
@@ -840,6 +833,14 @@ public class CTutorEngine implements ILoadableObject2 {
         HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
         System.out.println("h2 : " + h2);
         return matrix;
+    }
+
+    private static void getArm() {
+        String tutorName = "activity_selector";
+        String dataPath = TCONST.TUTORROOT + "/" + tutorName;
+        String dataFile = RoboTutor.ARM_WEIGHTS_FILE;
+
+        MABHandler.getArm(dataPath + "/" + dataFile, mRootScope);
     }
 
 

@@ -298,6 +298,16 @@
       "tutorName": "story_questions",
       "features": "FTR_USER_HEAR:FTR_GEN"
     },
+    "story.nsp.does.hear": {
+      "type": "TUTORVAR_MAP",
+      "tutorName": "story_questions",
+      "features": "FTR_USER_HEAR:FTR_NSP_DOES"
+    },
+    "story.nsp.which.hear": {
+      "type": "TUTORVAR_MAP",
+      "tutorName": "story_questions",
+      "features": "FTR_USER_HEAR:FTR_NSP_WHICH"
+    },
 //    "story.mix.hear": {
 //      "type": "TUTORVAR_MAP",
 //      "tutorName": "story_questions",

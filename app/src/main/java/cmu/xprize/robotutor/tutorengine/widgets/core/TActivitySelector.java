@@ -5,7 +5,6 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
 
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -33,7 +32,7 @@ import cmu.xprize.comp_session.AS_CONST;
 import cmu.xprize.comp_session.CActivitySelector;
 import cmu.xprize.robotutor.R;
 import cmu.xprize.robotutor.RoboTutor;
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 import cmu.xprize.robotutor.tutorengine.CDebugLauncher;
 import cmu.xprize.robotutor.tutorengine.CMediaController;
 import cmu.xprize.robotutor.tutorengine.CMediaManager;

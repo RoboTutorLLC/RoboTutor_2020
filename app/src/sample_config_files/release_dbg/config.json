@@ -3,6 +3,7 @@
   "language_override": false,
   "show_tutorversion": true,
   "show_debug_launcher": true,
+  "menu_type": "CD1",
   "language_switcher": true,
   "no_asr_apps": false,
   "language_feature_id": "LANG_NULL",

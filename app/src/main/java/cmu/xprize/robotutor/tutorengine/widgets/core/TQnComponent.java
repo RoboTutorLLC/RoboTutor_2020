@@ -1,6 +1,7 @@
 package cmu.xprize.robotutor.tutorengine.widgets.core;
 
 import android.content.Context;
+import androidx.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -961,6 +962,26 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
 
         public void hideClozeButtons(){super.hideClozeButtons();}
 
+        public void resetNSPDoesButtons(){super.resetNSPDoesButtons();}
+
+        public void showNSPDoesButtons(){super.showNSPDoesButtons();}
+
+        public void hideNSPDoesButtons(){super.hideNSPDoesButtons();}
+
+        public void enableNSPDoesButtons(){super.enableNSPDoesButtons();}
+
+        public void disableNSPDoesButtons(){super.disableNSPDoesButtons();}
+
+        public void resetNSPWhichButtons(){super.resetNSPWhichButtons();}
+
+        public void showNSPWhichButtons(){super.showNSPWhichButtons();}
+
+        public void hideNSPWhichButtons(){super.hideNSPWhichButtons();}
+
+        public void enableNSPWhichButtons(){super.enableNSPWhichButtons();}
+
+        public void disableNSPWhichButtons(){super.disableNSPWhichButtons();}
+
         public void showClozeWordInBlank(){super.showClozeWordInBlank();}
 
         public void hideClozeWordInBlank(){super.hideClozeWordInBlank();}
@@ -973,7 +994,15 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
 
         public void playClozeSentence(){super.playClozeSentence();}
 
-        public void setSpeakButton(String command) {
+        public void playNSPDoesSentence() {
+        super.playNSPDoesSentence();
+    }
+
+        public void playNSPWhichSentence() {
+        super.playNSPWhichSentence();
+    }
+
+    public void setSpeakButton(String command) {
         super.setSpeakButton(command);
     }
 
@@ -1130,6 +1159,14 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
         }
 
         @Override
+        public void displayNSPWhichQuestion() { mViewManager.displayNSPWhichQuestion();}
+
+        @Override
+        public void displayNSPDoesQuestion() {
+            mViewManager.displayNSPDoesQuestion();
+        }
+
+        @Override
         public void setPictureMatch() {
             super.setPictureMatch();
         }
@@ -1137,6 +1174,16 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
         @Override
         public void setClozePage() {
             super.setClozePage();
+        }
+
+        @Override
+        public void setNSPWhichPage() {
+            super.setNSPWhichPage();
+        }
+
+        @Override
+        public void setNSPDoesPage() {
+            super.setNSPDoesPage();
         }
 
         @Override
@@ -1227,6 +1274,7 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
     }
 
     // FIX_CLOZE make this right
+
     public void logClozePerformance(boolean correct, String expected, String studentChoice, String[] options, int page) {
 
         PerformanceLogItem event = new PerformanceLogItem();
@@ -1325,5 +1373,9 @@ public class TQnComponent extends CQn_Component implements IBehaviorManager, ITu
         event.setTimestamp(System.currentTimeMillis());
 
         RoboTutor.perfLogManager.postPerformanceLog(event);
+    }
+
+    public void logNSPPerformance(boolean correct, String correctSentence, int index, String type) {
+            // TODO: Implement the method
     }
 }

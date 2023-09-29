@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import java.text.DateFormat;
 import java.util.Date;
 
-import cmu.xprize.robotutor.startup.configuration.Configuration;
+import cmu.xprize.util.configuration.Configuration;
 
 /**
  * This View is purpose built to diplay the current app build version name from the Gradle app script

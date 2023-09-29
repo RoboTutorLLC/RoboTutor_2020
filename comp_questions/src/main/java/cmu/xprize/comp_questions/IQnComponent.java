@@ -106,4 +106,39 @@ public interface IQnComponent {
 
     void hasQuestion();
 
+    public void resetNSPDoesButtons();
+
+    public void showNSPDoesButtons();
+
+    public void hideNSPDoesButtons();
+
+    public void enableNSPDoesButtons();
+
+    public void disableNSPDoesButtons();
+
+    public void resetNSPWhichButtons();
+
+    public void showNSPWhichButtons();
+
+    public void hideNSPWhichButtons();
+
+    public void enableNSPWhichButtons();
+
+    public void disableNSPWhichButtons();
+
+    public void displayNSPWhichQuestion();
+
+    public void setNSPWhichQuestion();
+
+    public void setNSPWhichPage();
+
+    public void displayNSPDoesQuestion();
+
+    public void setNSPDoesQuestion();
+
+    public void setNSPDoesPage();
+
+    public void playNSPDoesSentence();
+
+    public void playNSPWhichSentence();
 }

@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import cmu.xprize.robotutor.BuildConfig;
 import cmu.xprize.robotutor.RoboTutor;
@@ -34,6 +36,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         activity.hbRecorder.stopScreenRecording();
         StackTraceElement[] arr = e.getStackTrace();
         String report = e.toString()+"\n\n";
+        Pattern exceptionPattern = Pattern.compile("([a-zA-Z]+)\\s*:");
+        Matcher matcher = exceptionPattern.matcher(report);
+        matcher.find();
+        String errorMessage = matcher.group(1);
         report += "--------- Stack trace ---------\n\n";
         for (int i=0; i<arr.length; i++) {
             report += "    "+arr[i].toString()+"\n";
@@ -60,7 +66,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             }
             File logFile = new File(_directory + "CRASH_RoboTutor_" + BuildConfig.BUILD_TYPE + "_" + BuildConfig.VERSION_NAME + "_" +
                     //RoboTutor.SEQUENCE_ID_STRING + "_" +
-                     timestamp + deviceId + ".txt");
+                     timestamp + "_" + RoboTutor.SESSION_ID + "_" + errorMessage + ".txt");
             logFile.createNewFile();
             FileOutputStream trace = new FileOutputStream(logFile, false);
             trace.write(report.getBytes());
