@@ -200,6 +200,7 @@ public class PromotionMechanism {
         CAt_Data transitionData = transitionMap.get(activeTutorId);
         if (transitionData == null) {
             CErrorManager.logEvent(TAG, "ERROR: no entry found for " + activeTutorId + ". Using rootTutor instead.", false);
+            // instead of root tutor, call filteredTranslation
             transitionData = transitionMap.get(rootTutor);
         }
         switch (promotionDecision) {

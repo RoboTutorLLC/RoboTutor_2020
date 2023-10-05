@@ -34,12 +34,19 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
 import cmu.xprize.comp_logging.CLogManager;
@@ -820,6 +827,11 @@ public class CTutorEngine implements ILoadableObject2 {
         // Load the datasource into a separate class...
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
+        System.out.println("dataPath: " + dataPath);
+        System.out.println("Log pointer");
+
+        HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
+        System.out.println("h2 : " + h2);
         return matrix;
     }
 
@@ -846,6 +858,49 @@ public class CTutorEngine implements ILoadableObject2 {
     public void loadJSON(JSONObject jsonObj, IScope scope) {
         // Log.d(TAG, "Loader iteration");
         loadJSON(jsonObj, (IScope2) scope);
+
+    }
+    public static HashMap<String, String> loadTranslationTable(Context context) {
+        HashMap<String, String> hm = new HashMap<>();
+
+        try {
+            //csv file containing data
+            InputStream is = context.getResources().openRawResource(R.raw.filtered_translation);
+
+            //create BufferedReader to read csv file
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String strLine;
+            StringTokenizer st;
+            int lineNumber = 0, tokenNumber = 0;
+
+            //read comma-separated file line by line
+            while ((strLine = br.readLine()) != null) {
+                lineNumber++;
+
+                //break comma-separated line using ","
+                st = new StringTokenizer(strLine, ",");
+
+                while (st.hasMoreTokens()) {
+                    tokenNumber++;
+                    String a = st.nextToken();
+                    tokenNumber+=2;
+                    String b = st.nextToken();
+                    hm.put(a, b);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return hm;
     }
 
+
 }
+
+
+
+
+
