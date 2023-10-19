@@ -17,9 +17,12 @@ public class NSPQuestion implements ILoadableObject {
     public NSPContextSentence context_sentence;
     public NSPChoice choices;
 
+
+    //todo choices is not a list and cannot be accessed as one. You must create an accumulated list of all nsp choices to iterate through NSP options.
     @Override
     public void loadJSON(JSONObject jsonObj, IScope scope) {
         JSON_Helper.parseSelf(jsonObj, this, CClassMap.classMap, scope);
 
     }
+
 }

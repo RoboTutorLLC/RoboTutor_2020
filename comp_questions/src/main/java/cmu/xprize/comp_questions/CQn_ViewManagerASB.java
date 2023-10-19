@@ -348,8 +348,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         }
 
 
-
-        // TODO: Fix
+        //todo choices is not a list and cannot be accessed as one. You must create an accumulated list of all nsp choices to iterate through NSP options.
 //        try {
 //            for (int i = 0; i < NspQuestions.length - 1; i++) {
 //                NspQuestion = NspQuestions[i];
@@ -459,7 +458,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPWhichPage() {
-//        // intializes
+
+
 //        int paracount = data[mCurrPage+1].text.length;
 //        int numLines = 0;
 //        numWordsCurPage = 0;
@@ -473,7 +473,8 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //                }
 //            }
 //        }
-
+//
+//        //TODO This will require NSP json files to be loaded onto development device
 //        for (int i = 0; i < NspQuestion.choices.size(); i++) {
 //            if (mPageCount == NspQuestion.choices.get(i).index) {
 //                nsp_which_mode = true;
@@ -534,6 +535,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
         // SHOW the buttons on the screen
+        //todo choices is not a list and cannot be accessed as one. You must create an accumulated list of all nsp choices to iterate through NSP options.
 
 //        for (int i = 0; i < NspQuestion.choices.size(); i++) {
 //            if (mPageCount == NspQuestion.choices.get(i).index) {
