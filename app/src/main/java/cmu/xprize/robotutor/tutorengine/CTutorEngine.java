@@ -815,7 +815,7 @@ public class CTutorEngine implements ILoadableObject2 {
         //String dataFile = "dev_data.json";
         String dataFile = RoboTutor.MATRIX_FILE;
 
-        // simpler way to refer to languge
+        // simpler way to refer to language
         String lang = TCONST.langMap.get(CTutorEngine.language);
 
         String dataPath = TCONST.TUTORROOT + "/" + tutorName + "/" + TCONST.TASSETS;
@@ -823,15 +823,14 @@ public class CTutorEngine implements ILoadableObject2 {
 
         String jsonData = JSON_Helper.cacheData(dataPath + dataFile);
 
-        //
         // Load the datasource into a separate class...
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
         System.out.println("dataPath: " + dataPath);
-        System.out.println("Log pointer");
+        System.out.println("Log pointer");      //to locate required data in log
 
-        HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
-        System.out.println("h2 : " + h2);
+        HashMap<String, String> translationTable = loadTranslationTable(Activity.getApplicationContext());
+        System.out.println("translationTable : " + translationTable);
         return matrix;
     }
 
@@ -861,7 +860,8 @@ public class CTutorEngine implements ILoadableObject2 {
 
     }
     public static HashMap<String, String> loadTranslationTable(Context context) {
-        HashMap<String, String> hm = new HashMap<>();
+
+        HashMap<String, String> translationTable = new HashMap<>();
 
         try {
             //csv file containing data
@@ -882,10 +882,10 @@ public class CTutorEngine implements ILoadableObject2 {
 
                 while (st.hasMoreTokens()) {
                     tokenNumber++;
-                    String a = st.nextToken();
+                    String currentActivity = st.nextToken();
                     tokenNumber+=2;
-                    String b = st.nextToken();
-                    hm.put(a, b);
+                    String nextActivity = st.nextToken();
+                    translationTable.put(currentActivity, nextActivity);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -894,7 +894,7 @@ public class CTutorEngine implements ILoadableObject2 {
             e.printStackTrace();
         }
 
-        return hm;
+        return translationTable;
     }
 
 
