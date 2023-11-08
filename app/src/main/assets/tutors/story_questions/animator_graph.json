@@ -835,7 +835,7 @@
 
             {"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",        "parms": "HIDE:String",    "features": ""}
             //,
-            //            {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "HIDE:String",    "features": ""}
+            {"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "HIDE:String",    "features": ""}
             //{"type": "COMMAND", "id": "SstoryQuestions", "method": "setSpeakButton",        "parms": "DISABLE:String",    "features": ""},
             //{"type": "COMMAND", "id": "SstoryQuestions", "method": "setPageFlipButton",        "parms": "DISABLE:String",    "features": ""}
 
