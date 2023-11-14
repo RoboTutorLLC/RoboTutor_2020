@@ -7,6 +7,7 @@ import cmu.xprize.comp_ask.CAskElement;
 import cmu.xprize.comp_ask.CAsk_Data;
 import cmu.xprize.comp_session.AS_CONST;
 import cmu.xprize.robotutor.RoboTutor;
+import cmu.xprize.robotutor.tutorengine.CTutorEngine;
 import cmu.xprize.util.CAt_Data;
 
 import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_MATH;
@@ -156,10 +157,15 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
         CAt_Data tutorToLaunch = (CAt_Data) transitionMap.get(activeTutorId);
 
         // This is just to make sure we go somewhere if there is a bad link - which
-        // there shuoldn't be :)
+        // there shouldn't be :)
         //
         if (tutorToLaunch == null) {
-            tutorToLaunch = (CAt_Data) transitionMap.get(rootTutor);
+            String nextTutorId = CTutorEngine.getTranslatedActivityID(activeTutorId);
+            tutorToLaunch = (CAt_Data) transitionMap.get(nextTutorId);
+
+            if (tutorToLaunch == null) {
+                tutorToLaunch = (CAt_Data) transitionMap.get(rootTutor);
+            }
         }
         return tutorToLaunch;
     }
