@@ -871,23 +871,39 @@ public class CTutorEngine implements ILoadableObject2 {
             BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String strLine;
             StringTokenizer st;
-            int lineNumber = 0, tokenNumber = 0;
+            int lineNumber = 0;
 
-            //read comma-separated file line by line
+            // Skip the first line
+            br.readLine();
+
+            // read comma-separated file line by line
             while ((strLine = br.readLine()) != null) {
                 lineNumber++;
 
-                //break comma-separated line using ","
+                // break comma-separated line using ","
                 st = new StringTokenizer(strLine, ",");
 
-                while (st.hasMoreTokens()) {
-                    tokenNumber++;
-                    String currentActivity = st.nextToken();
-                    tokenNumber+=2;
-                    String nextActivity = st.nextToken();
+                // Make sure there are at least 4 tokens before accessing 0th and 3rd indices
+                if (st.countTokens() >= 4) {
+                    // Skip the first three tokens
+                    String currentActivity = st.nextToken(); // 1st token
+                    System.out.println(currentActivity);
+                    st.nextToken(); // Skipping 2nd token
+                    st.nextToken(); // Skipping 3rd token
+
+                    String nextActivity = st.nextToken(); // 4th token
+                    System.out.println(nextActivity);
+
+                    // Skip the next two tokens
+                    st.nextToken(); // Skipping 4th token
+                    st.nextToken(); // Skipping 5th token
+
                     translationTable.put(currentActivity, nextActivity);
+                } else {
+                    System.err.println("Invalid format in line " + lineNumber + ": " + strLine);
                 }
             }
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -899,7 +915,6 @@ public class CTutorEngine implements ILoadableObject2 {
 
 
 }
-
 
 
 
