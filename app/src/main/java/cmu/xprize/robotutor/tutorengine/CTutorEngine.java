@@ -886,6 +886,10 @@ public class CTutorEngine implements ILoadableObject2 {
             StringTokenizer st;
             int lineNumber = 0;
 
+            //Sample of csv file
+            //unfiltered_activity_name,unfiltered_row,unfiltered_column,filtered_activity_name,filtered_row,filtered_column
+            //write.ltr.uc.dic:vow.asc.A..Z.3,0,49,akira:vow.ltr.uc:A..Z.vow.5.asc.say.11,0,50
+
             // Skip the first line
             br.readLine();
 
