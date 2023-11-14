@@ -122,6 +122,8 @@ public class CTutorEngine implements ILoadableObject2 {
 
     final static private String TAG         = "CTutorEngine";
 
+    static public HashMap<String, String> translationTable = new HashMap<>();
+
 
     /**
      * TutorEngine is a Singleton
@@ -829,10 +831,17 @@ public class CTutorEngine implements ILoadableObject2 {
         System.out.println("dataPath: " + dataPath);
         System.out.println("Log pointer");      //to locate required data in log
 
-        HashMap<String, String> translationTable = loadTranslationTable(Activity.getApplicationContext());
+        loadTranslationTable(Activity.getApplicationContext());
         System.out.println("translationTable : " + translationTable);
+
+        String oldActivity = "write.missingLtr:lc.begin.ka.2";
+        String nextActivity = getTranslatedActivityID(oldActivity);
+
+        System.out.println("Translated activity: " + nextActivity);
         return matrix;
     }
+
+
 
     private static void getArm() {
         String tutorName = "activity_selector";
@@ -859,9 +868,13 @@ public class CTutorEngine implements ILoadableObject2 {
         loadJSON(jsonObj, (IScope2) scope);
 
     }
-    public static HashMap<String, String> loadTranslationTable(Context context) {
 
-        HashMap<String, String> translationTable = new HashMap<>();
+    public static String getTranslatedActivityID(String oldActivityID){
+        return translationTable.get(oldActivityID);
+    }
+
+
+    static void loadTranslationTable(Context context) {
 
         try {
             //csv file containing data
@@ -887,34 +900,30 @@ public class CTutorEngine implements ILoadableObject2 {
                 if (st.countTokens() >= 4) {
                     // Skip the first three tokens
                     String currentActivity = st.nextToken(); // 1st token
-                    System.out.println(currentActivity);
                     st.nextToken(); // Skipping 2nd token
                     st.nextToken(); // Skipping 3rd token
 
                     String nextActivity = st.nextToken(); // 4th token
-                    System.out.println(nextActivity);
-
                     // Skip the next two tokens
-                    st.nextToken(); // Skipping 4th token
                     st.nextToken(); // Skipping 5th token
+                    st.nextToken(); // Skipping 6th token
 
                     translationTable.put(currentActivity, nextActivity);
                 } else {
                     System.err.println("Invalid format in line " + lineNumber + ": " + strLine);
                 }
             }
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return translationTable;
+        System.out.println("translationTable : " + translationTable);
     }
 
-
 }
+
 
 
 
