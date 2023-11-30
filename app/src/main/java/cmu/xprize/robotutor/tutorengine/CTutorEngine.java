@@ -844,11 +844,16 @@ public class CTutorEngine implements ILoadableObject2 {
 
 
     private static void getArm() {
+        
+        Log.d("MAB", "Entering getArm() method.");
+        
         String tutorName = "activity_selector";
         String dataPath = TCONST.TUTORROOT + "/" + tutorName;
         String dataFile = RoboTutor.ARM_WEIGHTS_FILE;
 
         MABHandler.getArm(dataPath + "/" + dataFile, mRootScope);
+        
+        Log.d("MAB", "Exiting getArm() method.");
     }
 
 
