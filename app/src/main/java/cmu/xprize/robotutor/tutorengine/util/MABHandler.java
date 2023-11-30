@@ -67,17 +67,24 @@ public class MABHandler {
 
 
     private static List<ArmWeight> getArmWeights(String dataSource, IScope2 scope) {
-        String jsonData = JSON_Helper.cacheData(dataSource);
-        List<ArmWeight> armWeights = new ArrayList<>();
-        try {
-            JSONObject rootObject = new JSONObject(jsonData);
-            JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
-            armWeights = parseArray(rootArray, scope);
-        } catch (Exception e) {
-            Log.d(TAG, "getArmWeights: "+e);
+    String jsonData = JSON_Helper.cacheData(dataSource);
+    List<ArmWeight> armWeights = new ArrayList<>();
+    try {
+        JSONObject rootObject = new JSONObject(jsonData);
+        JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
+        armWeights = parseArray(rootArray, scope);
+
+        // Adding logging to print arm weights
+        for (ArmWeight armWeight : armWeights) {
+            Log.d(TAG, "Arm: " + armWeight.name + ", Weight: " + armWeight.weight);
         }
-        return armWeights;
+
+    } catch (Exception e) {
+        Log.e(TAG, "Error in getArmWeights: " + e.getMessage());
     }
+    return armWeights;
+}
+
 
     private static List<ArmWeight> parseArray(JSONArray array, IScope2 scope) throws JSONException {
         List<ArmWeight> armWeights = new ArrayList<>();
