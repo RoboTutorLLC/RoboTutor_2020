@@ -76,7 +76,7 @@ public class MABHandler {
     
             // Adding logging to print arm weights
             for (ArmWeight armWeight : armWeights) {
-                Log.d(TAG, "Arm: " + armWeight.arm_name + ", Weight: " + armWeight.arm_weight);
+                Log.d(TAG, "Arm: " + armWeight;
             }
     
         } catch (Exception e) {
