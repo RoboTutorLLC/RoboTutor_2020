@@ -73,11 +73,7 @@ public class MABHandler {
             JSONObject rootObject = new JSONObject(jsonData);
             JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
             armWeights = parseArray(rootArray, scope);
-    
-            // Adding logging to print arm weights
-            for (ArmWeight armWeight : armWeights) {
-                Log.d(TAG, "Arm: " + armWeight;
-            }
+
     
         } catch (Exception e) {
             Log.e(TAG, "Error in getArmWeights: " + e.getMessage());
