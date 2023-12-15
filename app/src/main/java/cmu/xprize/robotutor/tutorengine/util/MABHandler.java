@@ -31,17 +31,17 @@ public class MABHandler {
     private static final String TAG = "MABHandler";
 
     public static String getArm(String dataSource, IScope2 scope) {
-        List<ArmWeight> armWeights = getArmWeights(dataSource, scope);
-        ArmWeight selectedArm = selectArm(armWeights);
-        Log.d(TAG, "getArm: list = "+armWeights);
-        Log.d(TAG, "getArm: selected = "+selectedArm);
+        List<Arm> arms = getarms(dataSource, scope);
+        Arm selectedArm = selectArm(arms);
+        Log.d(TAG, "getArm: list = " + arms);
+        Log.d(TAG, "getArm: selected = " + selectedArm);
         return "";
     }
 
     // Selects an arm from a list of arms
-    private static ArmWeight selectArm(List<ArmWeight> armWeights) {
+    private static Arm selectArm(List<Arm> arms) {
         float sum = 0;
-        for (ArmWeight arm : armWeights) {
+        for (Arm arm : arms) {
             sum += arm.weight;
         }
 
@@ -50,7 +50,7 @@ public class MABHandler {
 
         // find out where p lies
         float bottom = 0;
-        for (ArmWeight arm : armWeights) {
+        for (Arm arm : arms) {
             float top = bottom + arm.weight;
             if (bottom <= p && p <= top) {
                 return arm;
@@ -66,30 +66,34 @@ public class MABHandler {
     }
 
 
-    private static List<ArmWeight> getArmWeights(String dataSource, IScope2 scope) {
+    private static List<Arm> getarms(String dataSource, IScope2 scope) {
         String jsonData = JSON_Helper.cacheData(dataSource);
-        List<ArmWeight> armWeights = new ArrayList<>();
+        List<Arm> arms = new ArrayList<>();
         try {
             JSONObject rootObject = new JSONObject(jsonData);
             JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
-            armWeights = parseArray(rootArray, scope);
-
+            arms = parseArray(rootArray, scope);
+    
+            // Adding logging to print arms
+            for (Arm arm : arms) {
+                Log.d(TAG, "Arm: " + arm.name + ", Weight: " + arm.weight + ", Matrix Path"  + arm.matrix); 
+            }
     
         } catch (Exception e) {
-            Log.e(TAG, "Error in getArmWeights: " + e.getMessage());
+            Log.e(TAG, "Error in getarms: " + e.getMessage());
         }
-        return armWeights;
+        return arms;
 }
 
 
-    private static List<ArmWeight> parseArray(JSONArray array, IScope2 scope) throws JSONException {
-        List<ArmWeight> armWeights = new ArrayList<>();
+    private static List<Arm> parseArray(JSONArray array, IScope2 scope) throws JSONException {
+        List<Arm> arms = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
-            JSONObject armWeightJSON = array.getJSONObject(i);
-            ArmWeight armWeight = new ArmWeight(armWeightJSON, scope);
-            armWeights.add(armWeight);
+            JSONObject armJSON = array.getJSONObject(i);
+            Arm arm = new Arm(armJSON, scope);
+            arms.add(arm);
         }
-        return armWeights;
+        return arms;
     }
 
 
