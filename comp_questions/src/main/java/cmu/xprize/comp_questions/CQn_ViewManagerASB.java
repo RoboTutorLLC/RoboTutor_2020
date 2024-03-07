@@ -1167,6 +1167,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //            setNSPWhichView(mEvenPage);
         }
         // Ensure the buttons reflect the current states
+        //Rohan: Cleaned up redundancy issues. Still producing expected behavior
         updateButtons();
         if (cloze_page_mode){
             updateClozeButtons();
@@ -2720,14 +2721,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 //        updateClozeButtons();
     }
 
-    private String printArray(String[] a){
-        String result = "";
-        for (int i = 0; i < a.length; i++){
-            result+=a[i];
-            result+=" ";
-        }
-        return result;
-    }
+
 
     /**
      * TRACE_CLOZE here is where the cloze question text is set
@@ -2948,17 +2942,22 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         mParent.animatePageFlip(true, mCurrViewIndex);
     }
 
+    //Rohan: Produces error right now, while I assign the SHOW_NSP value
     @Override
     public void hasClozeDistractor(){
         if (mCurrPage <= mPageCount-1) {
             if (isClozePage && mCurrPara >= mParaCount-1){
                 mParent.publishValue(SHOW_CLOZE, TCONST.TRUE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+
+                //TODO: should this be NSP DOES or NSP Which. I don't fully understand
+                mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
             } else {
                 mParent.publishValue(SHOW_CLOZE, TCONST.FALSE);
                 mParent.publishValue(SHOW_PICMATCH, TCONST.FALSE);
-//                mParent.publishValue(SHOW_NSP, TCONST.FALSE);
+
+                //TODO: should this be NSP DOES or NSP Which. I don't fully understand
+                mParent.publishValue(SHOW_NSP_DOES, TCONST.FALSE);
             }
         }
     }
@@ -3054,6 +3053,7 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
         // check current page whether there is an nsp question
         // publishValue SHOW_NSP_DOES, SHOW_NSP_WHICH
         // TODO: WHERE IS isNSPDoesPage/isNSPWhichPage set??? temporarily not in the condition
+        // Todo: I really need NSP files for this to work. Please get that asap. 
 
 //        if (mCurrPage <= mPageCount-1) {
 //            for (int i = 0; i < NspQuestions.length; i++) {

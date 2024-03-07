@@ -984,16 +984,16 @@
         "SET_VERSION": {"type": "COMMAND", "id": "Sbanner", "method": "setVersionID", "parms": "v.0.0.1:String", "features": ""},
 
         "START_STORY":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "startStory", "features": ""},
-        //        "INIT_LISTENER": {"type": "COMMAND", "id": "SstoryQuestions", "method": "initListener", "features": "FTR_USER_PARROT"},
+                "INIT_LISTENER": {"type": "COMMAND", "id": "SstoryQuestions", "method": "initListener", "features": "FTR_USER_PARROT"},
 
-        //        "HESTITATION_TIMER":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|HESITATION_PROMPT:String|5000:Integer" , "features": ""},
-        //        "HESTITATION_RESET":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|NULL:String|0:Integer" , "features": ""},
+                "HESTITATION_TIMER":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|HESITATION_PROMPT:String|5000:Integer" , "features": ""},
+                "HESTITATION_RESET":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_TIMED_START_EVENT:String|NULL:String|0:Integer" , "features": ""},
 
-        //        "SET_WORD_EVENT":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|HESTITATION_RESET:String" , "features": ""},
-        //        "RESET_WORD_EVENT": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|NULL:String" , "features": ""},
+                "SET_WORD_EVENT":   {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|HESTITATION_RESET:String" , "features": ""},
+                "RESET_WORD_EVENT": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_WORD_EVENT:String|NULL:String" , "features": ""},
 
         "SET_UTTERANCE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "UTTERANCE_COMPLETE_EVENT:String|NEXT_NODE:String" , "features": ""},
-        //        "SET_CLOZE_RESPONSE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "ON_CLICK:String|NEXT_NODE:String" , "features": ""},
+//                "SET_CLOZE_RESPONSE_BEHAVIOR":  {"type": "COMMAND", "id": "SstoryQuestions", "method": "setStickyBehavior", "parms": "ON_CLICK:String|NEXT_NODE:String" , "features": ""},
 
         "SET_HYPOTHESIS_BEHAVIOR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_RECOGNITION_EVENT:String|NEXT_NODE:String" , "features": ""},
         "CLR_HYPOTHESIS_BEHAVIOR": {"type": "COMMAND", "id": "SstoryQuestions", "method": "setVolatileBehavior", "parms": "ASR_RECOGNITION_EVENT:String|NULL:String" , "features": ""},
