@@ -458,36 +458,30 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
     @Override
     public void setNSPWhichPage() {
+        int paracount = data[mCurrPage+1].text.length;
+        int numLines = 0;
+        numWordsCurPage = 0;
+        for(int i = 0; i < paracount; i++){
+            int linecount = data[mCurrPage+1].text[i].length;
+            numLines+=linecount;
+            for (int j = 0; j < linecount;j++){
+                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+                for(int k = 0; k < utteranceLen; k++){
+                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+                }
+            }
+        }
 
-
-//        int paracount = data[mCurrPage+1].text.length;
-//        int numLines = 0;
-//        numWordsCurPage = 0;
-//        for(int i = 0; i < paracount; i++){
-//            int linecount = data[mCurrPage+1].text[i].length;
-//            numLines+=linecount;
-//            for (int j = 0; j < linecount;j++){
-//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-//                for(int k = 0; k < utteranceLen; k++){
-//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-//                }
-//            }
-//        }
-//
-//        //TODO This will require NSP json files to be loaded onto development device
-//        for (int i = 0; i < NspQuestion.choices.size(); i++) {
-//            if (mPageCount == NspQuestion.choices.get(i).index) {
-//                nsp_which_mode = true;
-//                updateNSPWhichButtons();
-//                break;
-//            } else {
-//                nsp_which_mode = false;
-//            }
-//        }
-
-
-
-
+        //TODO This will require NSP json files to be loaded onto development device
+        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+            if (mPageCount == NspQuestion.choices.get(i).index) {
+                nsp_which_mode = true;
+                updateNSPWhichButtons();
+                break;
+            } else {
+                nsp_which_mode = false;
+            }
+        }
     }
 
     // Creates an NSP Does page, called by SET_NSP_DOES_PAGE
@@ -496,14 +490,14 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     public void setNSPDoesPage() {
 
         if(nsp_does_mode && isNSPDoesPage) {
-//            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
-//                if (NSPQuestion.choices.get(i).type.equals("correct")) {
-//                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
-//                } if (NSPQuestion.choices.get(i).type.equals(nsp_choice_type)) {
-//                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
-////                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
-//                }
-//            }
+            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
+                if (NSPQuestion.choices.get(i).type.equals("correct")) {
+                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
+                } if (NSPQuestion.choices.get(i).type.equals(nsp_choice_type)) {
+                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+//                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
+                }
+            }
 
             if (getRandomNumberInRange(0, 1) == 0) {
                 // show distractor
@@ -518,34 +512,34 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
             }
         }
 
-//        int paracount = data[mCurrPage+1].text.length;
-//        int numLines = 0;
-//        numWordsCurPage = 0;
-//        for(int i = 0; i < paracount; i++){
-//            int linecount = data[mCurrPage+1].text[i].length;
-//            numLines+=linecount;
-//            for (int j = 0; j < linecount;j++){
-//                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
-//                for(int k = 0; k < utteranceLen; k++){
-//                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
-//                }
-//
-//            }
-//        }
+        int paracount = data[mCurrPage+1].text.length;
+        int numLines = 0;
+        numWordsCurPage = 0;
+        for(int i = 0; i < paracount; i++){
+            int linecount = data[mCurrPage+1].text[i].length;
+            numLines+=linecount;
+            for (int j = 0; j < linecount;j++){
+                int utteranceLen = data[mCurrPage+1].text[i][j].narration.length;
+                for(int k = 0; k < utteranceLen; k++){
+                    numWordsCurPage+=data[mCurrPage+1].text[i][j].narration[k].segmentation.length;
+                }
+
+            }
+        }
 
 
         // SHOW the buttons on the screen
         //todo choices is not a list and cannot be accessed as one. You must create an accumulated list of all nsp choices to iterate through NSP options.
 
-//        for (int i = 0; i < NspQuestion.choices.size(); i++) {
-//            if (mPageCount == NspQuestion.choices.get(i).index) {
-//                nsp_does_mode = true;
-//                updateNSPDoesButtons();
-//                break;
-//            } else {
-//                nsp_does_mode = false;
-//            }
-//        }
+        for (int i = 0; i < NspQuestion.choices.size(); i++) {
+            if (mPageCount == NspQuestion.choices.get(i).index) {
+                nsp_does_mode = true;
+                updateNSPDoesButtons();
+                break;
+            } else {
+                nsp_does_mode = false;
+            }
+        }
 
 
     }
@@ -650,25 +644,32 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
 
 
     public void setPageFlipButton(String command) {
-        switch (command) {
-            case "ENABLE":
-                Log.i("ASB", "ENABLE Flip Button");
-                pageButtonEnable = command;
-                break;
-            case "DISABLE":
-                Log.i("ASB", "DISABLE Flip Button");
-                pageButtonEnable = command;
-                break;
-            case "SHOW":
-                pageButtonShow = command;
-                break;
-            case "HIDE":
-                pageButtonShow = command;
-                break;
+        if ("ENABLE".equals(command) || "DISABLE".equals(command) || "SHOW".equals(command) || "HIDE".equals(command)) {
+
+            switch (command) {
+                case "ENABLE":
+                    Log.i("ASB", "ENABLE Flip Button");
+                    pageButtonEnable = command;
+                    break;
+                case "DISABLE":
+                    Log.i("ASB", "DISABLE Flip Button");
+                    pageButtonEnable = command;
+                    break;
+                case "SHOW":
+                    pageButtonShow = command;
+                    break;
+                case "HIDE":
+                    pageButtonShow = command;
+                    break;
+            }
+            // Ensure the buttons reflect the current states
+            //
+            updateButtons();
         }
-        // Ensure the buttons reflect the current states
-        //
-        updateButtons();
+
+        else {
+            Log.w("ASB", "Invalid command: " + command);
+        }
     }
 
 
