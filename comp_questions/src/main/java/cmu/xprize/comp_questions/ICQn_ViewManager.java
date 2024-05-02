@@ -18,6 +18,10 @@
 
 package cmu.xprize.comp_questions;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+
 import cmu.xprize.util.ILoadableObject;
 import edu.cmu.xprize.listener.ListenerBase;
 
@@ -168,7 +172,7 @@ public interface ICQn_ViewManager extends ILoadableObject {
 
     void setNSPDoesQuestion();
 
-    void setNSPDoesPage();
+    void setNSPDoesPage() throws IOException, JSONException;
 
     void hasNSPDistractor();
 

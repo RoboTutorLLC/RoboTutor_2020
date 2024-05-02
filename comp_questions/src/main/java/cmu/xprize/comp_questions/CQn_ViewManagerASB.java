@@ -25,6 +25,7 @@ import android.graphics.PointF;
 import android.text.Html;
 import android.text.Layout;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,10 +41,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -487,14 +492,39 @@ public class CQn_ViewManagerASB implements ICQn_ViewManager, ILoadableObject  {
     // Creates an NSP Does page, called by SET_NSP_DOES_PAGE
     // Assigns the sentence to be shown on the screen
     @Override
-    public void setNSPDoesPage() {
+    public void setNSPDoesPage() throws IOException, JSONException {
+
+        InputStream loaded = JSON_Helper.assetManager().open("/robotutor_assets/assets/story/sw/nsp/story/story_40/nsp.json");
+
+
+
+        StringBuilder textBuilder = new StringBuilder();
+        try (Reader reader = new BufferedReader(new InputStreamReader
+                (loaded, StandardCharsets.UTF_8))) {
+            int c = 0;
+            while ((c = reader.read()) != -1) {
+                textBuilder.append((char) c);
+            }
+        }
+
+        JSONObject newOBJ = new JSONObject();
+
+        try {
+            newOBJ = new JSONObject(textBuilder.toString());
+        }catch (JSONException err){
+            Log.d("Error", err.toString());
+        }
+
+        NSPQuestion nspQuestions = new NSPQuestion(newOBJ);
+
+
 
         if(nsp_does_mode && isNSPDoesPage) {
-            for(int i = 0; i < NSPQuestion.choices.size(); i++) {
-                if (NSPQuestion.choices.get(i).type.equals("correct")) {
-                    NSPDoesCorrect = NSPQuestion.choices.get(i).text;
-                } if (NSPQuestion.choices.get(i).type.equals(nsp_choice_type)) {
-                    NSPDoesDistractor =  NSPQuestion.choices.get(i).text;
+            for(int i = 0; i < nspQuestions.choices.size(); i++) {
+                if (nspQuestions.choices.get(i).type.equals("correct")) {
+                    NSPDoesCorrect = nspQuestions.choices.get(i).text;
+                } if (nspQuestions.choices.get(i).type.equals(nsp_choice_type)) {
+                    NSPDoesDistractor =  nspQuestions.choices.get(i).text;
 //                    NSPSentenceIndex = NSPQuestion.choices.get(i).index;
                 }
             }

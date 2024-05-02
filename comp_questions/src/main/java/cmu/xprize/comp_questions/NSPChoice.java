@@ -18,6 +18,13 @@ public class NSPChoice implements ILoadableObject{
     public String text;
     public Double coherence;
 
+    public NSPChoice(String type, int index, String text, Double coherence){
+        this.type = type;
+        this.index = index;
+        this.text = text;
+        this.coherence = coherence;
+    };
+
     @Override
     public void loadJSON(JSONObject jsonObj, IScope scope) {
         try{
