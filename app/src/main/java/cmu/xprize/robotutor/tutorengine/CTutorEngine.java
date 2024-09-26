@@ -122,6 +122,8 @@ public class CTutorEngine implements ILoadableObject2 {
 
     final static private String TAG         = "CTutorEngine";
 
+    static public HashMap<String, String> translationTable = new HashMap<>();
+
 
     /**
      * TutorEngine is a Singleton
@@ -815,7 +817,7 @@ public class CTutorEngine implements ILoadableObject2 {
         //String dataFile = "dev_data.json";
         String dataFile = RoboTutor.MATRIX_FILE;
 
-        // simpler way to refer to languge
+        // simpler way to refer to language
         String lang = TCONST.langMap.get(CTutorEngine.language);
 
         String dataPath = TCONST.TUTORROOT + "/" + tutorName + "/" + TCONST.TASSETS;
@@ -823,24 +825,35 @@ public class CTutorEngine implements ILoadableObject2 {
 
         String jsonData = JSON_Helper.cacheData(dataPath + dataFile);
 
-        //
         // Load the datasource into a separate class...
         TransitionMatrixModel matrix = new TransitionMatrixModel(dataPath + dataFile, mRootScope);
         matrix.validateAll();
         System.out.println("dataPath: " + dataPath);
-        System.out.println("Log pointer");
+        System.out.println("Log pointer");      //to locate required data in log
 
-        HashMap<String, String> h2 = loadTranslationTable(Activity.getApplicationContext());
-        System.out.println("h2 : " + h2);
+        loadTranslationTable(Activity.getApplicationContext());
+        System.out.println("translationTable : " + translationTable);
+
+        String oldActivity = "write.missingLtr:lc.begin.ka.2";
+        String nextActivity = getTranslatedActivityID(oldActivity);
+
+        System.out.println("Translated activity: " + nextActivity);
         return matrix;
     }
 
+
+
     private static void getArm() {
+        
+        Log.d("MAB", "Entering getArm() method.");
+        
         String tutorName = "activity_selector";
         String dataPath = TCONST.TUTORROOT + "/" + tutorName;
         String dataFile = RoboTutor.ARM_WEIGHTS_FILE;
 
         MABHandler.getArm(dataPath + "/" + dataFile, mRootScope);
+        
+        Log.d("MAB", "Exiting getArm() method.");
     }
 
 
@@ -860,8 +873,13 @@ public class CTutorEngine implements ILoadableObject2 {
         loadJSON(jsonObj, (IScope2) scope);
 
     }
-    public static HashMap<String, String> loadTranslationTable(Context context) {
-        HashMap<String, String> hm = new HashMap<>();
+
+    public static String getTranslatedActivityID(String oldActivityID){
+        return translationTable.get(oldActivityID);
+    }
+
+
+    static void loadTranslationTable(Context context) {
 
         try {
             //csv file containing data
@@ -871,21 +889,37 @@ public class CTutorEngine implements ILoadableObject2 {
             BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String strLine;
             StringTokenizer st;
-            int lineNumber = 0, tokenNumber = 0;
+            int lineNumber = 0;
 
-            //read comma-separated file line by line
+            //Sample of csv file
+            //unfiltered_activity_name,unfiltered_row,unfiltered_column,filtered_activity_name,filtered_row,filtered_column
+            //write.ltr.uc.dic:vow.asc.A..Z.3,0,49,akira:vow.ltr.uc:A..Z.vow.5.asc.say.11,0,50
+
+            // Skip the first line
+            br.readLine();
+
+            // read comma-separated file line by line
             while ((strLine = br.readLine()) != null) {
                 lineNumber++;
 
-                //break comma-separated line using ","
+                // break comma-separated line using ","
                 st = new StringTokenizer(strLine, ",");
 
-                while (st.hasMoreTokens()) {
-                    tokenNumber++;
-                    String a = st.nextToken();
-                    tokenNumber+=2;
-                    String b = st.nextToken();
-                    hm.put(a, b);
+                // Make sure there are at least 4 tokens before accessing 0th and 3rd indices
+                if (st.countTokens() >= 4) {
+                    // Skip the first three tokens
+                    String currentActivity = st.nextToken(); // 1st token
+                    st.nextToken(); // Skipping 2nd token
+                    st.nextToken(); // Skipping 3rd token
+
+                    String nextActivity = st.nextToken(); // 4th token
+                    // Skip the next two tokens
+                    st.nextToken(); // Skipping 5th token
+                    st.nextToken(); // Skipping 6th token
+
+                    translationTable.put(currentActivity, nextActivity);
+                } else {
+                    System.err.println("Invalid format in line " + lineNumber + ": " + strLine);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -894,9 +928,8 @@ public class CTutorEngine implements ILoadableObject2 {
             e.printStackTrace();
         }
 
-        return hm;
+        System.out.println("translationTable : " + translationTable);
     }
-
 
 }
 
