@@ -21,6 +21,10 @@ allprojects {
         maven { url 'https://jitpack.io' }
         mavenCentral()
         google()
+        // Add for Flexbox
+        maven {
+            url "https://google.bintray.com/flexbox-layout"
+        }
     }
 
     // Global variables common to all modules
