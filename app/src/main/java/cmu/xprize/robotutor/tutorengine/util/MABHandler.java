@@ -33,9 +33,14 @@ public class MABHandler {
     public static String getArm(String dataSource, IScope2 scope) {
         List<Arm> arms = getarms(dataSource, scope);
         Arm selectedArm = selectArm(arms);
-        Log.d(TAG, "getArm: list = " + arms);
-        Log.d(TAG, "getArm: selected = " + selectedArm);
-        return "";
+        // Ensure that selected arm is not null
+        if (selectedArm != null) {
+            Log.d(TAG, "getArm: selected = " + selectedArm.name);
+            return selectedArm.name;
+        } else {
+            Log.e(TAG, "getArm: No arm was selected");
+            return "default_arm";
+        }
     }
 
     // Selects an arm from a list of arms
