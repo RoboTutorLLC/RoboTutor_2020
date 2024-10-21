@@ -87,6 +87,7 @@ import cmu.xprize.robotutor.tutorengine.QuickDebugTutorList;
 import cmu.xprize.robotutor.tutorengine.util.CAssetObject;
 import cmu.xprize.robotutor.tutorengine.util.CrashHandler;
 import cmu.xprize.robotutor.tutorengine.widgets.core.IGuidView;
+import cmu.xprize.robotutor.tutorengine.util.MABHandler;
 import cmu.xprize.util.CDisplayMetrics;
 import cmu.xprize.util.CLoaderView;
 import cmu.xprize.util.IReadyListener;
@@ -206,6 +207,10 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     private final String ID_TAG = "StudentId";
     ScreenRecordHelper screenRecordHelper;
     private ScreenRecorder screenRecorder = null;
+
+
+    //Declare armName
+    private String armName = "default_arm";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -351,7 +356,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
         SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
-        String logFilename  = "RoboTutor_" + // TODO TODO TODO there should be a version name in here!!!
+        String logFilename  = "RoboTutor_" + armName +
                 Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + SEQUENCE_ID_STRING +
                 "_" + initTime + "_" + Build.SERIAL;
 
@@ -373,6 +378,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         // TODO : implement time stamps
         logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");
         logManager.postEvent_I(GRAPH_MSG, "EngineVersion:" + VERSION_RT);
+
+        // After starting logging, select the arm name using MABHandler
+        armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
+
+        // Update the log filename with the selected arm name
+        logFilename = logFilename.replace("default_arm", armName);
+        Log.w(TAG, "Log filename updated: " + logFilename);
     }
 
     /**
