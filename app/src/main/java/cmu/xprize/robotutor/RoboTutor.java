@@ -59,6 +59,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.List;
 
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
@@ -88,6 +89,7 @@ import cmu.xprize.robotutor.tutorengine.util.CAssetObject;
 import cmu.xprize.robotutor.tutorengine.util.CrashHandler;
 import cmu.xprize.robotutor.tutorengine.widgets.core.IGuidView;
 import cmu.xprize.robotutor.tutorengine.util.MABHandler;
+import cmu.xprize.robotutor.tutorengine.util.Arm;
 import cmu.xprize.util.CDisplayMetrics;
 import cmu.xprize.util.CLoaderView;
 import cmu.xprize.util.IReadyListener;
@@ -381,6 +383,13 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
         // After starting logging, select the arm name using MABHandler
         armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
+        List<Arm> arms = MABHandler.getarms(ARM_WEIGHTS_FILE, null);
+        // Use the helper methods to get the arm weight and matrix name
+        Float armWeight = MABHandler.getArmWeight(armName, arms);
+        String matrixName = MABHandler.getMatrixName(armName, arms);
+
+        // Log the arm details using Log.w for visibility
+        Log.w(TAG, "Selected Arm: " + armName + ", Arm Weight: " + armWeight + ", Matrix Name: " + matrixName);
 
         // Update the log filename with the selected arm name
         logFilename = logFilename.replace("default_arm", armName);
