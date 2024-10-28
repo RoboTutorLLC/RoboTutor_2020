@@ -43,6 +43,24 @@ public class MABHandler {
         }
     }
 
+    public static Float getArmWeight(String armName, List<Arm> arms) {
+        for (Arm arm : arms) {
+            if (arm.name.equals(armName)) {
+                return arm.weight;
+            }
+        }
+        return null;
+    }
+
+    public static String getMatrixName(String armName, List<Arm> arms) {
+        for (Arm arm : arms) {
+            if (arm.name.equals(armName)) {
+                return arm.matrix;
+            }
+        }
+        return null;
+    }
+
     // Selects an arm from a list of arms
     private static Arm selectArm(List<Arm> arms) {
         float sum = 0;
@@ -71,7 +89,7 @@ public class MABHandler {
     }
 
 
-    private static List<Arm> getarms(String dataSource, IScope2 scope) {
+    public static List<Arm> getarms(String dataSource, IScope2 scope) {
         String jsonData = JSON_Helper.cacheData(dataSource);
         List<Arm> arms = new ArrayList<>();
         try {
