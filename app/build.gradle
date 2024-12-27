@@ -130,6 +130,7 @@ dependencies {
     implementation project(path: ':comp_spelling')
 
     implementation project(path: ':comp_intervention')
+    implementation 'com.blankj:utilcode:1.30.6'
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
 }
