@@ -11,18 +11,22 @@ android {
         versionCode rootProject.ext.rtVersionCode
         versionName rootProject.ext.rtVersionName
 
+        // Enable multidex support
         multiDexEnabled true
     }
 
     testOptions {
+        // Ensure unit tests return default values for easier testing
         unitTests.returnDefaultValues = true
     }
 
+    // Load keystore properties for signing
     def keystorePropertiesFile = rootProject.file("app/src/sample_config_files/sample_keystore.properties")
     def keystoreProperties = new Properties()
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
     signingConfigs {
+        // Signing configuration for release builds
         android {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
@@ -32,20 +36,24 @@ android {
     }
 
     buildTypes {
+        // Configuration for release builds
         release {
             signingConfig signingConfigs.android
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        // Configuration for debug builds
         debug {
             debuggable true
         }
+        // Custom debug build type with signing
         release_dbg {
             debuggable true
             signingConfig signingConfigs.android
         }
     }
 
+    // Define APK naming behavior
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             def project = "robotutor"
@@ -53,36 +61,43 @@ android {
             def buildType = variant.buildType.name
             def version = variant.versionName
 
+            // Set a custom APK name
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
             output.outputFileName = new File("./../../../../../build/", newApkName)
         }
     }
 
     lintOptions {
+        // Set to true to turn off analysis progress reporting by lint
         quiet false
+        // If true, stop the gradle build if errors are found
         abortOnError false
+        // If true, only report errors
         ignoreWarnings true
     }
 
+    // Apply checkstyle for code quality checks
     apply from: "checkstyle.gradle"
     afterEvaluate {
         preBuild.dependsOn('checkstyle')
         check.dependsOn 'checkstyle'
     }
-
 }
 
 repositories {
     google()
     mavenCentral()
+    // Added the custom Maven repository for utilcode
     maven {
-        // Added the custom Maven repository
         url 'http://maven.xdja.com:8081/nexus3/repository/aliyun/'
     }
 }
 
 dependencies {
+    // Unit testing dependency
     testImplementation 'junit:junit:4.12'
+
+    // Core dependencies
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
     implementation 'com.google.guava:guava:25.0-android'
     implementation 'androidx.appcompat:appcompat:1.0.0'
@@ -90,6 +105,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'org.mp4parser:isoparser:1.9.41'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+
+    // Project-specific dependencies
     implementation project(':comp_banner')
     implementation project(':comp_ltkplus')
     implementation project(':util')
@@ -116,14 +133,17 @@ dependencies {
     implementation project(path: ':comp_picmatch')
     implementation project(path: ':comp_bigmath')
     implementation project(path: ':comp_spelling')
-
     implementation project(path: ':comp_intervention')
-    // Updated dependency to use the exact version from the custom repository
+
+    // Dependency resolved from custom Maven repository
     implementation 'com.blankj:utilcode:1.24.4'
+
+    // External libraries
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
 }
 
+// Task to retrieve version name
 task getVersionName() {
     project.gradle.projectsEvaluated {
         println "$project.android.defaultConfig.versionName"
