@@ -10,7 +10,6 @@ android {
         targetSdkVersion rootProject.ext.rtTargetSdkVersion
         versionCode rootProject.ext.rtVersionCode
         versionName rootProject.ext.rtVersionName
-        // default is signed by the Android default key
 
         multiDexEnabled true
     }
@@ -19,13 +18,8 @@ android {
         unitTests.returnDefaultValues = true
     }
 
-    // Create a variable called keystorePropertiesFile, and initialize it to your
-    // keystore.properties file, in the sample_config_files folder, inside app/src.
     def keystorePropertiesFile = rootProject.file("app/src/sample_config_files/sample_keystore.properties")
-    // Initialize a new Properties() object called keystoreProperties
     def keystoreProperties = new Properties()
-
-    // Load your keystore.properties file into the keystoreProperties object.
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
     signingConfigs {
@@ -38,7 +32,6 @@ android {
     }
 
     buildTypes {
-
         release {
             signingConfig signingConfigs.android
             minifyEnabled false
@@ -47,18 +40,12 @@ android {
         debug {
             debuggable true
         }
-
-        // This release includes the DEBUG selector and other various debug support features.
-        //
         release_dbg {
             debuggable true
             signingConfig signingConfigs.android
         }
-
     }
 
-    // define apk naming behavior
-    // define apk naming behavior
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             def project = "robotutor"
@@ -67,22 +54,18 @@ android {
             def version = variant.versionName
 
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
-//            new File(output.outputFile.parent, newApkName)
             output.outputFileName = new File("./../../../../../build/", newApkName)
         }
     }
 
     lintOptions {
-        // set to true to turn off analysis progress reporting by lint
         quiet false
-        // if true, stop the gradle build if errors are found
         abortOnError false
-        // if true, only report errors
         ignoreWarnings true
     }
 
     apply from: "checkstyle.gradle"
-    afterEvaluate{
+    afterEvaluate {
         preBuild.dependsOn('checkstyle')
         check.dependsOn 'checkstyle'
     }
@@ -90,7 +73,12 @@ android {
 }
 
 repositories {
+    google()
     mavenCentral()
+    maven {
+        // Added the custom Maven repository
+        url 'http://maven.xdja.com:8081/nexus3/repository/aliyun/'
+    }
 }
 
 dependencies {
@@ -130,7 +118,8 @@ dependencies {
     implementation project(path: ':comp_spelling')
 
     implementation project(path: ':comp_intervention')
-    implementation 'com.blankj:utilcode:1.30.6'
+    // Updated dependency to use the exact version from the custom repository
+    implementation 'com.blankj:utilcode:1.24.4'
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
 }
