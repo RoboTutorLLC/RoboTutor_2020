@@ -15,7 +15,6 @@ import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 
 /**
  * StudentChooseMatrixActivityMenu
- *
  * An Activity Menu style where the student chooses which matrix they'll play in.
  * <p>
  * Created by kevindeland on 9/25/18.
