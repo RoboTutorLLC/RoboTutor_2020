@@ -29,6 +29,13 @@ public class PromotionMechanism {
     private IStudentDataModel _studentModel; // holds the StudentDataModel
     private TransitionMatrixModel _matrix; // now holds the transition map things...
 
+    public static final PerformanceData performance; // `final` ensures it can't be changed
+
+    // Static block to initialize `performance` if it needs to be done in a specific way
+    static {
+        performance = new PerformanceData(); // Initialize here, can be any valid initialization
+    }
+
     public PromotionMechanism(IStudentDataModel studentModel, TransitionMatrixModel matrix) {
         this._studentModel = studentModel;
         this._matrix = matrix;
@@ -156,7 +163,6 @@ public class PromotionMechanism {
             rules = new PerformancePromotionRules();
         }
 
-        PerformanceData performance = new PerformanceData();
         performance.setActivityType(activeTutorId);
         // look up activeSkill every time?
         performance.setActiveSkill(lastSkillPlayed);

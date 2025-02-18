@@ -15,6 +15,7 @@ import static cmu.xprize.comp_session.AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING;
 
 /**
  * StudentChooseMatrixActivityMenu
+ *
  * An Activity Menu style where the student chooses which matrix they'll play in.
  * <p>
  * Created by kevindeland on 9/25/18.
@@ -24,15 +25,27 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
 
     TransitionMatrixModel _matrix;
     IStudentDataModel _student;
-    
+    PromotionMechanism _promotionMechanism;
+    private static final int MIN_NUM_ATTEMPTS = 3;
+
     public StudentChooseMatrixActivityMenu(TransitionMatrixModel matrix, IStudentDataModel student) {
         this._matrix = matrix;
         this._student = student;
+        this._promotionMechanism = new PromotionMechanism(this._student, this._matrix);
     }
 
     @Override
     public String getLayoutName() {
-        return "ask_activity_selector_2x3";
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() /this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD
+
+        )
+            return "ask_activity_selector_2x3_elevate";
+        else
+            return "ask_activity_selector_2x3";
     }
 
     @Override
@@ -69,11 +82,23 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
         activeLayout.items[2].help = "numbers and math";
 
 
-        activeLayout.items[3] =  new CAskElement();
-        activeLayout.items[3].componentID = "SbuttonRepeat";
-        activeLayout.items[3].behavior = AS_CONST.SELECT_REPEAT;
-        activeLayout.items[3].prompt = "lets do it again";
-        activeLayout.items[3].help = "lets do it again";
+        activeLayout.items[3] = new CAskElement();
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
+            activeLayout.items[3].componentID = "Sbutton1";
+            activeLayout.items[3].behavior = AS_CONST.ELEVATE;
+            activeLayout.items[3].prompt = "escape to placement";
+            activeLayout.items[3].help = "escape to placement";
+        }
+        else{
+            activeLayout.items[3].componentID = "SbuttonRepeat";
+            activeLayout.items[3].behavior = AS_CONST.SELECT_REPEAT;
+            activeLayout.items[3].prompt = "lets do it again";
+            activeLayout.items[3].help = "lets do it again";
+        }
 
         activeLayout.items[4] =  new CAskElement();
         activeLayout.items[4].componentID = "SbuttonExit";
@@ -91,7 +116,16 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
         map.put(AS_CONST.BEHAVIOR_KEYS.SELECT_WRITING, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
         map.put(AS_CONST.BEHAVIOR_KEYS.SELECT_STORIES, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
         map.put(AS_CONST.BEHAVIOR_KEYS.SELECT_MATH, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
-        map.put(AS_CONST.SELECT_REPEAT, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
+            map.put(AS_CONST.ELEVATE, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+        }
+        else{
+            map.put(AS_CONST.SELECT_REPEAT, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+        }
         map.put(AS_CONST.SELECT_EXIT, AS_CONST.QUEUEMAP_KEYS.EXIT_BUTTON_BEHAVIOR);
         return map;
     }
@@ -102,11 +136,31 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
         String activeTutorId = null;
         HashMap transitionMap = null;
         String rootTutor = null;
-
         String activeSkill = null;
-        
+
         // this could seriously be cleaned up...
         switch (buttonBehavior.toUpperCase()) {
+            case AS_CONST.ELEVATE:
+
+                activeSkill = _student.getLastSkill();
+                transitionMap = _matrix.getTransitionMapByContentArea(activeSkill);
+                activeTutorId = _student.getLastTutor();
+
+                if(activeSkill != null){
+                    // If the last activity is not null then go to that activity but update the placement index by 1
+                    if(activeSkill.equals(SELECT_MATH)) {
+                        rootTutor = _matrix.getRootSkillByContentArea(SELECT_MATH);
+                        CAt_Data transitionData = (CAt_Data) transitionMap.get(activeTutorId);
+                        activeTutorId = transitionData.harder;
+                    }
+                    if(activeSkill.equals(SELECT_WRITING)) {
+                        rootTutor = _matrix.getRootSkillByContentArea(SELECT_WRITING);
+                        CAt_Data transitionData = (CAt_Data) transitionMap.get(activeTutorId);
+                        activeTutorId = transitionData.harder;
+                    }
+                }
+
+                break;
 
             case AS_CONST.SELECT_REPEAT:
 

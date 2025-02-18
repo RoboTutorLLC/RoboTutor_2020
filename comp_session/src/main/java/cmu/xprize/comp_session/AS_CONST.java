@@ -52,7 +52,7 @@ public class AS_CONST {
     public static final String SELECT_AUTO_DIFFICULTY = "SELECT_AUTO_DIFFICULTY";   // get rid of me
     public static final String SELECT_REPEAT          = "SELECT_REPEAT";
     public static final String SELECT_EXIT            = "SELECT_EXIT";
-
+    public static final String ELEVATE                = "ELEVATE_TO_PLACEMENT";
     public static final String SELECT_NONE            = "SELECT_NONE";
 
     public static final String VAR_BUTTONID         = ".buttonid";
