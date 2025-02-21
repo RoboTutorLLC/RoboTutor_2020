@@ -44,7 +44,7 @@ jobs:
         run: mv build/robotutor.debug.${{ steps.fetch_version_name.outputs.VERSION_NAME }}.apk build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
           path: build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
