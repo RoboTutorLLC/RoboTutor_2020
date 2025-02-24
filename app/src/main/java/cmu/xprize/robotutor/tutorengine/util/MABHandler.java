@@ -12,6 +12,7 @@ import java.util.List;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
+import cmu.xprize.comp_logging.PerformanceLogItem;
 
 /**
  * Handler for MAB (Multi-Arm Bandit)
@@ -32,7 +33,7 @@ public class MABHandler {
 
     public static String getArm(String dataSource, IScope2 scope) {
         List<Arm> arms = getarms(dataSource, scope);
-        Arm selectedArm = selectArm(arms);
+        Arm selectedArm = selectArm(arms, 0.1F);
         // Ensure that selected arm is not null
         if (selectedArm != null) {
             Log.d(TAG, "getArm: selected = " + selectedArm.name);
@@ -61,27 +62,30 @@ public class MABHandler {
         return null;
     }
 
-    // Selects an arm from a list of arms
-    private static Arm selectArm(List<Arm> arms) {
-        float sum = 0;
-        for (Arm arm : arms) {
-            sum += arm.weight;
-        }
 
-        // Select random number between 0 and sum
-        float p = getRandom(0, sum);
-
-        // find out where p lies
-        float bottom = 0;
-        for (Arm arm : arms) {
-            float top = bottom + arm.weight;
-            if (bottom <= p && p <= top) {
-                return arm;
+    // Selects an arm from a list of arms using ε-greedy algorithm
+    private static Arm selectArm(List<Arm> arms, float epsilon) {
+        // Random number to decide between exploration and exploitation
+        float randomV = getRandom(0, 1);
+        if (randomV < epsilon) {
+            // Exploration:choose a random arm
+            int randomIndex = (int) getRandom(0, arms.size());
+            Arm randomArm = arms.get(randomIndex);
+            return randomArm;
+        } else {
+            // Exploitation:choose the arm with highest weight
+            Arm bestArm = null;
+            float maxWeight = Float.NEGATIVE_INFINITY;
+            for (Arm arm : arms) {
+                if (arm.weight > maxWeight) {
+                    maxWeight = arm.weight;
+                    bestArm = arm;
+                }
             }
-            bottom = top;
+            return bestArm;
         }
-        return null;
     }
+
 
     // Returns random number between [min, max]
     private static float getRandom(float min, float max) {
@@ -96,17 +100,17 @@ public class MABHandler {
             JSONObject rootObject = new JSONObject(jsonData);
             JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
             arms = parseArray(rootArray, scope);
-    
+
             // Adding logging to print arms
             for (Arm arm : arms) {
-                Log.d(TAG, "Arm: " + arm.name + ", Weight: " + arm.weight + ", Matrix Path"  + arm.matrix); 
+                Log.d(TAG, "Arm: " + arm.name + ", Weight: " + arm.weight + ", Matrix Path"  + arm.matrix);
             }
-    
+
         } catch (Exception e) {
             Log.e(TAG, "Error in getarms: " + e.getMessage());
         }
         return arms;
-}
+    }
 
 
     private static List<Arm> parseArray(JSONArray array, IScope2 scope) throws JSONException {
