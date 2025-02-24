@@ -61,6 +61,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.List;
 
+
 import cmu.xprize.comp_intervention.data.CInterventionStudentData;
 import cmu.xprize.comp_intervention.CInterventionTimes;
 import cmu.xprize.comp_intervention.data.CUpdateInterventionStudentData;
@@ -89,7 +90,6 @@ import cmu.xprize.robotutor.tutorengine.util.CAssetObject;
 import cmu.xprize.robotutor.tutorengine.util.CrashHandler;
 import cmu.xprize.robotutor.tutorengine.widgets.core.IGuidView;
 import cmu.xprize.robotutor.tutorengine.util.MABHandler;
-import cmu.xprize.robotutor.tutorengine.util.Arm;
 import cmu.xprize.util.CDisplayMetrics;
 import cmu.xprize.util.CLoaderView;
 import cmu.xprize.util.IReadyListener;
@@ -98,7 +98,7 @@ import cmu.xprize.util.JSON_Helper;
 import cmu.xprize.util.TCONST;
 import cmu.xprize.util.TTSsynthesizer;
 import edu.cmu.xprize.listener.ListenerBase;
-
+import cmu.xprize.robotutor.tutorengine.util.Arm;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.LITERACY_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.MATH_MATRIX;
 import static cmu.xprize.comp_logging.PerformanceLogItem.MATRIX_TYPE.SONGS_MATRIX;
@@ -139,7 +139,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
     private static final boolean QUICK_DEBUG_CONFIG = false;
     private static final ConfigurationItems QUICK_DEBUG_CONFIG_OPTION = ConfigurationQuickOptions.DEBUG_EN;
 
-    public static final String MATRIX_FILE = "dev_data.open.json";
+    public static final String MATRIX_FILE =  "dev_data.open.json";
     public static final String ARM_WEIGHTS_FILE = "arm-weights.json";
 
     private static final String LOG_SEQUENCE_ID = "LOG_SEQUENCE_ID";
@@ -213,6 +213,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
     //Declare armName
     private String armName = "default_arm";
+    public static String sArmName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -358,9 +359,14 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
         SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
-        String logFilename  = "RoboTutor_" + armName +
-                Configuration.configVersion(this) + "_" + BuildConfig.VERSION_NAME + "_" + SEQUENCE_ID_STRING +
-                "_" + initTime + "_" + Build.SERIAL;
+        armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
+        List<Arm> arms = MABHandler.getarms(ARM_WEIGHTS_FILE, null);
+        // Use the helper methods to get the arm weight and matrix name
+        Float armWeight = MABHandler.getArmWeight(armName, arms);
+        String matrixName = MABHandler.getMatrixName(armName, arms);
+        String logFilename  = "RoboTutor_" + Build.SERIAL + "_" + SEQUENCE_ID_STRING + "_" +
+                Configuration.configVersion(this) + BuildConfig.VERSION_NAME + "_" + armName + "_" + armWeight +
+                "_" + initTime;
 
         Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
 
@@ -381,15 +387,11 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");
         logManager.postEvent_I(GRAPH_MSG, "EngineVersion:" + VERSION_RT);
 
-        // After starting logging, select the arm name using MABHandler
-        armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
-        List<Arm> arms = MABHandler.getarms(ARM_WEIGHTS_FILE, null);
-        // Use the helper methods to get the arm weight and matrix name
-        Float armWeight = MABHandler.getArmWeight(armName, arms);
-        String matrixName = MABHandler.getMatrixName(armName, arms);
-
         // Log the arm details using Log.w for visibility
         Log.w(TAG, "Selected Arm: " + armName + ", Arm Weight: " + armWeight + ", Matrix Name: " + matrixName);
+
+
+
 
         // Update the log filename with the selected arm name
         logFilename = logFilename.replace("default_arm", armName);
@@ -951,9 +953,14 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         // Start the async task to initialize the tutor
         //
         new tutorConfigTask().execute();
+
+        // Add ArmName on banner
+        sArmName = armName;
     }
 
-
+    public static String getArmName() {
+        return sArmName;
+    }
     /**
      *  requery DB Cursors here
      */
