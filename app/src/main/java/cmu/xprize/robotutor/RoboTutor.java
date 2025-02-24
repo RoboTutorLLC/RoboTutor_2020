@@ -213,6 +213,7 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
     //Declare armName
     private String armName = "default_arm";
+    private float armWeight = 0;
     public static String sArmName = null;
 
     @Override
@@ -359,15 +360,9 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
         String initTime     = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss", Locale.US).format(calendar.getTime());
         SEQUENCE_ID_STRING = String.format(Locale.US, "%06d", getNextLogSequenceId());
         // NOTE: Need to include the configuration name when that is fully merged
-        armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
-        List<Arm> arms = MABHandler.getarms(ARM_WEIGHTS_FILE, null);
-        // Use the helper methods to get the arm weight and matrix name
-        Float armWeight = MABHandler.getArmWeight(armName, arms);
-        String matrixName = MABHandler.getMatrixName(armName, arms);
         String logFilename  = "RoboTutor_" + Build.SERIAL + "_" + SEQUENCE_ID_STRING + "_" +
                 Configuration.configVersion(this) + BuildConfig.VERSION_NAME + "_" + armName + "_" + armWeight +
                 "_" + initTime;
-
         Log.w("LOG_DEBUG", "Beginning new session with LOG_FILENAME = " + logFilename);
 
         logManager = CLogManager.getInstance();
@@ -379,23 +374,42 @@ public class RoboTutor extends Activity implements IReadyListener, IRoboTutor, H
 
         perfLogManager = CPerfLogManager.getInstance();
         perfLogManager.startLogging(hotLogPathPerf, "PERF_" + logFilename);
-
         CInterventionLogManager.getInstance().startLogging(interventionLogPath,
                 "INT_" + logFilename);
+
+        ConfigurationItems config = new ConfigurationItems();
+        // Use MAB
+        if (config.use_MAB) {
+            armName = MABHandler.getArm(ARM_WEIGHTS_FILE, null);
+            List<Arm> arms = MABHandler.getarms(ARM_WEIGHTS_FILE, null);
+            armWeight = MABHandler.getArmWeight(armName, arms);
+            String matrixName = MABHandler.getMatrixName(armName, arms);
+            // Log the arm details using Log.w for visibility
+            Log.w(TAG, "Selected Arm: " + armName + ", Arm Weight: " + armWeight + ", Matrix Name: " + matrixName);
+        } else {
+            armName = "default_arm";  // Set back to default
+            armWeight = 0;
+        }
+
+
+        logManager.stopLogging();
+        perfLogManager.stopLogging();
+        CInterventionLogManager.getInstance().stopLogging();
+
+        // Rename the Log File in-place
+        String newLogFilename = "RoboTutor_" + Build.SERIAL + "_" + SEQUENCE_ID_STRING + "_" +
+                Configuration.configVersion(this) + BuildConfig.VERSION_NAME + "_" + armName + "_" + armWeight +
+                "_" + initTime;
+
+        // Restart Logging with updated name
+        logManager.startLogging(hotLogPath, newLogFilename);
+        perfLogManager.startLogging(hotLogPathPerf, "PERF_" + newLogFilename);
+        CInterventionLogManager.getInstance().startLogging(interventionLogPath, "INT_" + newLogFilename);
 
         // TODO : implement time stamps
         logManager.postDateTimeStamp(GRAPH_MSG, "RoboTutor:SessionStart");
         logManager.postEvent_I(GRAPH_MSG, "EngineVersion:" + VERSION_RT);
 
-        // Log the arm details using Log.w for visibility
-        Log.w(TAG, "Selected Arm: " + armName + ", Arm Weight: " + armWeight + ", Matrix Name: " + matrixName);
-
-
-
-
-        // Update the log filename with the selected arm name
-        logFilename = logFilename.replace("default_arm", armName);
-        Log.w(TAG, "Log filename updated: " + logFilename);
     }
 
     /**
