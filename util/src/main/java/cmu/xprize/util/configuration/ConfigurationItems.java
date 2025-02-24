@@ -36,7 +36,10 @@ public class ConfigurationItems implements ILoadableObject {
     public static final String BASE_DIRECTORY = "BASE_DIRECTORY";
     public static final String PINNING_MODE = "PINNING_MODE";
 
+    //Add MAB control
+    public static final String USE_MAB = "use_MAB";
     public String config_version;
+    public boolean use_MAB;
     public boolean language_override;
     public boolean show_tutorversion;
     public boolean show_debug_launcher;
@@ -140,6 +143,8 @@ public class ConfigurationItems implements ILoadableObject {
         record_pixels_wide = 480;
         record_pixels_high = 854;
         record_session_or_activity = "activity";
+
+        use_MAB = false;
     }
 
     private void setConfigVersion() {
