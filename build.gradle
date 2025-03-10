@@ -6,7 +6,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
+
+        classpath 'com.android.tools.build:gradle:4.2.2'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -22,15 +23,9 @@ allprojects {
         google()
     }
 
-    dependencies {
-        modules {
-            module("com.google.android:flexbox") {
-                replacedBy("com.google.android.flexbox:flexbox")
-            }
-        }
-    }
-
     // Global variables common to all modules
+    // see: http://tools.android.com/tech-docs/new-build-system/tips
+    //
     ext {
         rtCompileSdkVersion=29          //Integer
         rtBuildToolsVersion="26.0.1"    //String
@@ -39,17 +34,23 @@ allprojects {
 
         // Note that using target version 22 bypasses the new run-time permissions found
         // in Marshmallow 23
+        //
         rtTargetSdkVersion=22
 
         rtVersionCode=1
 
         // Semantic versioning description:
         // <Milestone release> <Feature Release> <Patch release> <Asset Compatibility INDEX>
+
+
         rtVersionName="3.5.0.1"
         //TODO: move this out of build so we don't have to rebuild to unzip assets
+
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+

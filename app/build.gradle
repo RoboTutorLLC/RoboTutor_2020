@@ -85,12 +85,8 @@ android {
 }
 
 repositories {
-    google()
     mavenCentral()
-    // Added the custom Maven repository for utilcode
-    maven {
-        url 'http://maven.xdja.com:8081/nexus3/repository/aliyun/'
-    }
+    
 }
 
 dependencies {
@@ -136,7 +132,7 @@ dependencies {
     implementation project(path: ':comp_intervention')
 
     // Dependency resolved from custom Maven repository
-    implementation 'com.blankj:utilcode:1.24.4'
+    implementation 'com.blankj:utilcode:1.30.7'
 
     // External libraries
     implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
