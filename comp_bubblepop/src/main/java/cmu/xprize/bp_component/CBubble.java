@@ -38,6 +38,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.util.TypedValue;
+import android.widget.Toast;
+import android.media.MediaPlayer;
+import java.io.IOException;
 
 public class CBubble extends FrameLayout {
 
@@ -89,6 +92,7 @@ public class CBubble extends FrameLayout {
 
         float instanceDensity = mContext.getResources().getDisplayMetrics().density;
         mScaleCorrection      = BP_CONST.DESIGN_SCALE / instanceDensity;
+        showToast("Please Tap");
     }
 
 
@@ -164,6 +168,33 @@ public class CBubble extends FrameLayout {
 //        mAudio.setImageResource(BP_CONST.audioBubbleMap.get(mColor));
 //    }
 //
+
+
+
+public void showToast(String message) {
+        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+        playAudioFromAssets("tutors/trackdata/LIBRARY/audio/en/cmu/xprize/bubble_pop/Please tap.mp3");
+
+    }
+
+    private void playAudioFromAssets(String fileName) {
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor afd = mContext.getAssets().openFd(fileName);
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            afd.close();
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            mediaPlayer.setOnCompletionListener(mp -> {
+                mp.release();
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(mContext, "Failed to play audio: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            mediaPlayer.release();
+        }
+    }
 
     public String getColor() {
         return mColor;

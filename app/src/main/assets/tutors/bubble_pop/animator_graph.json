@@ -50,7 +50,7 @@
           "COMMENT": "When module is complete - move to next scene in the scenegraph",
           "maptype":"moduleMap",
           "mapname": "USERINPUT",
-          "preenter": [],
+          "preenter": ["SHOW_TOAST"],
           "preexit": [],
           "edges": [
             {
@@ -160,14 +160,11 @@
             {"name": "LOG_EVENT", "type": "QUEUEDCOMMAND", "id": "SBubblePop", "method": "logState", "parms": "type#node,value#INTROSTATE:String", "features":""},
 
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.sound_track}}", "soundpackage":"tutor_effect", "repeat":true, "volume": 0.10, "mode":"event", "features": ""},
-            {"type": "AUDIO", "command": "PLAY", "soundsource": "Please tap on it.mp3", "soundpackage":"default", "volume": 0.7, "mode":"flow", "features": ""}
+            {"type": "AUDIO", "command": "PLAY", "soundsource": "Please tap.mp3", "soundpackage":"default", "volume": 0.7, "mode":"flow", "features": ""}
           ]
         },
 
-        // Here we manage the Stimulus display.
-        // We are either going to Speak the Stimulus / Show the Stimulus / Both or Neither -
 
-        // JUDITH trigger the hesitation here...
         "UPDATESTIMULUS": {
           "type": "MODULE",
           "reuse":true,
@@ -176,7 +173,6 @@
 
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent",           "parms": "SHOW_STIMULUS:String"                  ,  "features":"FTR_SHOW"},
 
-            // ND_SCAFFOLD NEXT(1) make sure to check for correct features
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.questValue}}.mp3",                "soundpackage":"missing_number", "volume": 1.0, "mode":"event",   "features": "FTR_SAY&FTR_MIS_NUM"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.questValue}}.mp3",                "soundpackage":"missing_number", "volume": 1.0, "mode":"event",   "features": "FTR_SAY&FTR_GT_LT"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "Neno gani huanza na.mp3",                      "soundpackage":"xprize",          "volume": 1.0, "mode":"flow",   "features": "FTR_SAY&FTR_WORDS&FTR_WORD_STARTS_WITH"},
@@ -199,11 +195,6 @@
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.questValueTens}}.mp3",            "soundpackage":"numbers",        "volume": 1.0, "mode":"flow",    "features": "FTR_SAY&FTR_N2E&FTR_QUEST_TENS"},
 
 
-            //{"type": "COMMAND", "id": "SBubblePop", "method": "setVolatileBehavior", "parms": "STIMULUS_SHOWN:String|NEXTNODE:String" , "features":"FTR_SHOW&!(FTR_SAY&(FTR_E2N|FTR_WORD_STARTS_WITH|FTR_WORD_ENDS_WITH|FTR_GT_LT|FTR_QUEST_HUNDREDS|FTR_WORDS))"},
-
-            //If we are showing it we have to wait for the animation to complete before continuing
-            //Only wait for non expression or short numbers (without hundreds) which are spoken
-            //            {"type": "COMMAND", "id": "SBubblePop", "method": "setVolatileBehavior", "parms": "STIMULUS_SHOWN:String|NEXTNODE:String" , "features":"FTR_SHOW&FTR_SAY&FTR_LETTERS"},
 
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent",           "parms": "SHOW_BUBBLES:String"              ,"features":""}
 
@@ -221,6 +212,15 @@
             {"type": "COMMAND", "id": "SBubblePop", "method": "setVolatileBehavior", "parms": "BUBBLE_TOUCH_EVENT:String|NEXTNODE:String" ,"features":""},
             {"type": "COMMAND", "cmd": "WAIT"  }
           ]
+        },
+        "PLAY_PROMPT": {
+          "type": "AUDIO",
+          "command": "PLAY",
+          "soundsource": "Please tap on it.mp3",
+          "soundpackage": "default",
+          "volume": 0.7,
+          "mode": "flow",
+          "features": ""
         },
 
 
@@ -249,18 +249,6 @@
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueHundreds}}.mp3",        "soundpackage":"numbers",  "volume": 1.0, "mode":"flow",   "features": "FTR_E2N&FTR_ANS_HUNDREDS"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "Na.mp3",                                     "soundpackage":"xprize",  "volume": 1.0,  "mode":"flow",   "features": "FTR_E2N&FTR_ANS_HUNDREDS&FTR_ANS_TENS"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueTens}}.mp3",            "soundpackage":"numbers",  "volume": 1.0, "mode":"flow",   "features": "FTR_E2N&FTR_ANS_TENS"},
-//            Not saying the correct answer when user gets N2E correct since it takes too long
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimOneHundreds}}.mp3", "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_ONE_HUNDREDS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "Na.mp3",                                     "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_ONE_HUNDREDS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimOneTens}}.mp3",     "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_ONE_TENS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "Na.mp3",                                     "soundpackage":"xprize",    "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_ONE_TENS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimOneOnes}}.mp3",     "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_ONE_ONES"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueOperand}}.mp3",         "soundpackage":"xprize",    "volume": 1.0, "mode":"flow", "features": "FTR_N2E"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimTwoHundreds}}.mp3", "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_TWO_HUNDREDS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "Na.mp3",                                     "soundpackage":"xprize",    "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_TWO_HUNDREDS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimTwoTens}}.mp3",     "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_TWO_TENS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "Na.mp3",                                     "soundpackage":"xprize",    "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_TWO_TENS"},
-//            {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValueStimTwoOnes}}.mp3",     "soundpackage":"numbers",   "volume": 1.0, "mode":"flow", "features": "FTR_N2E&FTR_ANS_STIM_TWO_ONES"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValue}}.mp3",                "soundpackage":"letters",  "volume": 1.0, "mode":"event",  "features": "FTR_LETTERS"},
             {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.ansValue}}.mp3",                "soundpackage":"shapes",   "volume": 1.0, "mode":"event",  "features": "FTR_SHAPES"},
 
@@ -350,10 +338,7 @@
             {"type": "COMMAND", "cmd": "WAIT" ,"features":"FTR_LASTATTEMPT" },
             {"type": "COMMAND", "id": "SBubblePop", "method": "postEvent", "parms": "HIDE_MASK:String" ,"features":"FTR_LASTATTEMPT"}
 
-            // TODO: is this delay required   removed in 45.1
-            //
-            //            {"type": "TIMER", "id":"nextDelayTimer", "startdelay":"0", "period":"50", "repeat":"false", "action":"CREATEANDSTART", "ontimer":"NEXTNODE", "features": "" },
-            //            {"type": "COMMAND", "cmd": "WAIT"  }
+
           ]
         },
 
@@ -388,16 +373,30 @@
         "COMMENT": "@@@@@  CActions @@@@@ ",
 
         "PLAY_BACKINGTRACK": {"type": "AUDIO", "command": "PLAY", "soundsource": "{{SBubblePop.sound_track}}", "soundpackage":"tutor_effect", "repeat":true, "volume": 0.20, "mode":"event", "features": ""},
-        "PLAY_PROMPT": {"type": "AUDIO", "command": "PLAY", "soundsource": "Please tap on it.mp3", "soundpackage":"default", "volume": 0.7, "mode":"flow", "features": ""},
+        "PLAY_AUDIO": {
+          "type": "AUDIO",
+          "command": "PLAY",
+          "soundsource": "tutors/trackdata/LIBRARY/audio/en/cmu/xprize/bubble_pop/Please tap.mp3",
+          "soundpackage": "default",
+          "repeat": false,
+          "volume": 0.70,
+          "mode": "event",
+          "features": ""
+        },
 
         "SET_VERSION":{"type": "COMMAND", "id": "Sbanner", "method": "setVersionID", "parms": "v.0.0.1:String","features":""},
         "SET_DATASOURCE":{"type": "COMMAND", "id": "SBubblePop", "method": "setDataSource", "parms": "[file]bp_data.json:String","features":"!DATA_SBUBBLEPOP"},
         "SET_SOUND_TRACK":{"type": "COMMAND", "id": "SBubblePop", "method": "setSoundTrack"},
         "NEXT_DATASET":{"type": "COMMAND", "id": "SBubblePop", "method": "next" ,"features":""},
+        "SHOW_TOAST": {
+          "type": "COMMAND",
+          "id": "SBubblePop",
+          "method": "showToast",
+          "params": "Please Tap:String",
+          "features": ""
+        },
 
 
-
-        //        "SET_SHOW":{"type": "COMMAND", "id": "SBubblePop", "method": "setEventBehavior" ,"features":""},
 
         "NEXTNODE": {"type": "COMMAND", "cmd": "NEXT"  },
 
