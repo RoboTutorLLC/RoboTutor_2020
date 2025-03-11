@@ -20,6 +20,7 @@ package cmu.xprize.bp_component;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;

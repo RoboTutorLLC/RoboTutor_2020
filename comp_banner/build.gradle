@@ -6,8 +6,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.rtMinSdkVersion
         targetSdkVersion rootProject.ext.rtTargetSdkVersion
-        versionCode rootProject.ext.rtVersionCode
-        versionName rootProject.ext.rtVersionName
     }
 
     buildTypes {
@@ -25,7 +23,6 @@ android {
         // if true, only report errors
         ignoreWarnings true
     }
-    buildToolsVersion '27.0.3'
 }
 
 dependencies {

@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
 
     compileSdkVersion rootProject.ext.rtCompileSdkVersion
-    buildToolsVersion rootProject.ext.rtBuildToolsVersion
     defaultConfig {
         applicationId "cmu.xprize.robotutor"
         minSdkVersion rootProject.ext.rtMinSdkVersion
