@@ -1,10 +1,10 @@
 {
   "config_version": "release",
-  "language_override": false,
+  "language_override": true,
   "show_tutorversion": true,
   "show_debug_launcher": true,
   "language_switcher": true,
   "no_asr_apps": false,
-  "language_feature_id": "LANG_NULL",
+  "language_feature_id": "LANG_EN",
   "show_demo_vids": false
 }

@@ -21,15 +21,15 @@
 	// path     - the resource path relative to assets/tutors/trackdata/LIBRARY/audio/<language>
 
 	"soundMap" : {
-		"tutor_effect":  {"type": "SOUNDMAP", "language": "LANG_EFFECT", "path": "cmu/xprize/bubble_pop"},
-		"default":       {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/bubble_pop"},
-		"xprize":        {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/global"},
-		"words":         {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/literacy"},
-		"numbers":       {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/global/numbers"},
-		"letters":       {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/literacy"},
-		"shapes":        {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/global/shapes"},
-        "writing":       {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/writing"},
-		"missing_number": {"type": "SOUNDMAP", "language": "LANG_AUTO",   "path": "cmu/xprize/missing_number"}
+		"tutor_effect":  {"type": "SOUNDMAP", "language": "LANG_EN", "path": "cmu/xprize/bubble_pop"},
+		"default":       {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/bubble_pop"},
+		"xprize":        {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/global"},
+		"words":         {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/literacy"},
+		"numbers":       {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/global/numbers"},
+		"letters":       {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/literacy"},
+		"shapes":        {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/global/shapes"},
+        "writing":       {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/writing"},
+		"missing_number": {"type": "SOUNDMAP", "language": "LANG_EN",   "path": "cmu/xprize/missing_number"}
 	},
 
 	"navigatorType":"SIMPLE_NAVIGATOR"
