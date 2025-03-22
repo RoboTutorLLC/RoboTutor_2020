@@ -174,28 +174,26 @@ public class CBubble extends FrameLayout {
 
 public void showToast(String message) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-        playAudioFromAssets("tutors/trackdata/LIBRARY/audio/en/cmu/xprize/bubble_pop/Please tap.mp3");
+//        playAudioFromAssets("tutors/trackdata/LIBRARY/audio/en/cmu/xprize/bubble_pop/Please tap.mp3");
 
     }
 
-    private void playAudioFromAssets(String fileName) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        try {
-            AssetFileDescriptor afd = mContext.getAssets().openFd(fileName);
-            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            afd.close();
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            mediaPlayer.setOnCompletionListener(mp -> {
-                mp.release();
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(mContext, "Failed to play audio: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        } finally {
-            mediaPlayer.release();
-        }
-    }
+//    private void playAudioFromAssets(String fileName) {
+//        MediaPlayer mediaPlayer = new MediaPlayer();
+//        try {
+//            AssetFileDescriptor afd = mContext.getAssets().openFd(fileName);
+//            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+//            afd.close();
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
+//            mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Toast.makeText(mContext, "Failed to play audio: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//        } finally {
+//            mediaPlayer.release();
+//        }
+//    }
 
     public String getColor() {
         return mColor;
