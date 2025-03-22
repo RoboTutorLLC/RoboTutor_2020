@@ -12,7 +12,7 @@
 
   // Set the default language for the tutors
   //
-  "language":"LANG_SW",
+  "language":"LANG_EN",
 
 
   // This maps a "variant" i.e. arbitrary name to the tutor/featureset that define a
