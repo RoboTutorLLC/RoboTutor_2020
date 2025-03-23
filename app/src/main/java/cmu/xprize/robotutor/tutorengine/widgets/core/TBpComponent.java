@@ -298,17 +298,17 @@ public class TBpComponent extends CBP_Component implements IBehaviorManager, ITu
     /**
      * Chooses one track randomly out of a list kept in string.xml
      */
-    public void setSoundTrack() {
-
-        Resources res = getResources();
-        String[] sound_tracks = res.getStringArray(cmu.xprize.bp_component.R.array.sound_tracks);
-        Random rand = new Random();
-        String sound_track = sound_tracks[rand.nextInt(sound_tracks.length)];
-
-        Log.i("BPOP", "Chosen sound track: " + sound_track);
-
-        publishValue(BP_CONST.SOUND_TRACK, sound_track);
-    }
+//    public void setSoundTrack() {
+//
+//        Resources res = getResources();
+//        String[] sound_tracks = res.getStringArray(cmu.xprize.bp_component.R.array.sound_tracks);
+//        Random rand = new Random();
+//        String sound_track = sound_tracks[rand.nextInt(sound_tracks.length)];
+//
+//        Log.i("BPOP", "Chosen sound track: " + sound_track);
+//
+//        publishValue(BP_CONST.SOUND_TRACK, sound_track);
+//    }
 
 
     // Override in child class
