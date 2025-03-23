@@ -164,7 +164,12 @@ public class TBanner extends CBanner implements ITutorObject, View.OnClickListen
 
             //mTutor_Ver += versionID; // not sure why this versionID was used, as it seems to have no significance
             mTutor_Ver += "v" + Configuration.configVersion(getContext());
-
+            // Retrieve the arm name from RoboTutor
+            String armName = RoboTutor.getArmName();
+            if (armName != null) {
+                // Add a new line, a space, or any formatting you like
+                mTutor_Ver += "\n" + armName;
+            }
             mVersion.setText(mTutor_Ver);
         }
         else {
