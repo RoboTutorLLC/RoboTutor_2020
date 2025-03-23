@@ -2,6 +2,8 @@ package cmu.xprize.comp_logging;
 
 public interface ILogManager {
 
+    void startLoggingWithDynamicFilename(String logPath, String logFilename);
+
     /**
      * Transfer logs from one path to another. Separation of hot logs from ready logs prevents
      * RoboTransfer from transferring a log while it is being written.
@@ -40,4 +42,7 @@ public interface ILogManager {
     public void postBattery(String Tag, String percent, String chargeType);
 
     public void postPacket(String packet);
+
+    void updateLogFilename(String newLogFilename);
+
 }
