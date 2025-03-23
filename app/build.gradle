@@ -10,25 +10,23 @@ android {
         targetSdkVersion rootProject.ext.rtTargetSdkVersion
         versionCode rootProject.ext.rtVersionCode
         versionName rootProject.ext.rtVersionName
-        // default is signed by the Android default key
 
+        // Enable multidex support
         multiDexEnabled true
     }
 
     testOptions {
+        // Ensure unit tests return default values for easier testing
         unitTests.returnDefaultValues = true
     }
 
-    // Create a variable called keystorePropertiesFile, and initialize it to your
-    // keystore.properties file, in the sample_config_files folder, inside app/src.
+    // Load keystore properties for signing
     def keystorePropertiesFile = rootProject.file("app/src/sample_config_files/sample_keystore.properties")
-    // Initialize a new Properties() object called keystoreProperties
     def keystoreProperties = new Properties()
-
-    // Load your keystore.properties file into the keystoreProperties object.
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
     signingConfigs {
+        // Signing configuration for release builds
         android {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
@@ -38,27 +36,24 @@ android {
     }
 
     buildTypes {
-
+        // Configuration for release builds
         release {
             signingConfig signingConfigs.android
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        // Configuration for debug builds
         debug {
             debuggable true
         }
-
-        // This release includes the DEBUG selector and other various debug support features.
-        //
+        // Custom debug build type with signing
         release_dbg {
             debuggable true
             signingConfig signingConfigs.android
         }
-
     }
 
-    // define apk naming behavior
-    // define apk naming behavior
+    // Define APK naming behavior
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
             def project = "robotutor"
@@ -66,35 +61,43 @@ android {
             def buildType = variant.buildType.name
             def version = variant.versionName
 
+            // Set a custom APK name
             def newApkName = project + SEP + buildType + SEP + version + ".apk"
-//            new File(output.outputFile.parent, newApkName)
             output.outputFileName = new File("./../../../../../build/", newApkName)
         }
     }
 
     lintOptions {
-        // set to true to turn off analysis progress reporting by lint
+        // Set to true to turn off analysis progress reporting by lint
         quiet false
-        // if true, stop the gradle build if errors are found
+        // If true, stop the gradle build if errors are found
         abortOnError false
-        // if true, only report errors
+        // If true, only report errors
         ignoreWarnings true
     }
 
+    // Apply checkstyle for code quality checks
     apply from: "checkstyle.gradle"
-    afterEvaluate{
+    afterEvaluate {
         preBuild.dependsOn('checkstyle')
         check.dependsOn 'checkstyle'
     }
-
 }
 
 repositories {
+    google()
     mavenCentral()
+    // Added the custom Maven repository for utilcode
+    maven {
+        url 'http://maven.xdja.com:8081/nexus3/repository/aliyun/'
+    }
 }
 
 dependencies {
+    // Unit testing dependency
     testImplementation 'junit:junit:4.12'
+
+    // Core dependencies
     implementation 'com.writingminds:FFmpegAndroid:0.3.2'
     implementation 'com.google.guava:guava:25.0-android'
     implementation 'androidx.appcompat:appcompat:1.0.0'
@@ -102,6 +105,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'org.mp4parser:isoparser:1.9.41'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+
+    // Project-specific dependencies
     implementation project(':comp_banner')
     implementation project(':comp_ltkplus')
     implementation project(':util')
@@ -128,14 +133,17 @@ dependencies {
     implementation project(path: ':comp_picmatch')
     implementation project(path: ':comp_bigmath')
     implementation project(path: ':comp_spelling')
-
     implementation project(path: ':comp_intervention')
-    implementation ('com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0') {
-        exclude group: 'com.blankj', module: 'utilcode'
-    }
+
+    // Dependency resolved from custom Maven repository
+    implementation 'com.blankj:utilcode:1.24.4'
+
+    // External libraries
+    implementation 'com.github.RoboTutorLLC:ScreenRecordHelper:1.0.0'
     implementation 'com.github.HBiSoft:HBRecorder:2.0.3'
 }
 
+// Task to retrieve version name
 task getVersionName() {
     project.gradle.projectsEvaluated {
         println "$project.android.defaultConfig.versionName"
