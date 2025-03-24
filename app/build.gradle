@@ -90,6 +90,7 @@ repositories {
     // Added the custom Maven repository for utilcode
     maven {
         url 'http://maven.xdja.com:8081/nexus3/repository/aliyun/'
+        allowInsecureProtocol true
     }
 }
 
