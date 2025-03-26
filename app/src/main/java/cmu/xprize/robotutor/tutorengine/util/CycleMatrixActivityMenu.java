@@ -35,15 +35,26 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
 
     TransitionMatrixModel _matrix;
     IStudentDataModel _student;
+    PromotionMechanism _promotionMechanism;
+    private static final int MIN_NUM_ATTEMPTS = 3;
 
     public CycleMatrixActivityMenu(TransitionMatrixModel matrix, IStudentDataModel student) {
         this._matrix = matrix;
         this._student = student;
+        this._promotionMechanism = new PromotionMechanism(this._student, this._matrix);
     }
 
     @Override
     public String getLayoutName() {
-        return "ask_activity_selector_2x2";
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD
+        )
+            return "ask_activity_selector_2x2_elevate";
+        else
+            return "ask_activity_selector_2x2";
     }
 
     @Override
@@ -99,9 +110,62 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
             Log.e("SUPER_PLACEMENT", "not ready yet");
             nextTutors[0] = (CAt_Data) transitionMap.get(tutorId);
             nextTutors[1] = nextTutors[0];
+
+            // Add null check for nextTutors[0]
+            if (nextTutors[0] == null) {
+                Log.e(MENU_BUG_TAG, "Could not find tutor with ID: " + tutorId + " in placement mode");
+                // Try to get root tutor as fallback
+                String rootTutor = "";
+                switch(_student.getActiveSkill()) {
+                    case SELECT_WRITING:
+                        rootTutor = _matrix.getRootSkillByContentArea(SELECT_WRITING);
+                        break;
+                    case SELECT_STORIES:
+                        rootTutor = _matrix.getRootSkillByContentArea(SELECT_STORIES);
+                        break;
+                    case SELECT_MATH:
+                        rootTutor = _matrix.getRootSkillByContentArea(SELECT_MATH);
+                        break;
+                }
+                nextTutors[0] = (CAt_Data) transitionMap.get(rootTutor);
+                nextTutors[1] = nextTutors[0];
+            }
         } else {
             nextTutors[0] = (CAt_Data) transitionMap.get(tutorId); // N
-            nextTutors[1] = isPlacementMode ? nextTutors[0] : (CAt_Data) transitionMap.get(nextTutors[0].next); // N or N + 1
+
+            // Add null checking here
+            if (nextTutors[0] != null && nextTutors[0].next != null) {
+                CAt_Data nextTutor = (CAt_Data) transitionMap.get(nextTutors[0].next);
+                nextTutors[1] = isPlacementMode ? nextTutors[0] : nextTutor;
+
+                // Add null check for nextTutors[1]
+                if (nextTutors[1] == null) {
+                    nextTutors[1] = nextTutors[0]; // Use the same tutor if next is null
+                    Log.e(MENU_BUG_TAG, "Next tutor is null, using same tutor twice: " + tutorId);
+                }
+            } else {
+                // If there's no valid next tutor, use the same tutor twice
+                if (nextTutors[0] == null) {
+                    Log.e(MENU_BUG_TAG, "Current tutor is null for ID: " + tutorId);
+                    // Try to get root tutor as fallback
+                    String rootTutor = "";
+                    switch(_student.getActiveSkill()) {
+                        case SELECT_WRITING:
+                            rootTutor = _matrix.getRootSkillByContentArea(SELECT_WRITING);
+                            break;
+                        case SELECT_STORIES:
+                            rootTutor = _matrix.getRootSkillByContentArea(SELECT_STORIES);
+                            break;
+                        case SELECT_MATH:
+                            rootTutor = _matrix.getRootSkillByContentArea(SELECT_MATH);
+                            break;
+                    }
+                    nextTutors[0] = (CAt_Data) transitionMap.get(rootTutor);
+                }
+
+                nextTutors[1] = nextTutors[0];
+                Log.d(MENU_BUG_TAG, "No next tutor available, using the same tutor twice");
+            }
         }
 
         return nextTutors;
@@ -142,10 +206,22 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
         activeLayout.items[1].help = "something different";
 
         activeLayout.items[2] =  new CAskElement();
-        activeLayout.items[2].componentID = "SbuttonRepeat";
-        activeLayout.items[2].behavior = AS_CONST.SELECT_REPEAT;
-        activeLayout.items[2].prompt = "lets do it again";
-        activeLayout.items[2].help = "lets do it again";
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
+            activeLayout.items[2].componentID = "Sbutton1";
+            activeLayout.items[2].behavior = AS_CONST.ELEVATE;
+            activeLayout.items[2].prompt = "escape to placement";
+            activeLayout.items[2].help = "escape to placement";
+        }
+        else{
+            activeLayout.items[2].componentID = "SbuttonRepeat";
+            activeLayout.items[2].behavior = AS_CONST.SELECT_REPEAT;
+            activeLayout.items[2].prompt = "lets do it again";
+            activeLayout.items[2].help = "lets do it again";
+        }
 
         activeLayout.items[3] =  new CAskElement();
         activeLayout.items[3].componentID = "SbuttonExit";
@@ -162,7 +238,18 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
 
         map.put(SELECT_OPTION_0, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
         map.put(SELECT_OPTION_1, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
-        map.put(AS_CONST.SELECT_REPEAT, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+
+        if(this._promotionMechanism.performance.getNumberAttempts() >= MIN_NUM_ATTEMPTS
+                &&
+                this._promotionMechanism.performance.getTotalNumberQuestions() >= 3
+                &&
+                this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
+            map.put(AS_CONST.ELEVATE, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+        }
+        else{
+            map.put(AS_CONST.SELECT_REPEAT, AS_CONST.QUEUEMAP_KEYS.BUTTON_BEHAVIOR);
+        }
+
         map.put(AS_CONST.SELECT_EXIT, AS_CONST.QUEUEMAP_KEYS.EXIT_BUTTON_BEHAVIOR);
         return map;
     }
@@ -176,7 +263,7 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
         String rootTutor = "";
 
         String activeSkill = null;
-        String chosenTutorId;
+        String chosenTutorId = null;
 
         Log.d("OH_BEHAVE", "some behavior here should be different...");
 
@@ -188,12 +275,49 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
             transitionMap = _matrix.getTransitionMapByContentArea(activeSkill);
             rootTutor = _matrix.getRootSkillByContentArea(activeSkill);
             RoboTutor.logManager.postEvent_I(REPEAT_DEBUG_TAG, String.format("activeSkill=%s;chosenTutorId=%s;transitionMap=%s;rootTutor=%s", activeSkill, chosenTutorId, activeSkill, rootTutor));
+        }
+        else if (buttonBehavior.equals(AS_CONST.ELEVATE)) {
+            activeSkill = _student.getLastSkill();
+            transitionMap = _matrix.getTransitionMapByContentArea(activeSkill);
+            chosenTutorId = _student.getLastTutor();
 
+            if(activeSkill != null) {
+                // If the last activity is not null then go to that activity but update the placement index by 1
+                if(activeSkill.equals(SELECT_MATH)) {
+                    rootTutor = _matrix.getRootSkillByContentArea(SELECT_MATH);
+                    CAt_Data transitionData = (CAt_Data) transitionMap.get(chosenTutorId);
+                    if (transitionData != null && transitionData.harder != null) {
+                        chosenTutorId = transitionData.harder;
+                    } else {
+                        // If no harder level available, stay at current level
+                        Log.e(MENU_BUG_TAG, "No harder math level available for " + chosenTutorId);
+                    }
+                }
+                else if(activeSkill.equals(SELECT_WRITING)) {
+                    rootTutor = _matrix.getRootSkillByContentArea(SELECT_WRITING);
+                    CAt_Data transitionData = (CAt_Data) transitionMap.get(chosenTutorId);
+                    if (transitionData != null && transitionData.harder != null) {
+                        chosenTutorId = transitionData.harder;
+                    } else {
+                        // If no harder level available, stay at current level
+                        Log.e(MENU_BUG_TAG, "No harder writing level available for " + chosenTutorId);
+                    }
+                }
+                else if(activeSkill.equals(SELECT_STORIES)) {
+                    rootTutor = _matrix.getRootSkillByContentArea(SELECT_STORIES);
+                    CAt_Data transitionData = (CAt_Data) transitionMap.get(chosenTutorId);
+                    if (transitionData != null && transitionData.harder != null) {
+                        chosenTutorId = transitionData.harder;
+                    } else {
+                        // If no harder level available for stories, stay at current level
+                        Log.e(MENU_BUG_TAG, "No harder stories level available for " + chosenTutorId);
+                    }
+                }
+            }
         } else {
-
             activeSkill = _student.getActiveSkill();
             CAt_Data zeroIndexedTutor;
-            String[] nextTutors = new String[3];
+            String[] nextTutorIds = new String[3];
 
             boolean inPlacementMode = false;
 
@@ -206,6 +330,11 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
 
                 case SELECT_STORIES:
                     zeroIndexedTutorId = _student.getStoryTutorID();
+                    if (zeroIndexedTutorId == null) {
+                        // If story tutor ID is null, get the root story tutor
+                        zeroIndexedTutorId = _matrix.getRootSkillByContentArea(SELECT_STORIES);
+                        Log.e(MENU_BUG_TAG, "Story tutor ID was null, falling back to root: " + zeroIndexedTutorId);
+                    }
                     Log.d("REPEAT_ME", "storyTutor=" + zeroIndexedTutorId);
                     break;
 
@@ -220,26 +349,79 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
             RoboTutor.logManager.postEvent_I(MENU_BUG_TAG, "CycleMatrixActivityMenu: activeSkill=" + activeSkill + " -- activeTutorId=" + zeroIndexedTutorId);
             transitionMap = _matrix.getTransitionMapByContentArea(activeSkill);
             rootTutor = _matrix.getRootSkillByContentArea(activeSkill);
+
+            // Additional safety for stories
+            if (activeSkill != null && activeSkill.equals(SELECT_STORIES) && (transitionMap == null || transitionMap.isEmpty())) {
+                Log.e(MENU_BUG_TAG, "Story transition map is null or empty!");
+                // Create a minimal transition map if none exists
+                if (transitionMap == null) {
+                    transitionMap = new HashMap();
+                }
+                // Make sure the root tutor exists in the map
+                if (rootTutor != null && !transitionMap.containsKey(rootTutor)) {
+                    Log.e(MENU_BUG_TAG, "Adding root story tutor to map as fallback: " + rootTutor);
+                    CAt_Data rootData = new CAt_Data();
+                    rootData.tutor_id = rootTutor;
+                    rootData.next = rootTutor; // Point to itself as fallback
+                    rootData.same = rootTutor;
+                    transitionMap.put(rootTutor, rootData);
+                }
+            }
+
             zeroIndexedTutor = (CAt_Data) transitionMap.get(zeroIndexedTutorId);
-            nextTutors[0] = zeroIndexedTutor.tutor_id;
-            nextTutors[1] = inPlacementMode ? nextTutors[0] : ((CAt_Data) transitionMap.get(zeroIndexedTutor.next)).tutor_id; // next hardest tutor!!! (I don't know WHY this is implemented twice)
+
+            if (zeroIndexedTutor != null) {
+                nextTutorIds[0] = zeroIndexedTutor.tutor_id;
+
+                if (zeroIndexedTutor.next != null) {
+                    CAt_Data nextTutor = (CAt_Data) transitionMap.get(zeroIndexedTutor.next);
+                    nextTutorIds[1] = inPlacementMode ? nextTutorIds[0] : (nextTutor != null ? nextTutor.tutor_id : nextTutorIds[0]);
+
+                    // Initialize nextTutorIds[2] to prevent null when SELECT_OPTION_2 is used
+                    if (nextTutor != null && nextTutor.next != null) {
+                        CAt_Data nextNextTutor = (CAt_Data) transitionMap.get(nextTutor.next);
+                        nextTutorIds[2] = nextNextTutor != null ? nextNextTutor.tutor_id : nextTutorIds[1];
+                    } else {
+                        nextTutorIds[2] = nextTutorIds[1]; // Use previous tutor if no "next next" is available
+                    }
+                } else {
+                    nextTutorIds[1] = nextTutorIds[0];
+                    nextTutorIds[2] = nextTutorIds[0]; // Initialize index 2 as well
+                    Log.d(MENU_BUG_TAG, "No next tutor defined, using the same tutor twice");
+                }
+            } else {
+                // Handle case where zeroIndexedTutor is null
+                Log.e(MENU_BUG_TAG, "Could not find tutor with ID: " + zeroIndexedTutorId);
+                // Use root tutor as fallback
+                CAt_Data rootTutorData = (CAt_Data) transitionMap.get(rootTutor);
+                if (rootTutorData != null) {
+                    nextTutorIds[0] = rootTutorData.tutor_id;
+                    nextTutorIds[1] = rootTutorData.tutor_id;
+                } else {
+                    // Critical error - no valid tutor found
+                    Log.e(MENU_BUG_TAG, "Critical error: No valid tutor found in transition map");
+                    // Set to null and handle later
+                    nextTutorIds[0] = null;
+                    nextTutorIds[1] = null;
+                }
+            }
 
             switch(buttonBehavior.toUpperCase()) {
 
                 case SELECT_OPTION_0: // TRACE_PROMOTION looks good...
-                    chosenTutorId = nextTutors[0];
+                    chosenTutorId = nextTutorIds[0];
                     break;
 
                 case SELECT_OPTION_1: // TRACE_PROMOTION looks good...
                     // launch the next tutor
                     // something like this...
-                    chosenTutorId = nextTutors[1];
+                    chosenTutorId = nextTutorIds[1];
 
                     break;
 
                 case SELECT_OPTION_2:
                     // launch the next.next tutor
-                    chosenTutorId = nextTutors[2];
+                    chosenTutorId = nextTutorIds[2];
                     break;
 
                 default:
@@ -249,7 +431,7 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
 
             // If they choose the second option, update our position in thematrix //
             // will only be updated if SELECT_OPTION_1 or SELECT_OPTION_2 were selected //
-            if (!chosenTutorId.equals(zeroIndexedTutorId)) {
+            if (!chosenTutorId.equals(zeroIndexedTutorId) && !buttonBehavior.equals(AS_CONST.ELEVATE)) {
                 switch (activeSkill) {
                     case SELECT_WRITING:
                         _student.updateWritingTutorID(chosenTutorId, true);
@@ -264,12 +446,18 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
                         break;
                 }
             }
-
         }
 
 
         // TRACE_PROMOTION doesn't save tutorToLaunch when we choose the second option!!!
         // the next tutor to be launched
+
+        // Final check to ensure chosenTutorId is not null
+        if (chosenTutorId == null) {
+            Log.e(MENU_BUG_TAG, "Critical error: chosenTutorId is null, using root tutor as fallback");
+            chosenTutorId = rootTutor;
+        }
+
         CAt_Data tutorToLaunch = (CAt_Data) transitionMap.get(chosenTutorId);
         Log.wtf(MENU_BUG_TAG, chosenTutorId + " " +  activeSkill);
 
