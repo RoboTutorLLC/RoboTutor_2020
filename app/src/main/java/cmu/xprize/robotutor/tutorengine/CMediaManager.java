@@ -246,7 +246,7 @@ public class CMediaManager {
         catch(Exception e) {
             soundPackage = autoLang;
         }
-
+        Log.d(TAG, "Resolved soundPackage = " + soundPackage);
         return soundPackage;
     }
 
@@ -285,6 +285,8 @@ public class CMediaManager {
         catch(Exception e) {
             packagePath = TCONST.BASE_ASSETS;
         }
+        Log.d(TAG, "Resolved packagePath = " + packagePath);
+
 
         return packagePath;
     }
@@ -324,6 +326,7 @@ public class CMediaManager {
         catch(Exception e) {
             packageLocation = TCONST.EXTERNAL;
         }
+        Log.d(TAG, "Resolved packageLocation = " + packageLocation);
 
         return packageLocation;
     }

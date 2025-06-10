@@ -1,6 +1,6 @@
 {
   // Use this to force language for this specific tutor
-  //"language":"LANG_EN",
+  "language":"LANG_EN",
 
   "dataSource": {
     "scene_bindings" : {
