@@ -90,7 +90,7 @@ public class StudentChooseMatrixActivityMenu implements IActivityMenu {
                 this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
             activeLayout.items[3].componentID = "Sbutton1";
             activeLayout.items[3].behavior = AS_CONST.ELEVATE;
-            activeLayout.items[3].prompt = "I want something harder";
+            activeLayout.items[3].prompt = "something harder";
             activeLayout.items[3].help = "something harder";
         }
         else{
