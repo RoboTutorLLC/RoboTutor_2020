@@ -213,8 +213,8 @@ public class CycleMatrixActivityMenu implements IActivityMenu {
                 this._promotionMechanism.performance.getNumberCorrect() / this._promotionMechanism.performance.getNumberAttempts() > PlacementPromotionRules.HIGH_PERFORMANCE_THRESHOLD){
             activeLayout.items[2].componentID = "Sbutton1";
             activeLayout.items[2].behavior = AS_CONST.ELEVATE;
-            activeLayout.items[2].prompt = "escape to placement";
-            activeLayout.items[2].help = "escape to placement";
+            activeLayout.items[2].prompt = "I want something harder";
+            activeLayout.items[2].help = "something harder";
         }
         else{
             activeLayout.items[2].componentID = "SbuttonRepeat";
