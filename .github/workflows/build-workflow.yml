@@ -5,13 +5,13 @@ name: Pre Merge Checks
 on:
   push:
     branches:
-      - '*'  # This means the workflow will run on push events for all branches.
+      - '*'
+
 
 # Jobs to be run on this workflow
 jobs:
   build:
-    runs-on: 'ubuntu-latest'  # Specifies the runner environment (Ubuntu latest version).
-
+    runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3  # This step checks out the repository so that workflow can access the code.
@@ -23,39 +23,34 @@ jobs:
           java-version: '11'  # Setting Java to version 11 because Gradle 6.5 does not support Java 17.
 
       - name: Build project
-        run: ./gradlew assembleDebug  # This command builds the project and generates the APK.
+        run: ./gradlew assembleDebug
 
       - name: Fetch current datetime
         id: fetch_current_datetime
         run: echo "DATE_TIME=$(date +%Y%m%d_%H%M%S.%N | cut -b1-19)" >> $GITHUB_OUTPUT
-        # Fetches the current date and time in the format YYYYMMDD_HHMMSS.milliseconds.
-        # Example output: 20230316_125512.123
-        # `cut -b1-19` ensures that we get only the first 19 characters of the timestamp.
+      #       steps.fetch_current_datetime.outputs.DATE_TIME
+      # cut -b1-19 : example- 20230316_125512.123 - 19 characters
 
       - name: Fetch current branch name
         id: fetch_current_branch
         run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_OUTPUT
-        # Extracts the name of the branch that triggered the workflow.
-        # If it's a pull request, it uses `github.head_ref`, otherwise `github.ref_name`.
+      #       steps.fetch_current_branch.outputs.BRANCH_NAME
 
       - name: Fetch app version name
         id: fetch_version_name
         run: echo "VERSION_NAME=$(./gradlew -q getVersionName --warning-mode=none)" >> $GITHUB_OUTPUT
-        # Uses Gradle to extract the app version name from the project's build settings.
-        # `-q` ensures that only the version name is printed without unnecessary logs.
+      #       steps.fetch_version_name.outputs.VERSION_NAME
 
       - name: Fetch APK Name
         id: fetch_apk_name
         run: echo "APK_NAME=RoboTutor2020-${{ steps.fetch_current_branch.outputs.BRANCH_NAME }}-${{ steps.fetch_version_name.outputs.VERSION_NAME }}-${{ steps.fetch_current_datetime.outputs.DATE_TIME }}" >> $GITHUB_OUTPUT
-        # Constructs a unique APK filename using the branch name, app version, and timestamp.
-        # Example filename: RoboTutor2020-main-1.2.3-20230316_125512.123.apk
+      #       steps.fetch_apk_name.outputs.APK_NAME
 
       - name: Rename APK
         run: mv build/robotutor.debug.${{ steps.fetch_version_name.outputs.VERSION_NAME }}.apk build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
-        # Renames the APK file generated during the build process to match the formatted name.
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4  # Uploads the generated APK as an artifact for later use.
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk  # Uses the generated APK name.
-          path: build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk  # Specifies the path of the APK file to upload.
+          name: ${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
+          path: build/${{ steps.fetch_apk_name.outputs.APK_NAME }}.apk
