@@ -59,7 +59,33 @@ public class PerformanceLogItem {
     //
     // iterative way to print fields in the desired order
     private static final String[] orderedFieldsToPrint = {"timestamp", "userId", "sessionId", "gameId", "language", "tutorName", "tutorId", "matrixName", "levelName", "taskName",
-            "problemName", "problemNumber", "substepNumber", "substepProblem", "attemptNumber", "expectedAnswer", "userResponse", "correctness", "feedbackType", "totalProblemsCount", "promotionMode", "scaffolding"};
+            "problemName", "problemNumber", "substepNumber", "substepProblem", "attemptNumber", "expectedAnswer", "userResponse", "correctness", "feedbackType", "totalProblemsCount", "promotionMode", "scaffolding", "selectedArmName", "selectedArmWeight", "selectedMatrixName"};
+    private String selectedArmName;
+    private float selectedArmWeight;
+    private String selectedMatrixName;
+    public String getSelectedArmName() {
+        return selectedArmName;
+    }
+
+    public void setSelectedArmName(String selectedArmName) {
+        this.selectedArmName = selectedArmName;
+    }
+
+    public float getSelectedArmWeight() {
+        return selectedArmWeight;
+    }
+
+    public void setSelectedArmWeight(float selectedArmWeight) {
+        this.selectedArmWeight = selectedArmWeight;
+    }
+
+    public String getSelectedMatrixName() {
+        return selectedMatrixName;
+    }
+
+    public void setSelectedMatrixName(String selectedMatrixName) {
+        this.selectedMatrixName = selectedMatrixName;
+    }
 
     public PerformanceLogItem() {
     }

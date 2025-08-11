@@ -89,5 +89,18 @@ public class CPerfLogManager extends CLogManagerBase implements IPerfLogManager 
 
         postEvent_I(TLOG_CONST.PERFORMANCE_TAG, event.toString());
     }
+
+
+
+    @Override
+    public void startLoggingWithDynamicFilename(String logPath, String logFilename) {
+        super.startLoggingWithDynamicFilename(logPath, logFilename);
+    }
+
+    @Override
+    public void updateLogFilename(String newFilename) {
+        super.updateLogFilename(newFilename);
+    }
+
 }
 

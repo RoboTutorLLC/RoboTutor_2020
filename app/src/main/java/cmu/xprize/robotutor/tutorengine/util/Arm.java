@@ -5,13 +5,13 @@ import org.json.JSONObject;
 
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 
-public class ArmWeight {
+public class Arm {
 
     public String name;
     public Float weight;
     public String matrix;
 
-    public ArmWeight(JSONObject jsonObject, IScope2 scope) {
+    public Arm(JSONObject jsonObject, IScope2 scope) {
         try {
             loadJSON(jsonObject);
         } catch (Exception e) {
@@ -27,7 +27,7 @@ public class ArmWeight {
 
     @Override
     public String toString() {
-        return "ArmWeight{" +
+        return "Arm{" +
                 "name='" + name + '\'' +
                 ", weight=" + weight +
                 ", matrix='" + matrix + '\'' +

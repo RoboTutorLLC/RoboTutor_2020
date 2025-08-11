@@ -1,0 +1,25 @@
+{
+  "arms": [
+    {
+      "name": "original",
+      "weight": 0.22628347156945203,
+      "matrix": "original_devdata.json"
+    },
+    {
+      "name": "filtered",
+      "weight": 0.2710968140239559,
+
+      "matrix": "filtered_devdata.json"
+    },
+    {
+      "name": "reordered",
+      "weight": 0.2602214321074131,
+      "matrix": "reordered_devdata.json"
+    },
+    {
+      "name": "reordered_filtered",
+      "weight": 0.24239828229917879,
+      "matrix": "reordered_filtered_devdata.json"
+    }
+  ]
+}

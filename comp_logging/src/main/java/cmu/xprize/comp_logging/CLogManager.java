@@ -35,6 +35,13 @@ public class CLogManager extends CLogManagerBase implements ILogManager {
     }
 
 
-
+    @Override
+    public void startLoggingWithDynamicFilename(String logPath, String logFilename) {
+        super.startLoggingWithDynamicFilename(logPath, logFilename);
+    }
+    @Override
+    public void updateLogFilename(String newFilename) {
+        super.updateLogFilename(newFilename);
+    }
 
 }

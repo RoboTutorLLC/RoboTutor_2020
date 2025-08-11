@@ -12,6 +12,7 @@ import java.util.List;
 import cmu.xprize.robotutor.tutorengine.graph.vars.IScope2;
 import cmu.xprize.util.IScope;
 import cmu.xprize.util.JSON_Helper;
+import cmu.xprize.comp_logging.PerformanceLogItem;
 
 /**
  * Handler for MAB (Multi-Arm Bandit)
@@ -31,34 +32,60 @@ public class MABHandler {
     private static final String TAG = "MABHandler";
 
     public static String getArm(String dataSource, IScope2 scope) {
-        List<ArmWeight> armWeights = getArmWeights(dataSource, scope);
-        ArmWeight selectedArm = selectArm(armWeights);
-        Log.d(TAG, "getArm: list = "+armWeights);
-        Log.d(TAG, "getArm: selected = "+selectedArm);
-        return "";
+        List<Arm> arms = getarms(dataSource, scope);
+        Arm selectedArm = selectArm(arms, 0.1F);
+        // Ensure that selected arm is not null
+        if (selectedArm != null) {
+            Log.d(TAG, "getArm: selected = " + selectedArm.name);
+            return selectedArm.name;
+        } else {
+            Log.e(TAG, "getArm: No arm was selected");
+            return "default_arm";
+        }
     }
 
-    // Selects an arm from a list of arms
-    private static ArmWeight selectArm(List<ArmWeight> armWeights) {
-        float sum = 0;
-        for (ArmWeight arm : armWeights) {
-            sum += arm.weight;
-        }
-
-        // Select random number between 0 and sum
-        float p = getRandom(0, sum);
-
-        // find out where p lies
-        float bottom = 0;
-        for (ArmWeight arm : armWeights) {
-            float top = bottom + arm.weight;
-            if (bottom <= p && p <= top) {
-                return arm;
+    public static Float getArmWeight(String armName, List<Arm> arms) {
+        for (Arm arm : arms) {
+            if (arm.name.equals(armName)) {
+                return arm.weight;
             }
-            bottom = top;
         }
         return null;
     }
+
+    public static String getMatrixName(String armName, List<Arm> arms) {
+        for (Arm arm : arms) {
+            if (arm.name.equals(armName)) {
+                return arm.matrix;
+            }
+        }
+        return null;
+    }
+
+
+    // Selects an arm from a list of arms using ε-greedy algorithm
+    private static Arm selectArm(List<Arm> arms, float epsilon) {
+        // Random number to decide between exploration and exploitation
+        float randomV = getRandom(0, 1);
+        if (randomV < epsilon) {
+            // Exploration:choose a random arm
+            int randomIndex = (int) getRandom(0, arms.size());
+            Arm randomArm = arms.get(randomIndex);
+            return randomArm;
+        } else {
+            // Exploitation:choose the arm with highest weight
+            Arm bestArm = null;
+            float maxWeight = Float.NEGATIVE_INFINITY;
+            for (Arm arm : arms) {
+                if (arm.weight > maxWeight) {
+                    maxWeight = arm.weight;
+                    bestArm = arm;
+                }
+            }
+            return bestArm;
+        }
+    }
+
 
     // Returns random number between [min, max]
     private static float getRandom(float min, float max) {
@@ -66,27 +93,34 @@ public class MABHandler {
     }
 
 
-    private static List<ArmWeight> getArmWeights(String dataSource, IScope2 scope) {
+    public static List<Arm> getarms(String dataSource, IScope2 scope) {
         String jsonData = JSON_Helper.cacheData(dataSource);
-        List<ArmWeight> armWeights = new ArrayList<>();
+        List<Arm> arms = new ArrayList<>();
         try {
             JSONObject rootObject = new JSONObject(jsonData);
             JSONArray rootArray = rootObject.getJSONArray(KEY_ARRAY);
-            armWeights = parseArray(rootArray, scope);
+            arms = parseArray(rootArray, scope);
+
+            // Adding logging to print arms
+            for (Arm arm : arms) {
+                Log.d(TAG, "Arm: " + arm.name + ", Weight: " + arm.weight + ", Matrix Path"  + arm.matrix);
+            }
+
         } catch (Exception e) {
-            Log.d(TAG, "getArmWeights: "+e);
+            Log.e(TAG, "Error in getarms: " + e.getMessage());
         }
-        return armWeights;
+        return arms;
     }
 
-    private static List<ArmWeight> parseArray(JSONArray array, IScope2 scope) throws JSONException {
-        List<ArmWeight> armWeights = new ArrayList<>();
+
+    private static List<Arm> parseArray(JSONArray array, IScope2 scope) throws JSONException {
+        List<Arm> arms = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
-            JSONObject armWeightJSON = array.getJSONObject(i);
-            ArmWeight armWeight = new ArmWeight(armWeightJSON, scope);
-            armWeights.add(armWeight);
+            JSONObject armJSON = array.getJSONObject(i);
+            Arm arm = new Arm(armJSON, scope);
+            arms.add(arm);
         }
-        return armWeights;
+        return arms;
     }
 
 

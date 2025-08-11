@@ -18,14 +18,11 @@
 
 package cmu.xprize.comp_logging;
 
-import android.app.Activity;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,8 +40,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-
-public class CLogManagerBase implements ILogManager {
+public abstract class CLogManagerBase implements ILogManager {
 
     private static final int OBJ_PART       = 0;
     private static final int VAL_PART       = 1;
@@ -96,7 +92,10 @@ public class CLogManagerBase implements ILogManager {
     public void startLogging(String logPath, String logFilename) {
 
         log_Path = logPath;
-        log_Filename = logFilename;
+        if (this.log_Filename == null) {
+            this.log_Filename = logFilename;
+        }
+
         sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
 
         // Restart the log if necessary
@@ -148,6 +147,107 @@ public class CLogManagerBase implements ILogManager {
             releaseLog();
         }
     }
+
+
+
+    @Override
+    public void startLoggingWithDynamicFilename(String logPath, String logFilename) {
+        // Set log path and filename
+        log_Path = logPath;
+        log_Filename = logFilename;
+        // Store session start time in a timestamp format
+        sessionStartTime = new SimpleDateFormat("yyyyMMdd_HHmmss.SSS").format(new Date());
+
+        // Enable logging and reset the disabled flag
+        isLogging = true;
+        mDisabled = false;
+
+        // Create and start a separate thread for logging operations
+        logThread = new LogThread(TAG);
+        logThread.start();
+
+        try {
+            // Initialize a handler for the logging thread
+            logHandler = new Handler(logThread.getLooper());
+        } catch (Exception e) {
+            Log.e(TAG, "Handler Create Failed: " + e);
+        }
+
+        // Open log file
+        openLogFile(logFilename);
+    }
+
+
+    private void openLogFile(String filename) {
+        // Construct full file path for the log file
+        String filePath = log_Path + filename + TLOG_CONST.JSONLOG;
+        logFile = new File(filePath);
+
+        try {
+            // Open the file in append mode (ensuring previous logs are preserved)
+            logStream = new FileOutputStream(logFile, true); // Open in append mode
+            // Lock the file to prevent concurrent changes
+            logLock = logStream.getChannel().lock();
+
+
+            if (seekable) {
+                seekableLogWriter = new RandomAccessFile(filePath, "rwd");
+            } else {
+                logWriter = new FileWriter(filePath, TLOG_CONST.APPEND);
+            }
+
+
+            // Mark log writer as valid for further writes
+            logWriterValid = true;
+            // Begin the root JSON element
+            postPacket("{\"RT_log_version\":\"" + LOG_VERSION + "\",\"RT_log_data\":[");
+
+        } catch (Exception e) {
+            Log.e(TAG, "openLogFile Failed: " + e);
+        }
+    }
+
+
+    public void updateLogFilename(String newFilename) {
+        if (logWriterValid && logFile != null) {
+            try {
+                //Flush the log data to ensure no data loss
+                if (seekable) {
+                    seekableLogWriter.getFD().sync();
+                } else {
+                    logWriter.flush();
+                }
+
+                logLock.release();
+                logStream.close();
+                //Manually update the filename
+                this.log_Filename = newFilename;
+
+                // Construct the new path
+                String newFilePath = log_Path + newFilename + TLOG_CONST.JSONLOG;
+
+                //Rename the file at the system level while keeping it open
+                Process renameProcess = Runtime.getRuntime().exec(new String[]{"mv", logFile.getAbsolutePath(), newFilePath});
+                renameProcess.waitFor();
+
+                // Update the internal reference to point to the new filename
+                this.logFile = new File(newFilePath);
+
+                logStream = new FileOutputStream(logFile, true); // Append mode
+                logLock = logStream.getChannel().lock();
+
+                Log.i(TAG, "Log file successfully renamed to: " + newFilename);
+
+            } catch (Exception e) {
+                Log.e(TAG, "Log filename update error: " + e);
+            }
+        }
+    }
+
+
+
+
+
 
     public void transferHotLogs(String hotPath, String readyPath) {
 
